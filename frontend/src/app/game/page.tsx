@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react';
-import { io } from "socket.io-client";
-import {socket} from "./socket"
+import { useState, useEffect, useRef } from 'react';
+import {socket} from "../socket"
+import Styles from "./game.module.css"
 
 export default function Home() {
   const [message, setMessage] = useState('');
+  const refCanvas = useRef(null);
 
   useEffect(() => {
-    // const socket = io("http://127.0.0.1:4000");
     socket.connect();
 
     socket.on('connect', () => {
@@ -18,6 +18,13 @@ export default function Home() {
     socket.on('messageee', (msg) => {
       setMessage(msg);
     })
+
+    const canvas = refCanvas.current;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 50, 50, 200);
+
     return () => {
       socket.disconnect();
     }
@@ -28,16 +35,14 @@ export default function Home() {
     socket.emit("message", message);
     setMessage('');
   }
+  const canvasStyle  = {
+    backgroundColor: "gray",
+
+  }
 
   return (
-    <div>
-      <h1>Salam Donia</h1>
-      {/* <p>message recived: {message}</p> */}
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="msg">Enter message:</label>
-        <input type="text" id="msg" onChange={(e) => setMessage(e.target.value)} placeholder='enter message'/>
-        <p>the message: {message}</p>
-      </form>
+    <div className={Styles.container}>
+      <canvas ref={refCanvas} width="900px" height="600px" className={Styles.canvas}></canvas>
     </div>
   );
 }
