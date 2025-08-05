@@ -3,10 +3,10 @@ import Fastify, { FastifyInstance } from "fastify";
 
 const GAME_WIDTH = 900;
 const GAME_HEIGHT = 600;
-const PADDLE_HEIGHT = 100;
-const PADDLE_WIDTH = 20;
-const BALL_RADIUS = 10;
-const PADDLE_SPEED = 5;
+const PADDLE_HEIGHT = 150;
+const PADDLE_WIDTH = 30;
+const BALL_RADIUS = 20;
+const PADDLE_SPEED = 14;
 
 interface IBall {
     x: number,
@@ -42,9 +42,8 @@ let gameState: IGameState = {
     playersNb: 0
 };
 
-
 let     gameInterval: NodeJS.Timeout | null = null;
-const   INTERVAL = 1000 / 60;
+const   INTERVAL = 500 / 60;
 
 function startGame() {
     if (gameInterval)
@@ -57,19 +56,14 @@ function startGame() {
         
         if (gameState.ball.y - 10 <= 0 || gameState.ball.y + 10 >= GAME_HEIGHT) {
             gameState.ball.dy *= -1;
-            // if (gameInterval)
-            //     clearInterval(gameInterval);
         }
         if (gameState.ball.x - 10 <= 0 || gameState.ball.x + 10 >= GAME_WIDTH) {
             gameState.ball.dx *= -1;
-            // if (gameInterval)
-            //     clearInterval(gameInterval);
+            
         }
-
         io.emit('gameStateUpdate', gameState);
     }, INTERVAL);
 }
-
 
 const io: Server = new Server(5000, {
     cors: {
@@ -113,10 +107,38 @@ io.on('connection', (socket: Socket) => {
 
         gameState.playersNb++;
         if (gameState.playersNb === 1)
-            socket.emit('playerRole', 'Player 1');
+            socket.emit('playerRole', 'player1');
         else {
-            socket.emit('playerRole', 'Player 2');
+            socket.emit('playerRole', 'player2');
             startGame();
         }
+    });
+    
+    socket.on('moveUp', (playerRole) => {
+        console.log("Move Up, Player Role: ", playerRole);
+        if (playerRole === 'player1') {
+            if (gameState.paddle1.y - PADDLE_SPEED > 0)
+                gameState.paddle1.y -= PADDLE_SPEED;
+        }
+        else {
+            if (gameState.paddle2.y - PADDLE_SPEED > 0)
+                gameState.paddle2.y -= PADDLE_SPEED;
+        }
+    });
+
+    socket.on('moveDown', (playerRole) => {
+        console.log("Move Down, Player Role: ", playerRole);
+        if (playerRole === 'player1') {
+            if (gameState.paddle1.y + PADDLE_HEIGHT + PADDLE_SPEED < GAME_HEIGHT)
+                gameState.paddle1.y += PADDLE_SPEED;
+        }
+        else {
+            if (gameState.paddle2.y + PADDLE_HEIGHT + PADDLE_SPEED < GAME_HEIGHT)
+                gameState.paddle2.y += PADDLE_SPEED;
+        }
+    });
+
+    socket.on('stopGame', () => {
+        console.log("\nstop game");
     });
 });
