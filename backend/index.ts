@@ -1,37 +1,7 @@
 import { Server, Socket } from "socket.io";
 import Fastify, { FastifyInstance } from "fastify";
-
-const GAME_WIDTH = 900;
-const GAME_HEIGHT = 600;
-const PADDLE_HEIGHT = 150;
-const PADDLE_WIDTH = 30;
-const BALL_RADIUS = 20;
-const PADDLE_SPEED = 14;
-
-interface IBall {
-    x: number,
-    y: number,
-    dx: number,
-    dy: number,
-    radius: number
-}
-
-interface IPaddle {
-    y: number,
-    height: number,
-    width: number,
-    score: number
-}
-
-
-interface IGameState {
-    ball: IBall,
-    paddle1: IPaddle,
-    paddle2: IPaddle,
-    status: 'waiting' | 'playing' | 'ended'
-    players: { [socketId: string]: 'player1' | 'player2' | 'spectator' },
-    playersNb: number
-}
+import { GAME_WIDTH, GAME_HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_SPEED, BALL_RADIUS } from "./src/config/game";
+import { IGameState } from "@/types/game";
 
 let gameState: IGameState = {
     ball: { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2, dx: 5, dy: 5, radius: BALL_RADIUS },
