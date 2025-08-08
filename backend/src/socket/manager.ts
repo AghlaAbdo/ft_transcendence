@@ -4,7 +4,7 @@ import {
     handlePlay,
     handleMoveUp,
     handleMoveDown,
-    handleStopGame,
+    handleGameOver,
     handleDisconnect,
  } from "./gameHandlers";
 
@@ -22,7 +22,7 @@ import {
         socket.on('play', ()=> handlePlay(socket));
         socket.on('moveUp', (playerRole)=> handleMoveUp(playerRole));
         socket.on('moveDown', (playerRole)=> handleMoveDown(playerRole));
-        socket.on('stopGame', ()=> handleStopGame());
+        socket.on('gameOver', ()=> handleGameOver());
         // -------- End of Pong Game events --------
         socket.on('disconnect', (reason)=> handleDisconnect(socket, reason));
     });

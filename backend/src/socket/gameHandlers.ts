@@ -17,8 +17,9 @@ export function handlePlay(socket: Socket): void {
     if (gameState.playersNb + 1 > 2)
         return;
     gameState.playersNb++;
-    if (gameState.playersNb === 1)
+    if (gameState.playersNb === 1) {
         socket.emit('playerRole', 'player1');
+    }
     else {
         socket.emit('playerRole', 'player2');
         startGame();
@@ -33,6 +34,6 @@ export function handleMoveDown(playerRole: string): void {
     paddleMoveDown(playerRole);
 }
 
-export function handleStopGame(): void {
+export function handleGameOver(): void {
     // TODO
 }

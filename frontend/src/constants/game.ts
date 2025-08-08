@@ -22,9 +22,10 @@ export interface IPaddle {
 
 export interface IGameState {
     ball: IBall,
-    paddle1: IPaddle,
-    paddle2: IPaddle,
+    leftPaddle: IPaddle,
+    rightPaddle: IPaddle,
     status: 'waiting' | 'playing' | 'ended'
-    players: { [socketId: string]: 'player1' | 'player2' | 'spectator' },
+    players: {plr1Socket: string | null, plr2Socket: string | null},
     playersNb: number
+    winner: string | null;
 }
