@@ -6,16 +6,14 @@ interface returnType {
     handlePlayBtn: () => void,
     handleStopBtn: () => void,
     refCanvas: React.RefObject<HTMLCanvasElement | null>,
-    winner: string | null,
 }
 
 export const usePongGameLogic = (): returnType => {
     const refCanvas = useRef<HTMLCanvasElement>(null);
     const pressedKeys = useRef<Set<string>>(new Set());
     const animationFrameId = useRef<number | null>(null);
-    const [winner, setWinner] = useState<string | null>(null);
     let   isPlaying = useRef<boolean>(false);
-    let   playerRole: "player1" | "player2";
+    let   playerRole = useRef<"player1" | "player2">(null);
     
     
     useEffect(() => {
@@ -26,15 +24,13 @@ export const usePongGameLogic = (): returnType => {
         });
         socket.on('playerRole', (msg) => {
             console.log("player role: ", msg);
-            playerRole = msg;
+            playerRole.current = msg;
         });
         socket.on('gameStateUpdate', (gameState: IGameState) => {
             drawGame(gameState);
         });
-        socket.on('gameOver', (winner)=> {
+        socket.on('gameOver', ()=> {
             isPlaying.current = false;
-            // socket.disconnect();
-            // setWinner(winner);
 
         });
         window.addEventListener('keydown', keydownEvent);
@@ -42,8 +38,7 @@ export const usePongGameLogic = (): returnType => {
         return () => {
             window.removeEventListener('keydown', keydownEvent);
             window.removeEventListener('keyup', keyupEvent);
-            // if (isPlaying)
-                socket.disconnect();
+            socket.disconnect();
         };
     }, [])
 
@@ -54,13 +49,11 @@ export const usePongGameLogic = (): returnType => {
         const ctx = canvas.getContext('2d');
         if (!ctx)
             return;
-        if (gameState.status === 'ended') {
-            ctx.font = "48px serif";
-            ctx.textAlign = "center";
-            ctx.strokeText("Winner: " + gameState.winner, GAME_WIDTH / 2, GAME_HEIGHT / 2);
-            return;
-        }
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        // Score
+        ctx.font = "48px serif";
+        ctx.textAlign = "center";
+        ctx.fillText(gameState.leftPaddle.score + " | " + gameState.rightPaddle.score, GAME_WIDTH / 2, 80);
         // Ball
         ctx.fillStyle = '#689B8A';
         ctx.beginPath();
@@ -71,15 +64,21 @@ export const usePongGameLogic = (): returnType => {
         ctx.fillRect(0, gameState.leftPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
         //right paddle
         ctx.fillRect(GAME_WIDTH - PADDLE_WIDTH, gameState.rightPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        if (gameState.status === 'ended') {
+            ctx.font = "48px serif";
+            ctx.textAlign = "center";
+            ctx.strokeText(gameState.winner === playerRole.current ? "You Won": "You Lost", GAME_WIDTH / 2, GAME_HEIGHT / 2);
+            return;
+        }
         
     }, []);
 
     const gameLoop = ()=> {
         if (pressedKeys.current.has('ArrowUp')) {
-            socket.emit('moveUp', playerRole);
+            socket.emit('moveUp', playerRole.current);
         }
         else if (pressedKeys.current.has('ArrowDown')) {
-            socket.emit('moveDown', playerRole);
+            socket.emit('moveDown', playerRole.current);
         }
         animationFrameId.current = requestAnimationFrame(gameLoop);
     };
@@ -94,7 +93,7 @@ export const usePongGameLogic = (): returnType => {
         if (!animationFrameId.current)
             animationFrameId.current = requestAnimationFrame(gameLoop);
 
-        if (!playerRole || playerRole === 'player1') {
+        if (!playerRole.current || playerRole.current === 'player1') {
             const canvas: HTMLCanvasElement | null = refCanvas.current;
             if (!canvas)
                 return;
@@ -110,9 +109,7 @@ export const usePongGameLogic = (): returnType => {
     function handleStopBtn() {
         console.log("stop game");
         socket.emit('stopGame');
-        // setIsPlaying(false);
         isPlaying.current = false
-        // socket.disconnect();
 
     }
 
@@ -132,6 +129,5 @@ export const usePongGameLogic = (): returnType => {
         handlePlayBtn,
         handleStopBtn,
         refCanvas,
-        winner,
     };
 };
