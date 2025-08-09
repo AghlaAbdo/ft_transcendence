@@ -3,6 +3,7 @@ export interface IBall {
     y: number,
     dx: number,
     dy: number,
+    dir: number,
     radius: number
 }
 
