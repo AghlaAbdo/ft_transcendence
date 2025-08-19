@@ -9,10 +9,9 @@ import {
   BALL_SPEED,
 } from '../config/game';
 
-const direction = Math.random() < 0.5 ? 1 : -1;
-const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
-
-export function GenerateGameState(gameId: string): IGameState {
+export function generateGameState(gameId: string): IGameState {
+  const direction = Math.random() < 0.5 ? 1 : -1;
+  const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
   return {
     id: gameId,
     ball: {
@@ -46,9 +45,11 @@ export function paddleMoveUp(gameState: IGameState, playerRole: string): void {
   if (playerRole === 'player1') {
     if (gameState.leftPaddle.y - PADDLE_SPEED > 0)
       gameState.leftPaddle.y -= PADDLE_SPEED;
-  } else {
+    else gameState.leftPaddle.y = 0;
+  } else if (playerRole === 'player2') {
     if (gameState.rightPaddle.y - PADDLE_SPEED > 0)
       gameState.rightPaddle.y -= PADDLE_SPEED;
+    else gameState.rightPaddle.y = 0;
   }
 }
 
@@ -59,9 +60,11 @@ export function paddleMoveDown(
   if (playerRole === 'player1') {
     if (gameState.leftPaddle.y + PADDLE_HEIGHT + PADDLE_SPEED < GAME_HEIGHT)
       gameState.leftPaddle.y += PADDLE_SPEED;
-  } else {
+    else gameState.leftPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
+  } else if (playerRole === 'player2') {
     if (gameState.rightPaddle.y + PADDLE_HEIGHT + PADDLE_SPEED < GAME_HEIGHT)
       gameState.rightPaddle.y += PADDLE_SPEED;
+    else gameState.rightPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
   }
 }
 

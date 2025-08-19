@@ -6,14 +6,20 @@ import {
   PADDLE_HEIGHT,
   BALL_RADIUS,
   BALL_SPEED,
+  GAME_INTERVAL_MS,
 } from '../config/game';
 import { IGameState } from '../types/game';
 import { Server } from 'socket.io';
 
 let ioInstance: Server;
-const INTERVAL = 800 / 60;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
   {};
+
+export function _resetGameIntervalsForTesting(): void {
+  Object.keys(gameIntervals).forEach((key) => {
+    delete gameIntervals[key];
+  });
+}
 
 export function setIoInstance(io: Server): void {
   ioInstance = io;
@@ -25,14 +31,14 @@ export function startGame(gameState: IGameState) {
   gameState.status = 'playing';
   gameIntervals[gameState.id] = setInterval(
     () => gameLoop(gameState),
-    INTERVAL,
+    GAME_INTERVAL_MS,
   );
 }
 
 function gameLoop(gameState: IGameState): void {
+  //check for top and bottom collision
   gameState.ball.x += gameState.ball.dx;
   gameState.ball.y += gameState.ball.dy;
-  //check for top and bottom collision
   if (
     gameState.ball.y - BALL_RADIUS / 2 < 0 ||
     gameState.ball.y + BALL_RADIUS >= GAME_HEIGHT
@@ -87,7 +93,7 @@ function gameLoop(gameState: IGameState): void {
   ioInstance.to(gameState.id).emit('gameStateUpdate', gameState);
 }
 
-function endGame(gameState: IGameState): void {
+export function endGame(gameState: IGameState): void {
   if (gameState.leftPaddle.score > gameState.rightPaddle.score)
     gameState.winner = 'player1';
   else gameState.winner = 'player2';

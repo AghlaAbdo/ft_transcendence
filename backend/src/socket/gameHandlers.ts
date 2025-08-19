@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import {
-  GenerateGameState,
+  generateGameState,
   paddleMoveDown,
   paddleMoveUp,
 } from '../game/gameState';
@@ -18,22 +18,10 @@ export function handleDisconnect(socket: Socket, reason: string): void {
 }
 
 export function handlePlay(socket: Socket): void {
-  // const gameState: IGameState = getGameState();
-  // if (gameState.playersNb + 1 > 2)
-  //     return;
-  // gameState.playersNb++;
-  // if (gameState.playersNb === 1) {
-  //     socket.emit('playerRole', 'player1');
-  // }
-  // else {
-  //     socket.emit('playerRole', 'player2');
-  //     startGame();
-  // }
-
   const allGames = getAllGames();
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
-    allGames.games[gameId] = GenerateGameState(gameId);
+    allGames.games[gameId] = generateGameState(gameId);
     socket.emit('playerRole', 'player1');
     socket.join(gameId);
     allGames.lobyGame = gameId;
@@ -47,14 +35,6 @@ export function handlePlay(socket: Socket): void {
     allGames.lobyGame = null;
   }
 }
-
-// export function handleMoveUp(playerRole: string): void {
-//     paddleMoveUp(playerRole);
-// }
-
-// export function handleMoveDown(playerRole: string): void {
-//     paddleMoveDown(playerRole);
-// }
 
 export function handleMovePaddle(
   gameId: string,
