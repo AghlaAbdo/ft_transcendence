@@ -3,7 +3,7 @@ import {
   paddleMoveUp,
   paddleMoveDown,
   resetBallPos,
-} from '../../game/gameState';
+} from '../../remote-game/gameState';
 import {
   GAME_WIDTH,
   GAME_HEIGHT,

@@ -5,7 +5,7 @@ import {
   handleMovePaddle,
   handleGameOver,
   handleDisconnect,
-} from './gameHandlers';
+} from './handlers';
 
 export function initializeSocketIO(): Server {
   const io: Server = new Server(5000, {
@@ -19,8 +19,6 @@ export function initializeSocketIO(): Server {
     // -------- Start of Pong Game events --------
     handleConnection(socket, io);
     socket.on('play', () => handlePlay(socket));
-    // socket.on('moveUp', (playerRole)=> handleMoveUp(playerRole));
-    // socket.on('moveDown', (playerRole)=> handleMoveDown(playerRole));
     socket.on('movePaddle', (gameId, playerRole, dir) =>
       handleMovePaddle(gameId, playerRole, dir),
     );

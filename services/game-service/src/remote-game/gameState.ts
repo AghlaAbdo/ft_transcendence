@@ -14,6 +14,7 @@ export function generateGameState(gameId: string): IGameState {
   const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
   return {
     id: gameId,
+    db_id: 0,
     ball: {
       x: GAME_WIDTH / 2,
       y: GAME_HEIGHT / 2,
@@ -34,10 +35,14 @@ export function generateGameState(gameId: string): IGameState {
       width: PADDLE_WIDTH,
       score: 0,
     },
+    palyer1_id: 45,
+    player2_id: 23,
     status: 'waiting',
-    players: { plr1Socket: null, plr2Socket: null },
     playersNb: 1,
     winner: null,
+    startDate: null,
+    startAt: new Date().getTime(),
+    playtime: null,
   };
 }
 

@@ -16,13 +16,18 @@ export interface IPaddle {
 
 export interface IGameState {
   id: string;
+  db_id: number;
   ball: IBall;
   leftPaddle: IPaddle;
   rightPaddle: IPaddle;
+  palyer1_id: number;
+  player2_id: number;
   status: 'waiting' | 'playing' | 'ended';
-  players: { plr1Socket: string | null; plr2Socket: string | null };
   playersNb: number;
   winner: string | null;
+  startDate: string | null;
+  startAt: number;
+  playtime: number | null;
 }
 
 export interface IGmaes {

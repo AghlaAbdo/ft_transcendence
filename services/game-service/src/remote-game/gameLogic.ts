@@ -1,4 +1,6 @@
 import { resetBallPos } from './gameState';
+import { postGame } from '../models/game.model';
+import { getDiffInMin } from '../utils/dates';
 import {
   GAME_WIDTH,
   GAME_HEIGHT,
@@ -19,6 +21,7 @@ export function _resetGameIntervalsForTesting(): void {
   Object.keys(gameIntervals).forEach((key) => {
     delete gameIntervals[key];
   });
+  gameIntervals.foreach;
 }
 
 export function setIoInstance(io: Server): void {
@@ -102,5 +105,7 @@ export function endGame(gameState: IGameState): void {
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
+  gameState.playtime = getDiffInMin(gameState.startAt);
+  postGame(gameState);
   // resetGameState(gameState);
 }

@@ -3,8 +3,8 @@ import {
   startGame,
   endGame,
   _resetGameIntervalsForTesting,
-} from '../../game/gameLogic';
-import { resetBallPos } from '../../game/gameState'; // Mock this dependency
+} from '../../remote-game/gameLogic';
+import { resetBallPos } from '../../remote-game/gameState'; // Mock this dependency
 import {
   GAME_WIDTH,
   GAME_HEIGHT,

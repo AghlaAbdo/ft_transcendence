@@ -1,11 +1,13 @@
 import { Server, Socket } from 'socket.io';
+import { getCurrDate } from '../utils/dates';
+import { postGame } from '../models/game.model';
 import {
   generateGameState,
   paddleMoveDown,
   paddleMoveUp,
-} from '../game/gameState';
-import { startGame, setIoInstance } from '../game/gameLogic';
-import { getAllGames, getGameState } from '../game/AllGames';
+} from '../remote-game/gameState';
+import { startGame, setIoInstance } from '../remote-game/gameLogic';
+import { getAllGames, getGameState } from '../remote-game/AllGames';
 import crypto from 'crypto';
 
 export function handleConnection(socket: Socket, io: Server): void {
@@ -22,6 +24,7 @@ export function handlePlay(socket: Socket): void {
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
     allGames.games[gameId] = generateGameState(gameId);
+    console.log("\ncurr time: ", allGames.games[gameId].startDate, "\n");
     socket.emit('playerRole', 'player1');
     socket.join(gameId);
     allGames.lobyGame = gameId;
@@ -31,6 +34,7 @@ export function handlePlay(socket: Socket): void {
     socket.emit('playerRole', 'player2');
     socket.to(allGames.lobyGame).emit('startGame', allGames.lobyGame);
     socket.emit('startGame', allGames.lobyGame);
+    allGames.games[allGames.lobyGame].startDate = getCurrDate();
     startGame(allGames.games[allGames.lobyGame]);
     allGames.lobyGame = null;
   }
