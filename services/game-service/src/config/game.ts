@@ -5,4 +5,4 @@ export const PADDLE_WIDTH = 30;
 export const BALL_RADIUS = 20;
 export const PADDLE_SPEED = 14;
 export const BALL_SPEED = 5;
-export const GAME_INTERVAL_MS = 500 / 60;
+export const GAME_INTERVAL_MS = 800 / 60;

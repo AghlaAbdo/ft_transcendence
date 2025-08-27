@@ -20,11 +20,12 @@ export interface IGameState {
   ball: IBall;
   leftPaddle: IPaddle;
   rightPaddle: IPaddle;
-  palyer1_id: number;
+  player1_id: number;
   player2_id: number;
   status: 'waiting' | 'playing' | 'ended';
   playersNb: number;
   winner: string | null;
+  winner_id: number | null;
   startDate: string | null;
   startAt: number;
   playtime: number | null;

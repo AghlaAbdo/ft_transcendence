@@ -97,9 +97,14 @@ function gameLoop(gameState: IGameState): void {
 }
 
 export function endGame(gameState: IGameState): void {
-  if (gameState.leftPaddle.score > gameState.rightPaddle.score)
+  if (gameState.leftPaddle.score > gameState.rightPaddle.score) {
+    gameState.winner_id = gameState.player1_id;
     gameState.winner = 'player1';
-  else gameState.winner = 'player2';
+  }
+  else {
+    gameState.winner_id = gameState.player2_id;
+    gameState.winner = 'player2';
+  }
   gameState.status = 'ended';
   ioInstance.emit('gameOver');
   if (gameIntervals[gameState.id] != null)
@@ -107,5 +112,4 @@ export function endGame(gameState: IGameState): void {
   gameIntervals[gameState.id] = null;
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
-  // resetGameState(gameState);
 }
