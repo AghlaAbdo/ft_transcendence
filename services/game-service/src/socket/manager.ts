@@ -1,4 +1,6 @@
 import { Server, Socket } from 'socket.io';
+import Fastify, { FastifyInstance } from 'fastify';
+import http from 'http'
 import {
   handleConnection,
   handlePlay,
@@ -7,12 +9,14 @@ import {
   handleDisconnect,
 } from './handlers';
 
-export function initializeSocketIO(): Server {
-  const io: Server = new Server(5000, {
+export function initializeSocketIO(server: http.Server): Server {
+  console.log("fastify.server : " , server);
+  
+  const io: Server = new Server(server, {
     cors: {
       origin: ['http://localhost:3000'],
     },
-  });
+  }); 
 
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');
