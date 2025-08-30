@@ -14,7 +14,8 @@ export function initializeSocketIO(server: http.Server): Server {
   
   const io: Server = new Server(server, {
     cors: {
-      origin: ['http://localhost:3000'],
+      origin: "*", // <-- ADD THIS LINE
+    methods: ["GET", "POST"]
     },
   }); 
 

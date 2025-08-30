@@ -1,11 +1,14 @@
-FROM node:22-bullseye
+FROM node:22-bullseye AS base
+WORKDIR /app
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm install --only=prod
 
-WORKDIR app/backend
-
-COPY . .
-
+FROM base AS development
 RUN npm install
-
-EXPOSE 4000
-
 CMD ["npm", "run", "dev"]
+
+FROM base AS production
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "start"]
