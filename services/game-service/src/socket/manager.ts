@@ -10,25 +10,22 @@ import {
 } from './handlers';
 
 export function initializeSocketIO(server: http.Server): Server {
-  console.log("fastify.server : " , server);
-  
   const io: Server = new Server(server, {
+    path: "/ws/game",
     cors: {
-      origin: "*", // <-- ADD THIS LINE
+      origin: "*",
     methods: ["GET", "POST"]
     },
   }); 
 
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');
-    // -------- Start of Pong Game events --------
     handleConnection(socket, io);
     socket.on('play', () => handlePlay(socket));
     socket.on('movePaddle', (gameId, playerRole, dir) =>
       handleMovePaddle(gameId, playerRole, dir),
     );
     socket.on('gameOver', () => handleGameOver());
-    // -------- End of Pong Game events --------
     socket.on('disconnect', (reason) => handleDisconnect(socket, reason));
   });
 

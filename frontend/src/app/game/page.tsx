@@ -4,10 +4,8 @@ import Styles from "./game.module.css"
 import { GAME_WIDTH, GAME_HEIGHT } from '../../constants/game';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 
-
-
 export default function GamePage() {
-  const { handlePlayBtn, handleStopBtn, refCanvas, winner} = usePongGameLogic();
+  const { handlePlayBtn, handleStopBtn, refCanvas} = usePongGameLogic();
 
   return (
     <>
@@ -16,7 +14,6 @@ export default function GamePage() {
       <div className={Styles.container}>
         <canvas ref={refCanvas} width={GAME_WIDTH} height={GAME_HEIGHT}className={Styles.canvas}></canvas>
       </div>
-      {winner && <h1>The winner is {winner}</h1>}
     </>
   );
 }
