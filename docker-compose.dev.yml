@@ -1,4 +1,18 @@
 services:
+  nginx:
+    build:
+      target: base
+    volumes:
+      - ./services/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro
+
+  nextjs:
+    build:
+      target: development
+    volumes:
+      - ./frontend:/app
+    # ports:
+    #   - "3000:3000"
+
   game-service:
     build:
       target: development
@@ -6,5 +20,5 @@ services:
       - ./services/game-service:/app
     env_file:
       ./services/game-service/.env.dev
-    ports:
-      - "4000:4000"
+    # ports:
+    #   - "4000:4000"

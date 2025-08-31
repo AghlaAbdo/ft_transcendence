@@ -1,0 +1,14 @@
+services:
+  nginx:
+    build:
+      target: base
+
+  nextjs:
+    build:
+      target: production
+
+  game-service:
+    build:
+      target: production
+    env_file:
+      ./services/game-service/.env

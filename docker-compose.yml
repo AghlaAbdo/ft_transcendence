@@ -1,11 +1,29 @@
 services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    build:
+      context: ./services/nginx
+    networks:
+      - main_net
+    ports:
+      - "443:443"
+
+  nextjs:
+    container_name: nextjs
+    image: nextjs
+    build:
+      context: ./frontend
+    networks:
+      - main_net
+    
   game-service:
+    container_name: game-service
     image: game-service:1.0.0
     build:
       context: ./services/game-service
     networks:
       - main_net
-
 
 networks:
   main_net:
