@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react';
-import {socket} from "./socket"
+import {socket} from "./lib/socket"
 import Link from 'next/link'
 
 export default function Home() {

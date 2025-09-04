@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { socket } from "@/app/socket"
+import { socket } from "@/app/lib/socket"
 import { IGameState, GAME_WIDTH, GAME_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS } from "@/constants/game";
 
 interface returnType {
