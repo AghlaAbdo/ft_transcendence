@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 * {
   box-sizing: border-box;
@@ -24,7 +24,8 @@
 }
 
 body {
-  background: var(--background);
+  /* background: var(--background); */
+  background-color: #000030;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

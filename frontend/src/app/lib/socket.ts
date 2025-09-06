@@ -1,10 +1,8 @@
-'use client'
+'use client';
 
-import { Shippori_Antique } from 'next/font/google';
-import {io} from 'socket.io-client'
+import { io } from 'socket.io-client';
 
 export const socket = io({
-  path: "/ws/game",
+  path: '/ws/game',
   autoConnect: false,
 });
-

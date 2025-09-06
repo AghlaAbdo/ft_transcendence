@@ -1,16 +1,15 @@
 .container {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .canvas {
-    background-color: #F2EDD1;
+  background-color: #f2edd1;
 }
 
 .btn {
-    cursor: pointer;
-    border: 1px solid black;
-    border-radius: 5px;
-    padding: 6px 16px;
-
+  cursor: pointer;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 6px 16px;
 }
