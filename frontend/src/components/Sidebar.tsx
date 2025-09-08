@@ -8,16 +8,16 @@ import Styles from './sidebar.module.css';
 export default function Sidebar() {
   const pathName = usePathname();
   const linkBase =
-    'p-[14px] hover:[&>svg]:stroke-[#D9932B] flex items-center justify-center';
-  const linkActive = 'bg-[#85106B] rounded-lg [&>svg]:stroke-[#D9932B]';
+    'p-[14px] hover:[&>svg]:stroke-gray-50 flex items-center justify-center';
+  const linkActive = 'bg-purple rounded-lg [&>svg]:stroke-gray-50';
 
   return (
     <nav
       id={Styles.sidebar}
-      className='bg-[#3F0A57] py-4 pb-10 w-[72px] fixed top-0 left-0 h-full flex flex-col justify-between items-center'
+      className='bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full flex flex-col justify-between items-center'
     >
       <div className='flex flex-col items-center gap-[70px]'>
-        <Link href='./'>
+        <Link href='/'>
           {/* Logo Icon*/}
           <svg
             width='57'
@@ -58,7 +58,7 @@ export default function Sidebar() {
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
             className={`${linkBase} ${pathName === '/home' ? linkActive : ''}`}
-            href='./home'
+            href='/home'
           >
             {/* Home Icon*/}
             <svg
@@ -85,7 +85,7 @@ export default function Sidebar() {
           </Link>
           <Link
             className={`${linkBase} ${pathName === '/profile' ? linkActive : ''}`}
-            href='./profile'
+            href='/profile'
           >
             {/* Profile Icon */}
             <svg
@@ -112,7 +112,7 @@ export default function Sidebar() {
           </Link>
           <Link
             className={`${linkBase} ${pathName === '/game' ? linkActive : ''}`}
-            href='./game'
+            href='/game'
           >
             {/* Game Icon */}
             <svg
@@ -157,7 +157,7 @@ export default function Sidebar() {
           </Link>
           <Link
             className={`${linkBase} ${pathName === '/chat' ? linkActive : ''}`}
-            href='./chat'
+            href='/chat'
           >
             {/*Chat Icon */}
             <svg
@@ -182,7 +182,7 @@ export default function Sidebar() {
       <div className={Styles.navLinks}>
         <Link
           className={`${linkBase} ${pathName === '/settings' ? linkActive : ''}`}
-          href='./settings'
+          href='/settings'
         >
           {/* Settings Icon */}
           <svg
@@ -209,7 +209,7 @@ export default function Sidebar() {
         </Link>
         <Link
           className={`${linkBase} ${pathName === '/logout' ? linkActive : ''}`}
-          href='./logout'
+          href='/logout'
         >
           {/* Logout Icon */}
           <svg
