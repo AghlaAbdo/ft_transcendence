@@ -14,7 +14,7 @@ export default function Sidebar() {
   return (
     <nav
       id={Styles.sidebar}
-      className='bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full flex flex-col justify-between items-center'
+      className='hidden md:visible bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center'
     >
       <div className='flex flex-col items-center gap-[70px]'>
         <Link href='/'>
@@ -111,7 +111,7 @@ export default function Sidebar() {
             </svg>
           </Link>
           <Link
-            className={`${linkBase} ${pathName === '/game' ? linkActive : ''}`}
+            className={`${linkBase} ${pathName.startsWith('/game') ? linkActive : ''}`}
             href='/game'
           >
             {/* Game Icon */}

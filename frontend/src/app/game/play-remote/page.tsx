@@ -1,8 +1,8 @@
 'use client';
 
+import { GAME_HEIGHT, GAME_WIDTH } from '@/constants/game';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 
-import { GAME_HEIGHT, GAME_WIDTH } from '@/constants/game';
 import Styles from './game.module.css';
 
 export default function GamePage() {
