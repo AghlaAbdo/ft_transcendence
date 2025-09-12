@@ -6,7 +6,7 @@ import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 import Styles from './game.module.css';
 
 export default function GamePage() {
-  const { handlePlayBtn, handleStopBtn, refCanvas } = usePongGameLogic();
+  const { handlePlayBtn, handleStopBtn, containerRef } = usePongGameLogic();
 
   return (
     <>
@@ -17,12 +17,7 @@ export default function GamePage() {
         Stop Game
       </button>
       <div className={Styles.container}>
-        <canvas
-          ref={refCanvas}
-          width={GAME_WIDTH}
-          height={GAME_HEIGHT}
-          className={Styles.canvas}
-        ></canvas>
+        <div ref={containerRef}></div>
       </div>
     </>
   );
