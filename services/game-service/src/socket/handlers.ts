@@ -32,10 +32,16 @@ export function handlePlay(socket: Socket): void {
     allGames.games[allGames.lobyGame].playersNb++;
     socket.join(allGames.lobyGame);
     socket.emit('playerRole', 'player2');
-    socket.to(allGames.lobyGame).emit('startGame', allGames.lobyGame);
-    socket.emit('startGame', allGames.lobyGame);
-    allGames.games[allGames.lobyGame].startDate = getCurrDate();
-    startGame(allGames.games[allGames.lobyGame]);
+    socket.to(allGames.lobyGame).emit('matchFound', {username: "user_123", avatar: "random"});
+    socket.emit('matchFound', {username: "user_234", avatar: "random"});
+    const lobyGame = allGames.lobyGame;
+    setTimeout(()=> {
+      // if (!lobyGame) return;
+      socket.to(lobyGame).emit('startGame', lobyGame);
+      socket.emit('startGame', lobyGame);
+      allGames.games[lobyGame].startDate = getCurrDate();
+      startGame(allGames.games[lobyGame]);
+    }, 3000);
     allGames.lobyGame = null;
   }
 }

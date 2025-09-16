@@ -17,10 +17,12 @@ interface returnType {
   handleStopBtn: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
   waiting: boolean;
+  opponent: null | { username: string, avatar: string };
 }
 
 export const usePongGameLogic = (): returnType => {
   const [waiting, setWaiting] = useState(true);
+  const [opponent, setOpponent] = useState(null);
   const pressedKeys = useRef<Set<string>>(new Set());
   const animationFrameId = useRef<number | null>(null);
   const gameId = useRef<string>(null);
@@ -36,97 +38,97 @@ export const usePongGameLogic = (): returnType => {
   const scoreTextRef = useRef<PIXI.Text | null>(null);
   const endTextRef = useRef<PIXI.Text | null>(null);
 
-    useEffect(() => {
-      if (waiting) return;
-      let isInitialized = false;
-      const initPixiApp = async () => {
-        try {
-          const app = new PIXI.Application();
+  useEffect(() => {
+    if (waiting) return;
+    let isInitialized = false;
+    const initPixiApp = async () => {
+      try {
+        const app = new PIXI.Application();
 
-          await app.init({
-            width: GAME_WIDTH,
-            height: GAME_HEIGHT,
-            backgroundColor: 0xf2edd1,
-            antialias: true,
-            resolution: window.devicePixelRatio || 1,
-            autoDensity: true,
-          });
-          if (containerRef.current) {
-            containerRef.current.appendChild(app.canvas);
-          }
-          pixiApp.current = app;
-          isInitialized = true;
-
-          const scoreText = new PIXI.Text({
-            text: "0 | 0", 
-            style: {
-              fontSize: 48,
-              fill: 0x280a3e,
-              align: "center",
-            }
-          });
-          scoreText.anchor.set(0.5);
-          scoreText.x = GAME_WIDTH / 2;
-          scoreText.y = 80;
-          app.stage.addChild(scoreText);
-          scoreTextRef.current = scoreText;
-
-          const ball = new PIXI.Graphics();
-          ball.circle(0, 0, BALL_RADIUS);
-          ball.fill(0x689b8a);
-          ball.x = GAME_WIDTH / 2;
-          ball.y = GAME_HEIGHT / 2;
-          app.stage.addChild(ball);
-          ballRef.current = ball;
-
-          const leftPaddle = new PIXI.Graphics();
-          leftPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
-          leftPaddle.fill(0x280a3e);
-          leftPaddle.x = 0;
-          leftPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
-          app.stage.addChild(leftPaddle);
-          leftPaddleRef.current = leftPaddle;
-
-          const rightPaddle = new PIXI.Graphics();
-          rightPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
-          rightPaddle.fill(0x280a3e);
-          rightPaddle.x = GAME_WIDTH - PADDLE_WIDTH;
-          rightPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
-          app.stage.addChild(rightPaddle);
-          rightPaddleRef.current = rightPaddle;
-
-          const endText = new PIXI.Text({
-            text: "", 
-            style: {
-              fontSize: 48,
-              fill: 0x280a3e,
-              align: "center",
-            }
-          });
-          endText.anchor.set(0.5);
-          endText.x = GAME_WIDTH / 2;
-          endText.y = GAME_HEIGHT / 2;
-          app.stage.addChild(endText);
-          endTextRef.current = endText;
-
-        } catch (error) {
-          console.error("Failed to initialize PixiJS app:", error);
-          if (pixiApp.current) {
-            pixiApp.current.destroy(true, { children: true });
-            pixiApp.current = null;
-          }
+        await app.init({
+          width: GAME_WIDTH,
+          height: GAME_HEIGHT,
+          backgroundColor: 0xf2edd1,
+          antialias: true,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+        });
+        if (containerRef.current) {
+          containerRef.current.appendChild(app.canvas);
         }
-      };
+        pixiApp.current = app;
+        isInitialized = true;
 
-      initPixiApp();
-
-        return () => {
-          if (isInitialized && pixiApp.current) {
-            pixiApp.current.destroy();
-            pixiApp.current = null;
+        const scoreText = new PIXI.Text({
+          text: "0 | 0",
+          style: {
+            fontSize: 48,
+            fill: 0x280a3e,
+            align: "center",
           }
-        };
-    }, [waiting]);
+        });
+        scoreText.anchor.set(0.5);
+        scoreText.x = GAME_WIDTH / 2;
+        scoreText.y = 80;
+        app.stage.addChild(scoreText);
+        scoreTextRef.current = scoreText;
+
+        const ball = new PIXI.Graphics();
+        ball.circle(0, 0, BALL_RADIUS);
+        ball.fill(0x689b8a);
+        ball.x = GAME_WIDTH / 2;
+        ball.y = GAME_HEIGHT / 2;
+        app.stage.addChild(ball);
+        ballRef.current = ball;
+
+        const leftPaddle = new PIXI.Graphics();
+        leftPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+        leftPaddle.fill(0x280a3e);
+        leftPaddle.x = 0;
+        leftPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
+        app.stage.addChild(leftPaddle);
+        leftPaddleRef.current = leftPaddle;
+
+        const rightPaddle = new PIXI.Graphics();
+        rightPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+        rightPaddle.fill(0x280a3e);
+        rightPaddle.x = GAME_WIDTH - PADDLE_WIDTH;
+        rightPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
+        app.stage.addChild(rightPaddle);
+        rightPaddleRef.current = rightPaddle;
+
+        const endText = new PIXI.Text({
+          text: "",
+          style: {
+            fontSize: 48,
+            fill: 0x280a3e,
+            align: "center",
+          }
+        });
+        endText.anchor.set(0.5);
+        endText.x = GAME_WIDTH / 2;
+        endText.y = GAME_HEIGHT / 2;
+        app.stage.addChild(endText);
+        endTextRef.current = endText;
+
+      } catch (error) {
+        console.error("Failed to initialize PixiJS app:", error);
+        if (pixiApp.current) {
+          pixiApp.current.destroy(true, { children: true });
+          pixiApp.current = null;
+        }
+      }
+    };
+
+    initPixiApp();
+
+    return () => {
+      if (isInitialized && pixiApp.current) {
+        pixiApp.current.destroy();
+        pixiApp.current = null;
+      }
+    };
+  }, [waiting]);
 
   useEffect(() => {
     socket.connect();
@@ -151,9 +153,15 @@ export const usePongGameLogic = (): returnType => {
     socket.on('startGame', (id) => {
       isPlaying.current = true;
       console.log("Stared the game !!!!!");
-      setWaiting(false);
       gameId.current = id;
+      setWaiting(false);
     });
+
+    socket.on('matchFound', (opponent) => {
+      console.log("Match Found: ", opponent.username);
+      setOpponent(opponent)
+    });
+
     socket.on('gameStateUpdate', (gameState: IGameState) => {
       if (!pixiApp.current) return;
 
@@ -232,5 +240,6 @@ export const usePongGameLogic = (): returnType => {
     handleStopBtn,
     containerRef,
     waiting,
+    opponent,
   };
 };
