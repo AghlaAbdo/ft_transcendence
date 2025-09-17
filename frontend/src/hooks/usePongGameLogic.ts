@@ -10,7 +10,7 @@ import {
   PADDLE_HEIGHT,
   PADDLE_WIDTH,
 } from '@/constants/game';
-import { color } from "framer-motion";
+import { useLayout } from "@/context/LayoutContext";
 
 interface returnType {
   handlePlayBtn: () => void;
@@ -37,6 +37,8 @@ export const usePongGameLogic = (): returnType => {
   const rightPaddleRef = useRef<PIXI.Graphics | null>(null);
   const scoreTextRef = useRef<PIXI.Text | null>(null);
   const endTextRef = useRef<PIXI.Text | null>(null);
+
+  const {setHideHeaderSidebar} = useLayout();
 
   useEffect(() => {
     if (waiting) return;
@@ -155,6 +157,7 @@ export const usePongGameLogic = (): returnType => {
       console.log("Stared the game !!!!!");
       gameId.current = id;
       setWaiting(false);
+      setHideHeaderSidebar(true);
     });
 
     socket.on('matchFound', (opponent) => {
@@ -183,6 +186,7 @@ export const usePongGameLogic = (): returnType => {
 
       if (gameState.status === "ended" && endTextRef.current) {
         endTextRef.current.text = gameState.winner === playerRole.current ? "You Won" : "You Lost";
+        setHideHeaderSidebar(false);
       } else if (endTextRef.current) {
         endTextRef.current.text = "";
       }

@@ -1,14 +1,25 @@
+'use client'
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'framer-motion'
+import { useLayout } from '@/context/LayoutContext';
 
 import avatar from '@/../public/avatars/avatar1.png';
 
-import Styles from './Header.module.css';
-
 export default function Header() {
+  const {hideHeaderSidebar} = useLayout();
   return (
-    <div
-      id={Styles.container}
+    <motion.div
+      initial={false}
+      animate={{
+        y: hideHeaderSidebar ? -72 : 0,
+        opacity: hideHeaderSidebar ? 0 : 1,
+      }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut",
+      }}
       className='fixed h-[72px] w-[calc(100%-72px)] top-0 left-[72px] bg-bg-color flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
     >
       <div className='flex justify-between items-center gap-4'>
@@ -56,6 +67,6 @@ export default function Header() {
           </svg>
         </Link>
       </div>
-    </div>
+    </motion.div>
   );
 }

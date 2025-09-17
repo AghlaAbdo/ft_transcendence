@@ -2,19 +2,27 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import Styles from './sidebar.module.css';
+import {motion} from 'framer-motion'
+import { useLayout } from '@/context/LayoutContext';
 
 export default function Sidebar() {
   const pathName = usePathname();
   const linkBase =
     'p-[14px] hover:[&>svg]:stroke-gray-50 flex items-center justify-center';
   const linkActive = 'bg-purple rounded-lg [&>svg]:stroke-gray-50';
-
+  const {hideHeaderSidebar} = useLayout();
   return (
-    <nav
-      id={Styles.sidebar}
-      className='hidden md:visible bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center'
+    <motion.nav
+      initial={false}
+      animate={{
+        x: hideHeaderSidebar ? -72 : 0,
+        opacity: hideHeaderSidebar ? 0 : 1,
+      }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut",
+      }}
+      className={` bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center `}
     >
       <div className='flex flex-col items-center gap-[70px]'>
         <Link href='/'>
@@ -57,7 +65,7 @@ export default function Sidebar() {
 
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
-            className={`${linkBase} ${pathName === '/home' ? linkActive : ''}`}
+            className={`${linkBase} ${pathName.startsWith('/home') ? linkActive : ''}`}
             href='/home'
           >
             {/* Home Icon*/}
@@ -84,7 +92,7 @@ export default function Sidebar() {
             </svg>
           </Link>
           <Link
-            className={`${linkBase} ${pathName === '/profile' ? linkActive : ''}`}
+            className={`${linkBase} ${pathName.startsWith('/profile') ? linkActive : ''}`}
             href='/profile'
           >
             {/* Profile Icon */}
@@ -156,7 +164,7 @@ export default function Sidebar() {
             </svg>
           </Link>
           <Link
-            className={`${linkBase} ${pathName === '/chat' ? linkActive : ''}`}
+            className={`${linkBase} ${pathName.startsWith('/chat') ? linkActive : ''}`}
             href='/chat'
           >
             {/*Chat Icon */}
@@ -179,9 +187,9 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className={Styles.navLinks}>
+      <div >
         <Link
-          className={`${linkBase} ${pathName === '/settings' ? linkActive : ''}`}
+          className={`${linkBase} ${pathName.startsWith('/settings') ? linkActive : ''}`}
           href='/settings'
         >
           {/* Settings Icon */}
@@ -235,6 +243,6 @@ export default function Sidebar() {
           </svg>
         </Link>
       </div>
-    </nav>
+    </motion.nav>
   );
 }
