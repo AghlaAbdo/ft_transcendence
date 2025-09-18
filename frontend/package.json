@@ -15,7 +15,11 @@
     "pixi.js": "^8.13.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.542.0",
+    "react-lineicons": "^3.0.0",
+    "tailwind-scrollbar": "^4.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,0 +1,19 @@
+
+services:
+  user-service:
+    build:
+      context: .
+      target: development   # or prod
+    image: user-service:v2.0.0
+    ports:
+      - "5000:3000"
+    # volumes:
+    #   - .:/app
+    #   - ./database/user-service.db:/app/database/user-service.db
+    env_file:
+      - .env
+    networks:
+      - transcendence-network
+
+networks:
+  transcendence-network:

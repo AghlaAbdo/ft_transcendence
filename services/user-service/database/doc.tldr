@@ -1,0 +1,800 @@
+{
+	"tldrawFileFormatVersion": 1,
+	"schema": {
+		"schemaVersion": 2,
+		"sequences": {
+			"com.tldraw.store": 4,
+			"com.tldraw.asset": 1,
+			"com.tldraw.camera": 1,
+			"com.tldraw.document": 2,
+			"com.tldraw.instance": 25,
+			"com.tldraw.instance_page_state": 5,
+			"com.tldraw.page": 1,
+			"com.tldraw.instance_presence": 6,
+			"com.tldraw.pointer": 1,
+			"com.tldraw.shape": 4,
+			"com.tldraw.asset.bookmark": 2,
+			"com.tldraw.asset.image": 5,
+			"com.tldraw.asset.video": 5,
+			"com.tldraw.shape.group": 0,
+			"com.tldraw.shape.text": 2,
+			"com.tldraw.shape.bookmark": 2,
+			"com.tldraw.shape.draw": 2,
+			"com.tldraw.shape.geo": 9,
+			"com.tldraw.shape.note": 8,
+			"com.tldraw.shape.line": 5,
+			"com.tldraw.shape.frame": 0,
+			"com.tldraw.shape.arrow": 5,
+			"com.tldraw.shape.highlight": 1,
+			"com.tldraw.shape.embed": 4,
+			"com.tldraw.shape.image": 4,
+			"com.tldraw.shape.video": 2,
+			"com.tldraw.binding.arrow": 0
+		}
+	},
+	"records": [
+		{
+			"gridSize": 10,
+			"name": "",
+			"meta": {},
+			"id": "document:document",
+			"typeName": "document"
+		},
+		{
+			"meta": {},
+			"id": "page:page",
+			"name": "Page 1",
+			"index": "a1",
+			"typeName": "page"
+		},
+		{
+			"x": 193.11846923828125,
+			"y": 39.075490951538086,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:IxqQTI3guYMLuHGAaBzhh",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 532.7252197265625,
+				"text": "API Endpoints\nPOST /auth/register - User registration\nPOST /auth/login - Email/password login\nGET /auth/oauth/login - Start OAuth flow\nGET /auth/oauth/callback - OAuth callback\nGET /users/profile - Get user profile\nGET /users/friends - Get friends list\nPOST /auth/logout - Secure logout",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a1",
+			"typeName": "shape"
+		},
+		{
+			"x": 194.64517211914062,
+			"y": 341.49260421212,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:md_O2THrQVN1ZBg9AsKNn",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 488.18096923828125,
+				"text": "Friends\n* POST /friends/:userId — send request\n* POST /friends/:userId/accept\n* POST /friends/:userId/block\n* GET /friends",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a23FL",
+			"typeName": "shape"
+		},
+		{
+			"x": -560.3811146798739,
+			"y": 665.1780778628978,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:1wQwuhSoJNh1FuAmixAED",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 988.9166259765625,
+				"text": "services/user-service/\n├── src/\n│   ├── index.js                    # Main Fastify server (updated)\n│   ├── app.js                      # NEW: Application factory\n│   ├── plugins/                    # NEW: Fastify plugins directory\n│   │   ├── database.js             # Database connection plugin\n│   │   ├── auth.js                 # Authentication plugin\n│   │   ├── validation.js           # Validation plugin\n│   │   ├── cors.js                 # CORS plugin\n│   │   └── swagger.js              # API documentation plugin\n│   ├── database/\n│   │   ├── init.js                 # Database schema setup (used by plugin)\n│   │   └── queries.js              # All prepared statements (used by plugin)\n│   ├── controllers/\n│   │   ├── authController.js       # Register, login, logout\n│   │   ├── userController.js       # Profile, friends, stats  \n│   │   └── oauthController.js      # OAuth2 flow handling\n│   ├── middleware/\n│   │   ├── authenticate.js         # JWT validation (used by auth plugin)\n│   │   └── validate.js             # Input validation (used by validation plugin)\n│   ├── utils/\n│   │   ├── password.js             # bcrypt utilities\n│   │   ├── jwt.js                  # Token generation\n│   │   └── crypto.js               # Hashing utilities\n│   └── routes/\n│       ├── auth.js                 # Authentication endpoints (plugin-enabled)\n│       └── users.js                # User management endpoints (plugin-enabled)\n├── data/                           # SQLite files (mounted volume)\n├── package.json\n├── Dockerfile\n└── .env.example",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a30sd",
+			"typeName": "shape"
+		},
+		{
+			"x": 890.9471461263372,
+			"y": 33.0460641825224,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:1A6hiJRNfYWb9MY8XbEI5",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 880.31640625,
+				"text": "Authentication Routes (/api/auth)\n\n* POST /api/auth/signup - Register new user\n* POST /api/auth/login - User login\n* POST /api/auth/logout - Logout (requires auth)\n* POST /api/auth/refresh - Refresh JWT token (requires auth)\n* GET /api/auth/verify - Verify token validity (requires auth)\n\nUser Routes (/api/users)\n\n* GET /api/users/profile - Get current user profile (requires auth)\n* PUT /api/users/profile - Update profile (requires auth)\n* DELETE /api/users/profile - Delete account (requires auth)\n* POST /api/users/change-password - Change password (requires auth)\n* GET /api/users/:id - Get user by ID (requires auth)\n* GET /api/users - List users with pagination (requires auth)",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a4AV7",
+			"typeName": "shape"
+		},
+		{
+			"x": 716.3382947726143,
+			"y": 761.0962154337083,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:dYdyawid8s1UfxVsjwkUQ",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 657.8098754882812,
+				"text": "Key Endpoints Summary:\n\nAuth Routes (/api/auth):\n  * POST /register - Create new account\n  * POST /login - Login user\n  * POST /logout - Logout user\n  * GET /me - Get current user\n  * GET /check - Check auth status\n  * POST /refresh - Refresh token\n  * POST /forgot-password - Request password reset\n  * POST /reset-password - Reset password\n\nUser Routes (/api/users):\n   * GET /:id - Get user by ID\n   * PUT /:id - Update user profile\n   * GET / - Get users list (paginated)\n   * DELETE /:id - Delete user account\n   * GET /search/:query - Search users\n   * GET /:id/stats - Get user stats\n   * POST /:id/avatar - Upload avatar\n   * GET /online/users - Get online users",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a59RP",
+			"typeName": "shape"
+		},
+		{
+			"x": 1524.581638492939,
+			"y": 860.6735665294718,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:Cr14Am8HPecfpoCS3zgBr",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 742.0546875,
+				"text": "5. Profile Management\n  GET /api/user/profile - get user profile.\n  PUT /api/user/profile - update profile\n  POST /api/user/change-password - change password\n6. Session Management\n  GET /api/auth/me - get current user (you have checkAuth)\n  POST /api/auth/refresh - refresh JWT tokens",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a66Mn",
+			"typeName": "shape"
+		},
+		{
+			"x": 431.7756845134467,
+			"y": 1861.2999479563114,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:9yjq6WPJLQwepHwj8vsaM",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 333.1158752441406,
+				"text": "is_verified = 0\nverification_token\nverificationTokenExpiredAt\nverifiedAt",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a7AXP",
+			"typeName": "shape"
+		},
+		{
+			"x": 781.7496530193062,
+			"y": 1933.7869264871952,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:WGE--BaT3EawUjFb61kl8",
+			"type": "draw",
+			"props": {
+				"segments": [
+					{
+						"type": "free",
+						"points": [
+							{
+								"x": 0,
+								"y": 0,
+								"z": 0.5
+							},
+							{
+								"x": 0,
+								"y": -0.94,
+								"z": 0.5
+							},
+							{
+								"x": 0.76,
+								"y": -1.32,
+								"z": 0.5
+							},
+							{
+								"x": 2.58,
+								"y": -1.32,
+								"z": 0.5
+							},
+							{
+								"x": 3.72,
+								"y": -1.32,
+								"z": 0.5
+							},
+							{
+								"x": 4.49,
+								"y": -1.32,
+								"z": 0.5
+							},
+							{
+								"x": 4.86,
+								"y": -1.32,
+								"z": 0.5
+							},
+							{
+								"x": 6,
+								"y": -0.57,
+								"z": 0.5
+							},
+							{
+								"x": 6.38,
+								"y": 0.19,
+								"z": 0.5
+							},
+							{
+								"x": 6.38,
+								"y": 1.71,
+								"z": 0.5
+							},
+							{
+								"x": 6.38,
+								"y": 3.54,
+								"z": 0.5
+							},
+							{
+								"x": 7.24,
+								"y": 5.76,
+								"z": 0.5
+							},
+							{
+								"x": 7.24,
+								"y": 7.58,
+								"z": 0.5
+							},
+							{
+								"x": 7.24,
+								"y": 8.35,
+								"z": 0.5
+							},
+							{
+								"x": 7.24,
+								"y": 8.72,
+								"z": 0.5
+							},
+							{
+								"x": 7.24,
+								"y": 9.49,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 9.86,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 10.63,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 11,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 12.9,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 13.28,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 14.42,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 15.18,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 16.32,
+								"z": 0.5
+							},
+							{
+								"x": 7.62,
+								"y": 17.46,
+								"z": 0.5
+							},
+							{
+								"x": 8.97,
+								"y": 20.55,
+								"z": 0.5
+							},
+							{
+								"x": 9.35,
+								"y": 21.31,
+								"z": 0.5
+							},
+							{
+								"x": 9.73,
+								"y": 22.83,
+								"z": 0.5
+							},
+							{
+								"x": 10.1,
+								"y": 23.21,
+								"z": 0.5
+							},
+							{
+								"x": 10.48,
+								"y": 23.59,
+								"z": 0.5
+							},
+							{
+								"x": 10.86,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 11.24,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 12,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 12.38,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 13.14,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 13.52,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 14.28,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 14.65,
+								"y": 23.96,
+								"z": 0.5
+							},
+							{
+								"x": 15.03,
+								"y": 24.34,
+								"z": 0.5
+							},
+							{
+								"x": 15.03,
+								"y": 24.72,
+								"z": 0.5
+							},
+							{
+								"x": 15.03,
+								"y": 25.48,
+								"z": 0.5
+							},
+							{
+								"x": 15.03,
+								"y": 26.62,
+								"z": 0.5
+							},
+							{
+								"x": 15.03,
+								"y": 27,
+								"z": 0.5
+							},
+							{
+								"x": 15.03,
+								"y": 28.14,
+								"z": 0.5
+							},
+							{
+								"x": 15.79,
+								"y": 29.28,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 30.73,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 31.87,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 32.63,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 33.01,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 33.77,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 34.15,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 34.91,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 36.05,
+								"z": 0.5
+							},
+							{
+								"x": 16.27,
+								"y": 36.43,
+								"z": 0.5
+							},
+							{
+								"x": 15.78,
+								"y": 37.88,
+								"z": 0.5
+							},
+							{
+								"x": 15.01,
+								"y": 37.88,
+								"z": 0.5
+							},
+							{
+								"x": 13.86,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": 10.38,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": 7.46,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": 5.62,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": 2.7,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": 0.48,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": -0.68,
+								"y": 38.26,
+								"z": 0.5
+							},
+							{
+								"x": -2.52,
+								"y": 38.74,
+								"z": 0.5
+							},
+							{
+								"x": -3.67,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -4.44,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -5.59,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -6.74,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -7.9,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -8.28,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -9.05,
+								"y": 39.11,
+								"z": 0.5
+							},
+							{
+								"x": -9.43,
+								"y": 39.49,
+								"z": 0.5
+							}
+						]
+					}
+				],
+				"color": "black",
+				"fill": "none",
+				"dash": "draw",
+				"size": "m",
+				"isComplete": true,
+				"isClosed": false,
+				"isPen": false,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "a8062",
+			"typeName": "shape"
+		},
+		{
+			"x": 818.6375924724312,
+			"y": 1936.8858854563114,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:zNiXiTr7akvLRwBvXOEJ6",
+			"type": "text",
+			"props": {
+				"color": "red",
+				"size": "m",
+				"w": 113.03775787353516,
+				"text": "Datetime",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1.2634646405663057
+			},
+			"parentId": "page:page",
+			"index": "a9954",
+			"typeName": "shape"
+		},
+		{
+			"x": 420.8772470134467,
+			"y": 1851.1827394754764,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:JMn2QMMw7tKvLdL7ibfzc",
+			"type": "geo",
+			"props": {
+				"w": 548.5351257324219,
+				"h": 150.78778076171875,
+				"geo": "rectangle",
+				"color": "blue",
+				"labelColor": "black",
+				"fill": "none",
+				"dash": "draw",
+				"size": "m",
+				"font": "draw",
+				"text": "",
+				"align": "middle",
+				"verticalAlign": "middle",
+				"growY": 0,
+				"url": "",
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "aA6W8",
+			"typeName": "shape"
+		},
+		{
+			"x": 758.354856533128,
+			"y": 1779.2621671945926,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:Ka2ijuNMmkwnHNWAEGOEo",
+			"type": "text",
+			"props": {
+				"color": "orange",
+				"size": "m",
+				"w": 541.6920012500874,
+				"text": "/verify-email?token=${token}",
+				"font": "draw",
+				"textAlign": "middle",
+				"autoSize": true,
+				"scale": 1.4696543592703712
+			},
+			"parentId": "page:page",
+			"index": "aB0Be",
+			"typeName": "shape"
+		},
+		{
+			"x": 759.3343087810249,
+			"y": 1619.0473844797489,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:Wdfv7LoRKml0ilMELUqPq",
+			"type": "text",
+			"props": {
+				"color": "orange",
+				"size": "m",
+				"w": 413.7369689941406,
+				"text": "/reset-password?token=${token}",
+				"font": "draw",
+				"textAlign": "middle",
+				"autoSize": true,
+				"scale": 1.5140669162788776
+			},
+			"parentId": "page:page",
+			"index": "aC8oj",
+			"typeName": "shape"
+		},
+		{
+			"id": "pointer:pointer",
+			"typeName": "pointer",
+			"x": 201.13541815653252,
+			"y": 2575.5522695398154,
+			"lastActivityTimestamp": 1758119975521,
+			"meta": {}
+		},
+		{
+			"followingUserId": null,
+			"opacityForNextShape": 1,
+			"stylesForNextShape": {},
+			"brush": null,
+			"scribbles": [],
+			"cursor": {
+				"type": "default",
+				"rotation": 0
+			},
+			"isFocusMode": false,
+			"exportBackground": true,
+			"isDebugMode": false,
+			"isToolLocked": false,
+			"screenBounds": {
+				"x": 0,
+				"y": 0,
+				"w": 1097.5,
+				"h": 810.8333129882812
+			},
+			"insets": [
+				false,
+				false,
+				true,
+				false
+			],
+			"zoomBrush": null,
+			"isGridMode": false,
+			"isPenMode": false,
+			"chatMessage": "",
+			"isChatting": false,
+			"highlightedUserIds": [],
+			"isFocused": true,
+			"devicePixelRatio": 2.4000000953674316,
+			"isCoarsePointer": false,
+			"isHoveringCanvas": true,
+			"openMenus": [],
+			"isChangingStyle": false,
+			"isReadonly": false,
+			"meta": {},
+			"duplicateProps": null,
+			"id": "instance:instance",
+			"currentPageId": "page:page",
+			"typeName": "instance"
+		},
+		{
+			"editingShapeId": "shape:Vvp-oyxclATZu-Hz0NJlg",
+			"croppingShapeId": null,
+			"selectedShapeIds": [
+				"shape:Vvp-oyxclATZu-Hz0NJlg"
+			],
+			"hoveredShapeId": null,
+			"erasingShapeIds": [],
+			"hintingShapeIds": [],
+			"focusedGroupId": null,
+			"meta": {},
+			"id": "instance_page_state:page:page",
+			"pageId": "page:page",
+			"typeName": "instance_page_state"
+		},
+		{
+			"x": 244.37239434346748,
+			"y": -1545.8647695398154,
+			"z": 0.5,
+			"meta": {},
+			"id": "camera:page:page",
+			"typeName": "camera"
+		},
+		{
+			"x": 128.55729315653252,
+			"y": 2459.6668535089316,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:Vvp-oyxclATZu-Hz0NJlg",
+			"type": "text",
+			"props": {
+				"color": "black",
+				"size": "m",
+				"w": 20,
+				"text": "",
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1
+			},
+			"parentId": "page:page",
+			"index": "aD1eE",
+			"typeName": "shape"
+		}
+	]
+}

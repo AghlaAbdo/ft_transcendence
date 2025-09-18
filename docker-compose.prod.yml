@@ -12,3 +12,14 @@ services:
       target: production
     env_file:
       ./services/game-service/.env
+
+  user-service:
+    build:
+      target: production
+    env_file:
+      ./services/user-service/.env
+
+  chat-service:
+    chat-service:
+    build:
+      target: production
