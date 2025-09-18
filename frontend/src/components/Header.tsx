@@ -1,14 +1,15 @@
-'use client'
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion'
-import { useLayout } from '@/context/LayoutContext';
+
+import { motion } from 'framer-motion';
 
 import avatar from '@/../public/avatars/avatar1.png';
+import { useLayout } from '@/context/LayoutContext';
 
 export default function Header() {
-  const {hideHeaderSidebar} = useLayout();
+  const { hideHeaderSidebar } = useLayout();
   return (
     <motion.div
       initial={false}
@@ -18,7 +19,7 @@ export default function Header() {
       }}
       transition={{
         duration: 0.3,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       }}
       className='fixed h-[72px] w-[calc(100%-72px)] top-0 left-[72px] bg-bg-color flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
     >

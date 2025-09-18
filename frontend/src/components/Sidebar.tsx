@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {motion} from 'framer-motion'
+
+import { motion } from 'framer-motion';
+
 import { useLayout } from '@/context/LayoutContext';
 
 export default function Sidebar() {
@@ -10,7 +12,7 @@ export default function Sidebar() {
   const linkBase =
     'p-[14px] hover:[&>svg]:stroke-gray-50 flex items-center justify-center';
   const linkActive = 'bg-purple rounded-lg [&>svg]:stroke-gray-50';
-  const {hideHeaderSidebar} = useLayout();
+  const { hideHeaderSidebar } = useLayout();
   return (
     <motion.nav
       initial={false}
@@ -20,7 +22,7 @@ export default function Sidebar() {
       }}
       transition={{
         duration: 0.3,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       }}
       className={` bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center `}
     >
@@ -187,7 +189,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div >
+      <div>
         <Link
           className={`${linkBase} ${pathName.startsWith('/settings') ? linkActive : ''}`}
           href='/settings'

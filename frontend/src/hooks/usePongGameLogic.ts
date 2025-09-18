@@ -1,5 +1,6 @@
-import * as PIXI from "pixi.js";
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import * as PIXI from 'pixi.js';
 
 import { socket } from '@/app/lib/socket';
 import {
@@ -10,14 +11,14 @@ import {
   PADDLE_HEIGHT,
   PADDLE_WIDTH,
 } from '@/constants/game';
-import { useLayout } from "@/context/LayoutContext";
+import { useLayout } from '@/context/LayoutContext';
 
 interface returnType {
   handlePlayBtn: () => void;
   handleStopBtn: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
   waiting: boolean;
-  opponent: null | { username: string, avatar: string };
+  opponent: null | { username: string; avatar: string };
 }
 
 export const usePongGameLogic = (): returnType => {
@@ -38,7 +39,7 @@ export const usePongGameLogic = (): returnType => {
   const scoreTextRef = useRef<PIXI.Text | null>(null);
   const endTextRef = useRef<PIXI.Text | null>(null);
 
-  const {setHideHeaderSidebar} = useLayout();
+  const { setHideHeaderSidebar } = useLayout();
 
   useEffect(() => {
     if (waiting) return;
@@ -62,12 +63,12 @@ export const usePongGameLogic = (): returnType => {
         isInitialized = true;
 
         const scoreText = new PIXI.Text({
-          text: "0 | 0",
+          text: '0 | 0',
           style: {
             fontSize: 48,
             fill: 0x280a3e,
-            align: "center",
-          }
+            align: 'center',
+          },
         });
         scoreText.anchor.set(0.5);
         scoreText.x = GAME_WIDTH / 2;
@@ -100,21 +101,20 @@ export const usePongGameLogic = (): returnType => {
         rightPaddleRef.current = rightPaddle;
 
         const endText = new PIXI.Text({
-          text: "",
+          text: '',
           style: {
             fontSize: 48,
             fill: 0x280a3e,
-            align: "center",
-          }
+            align: 'center',
+          },
         });
         endText.anchor.set(0.5);
         endText.x = GAME_WIDTH / 2;
         endText.y = GAME_HEIGHT / 2;
         app.stage.addChild(endText);
         endTextRef.current = endText;
-
       } catch (error) {
-        console.error("Failed to initialize PixiJS app:", error);
+        console.error('Failed to initialize PixiJS app:', error);
         if (pixiApp.current) {
           pixiApp.current.destroy(true, { children: true });
           pixiApp.current = null;
@@ -148,21 +148,21 @@ export const usePongGameLogic = (): returnType => {
     socket.on('playerRole', (msg) => {
       console.log('player role: ', msg);
       if (msg === 'player1' && endTextRef.current) {
-        endTextRef.current.text = "waiting";
+        endTextRef.current.text = 'waiting';
       }
       playerRole.current = msg;
     });
     socket.on('startGame', (id) => {
       isPlaying.current = true;
-      console.log("Stared the game !!!!!");
+      console.log('Stared the game !!!!!');
       gameId.current = id;
       setWaiting(false);
       setHideHeaderSidebar(true);
     });
 
     socket.on('matchFound', (opponent) => {
-      console.log("Match Found: ", opponent.username);
-      setOpponent(opponent)
+      console.log('Match Found: ', opponent.username);
+      setOpponent(opponent);
     });
 
     socket.on('gameStateUpdate', (gameState: IGameState) => {
@@ -184,11 +184,12 @@ export const usePongGameLogic = (): returnType => {
         scoreTextRef.current.text = `${gameState.leftPaddle.score} | ${gameState.rightPaddle.score}`;
       }
 
-      if (gameState.status === "ended" && endTextRef.current) {
-        endTextRef.current.text = gameState.winner === playerRole.current ? "You Won" : "You Lost";
+      if (gameState.status === 'ended' && endTextRef.current) {
+        endTextRef.current.text =
+          gameState.winner === playerRole.current ? 'You Won' : 'You Lost';
         setHideHeaderSidebar(false);
       } else if (endTextRef.current) {
-        endTextRef.current.text = "";
+        endTextRef.current.text = '';
       }
     });
     socket.on('gameOver', () => {
