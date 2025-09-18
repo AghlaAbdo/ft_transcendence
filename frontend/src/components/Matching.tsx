@@ -1,10 +1,7 @@
 'use client';
 
-import Image from 'next/image';
-
 import { motion } from 'framer-motion';
-
-import avatar from '@/../public/avatars/avatar1.png';
+import Avatar from './Avatar';
 
 const avatars = [
   '/avatars/avatar1.png',
@@ -19,15 +16,15 @@ export default function Matching({
   opponent: null | { username: string; avatar: string };
 }) {
   return (
-    <div className='h-[calc(100vh-100px)] flex justify-center items-center gap-2 md:gap-12  px-2'>
-      <div className='w-48 flex flex-col gap-6 items-center'>
-        <Image src={avatar} alt='your avatar' className='w-full' />
+    <div className='h-[calc(100vh-100px)] flex justify-center items-center gap-2 sm:gap-12  px-2'>
+      <div className='w-30 sm:w-48 flex flex-col gap-6 items-center'>
+        <Avatar width={192} url='/avatars/avatar1.png' frame='gold2' />
         <span className='bg-gray-800 px-3 py-1 rounded-[8px] border-1 border-gray-500'>
           user_9823
         </span>
       </div>
 
-      <div className='w-36'>
+      <div className='w-20 sm:w-30 md:w-36'>
         <motion.img
           src='/images/vs.png'
           alt='VS'
@@ -41,7 +38,7 @@ export default function Matching({
         />
       </div>
 
-      <div className='w-48 flex flex-col gap-6 items-center'>
+      <div className='w-30 sm:w-48 flex flex-col gap-6 items-center'>
         {opponent ? (
           <>
             <motion.div
@@ -52,26 +49,19 @@ export default function Matching({
                 scale: { type: 'spring', bounce: 0.5, duration: 1 },
               }}
             >
-              <Image
-                src={avatar}
-                alt={opponent.username}
-                className='w-full rounded-full'
-                width={192}
-                height={192}
-              />
+              <Avatar width={192} url='/avatars/avatar2.png' frame='silver3' />
             </motion.div>
 
             <span className='bg-gray-800 px-3 py-1 rounded-[8px] border-1 border-gray-500'>
-              {opponent ? opponent.username : ''}
+              {opponent ? opponent.username : 'guest_9850'}
             </span>
           </>
         ) : (
-          <div className='relative h-60 sm:h-125 w-48 overflow-hidden flex items-end justify-center rounded-xl'>
+          <div className='relative h-60 sm:h-125 w-full overflow-hidden flex items-end justify-center rounded-xl'>
             {avatars.map((src, i) => (
-              <motion.img
+              <motion.div
                 key={i}
-                src={src}
-                className='absolute bottom-0 w-48 h-48 rounded-full object-cover'
+                className='absolute bottom-0 w-full rounded-full object-cover'
                 initial={{ opacity: 0, y: 0 }}
                 animate={{ opacity: [0, 1, 1, 0], y: [500, 250, -100, -500] }}
                 transition={{
@@ -80,7 +70,9 @@ export default function Matching({
                   ease: 'linear',
                   repeat: Infinity,
                 }}
-              />
+              >
+                <Avatar width={192} url={src} frame='silver1' />
+              </motion.div>
             ))}
           </div>
         )}
