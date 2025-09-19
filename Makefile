@@ -6,7 +6,7 @@ prod:
 	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_PROD) up --build
 
 dev:
-	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV) up --build
+	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV) up -d --build
 
 down:
 	docker compose -f $(DOCKER_COMPOSE_BASE) down
