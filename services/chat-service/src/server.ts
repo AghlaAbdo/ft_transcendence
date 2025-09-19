@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
 const start = async () => {
   try {
     await fastify.listen({ port: 4545, host: "0.0.0.0" });
-    console.log("server running on: localhost:4545");
+    console.log("Chat-service running on :4545");
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);
@@ -68,7 +68,7 @@ fastify.get("/shutdown", (req, rep) => {
 fastify.get("/api/chat/messages/:chatId", (request, reply) => {
   const { chatId } = request.params as { chatId: string };
   return getMessages(parseInt(chatId));
-});
+});``
 
 fastify.get("/api/chat/message/:MessageId", (request, reply) => {
   const { MessageId } = request.params as { MessageId: string };

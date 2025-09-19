@@ -21,7 +21,7 @@ export default function ChatPage() {
 
   useEffect(() => {
       if (selectedChatId){
-        fetch(`https://34.175.40.197/api/chat/messages/${selectedChatId}`) //protect with async, axios
+        fetch(`http://chat-service:4545/api/chat/chats/messages/${selectedChatId}`) //protect with async, axios
           .then((res) => res.json())
           .then((data: conversation[]) => {
             set_conv(data);
@@ -70,7 +70,7 @@ export default function ChatPage() {
     };
   }, [UserId, selectedChatId]);
   
-  const [SendMessage, setMessage] = useState<string | "">("");
+  // const [SendMessage, setMessage] = useState<string | "">("");
 
   useEffect(()=>{
     const userset = new URLSearchParams(window.location.search);

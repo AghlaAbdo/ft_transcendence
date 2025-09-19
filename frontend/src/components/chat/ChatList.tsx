@@ -43,7 +43,7 @@ export const Chatlist = ({
   useEffect(() => {
     // console.log('user in chatlist comp: ', userId);
     if (userId) {
-      fetch(`https://34.175.40.197/api/chat/chats/${userId}`)
+      fetch(`http://chat-service:4545/api/chat/${userId}`)
         .then((res) => res.json())
         .then((data: Chat[]) => {
           console.log("chats fetched from backend:", data);
@@ -55,7 +55,7 @@ export const Chatlist = ({
 
   return (
     <>
-      <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2">
+      <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 mt-20 ">
         <div className="flex items-center justify-between p-4 border-b border-gray-600">
           <h2 className="text-xl font-semibold text-white">Messages</h2>
           <button className="bg-purple-600 hover:bg-purple-700 rounded-lg p-2 transition-colors">
