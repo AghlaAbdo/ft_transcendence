@@ -186,6 +186,39 @@ export default function Sidebar() {
               />
             </svg>
           </Link>
+          <Link
+            className={`${linkBase} ${pathName.startsWith('/leaderboard') ? linkActive : ''}`}
+            href='/leaderboard'
+          >
+            {/* Leaderboard Icon */}
+            <svg
+              width='22'
+              height='22'
+              viewBox='0 0 16 16'
+              fill='none'
+              stroke='#6B7280'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M5.33333 6V14H2.66667C2.31304 14 1.97391 13.8595 1.72386 13.6095C1.47381 13.3594 1.33333 13.0203 1.33333 12.6667V7.33333C1.33333 6.97971 1.47381 6.64057 1.72386 6.39052C1.97391 6.14048 2.31304 6 2.66667 6H5.33333Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M10.6667 4V14H5.33337V4C5.33337 3.64638 5.47385 3.30724 5.7239 3.05719C5.97395 2.80714 6.31309 2.66667 6.66671 2.66667H9.33337C9.687 2.66667 10.0261 2.80714 10.2762 3.05719C10.5262 3.30724 10.6667 3.64638 10.6667 4Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M14.6667 8V14H10.6667V8C10.6667 7.64638 10.8071 7.30724 11.0572 7.05719C11.3072 6.80714 11.6464 6.66667 12 6.66667H13.3333C13.687 6.66667 14.0261 6.80714 14.2761 7.05719C14.5262 7.30724 14.6667 7.64638 14.6667 8Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+          </Link>
         </div>
       </div>
 
