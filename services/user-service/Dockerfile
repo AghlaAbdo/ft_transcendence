@@ -7,8 +7,9 @@ COPY . .
 # ---- Development ----
 FROM base AS development
 ENV NODE_ENV=development
-RUN npm install 
-CMD ["npm", "run", "dev"]
+COPY run_dev.sh /usr/local/bin/run_dev.sh
+RUN chmod +x /usr/local/bin/run_dev.sh
+CMD ["/usr/local/bin/run_dev.sh"]
 
 # ---- Production ----
 FROM base AS production
