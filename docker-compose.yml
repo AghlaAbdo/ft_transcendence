@@ -7,7 +7,7 @@ services:
     networks:
       - main_net
     ports:
-      - "443:443"
+      - "8080:8080"
 
   nextjs:
     container_name: nextjs
@@ -17,21 +17,21 @@ services:
     networks:
       - main_net
     
-  game-service:
-    container_name: game-service
-    image: game-service:1.0.0
-    build:
-      context: ./services/game-service
-    networks:
-      - main_net
+  # game-service:
+  #   container_name: game-service
+  #   image: game-service:1.0.0
+  #   build:
+  #     context: ./services/game-service
+  #   networks:
+  #     - main_net
 
-  user-service:
-    container_name: user-service
-    image: user-service:v2.0.0
-    build:
-      context: ./services/user-service
-    networks:
-      - main_net
+  # user-service:
+  #   container_name: user-service
+  #   image: user-service:v2.0.0
+  #   build:
+  #     context: ./services/user-service
+  #   networks:
+  #     - main_net
 
   chat-service:
     container_name: chat-service
