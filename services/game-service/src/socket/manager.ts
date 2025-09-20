@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import Fastify, { FastifyInstance } from 'fastify';
-import http from 'http'
+import http from 'http';
 import {
   handleConnection,
   handlePlay,
@@ -11,12 +11,12 @@ import {
 
 export function initializeSocketIO(server: http.Server): Server {
   const io: Server = new Server(server, {
-    path: "/ws/game",
+    path: '/ws/game',
     cors: {
-      origin: "*",
-    methods: ["GET", "POST"]
+      origin: '*',
+      methods: ['GET', 'POST'],
     },
-  }); 
+  });
 
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');

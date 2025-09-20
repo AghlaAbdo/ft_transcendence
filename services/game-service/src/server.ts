@@ -4,30 +4,29 @@ import { initializeSocketIO } from './socket/manager';
 import { initializeDb, getDb } from './database/db';
 import apiRouter from './api/router';
 
-
-
-
 const PORT = 4000;
 
 const httpServer = createServer();
 
-const serverFactory = (handler: (req: IncomingMessage, res: ServerResponse) => void) => {
+const serverFactory = (
+  handler: (req: IncomingMessage, res: ServerResponse) => void,
+) => {
   httpServer.on('request', handler);
   return httpServer;
 };
 
 const fastify: FastifyInstance = Fastify({
-  serverFactory: serverFactory
+  serverFactory: serverFactory,
 });
 
 initializeSocketIO(httpServer);
 
-fastify.addHook('onReady', ()=> {
+fastify.addHook('onReady', () => {
   initializeDb();
   fastify.decorate('db', getDb());
 });
 
-fastify.register(apiRouter, {prefix: '/api'});
+fastify.register(apiRouter, { prefix: '/api' });
 
 fastify.get('/hello', async (request, reply) => {
   return { message: 'Hello from Fastify!' };

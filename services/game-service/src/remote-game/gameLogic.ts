@@ -30,12 +30,26 @@ export function setIoInstance(io: Server): void {
 
 export function startGame(gameState: IGameState) {
   if (gameIntervals[gameState.id]) return;
-  // const gameState = getGameState();
-  gameState.status = 'playing';
-  gameIntervals[gameState.id] = setInterval(
-    () => gameLoop(gameState),
-    GAME_INTERVAL_MS,
-  );
+
+  for (let i = 1; i <= 3; i++) {
+    const j = 4 - i;
+
+    setTimeout(() => {
+      // console.log("starting:", j);
+      ioInstance.to(gameState.id).emit('starting', j);
+
+      if (j === 1) {
+        setTimeout(() => {
+          // console.log("started!!!!!!!!!");
+          gameState.status = 'playing';
+          gameIntervals[gameState.id] = setInterval(
+            () => gameLoop(gameState),
+            GAME_INTERVAL_MS,
+          );
+        }, 1000);
+      }
+    }, i * 1000);
+  }
 }
 
 function gameLoop(gameState: IGameState): void {
@@ -46,7 +60,6 @@ function gameLoop(gameState: IGameState): void {
     gameState.ball.y - BALL_RADIUS / 2 < 0 ||
     gameState.ball.y + BALL_RADIUS >= GAME_HEIGHT
   ) {
-    console.log('ball.y: ', gameState.ball.y);
     gameState.ball.dy *= -1;
   }
 
@@ -100,8 +113,7 @@ export function endGame(gameState: IGameState): void {
   if (gameState.leftPaddle.score > gameState.rightPaddle.score) {
     gameState.winner_id = gameState.player1_id;
     gameState.winner = 'player1';
-  }
-  else {
+  } else {
     gameState.winner_id = gameState.player2_id;
     gameState.winner = 'player2';
   }

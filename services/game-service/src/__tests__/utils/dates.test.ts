@@ -1,4 +1,4 @@
-import { getCurrDate, getDiffInMin } from "../../utils/dates";
+import { getCurrDate, getDiffInMin } from '../../utils/dates';
 
 describe('getCurrDate', () => {
   beforeAll(() => {
