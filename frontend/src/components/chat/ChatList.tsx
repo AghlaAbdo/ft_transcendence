@@ -5,6 +5,8 @@ import { Plus, Search } from "lucide-react";
 import { Search_Input } from "./Search_Input";
 import { formatDistanceToNow } from "date-fns";
 
+
+
 interface Message {
   id: number;
   chat_id: number;
@@ -42,8 +44,9 @@ export const Chatlist = ({
 
   useEffect(() => {
     // console.log('user in chatlist comp: ', userId);
+
     if (userId) {
-      fetch(`http://chat-service:4545/api/chat/${userId}`)
+      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`)
         .then((res) => res.json())
         .then((data: Chat[]) => {
           console.log("chats fetched from backend:", data);
@@ -86,7 +89,7 @@ export const Chatlist = ({
                   }`}
               >
                 <img
-                  src="/avatars/avatar6.png"
+                  src="/avatars/avatar3.png"
                   alt={`User ${otherUserId}`}
                   className="w-12 h-12 rounded-full mr-3"
                 />
