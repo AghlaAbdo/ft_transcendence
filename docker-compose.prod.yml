@@ -7,17 +7,17 @@ services:
     build:
       target: production
 
-  # game-service:
-  #   build:
-  #     target: production
-  #   env_file:
-  #     ./services/game-service/.env
+  game-service:
+    build:
+      target: production
+    env_file:
+      ./services/game-service/.env
 
-  # user-service:
-  #   build:
-  #     target: production
-  #   env_file:
-  #     ./services/user-service/.env
+  user-service:
+    build:
+      target: production
+    env_file:
+      ./services/user-service/.env
 
   chat-service:
     chat-service:
