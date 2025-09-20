@@ -1,7 +1,7 @@
 import Image from "next/image"
+import Link from "next/link"
 
-
-export default function Table({players}) {
+export default function Table({players, numOfPages, page, lastPage}) {
     return (
         <div className="m-10">
             <div className="
@@ -16,11 +16,11 @@ export default function Table({players}) {
                     <span>Games</span>
                 </div>
                 {
-                    players.map((player, index) => 
+                    players.map((player) => 
                     <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
                         hover:bg-[#222e43]
                     " key={player.username}>
-                        <li className="pl-2">{index + 1}</li>
+                        <li className="pl-2">{player.rank}</li>
                         <div className="flex items-center">
                             <Image
                             src="/avatars/avatar1.png"
@@ -34,6 +34,79 @@ export default function Table({players}) {
                         <li>{player.winrate} %</li>
                         <li>{player.games}</li>
                     </ul>
+                    )
+                }
+                {
+                    numOfPages > 1 && (
+                        <div className="mx-auto flex justify-between w-fit mx-auto mt-5 items-center">
+                            <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                flex items-center justify-center font-bold
+                                rounded-[4px] hover:bg-gray-400
+                            " 
+                            href={`leaderboard/?page=${1}`}>{"<<"}</Link>
+                            {
+                                page > 1 ? (
+                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    " 
+                                    href={`leaderboard/?page=${page - 1}`}>&lt;</Link>
+                                ):
+                                (
+                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    " 
+                                    href={`leaderboard/?page=${1}`}>&lt;</Link>
+                                )
+                            }
+                            <Link className="m-1 bg-[#9333EA] p-2 w-[30px] h-[30px] 
+                                flex items-center justify-center font-bold
+                                rounded-[4px]
+                            " 
+                            href={`leaderboard/?page=${page}`}>{page}</Link>
+                            {
+                                page + 1 < numOfPages ? (
+                                    <>
+                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    " 
+                                    href={`leaderboard/?page=${page + 1}`}>{page + 1}</Link>
+                                    <span className="w-[30px] text-center">...</span>
+                                    </>
+                                ): (
+                                    <></>
+                                )
+                            }
+                            {
+                                page < numOfPages ? (
+                               <>
+                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    " 
+                                    href={`leaderboard/?page=${numOfPages}`}>{numOfPages}</Link>
+                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    " 
+                                    href={`leaderboard/?page=${page + 1}`}>&gt;</Link>
+                               </>
+                            ):(
+                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    " 
+                                    href={`leaderboard/?page=${numOfPages}`}>&gt;</Link>
+                                )
+                            }
+                            <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                flex items-center justify-center font-bold
+                                rounded-[4px] hover:bg-gray-400
+                            " 
+                            href={`leaderboard/?page=${numOfPages}`}>{">>"}</Link>
+                        </div>
                     )
                 }
             </div>
