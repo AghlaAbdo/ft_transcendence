@@ -58,7 +58,7 @@ export const Chatlist = ({
 
   return (
     <>
-      <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 mt-20 ">
+      <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 ">
         <div className="flex items-center justify-between p-4 border-b border-gray-600">
           <h2 className="text-xl font-semibold text-white">Messages</h2>
           <button className="bg-purple-600 hover:bg-purple-700 rounded-lg p-2 transition-colors">

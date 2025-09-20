@@ -85,7 +85,7 @@ useEffect(() => {
 }, [selectedChatId]);
 
 return (
-  <div className="h-screen bg-[#111827] text-white flex px-2 gap-2 ">
+  <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
     <Chatlist
       onSelect={setSelectedChatId}
       selectedChatId={selectedChatId}
@@ -93,7 +93,7 @@ return (
       onReceiveChange={SetUser_2}
       conv={conv_}
     />
-    <div className="flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2 mt-20">
+    <div className="flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2">
       <ChatWindow SelectedChatId={selectedChatId} userId={UserId} conv={conv_} />
       {selectedChatId && <MessageInput onSendMessage={handleSendMessage} />}
     </div>
