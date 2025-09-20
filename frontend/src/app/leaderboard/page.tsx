@@ -4,10 +4,9 @@ import "./page.css"
 
 export default async function Leaderboard() {
     const players = await get_leaderboard()
-
     return (
         <div>
-            <Badge rank={1} imgSrc={"/avatars/avatar1.png"} />
+            <Badge rank={1} showCrown={true} imgSrc={"/avatars/avatar1.png"} username={players[0].username} score={players[0].score} />
         </div> 
     )
 }
