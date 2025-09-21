@@ -1,5 +1,8 @@
 import PlayButton from "@/components/dashboard/button"
 import BarChart from "@/components/dashboard/chart"
+import PieChart from "@/components/dashboard/pie"
+import Statistic from "@/components/dashboard/statistic"
+import Statistics from "@/components/dashboard/statistics"
 import Image from "next/image"
 
 export default function dashboard() {
@@ -22,7 +25,11 @@ export default function dashboard() {
                     </div>
                 </div>
                 {/* up right  */}
-                <div className="h-[40vh] rounded-[6px] m-2 mr-5 w-[70%] border-1 border-red-500">up right</div>
+                <div className="h-[40vh] rounded-[6px] m-2 mr-5 w-[70%] bg-gray-800">
+                    <PieChart/>
+                    {/* <Statistics label={"Total games"} value={56}/> */}
+                    <Statistic label={"Wins"} value={25} color="bg-green-500"/>
+                </div>
             </div>
             {/* down */}
             <div className="flex">
