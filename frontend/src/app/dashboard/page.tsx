@@ -1,4 +1,5 @@
-import PlayButton from "@/components/leaderboard/button"
+import PlayButton from "@/components/dashboard/button"
+import BarChart from "@/components/dashboard/chart"
 import Image from "next/image"
 
 export default function dashboard() {
@@ -26,7 +27,9 @@ export default function dashboard() {
             {/* down */}
             <div className="flex">
                 {/* down left */}
-                <div className="h-[40vh] rounded-[6px] m-2 ml-5 mb-5 w-[30%] border-1 border-red-500">down left</div>
+                <div className="h-[40vh] rounded-[6px] m-2 ml-5 mb-5 w-[30%]">
+                    <BarChart/>
+                </div>
                 {/* down right  */}
                 <div className="h-[40vh] rounded-[6px] m-2 mr-5 mb-5 w-[70%] border-1 border-red-500">down right</div>
             </div>
