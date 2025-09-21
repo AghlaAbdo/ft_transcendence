@@ -27,9 +27,9 @@ export default function GamePage() {
       {waiting ? (
         <Matching opponent={opponent} />
       ) : (
-        <div className='flex flex-col gap-4 justify-center'>
+        <div className='flex flex-col gap-4 justify-center items-center'>
           <GamePlayers leftUser={leftUser} rightUser={rightUser} />
-          <div ref={containerRef} className='flex justify-center'></div>
+          <div ref={containerRef} className='w-full max-w-[1500px] rounded-[8px] overflow-hidden aspect-[3/2] border-2 border-pink shadow-[0_0_14px_4px_rgba(236,72,135,1)]'></div>
         </div>
       )}
     </>

@@ -12,6 +12,7 @@ import {
   PADDLE_WIDTH,
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
+import { scale } from 'framer-motion';
 
 interface returnType {
   handlePlayBtn: () => void;
@@ -39,6 +40,7 @@ export const usePongGameLogic = (): returnType => {
   const scoreTextRef = useRef<PIXI.Text | null>(null);
   const endTextRef = useRef<PIXI.Text | null>(null);
   const coundDownRef = useRef<PIXI.Text | null>(null);
+  const gameContainerRef = useRef<PIXI.Container | null>(null);
 
   const { setHideHeaderSidebar } = useLayout();
 
@@ -74,9 +76,8 @@ export const usePongGameLogic = (): returnType => {
         const app = new PIXI.Application();
 
         await app.init({
-          width: GAME_WIDTH,
-          height: GAME_HEIGHT,
-          backgroundColor: 0xf2edd1,
+          resizeTo: containerRef.current!,
+          backgroundColor: 0x1F2937,
           antialias: true,
           resolution: window.devicePixelRatio || 1,
           autoDensity: true,
@@ -87,73 +88,117 @@ export const usePongGameLogic = (): returnType => {
         pixiApp.current = app;
         isInitialized = true;
 
+        const gameContainer = new PIXI.Container();
+        app.stage.addChild(gameContainer);
+        gameContainerRef.current = gameContainer;
+
+        // Middle dashed line
+        const middleLinePx = new PIXI.Graphics();
+        gameContainer.addChild(middleLinePx);
+        middleLinePx.clear();
+        const dash = 23;
+        const gap = 22;
+        const lineWidth = 3;
+        const cw = GAME_WIDTH;
+        const ch = GAME_HEIGHT;
+        const cx = cw / 2;
+        for (let y = 0; y < ch; y += dash + gap) {
+          middleLinePx.moveTo(cx, y);
+          middleLinePx.lineTo(cx, Math.min(y + dash, ch));
+        }
+        middleLinePx.stroke({ width: lineWidth, color: 0xf9fafb, alpha: 1 });
+
+        // Middle circle
+        const circle = new PIXI.Graphics();
+        circle.circle(GAME_WIDTH / 2, GAME_HEIGHT / 2, 40);
+        circle.fill(0x1F2937);
+        circle.stroke({ width: 2, color: 0xf9fafb, alpha: 1 });
+        gameContainer.addChild(circle);
+
+        // Score Text
         const scoreText = new PIXI.Text({
-          text: '0 | 0',
+          text: '0    0',
           style: {
-            fontSize: 48,
-            fill: 0x280a3e,
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            fontSize: 54 ,
+            fill: 0xf9fafb,
             align: 'center',
           },
+          resolution: 2,
         });
         scoreText.anchor.set(0.5);
-        scoreText.x = GAME_WIDTH / 2;
-        scoreText.y = 80;
-        app.stage.addChild(scoreText);
+        scoreText.x = (GAME_WIDTH ) / 2;
+        scoreText.y = 60;
+        gameContainer.addChild(scoreText);
         scoreTextRef.current = scoreText;
 
+        // Ball
         const ball = new PIXI.Graphics();
-        ball.circle(0, 0, BALL_RADIUS);
+        ball.circle(0, 0, BALL_RADIUS );
         ball.fill(0x689b8a);
-        ball.x = GAME_WIDTH / 2;
-        ball.y = GAME_HEIGHT / 2;
-        app.stage.addChild(ball);
+        ball.x = (GAME_WIDTH ) / 2;
+        ball.y = (GAME_HEIGHT ) / 2;
+        gameContainer.addChild(ball);
         ballRef.current = ball;
 
+        // Left Paddle
         const leftPaddle = new PIXI.Graphics();
-        leftPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
-        leftPaddle.fill(0x280a3e);
+        leftPaddle.rect(0, 0, (PADDLE_WIDTH ), (PADDLE_HEIGHT ));
+        leftPaddle.fill(0x9333EA);
         leftPaddle.x = 0;
-        leftPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
-        app.stage.addChild(leftPaddle);
+        leftPaddle.y = ((GAME_HEIGHT ) / 2 - (PADDLE_HEIGHT ) / 2);
+        gameContainer.addChild(leftPaddle);
         leftPaddleRef.current = leftPaddle;
 
+        // Right paddle
         const rightPaddle = new PIXI.Graphics();
-        rightPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
-        rightPaddle.fill(0x280a3e);
-        rightPaddle.x = GAME_WIDTH - PADDLE_WIDTH;
-        rightPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
-        app.stage.addChild(rightPaddle);
+        rightPaddle.rect(0, 0, (PADDLE_WIDTH ), (PADDLE_HEIGHT ));
+        rightPaddle.fill(0x9333EA);
+        rightPaddle.x = (GAME_WIDTH  - (PADDLE_WIDTH ));
+        rightPaddle.y = ((GAME_HEIGHT ) / 2 - (PADDLE_HEIGHT ) / 2);
+        gameContainer.addChild(rightPaddle);
         rightPaddleRef.current = rightPaddle;
 
+        // Result Text
         const endText = new PIXI.Text({
           text: '',
           style: {
-            fontSize: 48,
-            fill: 0x280a3e,
+            fontSize: 48 ,
+            fill: 0xf9fafb,
             align: 'center',
           },
         });
         endText.anchor.set(0.5);
-        endText.x = GAME_WIDTH / 2;
-        endText.y = GAME_HEIGHT / 2;
-        app.stage.addChild(endText);
+        endText.x = (GAME_WIDTH ) / 2;
+        endText.y = (GAME_HEIGHT ) / 2;
+        gameContainer.addChild(endText);
         endTextRef.current = endText;
 
+        // Count Down
         const countdownText = new PIXI.Text({
           text: '',
           style: {
             fontFamily: 'Arial',
-            fontSize: 120,
-            fill: 0x111827,
+            fontWeight: 'bold',
+            fontSize: 124 ,
+            fill: 0xEAB308,
             align: 'center',
           },
         });
-
         countdownText.anchor.set(0.5);
-        countdownText.x = app.screen.width / 2;
-        countdownText.y = app.screen.height / 2;
-        app.stage.addChild(countdownText);
+        countdownText.x = GAME_WIDTH / 2;
+        countdownText.y = GAME_HEIGHT / 2;
+        gameContainer.addChild(countdownText);
         coundDownRef.current = countdownText;
+
+        const scaleX = pixiApp.current!.renderer.width / GAME_WIDTH;
+        const scaleY = pixiApp.current!.renderer.height / GAME_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+        gameContainerRef.current!.scale.set(scale);
+        gameContainerRef.current!.x = (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
+        gameContainerRef.current!.y = (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
+
       } catch (error) {
         console.error('Failed to initialize PixiJS app:', error);
         if (pixiApp.current) {
@@ -228,7 +273,7 @@ export const usePongGameLogic = (): returnType => {
       }
 
       if (scoreTextRef.current) {
-        scoreTextRef.current.text = `${gameState.leftPaddle.score} | ${gameState.rightPaddle.score}`;
+        scoreTextRef.current.text = `${gameState.leftPaddle.score}    ${gameState.rightPaddle.score}`;
       }
 
       if (gameState.status === 'ended' && endTextRef.current) {
@@ -244,9 +289,24 @@ export const usePongGameLogic = (): returnType => {
     });
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
+    
+    function resize() {
+      if (!pixiApp.current || !gameContainerRef.current)
+        return;
+      const scaleX = pixiApp.current.renderer.width / GAME_WIDTH;
+      const scaleY = pixiApp.current.renderer.height / GAME_HEIGHT;
+      const scale = Math.min(scaleX, scaleY);
+      gameContainerRef.current.scale.set(scale);
+      gameContainerRef.current.x = (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
+      gameContainerRef.current.y = (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
+    }
+
+    window.addEventListener("resize", resize);
+
     return () => {
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
+      window.removeEventListener('resize', resize);
       socket.disconnect();
     };
   }, []);

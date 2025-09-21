@@ -20,12 +20,12 @@ export default function GamePlayers({
   };
 }) {
   return (
-    <div className='flex gap-5 items-center justify-center'>
+    <div className='flex gap-1 md:gap-5 items-center justify-center'>
       <div>
-        <div className='flex gap-2 items-center'>
+        <div className='flex gap-1 md:gap-2 items-center'>
           <div className='relative'>
             <div className='absolute left-0 top-1/2 -translate-y-1/2'>
-              <div className='relative w-12'>
+              <div className='relative w-8 md:w-12'>
                 <Image
                   width={24}
                   height={24}
@@ -33,22 +33,22 @@ export default function GamePlayers({
                   alt='star'
                   className='w-full pointer-events-none'
                 />
-                <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-lg font-bold text-stroke-[2px] text-stroke-black'>
+                <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px] md:text-[16px] text-gray-50 font-bold drop-shadow-[0_0_2px_black]'>
                   {leftUser.level}
                 </span>
               </div>
             </div>
-            <span className='block w-52 font-bold text-[20px] text-right px-2 py-1 rounded-[8px] bg-gray-600 ml-4'>
+            <span className='block w-24 md:w-52 font-bold text-[12px] md:text-[20px] text-right px-1 md:px-2 py-[2px] md:py-1 rounded-[8px] bg-gray-600 ml-3 md:ml-4'>
               {leftUser.username}
             </span>
           </div>
-          <div className='w-20'>
+          <div className='w-10 md:w-20'>
             <Avatar width={42} url={leftUser.avatar} frame={leftUser.frame} />
           </div>
         </div>
       </div>
 
-      <div className='w-16'>
+      <div className='w-4 md:w-16'>
         <Image
           width={56}
           height={56}
@@ -59,13 +59,13 @@ export default function GamePlayers({
       </div>
 
       <div>
-        <div className='flex gap-2 items-center'>
-          <div className='w-20'>
+        <div className='flex gap-1 md:gap-2 items-center'>
+          <div className='w-10 md:w-20'>
             <Avatar width={42} url={rightUser.avatar} frame={rightUser.frame} />
           </div>
           <div className='relative'>
             <div className='absolute right-0 top-1/2 -translate-y-1/2'>
-              <div className='relative w-12'>
+              <div className='relative w-8 md:w-12'>
                 <Image
                   width={24}
                   height={24}
@@ -73,12 +73,12 @@ export default function GamePlayers({
                   alt='star'
                   className='w-full pointer-events-none'
                 />
-                <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-lg font-bold text-stroke-[2px] text-stroke-black'>
+                <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px] md:text-[16px] text-gray-50 font-bold drop-shadow-[0_0_2px_black]'>
                   {rightUser.level}
                 </span>
               </div>
             </div>
-            <span className='block w-52 font-bold text-[20px] text-left px-2 py-1 rounded-[8px] bg-gray-600 mr-4'>
+            <span className='block w-24 md:w-52 font-bold text-[12px] md:text-[20px] text-left px-1 md:px-2 py-[2px] md:py-1 rounded-[8px] bg-gray-600 mr-3 md:mr-4'>
               {rightUser.username}
             </span>
           </div>
