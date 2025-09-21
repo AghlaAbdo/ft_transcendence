@@ -26,7 +26,7 @@ export default function Sidebar() {
       }}
       className={` bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center `}
     >
-      <div className='flex flex-col items-center gap-[70px]'>
+      <div className='flex flex-col items-center gap-[70px] z-1000'>
         <Link href='/'>
           {/* Logo Icon*/}
           <svg
@@ -67,26 +67,38 @@ export default function Sidebar() {
 
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
-            className={`${linkBase} ${pathName.startsWith('/home') ? linkActive : ''}`}
-            href='/home'
+            className={`${linkBase} ${pathName.startsWith('/dashboard') ? linkActive : ''}`}
+            href='/dashboard'
           >
-            {/* Home Icon*/}
+            {/* Dashboard Icon */}
             <svg
               width='22'
               height='22'
-              viewBox='0 0 17 16'
+              viewBox='0 0 16 16'
               fill='none'
               stroke='#6B7280'
               xmlns='http://www.w3.org/2000/svg'
             >
               <path
-                d='M10.67 14V8.66667C10.67 8.48986 10.5997 8.32029 10.4747 8.19526C10.3497 8.07024 10.1801 8 10.0033 8H7.33665C7.15984 8 6.99027 8.07024 6.86525 8.19526C6.74022 8.32029 6.66998 8.48986 6.66998 8.66667V14'
+                d='M2 2H7.33333V7.33333H2V2Z'
                 strokeWidth='1.33333'
                 strokeLinecap='round'
                 strokeLinejoin='round'
               />
               <path
-                d='M2.66998 6.66667C2.66994 6.47271 2.71221 6.28108 2.79384 6.10514C2.87548 5.92921 2.99451 5.7732 3.14265 5.648L7.80932 1.64867C8.04997 1.44527 8.35489 1.33368 8.66998 1.33368C8.98508 1.33368 9.28999 1.44527 9.53065 1.64867L14.1973 5.648C14.3455 5.7732 14.4645 5.92921 14.5461 6.10514C14.6278 6.28108 14.67 6.47271 14.67 6.66667V12.6667C14.67 13.0203 14.5295 13.3594 14.2795 13.6095C14.0294 13.8595 13.6903 14 13.3366 14H4.00332C3.64969 14 3.31056 13.8595 3.06051 13.6095C2.81046 13.3594 2.66998 13.0203 2.66998 12.6667V6.66667Z'
+                d='M8.66667 2H14V7.33333H8.66667V2Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M8.66667 8.66667H14V14H8.66667V8.66667Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M2 8.66667H7.33333V14H2V8.66667Z'
                 strokeWidth='1.33333'
                 strokeLinecap='round'
                 strokeLinejoin='round'
