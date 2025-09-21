@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import * as PIXI from 'pixi.js';
 
-import { socket } from '@/app/lib/socket';
+import { socket } from '@/app/(protected)/lib/socket';
 import {
   BALL_RADIUS,
   GAME_HEIGHT,
