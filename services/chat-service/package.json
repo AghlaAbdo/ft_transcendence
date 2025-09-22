@@ -2,11 +2,11 @@
     "name": "back-end",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "server.ts",
     "type": "module",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "node --loader ts-node/esm src/server.ts"
+        "dev": "npx tsx src/server.ts"
     },
     "keywords": [],
     "author": "",
@@ -22,6 +22,7 @@
         "@types/better-sqlite3": "^7.6.13",
         "@types/node": "^24.3.0",
         "ts-node": "^10.9.2",
+        "tsx": "^4.0.0",
         "typescript": "^5.9.2"
     }
 }

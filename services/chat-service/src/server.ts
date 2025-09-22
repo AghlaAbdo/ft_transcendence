@@ -5,7 +5,7 @@ import { getMessages, insert_message, getMessage } from "./database/conversation
 import { getChats } from "./database/chats.js";
 
 const fastify = Fastify();
-await fastify.register(cors, { origin: "*" });
+fastify.register(cors, { origin: "*" });
 const io = new SocketIOServer(fastify.server, { cors: { origin: "*" } });
 declare module "socket.io" {
   interface Socket {
@@ -13,13 +13,17 @@ declare module "socket.io" {
   }
 }
 
-const onlineUsers: Map<number, socket> = new Map();
+const onlineUsers: Map<number, Socket> = new Map();
 
-io.on("connection", (socket) => {
-  const use__rId = socket.handshake.auth.user_id;
-  if (!use__rId)
+io.on("connection", (socket: Socket) => {
+  const user__id = socket.handshake.auth.user_id;
+  if (!user__id)
     return socket.disconnect();
-  socket.userId = use__rId;
+
+  socket.userId = user__id;
+
+  onlineUsers.set(user__id, socket); // store socket
+  
   console.log("User connected:", socket.userId);
   socket.on("ChatMessage", (data) => {
     const chat_id = data.chatId;
@@ -30,13 +34,12 @@ io.on("connection", (socket) => {
       data.receiver,
       content
     );
-    if (newMessage) {
-      io.to(`chat:${chat_id}`).emit("ChatMessage", newMessage);
+    if (!newMessage)
+        return ;
+    const receiverSocket = onlineUsers.get(data.receiver);
+    if (receiverSocket) {
+      receiverSocket.emit("ChatMessage", newMessage);
     }
-  });
-  socket.on("joinChat", (chat_selected) => {
-    socket.join(`chat:${chat_selected}`);
-    console.log("user join chat: ", chat_selected);
   });
   socket.on("disconnect", () => {
     console.log("user disconnected:", socket.id);
@@ -55,17 +58,17 @@ const start = async () => {
 
 start();
 
-fastify.get("/api/chat/messages/:chatId", (request, reply) => {
+fastify.get("/api/chat/messages/:chatId", (request) => {
   const { chatId } = request.params as { chatId: string };
   return getMessages(parseInt(chatId));
 });
 
-fastify.get("/api/chat/message/:MessageId", (request, reply) => {
+fastify.get("/api/chat/message/:MessageId", (request) => {
   const { MessageId } = request.params as { MessageId: string };
   return getMessage(parseInt(MessageId));
 });
 
-fastify.get("/api/chat/chats/:userId", (request, reply) => {
+fastify.get("/api/chat/chats/:userId", (request) => {
   const { userId } = request.params as { userId: string };
   // if (!Number.isInteger(userId))
   // return reply.status(400).send({ error: "invalid userId" });

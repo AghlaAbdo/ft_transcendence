@@ -45,9 +45,8 @@ export default function ChatPage() {
       });
     }
   };
-
   const [UserId, SetUser] = useState<number | null>(null)
-  const [UserId_2, SetUser_2] = useState<number | null>(null) // second user which is the receiver
+  const [UserId_2, SetUser_2] = useState<number | null>(null) //second user which is the receiver
   useEffect(() => {
     const socket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`, {
       path: '/ws/chat/socket.io/',
@@ -77,12 +76,12 @@ useEffect(() => {
   console.log('user is: ', userFromUrl);
 }, [])
 
-useEffect(() => {
-  if (socketRef.current && selectedChatId) {
-    console.log("chat changed from front"); // remove later ni9a
-    socketRef.current.emit("joinChat", selectedChatId);
-  }
-}, [selectedChatId]);
+// useEffect(() => {
+//   if (socketRef.current && selectedChatId) {
+//     console.log("chat changed from front"); // remove later ni9a
+//     socketRef.current.emit("joinChat", selectedChatId);
+//   }
+// }, [selectedChatId]);
 
 return (
   <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
