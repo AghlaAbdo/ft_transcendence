@@ -43,8 +43,6 @@ export const Chatlist = ({
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
-    // console.log('user in chatlist comp: ', userId);
-
     if (userId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`)
         .then((res) => res.json())

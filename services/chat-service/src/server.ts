@@ -13,9 +13,12 @@ declare module "socket.io" {
   }
 }
 
+const onlineUsers: Map<number, socket> = new Map();
+
 io.on("connection", (socket) => {
   const use__rId = socket.handshake.auth.user_id;
-   if (!use__rId) return socket.disconnect();
+  if (!use__rId)
+    return socket.disconnect();
   socket.userId = use__rId;
   console.log("User connected:", socket.userId);
   socket.on("ChatMessage", (data) => {

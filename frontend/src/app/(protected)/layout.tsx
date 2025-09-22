@@ -16,7 +16,7 @@ const AppLayout = ({
       <LayoutProvider>
         <Sidebar />
         <Header />
-        <main className='mt-[100px] md:ml-[72px]'>{children}</main>
+        <main className='mt-[72px] md:ml-[72px]'>{children}</main>
       </LayoutProvider>
     </div>
   )

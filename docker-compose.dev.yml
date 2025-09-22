@@ -20,23 +20,23 @@ services:
     env_file:
       ./services/chat-service/.env
 
-  game-service:
-    build:
-      target: development
-    volumes:
-      - ./services/game-service:/app
-    env_file:
-      ./services/game-service/.env.dev
-    ports:
-      - "4000:4000"
+  # game-service:
+  #   build:
+  #     target: development
+  #   volumes:
+  #     - ./services/game-service:/app
+  #   env_file:
+  #     ./services/game-service/.env.dev
+  #   ports:
+  #     - "4000:4000"
 
-  user-service:
-    build:
-      target: development
-    env_file:
-      ./services/user-service/.env
-    volumes:
-      - ./services/user-service/:/app
+  # user-service:
+  #   build:
+  #     target: development
+  #   env_file:
+  #     ./services/user-service/.env
+  #   volumes:
+  #     - ./services/user-service/:/app
 
   chat-service:
     build:
