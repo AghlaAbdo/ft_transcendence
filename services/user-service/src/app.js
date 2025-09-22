@@ -2,7 +2,8 @@ import Fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifySession from '@fastify/session';
 import databasePlugin from './plugins/database.js'
-import authPlugin from './plugins/auth.js'
+import fastifyCORS from '@fastify/cors';
+import authPlugin from './plugins/auth.js';
 import authRoutes from './routes/auth.js';
 import oauthPlugin from './plugins/oauth.js';
 import userRoutes from './routes/users.js';
@@ -18,6 +19,11 @@ const createApp = () => {
     
     // fastify.register(fastifyCookie);
     // Session management
+    // fastify.register(fastifyCORS, {
+    //     origin: ['http://localhost:3000'],  // your frontend
+    //     credentials: true
+    // });
+
     fastify.register(fastifyCookie);
     // fastify.register(fastifySession, {
     //     secret: process.env.SESSION_SECRET,

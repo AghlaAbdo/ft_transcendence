@@ -5,6 +5,7 @@ import Input from '../../../components/auth/Input'
 import { Mail, Lock, User } from 'lucide-react'
 import Link from 'next/link';
 import { toast } from "sonner";
+import { redirect } from 'next/navigation';
 
 
 // function SignupForm() {
@@ -38,44 +39,47 @@ const SignUpPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   console.log(username, email, password);
   
     const handleSignUp = async (e: React.FormEvent) => {
       e.preventDefault();
-      setIsLoading(true);
+      // setIsLoading(true);
       setMessage('');
   
       try {
         // Changed from 'http://localhost:5000/api/auth/signup' to relative path
-        const response = await fetch('https://34.175.183.78/api/auth/signup', {
+        const response = await fetch('http://localhost:8080/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, email, password }),
+          credentials: "include"  // allow cookies
         });
   
         const data = await response.json();
-        console.log(data);
+        console.log("data --> ", data.status, data.message);
         
         if (response.ok) {
           toast.success("✅ Logged in successfully!");
 
           setMessage('Signup successful!');
-          // Optional: Clear form or redirect
-          // setUsername('');
-          // setEmail('');
-          // setPassword('');
+
         } else {
+          toast.error(`❌ ${data.message}`);
           setMessage(data.error || 'Signup failed.');
         }
       } catch (error) {
-        console.error('Signup error:', error);
-        toast.error("❌ Invalid credentials");
+        toast.error(`❌ Network error. Please check your connection and try again.`);
         setMessage('Network error. Please check your connection and try again.');
-      } finally {
-        setIsLoading(false);
-      }
+      } 
+      // finally {
+        // setIsLoading(false);
+      // }
+    }
+
+    const handleGoogleLogin = async (e: React.FormEvent) => {
+      window.location.href = 'http://localhost:8080/api/auth/google';
     }
 
   return (
@@ -135,8 +139,8 @@ const SignUpPage = () => {
 
           
           <button 
-              type='submit'
-              // onClick={handleGoogleLogin}
+              type='button'
+              onClick={handleGoogleLogin}
               className='flex justify-center items-center border-2 border-slate-700
                   p-2 rounded-lg shadow-md w-full gap-3 hover:shadow-sky-500
                   focus:outline-2 focus:outline-offset-2 focus:outline-sky-500 bg-gray-700' >
@@ -146,13 +150,14 @@ const SignUpPage = () => {
 
       </form>
       {/* {message && <p className="text-center text-white mt-4">{message}</p>} */}
-      {message && (
+      {
+        message && (
           <p className={`text-center mt-4 ${
             message.includes('successful') ? 'text-green-400' : 'text-red-400'
           }`}>
             {message}
-          </p>
-      )}
+          </p>)
+      }
     </div>
   </div>
   )
