@@ -8,23 +8,28 @@
   --background: #ffffff;
   --foreground: #171717;
   --bg-color: #111827;
+  --dark-blue: #000030;
   --gray-800: #1f2937;
+  --gray-700: #374151;
   --gray-500: #6b7280;
   --gray-200: #cdd3e0;
   --gray-50: #f9fafb;
   --purple: #9333ea;
   --pink: #ec4899;
-  --green: #0ece41;
+  --green: #15A426;
   --red: #b02c2c;
   --blue: #3b82f6;
   --aqua: #00dd9e;
+  --gold: #EAB308;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-bg-color: var(--bg-color);
+  --color-dark-blue: var(--dark-blue);
   --color-gray-800: var(--gray-800);
+  --color-gray-700: var(--gray-700);
   --color-gray-500: var(--gray-500);
   --color-gray-200: var(--gray-200);
   --color-gray-50: var(--gray-50);
@@ -34,6 +39,7 @@
   --color-red: var(--red);
   --color-blue: var(--blue);
   --color-aqua: var(--aqua);
+  --color-gold: var(--gold);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

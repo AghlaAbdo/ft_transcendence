@@ -27,8 +27,8 @@ export default function GamePlayers({
             <div className='absolute left-0 top-1/2 -translate-y-1/2'>
               <div className='relative w-8 md:w-12'>
                 <Image
-                  width={24}
-                  height={24}
+                  width={48}
+                  height={48}
                   src='/images/star.png'
                   alt='star'
                   className='w-full pointer-events-none'
@@ -43,15 +43,15 @@ export default function GamePlayers({
             </span>
           </div>
           <div className='w-10 md:w-20'>
-            <Avatar width={42} url={leftUser.avatar} frame={leftUser.frame} />
+            <Avatar width={80} url={leftUser.avatar} frame={leftUser.frame} />
           </div>
         </div>
       </div>
 
       <div className='w-4 md:w-16'>
         <Image
-          width={56}
-          height={56}
+          width={64}
+          height={64}
           alt='vs'
           src='/images/vs.png'
           className='w-full'
@@ -61,14 +61,14 @@ export default function GamePlayers({
       <div>
         <div className='flex gap-1 md:gap-2 items-center'>
           <div className='w-10 md:w-20'>
-            <Avatar width={42} url={rightUser.avatar} frame={rightUser.frame} />
+            <Avatar width={80} url={rightUser.avatar} frame={rightUser.frame} />
           </div>
           <div className='relative'>
             <div className='absolute right-0 top-1/2 -translate-y-1/2'>
               <div className='relative w-8 md:w-12'>
                 <Image
-                  width={24}
-                  height={24}
+                  width={48}
+                  height={48}
                   src='/images/star.png'
                   alt='star'
                   className='w-full pointer-events-none'

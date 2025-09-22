@@ -33,19 +33,19 @@ export default function RootLayout({
     //   <body
     //     className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
     //   >
-    //     <LayoutProvider>
     //       <Sidebar />
     //       <Header />
     //       <main className='md:ml-[72px] md:mt-[72px]'>{children}</main>
-    //     </LayoutProvider>
     //   </body>
     // </html>
-
+    
     <html lang="en">
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
-        >
-            {children}
+            >
+            <LayoutProvider>
+              {children}
+            </LayoutProvider>
         </body>
     </html>
   );

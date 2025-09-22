@@ -18,6 +18,7 @@ interface returnType {
   handlePlayBtn: () => void;
   handleStopBtn: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  dialogRef: React.RefObject<HTMLDialogElement | null>;
   waiting: boolean;
   opponent: null | { username: string; avatar: string };
 }
@@ -30,6 +31,7 @@ export const usePongGameLogic = (): returnType => {
   const gameId = useRef<string>(null);
   const isPlaying = useRef<boolean>(false);
   const playerRole = useRef<'player1' | 'player2'>(null);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pixiApp = useRef<PIXI.Application | null>(null);
@@ -279,13 +281,14 @@ export const usePongGameLogic = (): returnType => {
       if (gameState.status === 'ended' && endTextRef.current) {
         endTextRef.current.text =
           gameState.winner === playerRole.current ? 'You Won' : 'You Lost';
-        setHideHeaderSidebar(false);
+        // setHideHeaderSidebar(false);
       } else if (endTextRef.current) {
         endTextRef.current.text = '';
       }
     });
     socket.on('gameOver', () => {
       isPlaying.current = false;
+      dialogRef.current?.showModal();
     });
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
@@ -351,6 +354,7 @@ export const usePongGameLogic = (): returnType => {
     handlePlayBtn,
     handleStopBtn,
     containerRef,
+    dialogRef,
     waiting,
     opponent,
   };
