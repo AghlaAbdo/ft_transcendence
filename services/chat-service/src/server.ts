@@ -19,11 +19,8 @@ io.on("connection", (socket: Socket) => {
   const user__id = socket.handshake.auth.user_id;
   if (!user__id)
     return socket.disconnect();
-
   socket.userId = user__id;
-
   onlineUsers.set(user__id, socket); // store socket
-  
   console.log("User connected:", socket.userId);
   socket.on("ChatMessage", (data) => {
     const chat_id = data.chatId;
@@ -36,13 +33,17 @@ io.on("connection", (socket: Socket) => {
     );
     if (!newMessage)
         return ;
+    socket.emit("ChatMessage", newMessage); // here check if the user if a freind
     const receiverSocket = onlineUsers.get(data.receiver);
     if (receiverSocket) {
       receiverSocket.emit("ChatMessage", newMessage);
     }
   });
-  socket.on("disconnect", () => {
-    console.log("user disconnected:", socket.id);
+    socket.on("disconnect", () => {
+    if (socket.userId) {
+      onlineUsers.delete(socket.userId);
+      console.log(`User ${socket.userId} disconnected and removed from map`);
+    }
   });
 });
 

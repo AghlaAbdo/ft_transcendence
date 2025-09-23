@@ -9,7 +9,8 @@ COPY package*.json ./
 RUN npm i
 
 # copy rest of the source (excluding node_modules because of .dockerignore)
-COPY . .
+# COPY . .
 
 EXPOSE 4545
+
 CMD ["npm", "run", "dev"]

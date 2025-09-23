@@ -18,9 +18,10 @@ export function getMessages(chatId: number) {
 
 const updateChatStmt = db.prepare(`
   UPDATE chats
-  SET last_message_content = ?, last_message_timestamp = CURRENT_TIMESTAMP
+  SET last_message_content = ?,
+      last_message_timestamp = CURRENT_TIMESTAMP
   WHERE chat_id = ?
-  `);
+`);
 
 const insertStmt = db.prepare(`
   INSERT INTO messages (chat_id, sender, receiver, content)
@@ -35,6 +36,7 @@ export const getMessage = (MessageId: number) =>
 }
 
 export function insert_message(chat_id: number, sender: number, receiver: number, content: string) {
+  console.log("chat : " + chat_id + ", sender: " + sender + " reciver: " + receiver + " content: " + content);
   const info = insertStmt.run(chat_id, sender, receiver, content);
   const newMessageId = info.lastInsertRowid as number;
   updateChatStmt.run(content, chat_id);

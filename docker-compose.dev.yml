@@ -43,6 +43,6 @@ services:
       target: base
     env_file:
       ./services/chat-service/.env
-    # volumes:
-    #   - ./chat-service/back-end/src:/app/src
-    #   - ./chat-service/back-end/chat.db:/app/chat.db
+    volumes:
+      - ./chat-service/back-end/src:/app/src
+      - ./chat-service/back-end/chat.db:/app/chat.db

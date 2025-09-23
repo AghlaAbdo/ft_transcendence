@@ -56,17 +56,12 @@ export default function ChatPage() {
   socket.on("ChatMessage", (data) => {
     console.log("testing: " + selectedChatId)
     console.log("a message arries : " + data.content + " from chat: " + data.chat_id + " and id = " + data.id)
-    if (selectedChatId == data.chat_id) {
-      console.log("object arrives: " + data.receiver);
       set_conv((prevMessages) => [...prevMessages, data])
-    }
-    //what to do , i do not know ni9a, here we are going to recieve the message
   });
   return () => {
     socket.disconnect();
-    // also i do not know what to do here hhhhh
   };
-}, [UserId, selectedChatId]);
+}, [UserId]);
 
 useEffect(() => {
   const userset = new URLSearchParams(window.location.search);
@@ -76,12 +71,6 @@ useEffect(() => {
   console.log('user is: ', userFromUrl);
 }, [])
 
-// useEffect(() => {
-//   if (socketRef.current && selectedChatId) {
-//     console.log("chat changed from front"); // remove later ni9a
-//     socketRef.current.emit("joinChat", selectedChatId);
-//   }
-// }, [selectedChatId]);
 
 return (
   <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
