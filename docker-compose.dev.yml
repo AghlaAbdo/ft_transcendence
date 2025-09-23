@@ -40,9 +40,9 @@ services:
 
   chat-service:
     build:
-      target: base
+      target: development
     env_file:
       ./services/chat-service/.env
     volumes:
-      - ./chat-service/back-end/src:/app/src
-      - ./chat-service/back-end/chat.db:/app/chat.db
+      - ./services/chat-service/:/app/
+      # - ./chat-service/back-end/chat.db:/app/chat.db
