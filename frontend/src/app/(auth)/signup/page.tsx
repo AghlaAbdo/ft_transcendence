@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import Input from '../../../components/auth/Input'
 import { Mail, Lock, User } from 'lucide-react'
 import Link from 'next/link';
 import { toast } from "sonner";
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 
 // function SignupForm() {
@@ -35,6 +35,7 @@ import { redirect } from 'next/navigation';
 // }
 
 const SignUpPage = () => {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,7 +44,7 @@ const SignUpPage = () => {
 
   console.log(username, email, password);
   
-    const handleSignUp = async (e: React.FormEvent) => {
+    const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       // setIsLoading(true);
       setMessage('');
@@ -57,15 +58,15 @@ const SignUpPage = () => {
           credentials: "include"  // allow cookies
         });
   
-        const data = await response.json();
-        console.log("data --> ", data.status, data.message);
+        // console.log("data --> ", data.status, data.message);
         
         if (response.ok) {
           toast.success("✅ Logged in successfully!");
-
+          router.push('/home');
           setMessage('Signup successful!');
-
+          
         } else {
+          const data = await response.json();
           toast.error(`❌ ${data.message}`);
           setMessage(data.error || 'Signup failed.');
         }

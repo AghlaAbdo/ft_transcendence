@@ -40,6 +40,8 @@ const authPlugin = async (fastify, options) => {
 
             // const decoded = request.server.jwt.verify(token);
             const decoded = jwt.verify(token, JWT_SECRET);
+            if (!decoded)
+                return reply.code(401).send({ status: false, message: 'Unauthorized - Invalid token'});
 
             console.log('current user fro logged up--->; ', decoded);
 
