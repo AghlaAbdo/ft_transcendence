@@ -38,15 +38,13 @@ export default function RootLayout({
     //       <main className='md:ml-[72px] md:mt-[72px]'>{children}</main>
     //   </body>
     // </html>
-    
-    <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
-            >
-            <LayoutProvider>
-              {children}
-            </LayoutProvider>
-        </body>
+
+    <html lang='en'>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
+      >
+        <LayoutProvider>{children}</LayoutProvider>
+      </body>
     </html>
   );
 }

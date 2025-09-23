@@ -1,6 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
+
+import { IPlayer } from '@/constants/game';
+
 import Avatar from './Avatar';
 
 const avatars = [
@@ -11,18 +14,28 @@ const avatars = [
 ];
 
 export default function Matching({
+  player,
   opponent,
 }: {
-  opponent: null | { username: string; avatar: string };
+  player: IPlayer;
+  opponent: null | IPlayer;
 }) {
   return (
     <div className='h-[calc(100vh-100px)] flex justify-center items-center gap-2 sm:gap-12  px-2'>
-      <div className='w-30 sm:w-48 flex flex-col gap-6 items-center'>
-        <Avatar width={192} url='/avatars/avatar1.png' frame='gold2' />
+      <motion.div
+        className={`${!player ? 'invisible' : 'visible'} w-30 sm:w-48 flex flex-col gap-6 items-center`}
+        initial={{ opacity: 0, scale: 0.6 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.6,
+          scale: { type: 'spring', bounce: 0.4, duration: 0.6 },
+        }}
+      >
+        <Avatar width={192} url={player.avatar} frame={player.frame} />
         <span className='bg-gray-800 px-3 py-1 rounded-[8px] border-1 border-gray-500'>
-          user_9823
+          {player.username}
         </span>
-      </div>
+      </motion.div>
 
       <div className='w-20 sm:w-30 md:w-36'>
         <motion.img
@@ -49,7 +62,11 @@ export default function Matching({
                 scale: { type: 'spring', bounce: 0.5, duration: 1 },
               }}
             >
-              <Avatar width={192} url='/avatars/avatar2.png' frame='silver3' />
+              <Avatar
+                width={192}
+                url={`${opponent ? opponent.avatar : '/avatars/avatar2.png'}`}
+                frame={`${opponent ? opponent.frame : 'silver3'}`}
+              />
             </motion.div>
 
             <span className='bg-gray-800 px-3 py-1 rounded-[8px] border-1 border-gray-500'>

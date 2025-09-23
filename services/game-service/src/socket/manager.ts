@@ -7,6 +7,8 @@ import {
   handleMovePaddle,
   handleGameOver,
   handleDisconnect,
+  handleRematch,
+  handleQuit,
 } from './handlers';
 
 export function initializeSocketIO(server: http.Server): Server {
@@ -27,6 +29,8 @@ export function initializeSocketIO(server: http.Server): Server {
     );
     socket.on('gameOver', () => handleGameOver());
     socket.on('disconnect', (reason) => handleDisconnect(socket, reason));
+    socket.on('rematch', (gameId) => handleRematch(socket, gameId));
+    socket.on('quit', (gameId) => handleQuit(socket, gameId));
   });
 
   return io;

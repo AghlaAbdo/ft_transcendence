@@ -41,7 +41,7 @@ export function startGame(gameState: IGameState) {
       if (j === 1) {
         setTimeout(() => {
           // console.log("started!!!!!!!!!");
-          gameState.status = 'playing';
+          gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),
             GAME_INTERVAL_MS,
@@ -54,70 +54,70 @@ export function startGame(gameState: IGameState) {
 
 function gameLoop(gameState: IGameState): void {
   //check for top and bottom collision
-  gameState.ball.x += gameState.ball.dx;
-  gameState.ball.y += gameState.ball.dy;
+  gameState.game.ball.x += gameState.game.ball.dx;
+  gameState.game.ball.y += gameState.game.ball.dy;
   if (
-    gameState.ball.y - BALL_RADIUS / 2 < 0 ||
-    gameState.ball.y + BALL_RADIUS >= GAME_HEIGHT
+    gameState.game.ball.y - BALL_RADIUS / 2 < 0 ||
+    gameState.game.ball.y + BALL_RADIUS >= GAME_HEIGHT
   ) {
-    gameState.ball.dy *= -1;
+    gameState.game.ball.dy *= -1;
   }
 
   // check collision with left paddle
   if (
-    gameState.ball.x - BALL_RADIUS / 2 <= PADDLE_WIDTH &&
-    gameState.ball.y >= gameState.leftPaddle.y &&
-    gameState.ball.y <= gameState.leftPaddle.y + PADDLE_HEIGHT
+    gameState.game.ball.x - BALL_RADIUS / 2 <= PADDLE_WIDTH &&
+    gameState.game.ball.y >= gameState.game.leftPaddle.y &&
+    gameState.game.ball.y <= gameState.game.leftPaddle.y + PADDLE_HEIGHT
   ) {
     const relativeIntersectY =
-      gameState.leftPaddle.y + PADDLE_HEIGHT / 2 - gameState.ball.y;
+      gameState.game.leftPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.ball.dx = BALL_SPEED * Math.cos(bounceAngle);
-    gameState.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    gameState.game.ball.dx = BALL_SPEED * Math.cos(bounceAngle);
+    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
   }
   // check collision with right paddle
   else if (
-    gameState.ball.x + BALL_RADIUS / 2 >= GAME_WIDTH - PADDLE_WIDTH &&
-    gameState.ball.y >= gameState.rightPaddle.y &&
-    gameState.ball.y <= gameState.rightPaddle.y + PADDLE_HEIGHT
+    gameState.game.ball.x + BALL_RADIUS / 2 >= GAME_WIDTH - PADDLE_WIDTH &&
+    gameState.game.ball.y >= gameState.game.rightPaddle.y &&
+    gameState.game.ball.y <= gameState.game.rightPaddle.y + PADDLE_HEIGHT
   ) {
     const relativeIntersectY =
-      gameState.rightPaddle.y + PADDLE_HEIGHT / 2 - gameState.ball.y;
+      gameState.game.rightPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.ball.dx = -BALL_SPEED * Math.cos(bounceAngle);
-    gameState.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    gameState.game.ball.dx = -BALL_SPEED * Math.cos(bounceAngle);
+    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
   }
   // check for loss
-  else if (gameState.ball.x - 10 <= 0) {
-    gameState.rightPaddle.score++;
-    if (gameState.rightPaddle.score === 5) {
+  else if (gameState.game.ball.x - 10 <= 0) {
+    gameState.game.rightPaddle.score++;
+    if (gameState.game.rightPaddle.score === 5) {
       endGame(gameState);
     } else {
       resetBallPos(gameState);
     }
-  } else if (gameState.ball.x + 10 >= GAME_WIDTH) {
-    gameState.leftPaddle.score++;
-    if (gameState.leftPaddle.score === 5) {
+  } else if (gameState.game.ball.x + 10 >= GAME_WIDTH) {
+    gameState.game.leftPaddle.score++;
+    if (gameState.game.leftPaddle.score === 5) {
       endGame(gameState);
     } else {
       resetBallPos(gameState);
     }
   }
 
-  ioInstance.to(gameState.id).emit('gameStateUpdate', gameState);
+  ioInstance.to(gameState.id).emit('gameStateUpdate', gameState.game);
 }
 
 export function endGame(gameState: IGameState): void {
-  if (gameState.leftPaddle.score > gameState.rightPaddle.score) {
-    gameState.winner_id = gameState.player1_id;
-    gameState.winner = 'player1';
+  if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
+    gameState.winner_id = gameState.player1.id;
+    gameState.game.winner = 'player1';
   } else {
-    gameState.winner_id = gameState.player2_id;
-    gameState.winner = 'player2';
+    gameState.winner_id = gameState.player2.id;
+    gameState.game.winner = 'player2';
   }
-  gameState.status = 'ended';
+  gameState.game.status = 'ended';
   ioInstance.emit('gameOver');
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);

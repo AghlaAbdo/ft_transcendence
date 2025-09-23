@@ -15,31 +15,39 @@ export function generateGameState(gameId: string): IGameState {
   return {
     id: gameId,
     db_id: 0,
-    ball: {
-      x: GAME_WIDTH / 2,
-      y: GAME_HEIGHT / 2,
-      dx: BALL_SPEED * Math.cos(angle) * direction,
-      dy: BALL_SPEED * Math.sin(angle),
-      dir: direction,
-      radius: BALL_RADIUS,
+    game: {
+      status: 'waiting',
+      ball: {
+        x: GAME_WIDTH / 2,
+        y: GAME_HEIGHT / 2,
+        dx: BALL_SPEED * Math.cos(angle) * direction,
+        dy: BALL_SPEED * Math.sin(angle),
+        dir: direction,
+        radius: BALL_RADIUS,
+      },
+      leftPaddle: {
+        y: GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+        height: PADDLE_HEIGHT,
+        width: PADDLE_WIDTH,
+        score: 0,
+      },
+      rightPaddle: {
+        y: GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+        height: PADDLE_HEIGHT,
+        width: PADDLE_WIDTH,
+        score: 0,
+      },
+      winner: null,
     },
-    leftPaddle: {
-      y: GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2,
-      height: PADDLE_HEIGHT,
-      width: PADDLE_WIDTH,
-      score: 0,
+    player1: {
+      id: 45,
+      ready: false,
     },
-    rightPaddle: {
-      y: GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2,
-      height: PADDLE_HEIGHT,
-      width: PADDLE_WIDTH,
-      score: 0,
+    player2: {
+      id: 23,
+      ready: false,
     },
-    player1_id: 45,
-    player2_id: 23,
-    status: 'waiting',
     playersNb: 1,
-    winner: null,
     winner_id: null,
     startDate: null,
     startAt: new Date().getTime(),
@@ -49,13 +57,13 @@ export function generateGameState(gameId: string): IGameState {
 
 export function paddleMoveUp(gameState: IGameState, playerRole: string): void {
   if (playerRole === 'player1') {
-    if (gameState.leftPaddle.y - PADDLE_SPEED > 0)
-      gameState.leftPaddle.y -= PADDLE_SPEED;
-    else gameState.leftPaddle.y = 0;
+    if (gameState.game.leftPaddle.y - PADDLE_SPEED > 0)
+      gameState.game.leftPaddle.y -= PADDLE_SPEED;
+    else gameState.game.leftPaddle.y = 0;
   } else if (playerRole === 'player2') {
-    if (gameState.rightPaddle.y - PADDLE_SPEED > 0)
-      gameState.rightPaddle.y -= PADDLE_SPEED;
-    else gameState.rightPaddle.y = 0;
+    if (gameState.game.rightPaddle.y - PADDLE_SPEED > 0)
+      gameState.game.rightPaddle.y -= PADDLE_SPEED;
+    else gameState.game.rightPaddle.y = 0;
   }
 }
 
@@ -64,25 +72,31 @@ export function paddleMoveDown(
   playerRole: string,
 ): void {
   if (playerRole === 'player1') {
-    if (gameState.leftPaddle.y + PADDLE_HEIGHT + PADDLE_SPEED < GAME_HEIGHT)
-      gameState.leftPaddle.y += PADDLE_SPEED;
-    else gameState.leftPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
+    if (
+      gameState.game.leftPaddle.y + PADDLE_HEIGHT + PADDLE_SPEED <
+      GAME_HEIGHT
+    )
+      gameState.game.leftPaddle.y += PADDLE_SPEED;
+    else gameState.game.leftPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
   } else if (playerRole === 'player2') {
-    if (gameState.rightPaddle.y + PADDLE_HEIGHT + PADDLE_SPEED < GAME_HEIGHT)
-      gameState.rightPaddle.y += PADDLE_SPEED;
-    else gameState.rightPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
+    if (
+      gameState.game.rightPaddle.y + PADDLE_HEIGHT + PADDLE_SPEED <
+      GAME_HEIGHT
+    )
+      gameState.game.rightPaddle.y += PADDLE_SPEED;
+    else gameState.game.rightPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
   }
 }
 
 export function resetBallPos(gameState: IGameState): void {
   const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
-  gameState.ball = {
+  gameState.game.ball = {
     x: GAME_WIDTH / 2,
     y: GAME_HEIGHT / 2,
     dx: BALL_SPEED * Math.cos(angle),
     dy: BALL_SPEED * Math.sin(angle),
-    dir: gameState.ball.dir * -1,
+    dir: gameState.game.ball.dir * -1,
     radius: BALL_RADIUS,
   };
-  gameState.ball.dx *= gameState.ball.dir;
+  gameState.game.ball.dx *= gameState.game.ball.dir;
 }

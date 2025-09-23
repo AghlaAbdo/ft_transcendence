@@ -67,7 +67,7 @@ export default function Sidebar() {
 
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
-            className={`${linkBase} ${(pathName === '/home' || pathName == '/') ? linkActive : ''}`}
+            className={`${linkBase} ${pathName === '/home' || pathName == '/' ? linkActive : ''}`}
             href='/home'
           >
             {/* Home Icon*/}

@@ -1,10 +1,12 @@
-import { redirect } from 'next/navigation'
-import React from 'react'
-import HomePage from './home/page'
+import React from 'react';
+
+import { redirect } from 'next/navigation';
+
+import HomePage from './home/page';
 
 const MainPage = () => {
   // return redirect('/home');
-  return <HomePage />
-}
+  return <HomePage />;
+};
 
-export default MainPage
+export default MainPage;

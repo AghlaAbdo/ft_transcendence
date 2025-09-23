@@ -11,10 +11,10 @@ function postGame(gameState: IGameState): void {
   const result = db
     .prepare(query)
     .run(
-      gameState.player1_id,
-      gameState.player2_id,
-      gameState.leftPaddle.score,
-      gameState.rightPaddle.score,
+      gameState.player1.id,
+      gameState.player2.id,
+      gameState.game.leftPaddle.score,
+      gameState.game.rightPaddle.score,
       gameState.winner_id,
       gameState.playtime,
       gameState.startDate,

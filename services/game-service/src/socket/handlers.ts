@@ -32,10 +32,14 @@ export function handlePlay(socket: Socket): void {
     allGames.games[allGames.lobyGame].playersNb++;
     socket.join(allGames.lobyGame);
     socket.emit('playerRole', 'player2');
-    socket
-      .to(allGames.lobyGame)
-      .emit('matchFound', { username: 'user_123', avatar: 'random' });
-    socket.emit('matchFound', { username: 'user_234', avatar: 'random' });
+    const player = {
+      username: 'user_123',
+      avatar: '/avatars/avatar4.png',
+      frame: 'silver3',
+      level: '35',
+    };
+    socket.to(allGames.lobyGame).emit('matchFound', player);
+    socket.emit('matchFound', player);
     const lobyGame = allGames.lobyGame;
     setTimeout(() => {
       // if (!lobyGame) return;
@@ -60,4 +64,14 @@ export function handleMovePaddle(
 
 export function handleGameOver(): void {
   // TODO
+}
+
+export function handleRematch(socket: Socket, gameId: string): void {
+  console.log('Recived rematch!!');
+  socket.to(gameId).emit('rematch');
+}
+
+export function handleQuit(socket: Socket, gameId: string): void {
+  console.log('player quit');
+  socket.to(gameId).emit('opponentQuit');
 }

@@ -8,24 +8,27 @@ import {
   GAME_HEIGHT,
   GAME_WIDTH,
   IGameState,
+  IPlayer,
   PADDLE_HEIGHT,
   PADDLE_WIDTH,
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
-import { scale } from 'framer-motion';
 
 interface returnType {
-  handlePlayBtn: () => void;
-  handleStopBtn: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   waiting: boolean;
-  opponent: null | { username: string; avatar: string };
+  player: null | IPlayer;
+  opponent: null | IPlayer;
+  winner: string;
+  gameId: string | null;
 }
 
 export const usePongGameLogic = (): returnType => {
   const [waiting, setWaiting] = useState(true);
-  const [opponent, setOpponent] = useState(null);
+  const [opponent, setOpponent] = useState<IPlayer | null>(null);
+  const [player, setPlayer] = useState<IPlayer | null>(null);
+  const [winner, setWinner] = useState<string>('');
   const pressedKeys = useRef<Set<string>>(new Set());
   const animationFrameId = useRef<number | null>(null);
   const gameId = useRef<string>(null);
@@ -79,7 +82,7 @@ export const usePongGameLogic = (): returnType => {
 
         await app.init({
           resizeTo: containerRef.current!,
-          backgroundColor: 0x1F2937,
+          backgroundColor: 0x1f2937,
           antialias: true,
           resolution: window.devicePixelRatio || 1,
           autoDensity: true,
@@ -113,7 +116,7 @@ export const usePongGameLogic = (): returnType => {
         // Middle circle
         const circle = new PIXI.Graphics();
         circle.circle(GAME_WIDTH / 2, GAME_HEIGHT / 2, 40);
-        circle.fill(0x1F2937);
+        circle.fill(0x1f2937);
         circle.stroke({ width: 2, color: 0xf9fafb, alpha: 1 });
         gameContainer.addChild(circle);
 
@@ -123,42 +126,42 @@ export const usePongGameLogic = (): returnType => {
           style: {
             fontFamily: 'Arial',
             fontWeight: 'bold',
-            fontSize: 54 ,
+            fontSize: 54,
             fill: 0xf9fafb,
             align: 'center',
           },
           resolution: 2,
         });
         scoreText.anchor.set(0.5);
-        scoreText.x = (GAME_WIDTH ) / 2;
+        scoreText.x = GAME_WIDTH / 2;
         scoreText.y = 60;
         gameContainer.addChild(scoreText);
         scoreTextRef.current = scoreText;
 
         // Ball
         const ball = new PIXI.Graphics();
-        ball.circle(0, 0, BALL_RADIUS );
+        ball.circle(0, 0, BALL_RADIUS);
         ball.fill(0x689b8a);
-        ball.x = (GAME_WIDTH ) / 2;
-        ball.y = (GAME_HEIGHT ) / 2;
+        ball.x = GAME_WIDTH / 2;
+        ball.y = GAME_HEIGHT / 2;
         gameContainer.addChild(ball);
         ballRef.current = ball;
 
         // Left Paddle
         const leftPaddle = new PIXI.Graphics();
-        leftPaddle.rect(0, 0, (PADDLE_WIDTH ), (PADDLE_HEIGHT ));
-        leftPaddle.fill(0x9333EA);
+        leftPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+        leftPaddle.fill(0x9333ea);
         leftPaddle.x = 0;
-        leftPaddle.y = ((GAME_HEIGHT ) / 2 - (PADDLE_HEIGHT ) / 2);
+        leftPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
         gameContainer.addChild(leftPaddle);
         leftPaddleRef.current = leftPaddle;
 
         // Right paddle
         const rightPaddle = new PIXI.Graphics();
-        rightPaddle.rect(0, 0, (PADDLE_WIDTH ), (PADDLE_HEIGHT ));
-        rightPaddle.fill(0x9333EA);
-        rightPaddle.x = (GAME_WIDTH  - (PADDLE_WIDTH ));
-        rightPaddle.y = ((GAME_HEIGHT ) / 2 - (PADDLE_HEIGHT ) / 2);
+        rightPaddle.rect(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+        rightPaddle.fill(0x9333ea);
+        rightPaddle.x = GAME_WIDTH - PADDLE_WIDTH;
+        rightPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
         gameContainer.addChild(rightPaddle);
         rightPaddleRef.current = rightPaddle;
 
@@ -166,14 +169,14 @@ export const usePongGameLogic = (): returnType => {
         const endText = new PIXI.Text({
           text: '',
           style: {
-            fontSize: 48 ,
+            fontSize: 48,
             fill: 0xf9fafb,
             align: 'center',
           },
         });
         endText.anchor.set(0.5);
-        endText.x = (GAME_WIDTH ) / 2;
-        endText.y = (GAME_HEIGHT ) / 2;
+        endText.x = GAME_WIDTH / 2;
+        endText.y = GAME_HEIGHT / 2;
         gameContainer.addChild(endText);
         endTextRef.current = endText;
 
@@ -183,8 +186,8 @@ export const usePongGameLogic = (): returnType => {
           style: {
             fontFamily: 'Arial',
             fontWeight: 'bold',
-            fontSize: 124 ,
-            fill: 0xEAB308,
+            fontSize: 124,
+            fill: 0xeab308,
             align: 'center',
           },
         });
@@ -198,9 +201,10 @@ export const usePongGameLogic = (): returnType => {
         const scaleY = pixiApp.current!.renderer.height / GAME_HEIGHT;
         const scale = Math.min(scaleX, scaleY);
         gameContainerRef.current!.scale.set(scale);
-        gameContainerRef.current!.x = (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
-        gameContainerRef.current!.y = (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
-
+        gameContainerRef.current!.x =
+          (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
+        gameContainerRef.current!.y =
+          (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
       } catch (error) {
         console.error('Failed to initialize PixiJS app:', error);
         if (pixiApp.current) {
@@ -239,6 +243,12 @@ export const usePongGameLogic = (): returnType => {
         endTextRef.current.text = 'waiting';
       }
       playerRole.current = msg;
+      setPlayer({
+        username: 'user_13445',
+        avatar: '/avatars/avatar1.png',
+        frame: 'gold2',
+        level: '145',
+      });
     });
 
     socket.on('starting', (count) => {
@@ -254,7 +264,7 @@ export const usePongGameLogic = (): returnType => {
       setHideHeaderSidebar(true);
     });
 
-    socket.on('matchFound', (opponent) => {
+    socket.on('matchFound', (opponent: IPlayer) => {
       console.log('Match Found: ', opponent.username);
       setOpponent(opponent);
     });
@@ -281,6 +291,7 @@ export const usePongGameLogic = (): returnType => {
       if (gameState.status === 'ended' && endTextRef.current) {
         endTextRef.current.text =
           gameState.winner === playerRole.current ? 'You Won' : 'You Lost';
+        setWinner(gameState.winner!);
         // setHideHeaderSidebar(false);
       } else if (endTextRef.current) {
         endTextRef.current.text = '';
@@ -292,19 +303,20 @@ export const usePongGameLogic = (): returnType => {
     });
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
-    
+
     function resize() {
-      if (!pixiApp.current || !gameContainerRef.current)
-        return;
+      if (!pixiApp.current || !gameContainerRef.current) return;
       const scaleX = pixiApp.current.renderer.width / GAME_WIDTH;
       const scaleY = pixiApp.current.renderer.height / GAME_HEIGHT;
       const scale = Math.min(scaleX, scaleY);
       gameContainerRef.current.scale.set(scale);
-      gameContainerRef.current.x = (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
-      gameContainerRef.current.y = (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
+      gameContainerRef.current.x =
+        (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
+      gameContainerRef.current.y =
+        (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
     }
 
-    window.addEventListener("resize", resize);
+    window.addEventListener('resize', resize);
 
     return () => {
       window.removeEventListener('keydown', keydownEvent);
@@ -323,21 +335,6 @@ export const usePongGameLogic = (): returnType => {
     animationFrameId.current = requestAnimationFrame(gameLoop);
   };
 
-  function handlePlayBtn() {
-    if (isPlaying.current) return;
-    console.log('Play Now');
-    socket.emit('play');
-    isPlaying.current = true;
-    if (!animationFrameId.current)
-      animationFrameId.current = requestAnimationFrame(gameLoop);
-  }
-
-  function handleStopBtn() {
-    console.log('stop game');
-    socket.emit('stopGame');
-    isPlaying.current = false;
-  }
-
   function keydownEvent(event: KeyboardEvent) {
     event.preventDefault();
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown')
@@ -351,11 +348,12 @@ export const usePongGameLogic = (): returnType => {
   }
 
   return {
-    handlePlayBtn,
-    handleStopBtn,
     containerRef,
     dialogRef,
     waiting,
+    player,
     opponent,
+    winner,
+    gameId: gameId.current,
   };
 };

@@ -28,3 +28,10 @@ export interface IGameState {
   playersNb: number;
   winner: string | null;
 }
+
+export interface IPlayer {
+  username: string;
+  avatar: string;
+  frame: string;
+  level: string;
+}
