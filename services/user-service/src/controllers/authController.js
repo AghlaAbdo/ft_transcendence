@@ -133,6 +133,21 @@ const logout = async (request, reply) => {
     }    
 };
 
+
+const getMe = async (request, reply) => {
+    const user = request.user;
+
+    // return reply.code(200).send({
+    //     status: true,
+    //     user: user
+    // });
+    
+    return {
+        status: true,
+        user: request.user
+    };
+}
+
 const verifyEmail = async (request, reply) => {
     const { token } = request.body;
 
@@ -390,4 +405,4 @@ const resetPassword = async (request, reply) => {
 //     }
 // }
 
-export default {login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword};
+export default {login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};

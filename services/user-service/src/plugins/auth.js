@@ -47,7 +47,7 @@ const authPlugin = async (fastify, options) => {
 
             // Verify user exists in database
             // verify user if exists on db --> decoded.id --> 401 user no longer exists
-            const user = fastify.db.prepare('SELECT id, username, email FROM users WHERE id = ?').get(decoded.id);
+            const user = fastify.db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.id);
             if (!user) {
                 fastify.clearAuthCookie(reply);
                 return reply.code(401).send({ status: false, message: 'User no longer exists' });
