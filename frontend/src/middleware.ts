@@ -1,44 +1,57 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
+// import jwt, { JwtPayload } from "jsonwebtoken";
+
+import { jwtVerify } from 'jose';
+ 
 
 const publicAuthRoutes = ["/login", "/signup"];
 const protectedRoutes = ["/home", "/profile", "/game", "/chat", "/settings"];
 
+const secret = new TextEncoder().encode('pingpongsupersecretkey');
 
 function matchesRoutes(path: string, routes: string[]) {
     return routes.some(r => path === r || path.startsWith(r + "/"));
 }
 
-export default function middleware(req: NextRequest) {
-    const token = req.cookies.get('token')?.value;
+export default async function middleware(req: NextRequest) {
+    // const token = req.cookies.get('token')?.value;
 
-    const path = req.nextUrl.pathname;
-    // const isProtectedRoute = protectedRoutes.includes(path);
-    // const isPublicAuthRoute = publicAuthRoutes.includes(path);
+    const tokenCookie = req.cookies.get('token');
+    const token = tokenCookie?.value;
     
-    // if (!token && protectedRoutes.some(r => path.startsWith(r))) {
-    //     return NextResponse.redirect(new URL('/login', req.url))
-    // }
-    // if (token && publicAuthRoutes.some(r => path.startsWith(r))) {
-    //     return NextResponse.redirect(new URL('/home', req.url));
-    // }
+    console.log("Raw cookie:", tokenCookie);
+    console.log("Token value:", token);
+    console.log("Token type:", typeof token);
+    console.log("Token length:", token?.length);
+    
+    const path = req.nextUrl.pathname;
+    let isValid = false;
 
-    // console.log("-------- {Middleware triggered: ", { path, token });
+    if (token) {
+        try {
+            const { payload } = await jwtVerify(token, secret);
+            console.log("JWT payload:", payload);
 
-        console.log("Middleware triggered", {
-    path,
-    token,
-    isProtected: matchesRoutes(path, protectedRoutes),
-    isPublic: matchesRoutes(path, publicAuthRoutes)
-    });
 
+            isValid = true;
+        } catch (error) {
+            console.log("Invalid token: ", error);
+            // NextResponse.next();
+            const response  = NextResponse.redirect(new URL("/login", req.url));
+
+            response.cookies.delete('token');
+            return response;
+            
+        }
+    }
 
         
-    if (!token && matchesRoutes(path, protectedRoutes)) {
+    if (!isValid && matchesRoutes(path, protectedRoutes)) {
         return NextResponse.redirect(new URL('/login', req.url))
     }
 
-    if (token && matchesRoutes(path, publicAuthRoutes)) {
+    if (isValid && matchesRoutes(path, publicAuthRoutes)) {
         return NextResponse.redirect(new URL('/home', req.url));
     }
 
