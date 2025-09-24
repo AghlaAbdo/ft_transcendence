@@ -43,7 +43,7 @@ const signup = async (request, reply) => {
         const token = request.server.signToken( {
             id: userId,
             username: username,
-            email: username
+            email: email
         });
         
         request.server.setAuthCookie(reply, token);
@@ -129,7 +129,10 @@ const logout = async (request, reply) => {
         reply.send({status: true, message: 'Logged out successfully'});
     } catch (error) {
         console.error("logout error:", error);
-        reply.code(400).send({ status:false, message: error.message });
+        reply.code(500).send({ 
+            status: false, 
+            message: 'An error occurred during logout'
+        });
     }    
 };
 
@@ -144,7 +147,7 @@ const getMe = async (request, reply) => {
     
     return {
         status: true,
-        user: request.user
+        user: user
     };
 }
 

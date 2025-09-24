@@ -4,9 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Toaster } from "sonner";
 
-
-// className=""
-
 import React, { Children } from 'react'
 
 const AuthLayout = ({

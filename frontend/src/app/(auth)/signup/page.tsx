@@ -6,6 +6,7 @@ import { Mail, Lock, User } from 'lucide-react'
 import Link from 'next/link';
 import { toast } from "sonner";
 import { redirect, useRouter } from 'next/navigation';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
 
 // function SignupForm() {
@@ -79,9 +80,7 @@ const SignUpPage = () => {
       // }
     }
 
-    const handleGoogleLogin = async (e: React.FormEvent) => {
-      window.location.href = 'http://localhost:8080/api/auth/google';
-    }
+    const { handleGoogleLogin } = useGoogleAuth();
 
   return (
     <div className='flex justify-center items-center min-h-screen'>

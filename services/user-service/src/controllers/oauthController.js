@@ -26,6 +26,9 @@ const handleGoogleCallback = async (request, reply) => {
         the user's data on their behalf.
     */
    const code = request.query.code;
+   if (!code) {
+     return reply.redirect('http://localhost:3000/login');
+   }
 
    const tokenData = new URLSearchParams({
        code: code,
@@ -48,8 +51,9 @@ const handleGoogleCallback = async (request, reply) => {
             // console.log('token echange error: ', errorText);
             // throw new Error(`Token exchange failed: ${tokenResponse.status} ${errorText}`);
             // throw new Error(`Token exchange failed: ${tokenResponse.status}`);
-            reply.status(400).send({status: false,  error: 'Failed to retrieve token' });
-            return ;
+            // reply.status(400).send({status: false,  error: 'Failed to retrieve token' });
+            // return ;
+            return reply.redirect('http://localhost:3000/login?error=token_failed');
         }
         const data = await tokenResponse.json();
 
@@ -63,7 +67,8 @@ const handleGoogleCallback = async (request, reply) => {
         });
 
         if (!userInfo.ok) {
-            return reply.status(400).send({status: false,  error: 'Failed to retrieve userInfo' });
+            // return reply.status(400).send({status: false,  error: 'Failed to retrieve userInfo' });
+            return reply.redirect('http://localhost:3000/login?error=userinfo_failed');
         }
 
         const userInfoData = await userInfo.json();
@@ -120,25 +125,28 @@ const handleGoogleCallback = async (request, reply) => {
 
         request.server.setAuthCookie(reply, token);
          
-        reply.send({ 
-            status: true, 
-            message: "User Logged in successfully", 
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                avatar_url: user.avatar_url,
-                isAccountVerified: user.isAccountVerified
-            }
-        });
+        // reply.send({ 
+        //     status: true, 
+        //     message: "User Logged in successfully", 
+        //     user: {
+        //         id: user.id,
+        //         username: user.username,
+        //         email: user.email,
+        //         avatar_url: user.avatar_url,
+        //         isAccountVerified: user.isAccountVerified
+        //     }
+        // });
+
+        return reply.redirect('http://localhost:8080/home');
 
     } catch (error) {
         console.error('An error occurred:', error);
         request.log.error(error);
-        return reply.code(500).send({ 
-            status: false, 
-            message: error.message,
-            error: "Internal Server Error" });
+        // return reply.code(500).send({ 
+        //     status: false, 
+        //     message: error.message,
+        //     error: "Internal Server Error" });
+        return reply.redirect('http://localhost:3000/login?error=auth_failed');
     }
 }
 
