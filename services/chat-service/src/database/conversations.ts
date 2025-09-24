@@ -20,8 +20,8 @@ const updateChatStmt = db.prepare(`
   UPDATE chats
   SET last_message_content = ?,
       last_message_timestamp = CURRENT_TIMESTAMP
-  WHERE chat_id = ?
-`);
+  WHERE chat_id = ?`
+);
 
 const insertStmt = db.prepare(`
   INSERT INTO messages (chat_id, sender, receiver, content)
