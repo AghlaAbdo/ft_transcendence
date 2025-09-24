@@ -12,10 +12,14 @@ export default function ({
   rematch,
   setRematch,
   gameId,
+  playerRole,
+  dialogRef,
 }: {
   rematch: string[];
   setRematch: React.Dispatch<React.SetStateAction<string[]>>;
   gameId: string | null;
+  playerRole: 'player1' | 'player2' | null;
+  dialogRef: React.RefObject<HTMLDialogElement | null>;
 }) {
   const { setHideHeaderSidebar } = useLayout();
 
@@ -28,6 +32,10 @@ export default function ({
       console.log('Opponent quit!');
       setRematch((prev) => [...prev, 'rejected']);
     });
+    socket.on('playAgain', ()=>{
+      dialogRef.current?.close();
+      setRematch([]);
+    });
     return () => {
       setHideHeaderSidebar(false);
     };
@@ -36,7 +44,7 @@ export default function ({
   const handleRematch = () => {
     console.log('rematch!!');
     setRematch((prev) => [...prev, 'sent']);
-    socket.emit('rematch', gameId);
+    socket.emit('rematch', gameId, playerRole);
   };
 
   const handleReturn = () => {

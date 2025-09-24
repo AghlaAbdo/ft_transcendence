@@ -22,6 +22,7 @@ interface returnType {
   opponent: null | IPlayer;
   winner: string;
   gameId: string | null;
+  playerRole: 'player1' | 'player2' | null;
 }
 
 export const usePongGameLogic = (): returnType => {
@@ -292,7 +293,6 @@ export const usePongGameLogic = (): returnType => {
         endTextRef.current.text =
           gameState.winner === playerRole.current ? 'You Won' : 'You Lost';
         setWinner(gameState.winner!);
-        // setHideHeaderSidebar(false);
       } else if (endTextRef.current) {
         endTextRef.current.text = '';
       }
@@ -301,6 +301,14 @@ export const usePongGameLogic = (): returnType => {
       isPlaying.current = false;
       dialogRef.current?.showModal();
     });
+
+    socket.on('opponentQuit', () => {
+      isPlaying.current = false;
+      endTextRef.current!.text = 'You Won';
+      setWinner(playerRole.current!);
+      setTimeout(() => dialogRef.current?.showModal(), 2000);
+    });
+
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
 
@@ -318,10 +326,28 @@ export const usePongGameLogic = (): returnType => {
 
     window.addEventListener('resize', resize);
 
+    // const handleBeforeUnload = () => {
+    //   window.removeEventListener('keydown', keydownEvent);
+    //   window.removeEventListener('keyup', keyupEvent);
+    //   window.removeEventListener('resize', resize);
+    //   console.log("sent quit event");
+    //   // if (isPlaying.current)
+    //     socket.emit('quit', gameId.current);
+    //   // socket.off();
+    //   socket.disconnect();
+    // };
+
+    // window.addEventListener("beforeunload", handleBeforeUnload);
+
     return () => {
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);
+      // window.removeEventListener("beforeunload", handleBeforeUnload);
+      // if (isPlaying.current) {
+      //   socket.emit('quit', gameId.current);
+      // }
+      socket.off();
       socket.disconnect();
     };
   }, []);
@@ -355,5 +381,6 @@ export const usePongGameLogic = (): returnType => {
     opponent,
     winner,
     gameId: gameId.current,
+    playerRole: playerRole.current,
   };
 };

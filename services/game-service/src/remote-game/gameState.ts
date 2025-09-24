@@ -100,3 +100,28 @@ export function resetBallPos(gameState: IGameState): void {
   };
   gameState.game.ball.dx *= gameState.game.ball.dir;
 }
+
+export function resetGameState(gameState: IGameState): void {
+  const direction = Math.random() < 0.5 ? 1 : -1;
+  const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
+  gameState.game.status = 'waiting';
+  gameState.game.ball.x = GAME_WIDTH / 2;
+  gameState.game.ball.x = GAME_HEIGHT / 2;
+  gameState.game.ball.x = BALL_SPEED * Math.cos(angle) * direction;
+  gameState.game.ball.x = BALL_SPEED * Math.sin(angle);
+  gameState.game.ball.x = direction;
+  gameState.game.ball.x = BALL_RADIUS;
+  gameState.game.leftPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
+  gameState.game.leftPaddle.height = PADDLE_HEIGHT;
+  gameState.game.leftPaddle.width = PADDLE_WIDTH;
+  gameState.game.leftPaddle.score = 0;
+  gameState.game.rightPaddle.y = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
+  gameState.game.rightPaddle.height = PADDLE_HEIGHT;
+  gameState.game.rightPaddle.width = PADDLE_WIDTH;
+  gameState.game.rightPaddle.score = 0;
+  gameState.game.winner = null;
+  gameState.winner_id = null;
+  gameState.startDate = null;
+  gameState.startAt = new Date().getTime();
+  gameState.playtime = null;
+}

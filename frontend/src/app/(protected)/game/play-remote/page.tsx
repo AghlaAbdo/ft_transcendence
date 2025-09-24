@@ -12,8 +12,16 @@ import GameResultCard from '@/components/game/GameResultCard';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 
 export default function GamePage() {
-  const { containerRef, dialogRef, waiting, player, opponent, winner, gameId } =
-    usePongGameLogic();
+  const {
+    containerRef,
+    dialogRef,
+    waiting,
+    player,
+    opponent,
+    winner,
+    gameId,
+    playerRole,
+  } = usePongGameLogic();
   // const leftUser = {
   //   username: 'user_13445',
   //   avatar: '/avatars/avatar1.png',
@@ -46,6 +54,7 @@ export default function GamePage() {
             rightUser={opponent!}
             winner={winner}
             gameId={gameId}
+            playerRole={playerRole}
           />
         </div>
       )}

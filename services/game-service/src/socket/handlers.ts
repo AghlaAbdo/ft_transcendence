@@ -5,8 +5,9 @@ import {
   generateGameState,
   paddleMoveDown,
   paddleMoveUp,
+  resetGameState,
 } from '../remote-game/gameState';
-import { startGame, setIoInstance } from '../remote-game/gameLogic';
+import { startGame, setIoInstance, deleteGame } from '../remote-game/gameLogic';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
 import crypto from 'crypto';
 
@@ -66,12 +67,43 @@ export function handleGameOver(): void {
   // TODO
 }
 
-export function handleRematch(socket: Socket, gameId: string): void {
+export function handleRematch(
+  socket: Socket,
+  gameId: string,
+  playerRole: 'player1' | 'player2' | null,
+): void {
   console.log('Recived rematch!!');
+  if (!playerRole) {
+    console.log('playerRole is null!!');
+    return;
+  }
   socket.to(gameId).emit('rematch');
+  const gameState = getGameState(gameId);
+  if (playerRole === 'player1') gameState.player1.ready = true;
+  else gameState.player2.ready = true;
+  if (gameState.player1.ready && gameState.player2.ready) {
+    resetGameState(gameState);
+    setTimeout(() => {
+      // if (!lobyGame) return;
+      socket.to(gameId).emit('playAgain');
+      socket.emit('playAgain');
+      socket.to(gameId).emit('startGame', gameId);
+      socket.emit('startGame', gameId);
+      gameState.startDate = getCurrDate();
+      startGame(gameState);
+    }, 2000);
+  }
 }
 
 export function handleQuit(socket: Socket, gameId: string): void {
-  console.log('player quit');
+  console.log('revived quit event!!');
+  if (!gameId) {
+    console.log('gameId is Null');
+    return;
+  }
   socket.to(gameId).emit('opponentQuit');
+  const gameState = getGameState(gameId);
+  if (gameState) deleteGame(gameState);
+
+  console.log('player quit');
 }

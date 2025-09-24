@@ -19,12 +19,14 @@ export default function ({
   rightUser,
   winner,
   gameId,
+  playerRole
 }: {
   ref: React.RefObject<HTMLDialogElement | null>;
   leftUser: IPlayer;
   rightUser: IPlayer;
   winner: string;
   gameId: string | null;
+  playerRole: 'player1' | 'player2' | null;
 }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   // const [rematch, setRematch] = useState<"sent" | "accepted" | "rejected" | "recived" | null>(null);
@@ -83,7 +85,7 @@ export default function ({
         </div>
 
         <div className='relative flex-1 flex flex-col gap-4 items-center self-end pb-8'>
-          <Rematch rematch={rematch} setRematch={setRematch} gameId={gameId} />
+          <Rematch rematch={rematch} setRematch={setRematch} gameId={gameId} playerRole={playerRole} dialogRef={ref} />
         </div>
 
         <div className='relative flex-1 flex flex-col gap-2 items-center'>

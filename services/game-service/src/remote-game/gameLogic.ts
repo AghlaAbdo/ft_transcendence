@@ -12,6 +12,7 @@ import {
 } from '../config/game';
 import { IGameState } from '../types/game';
 import { Server } from 'socket.io';
+import { getAllGames } from './AllGames';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -53,6 +54,7 @@ export function startGame(gameState: IGameState) {
 }
 
 function gameLoop(gameState: IGameState): void {
+  if (gameState.game.status !== 'playing') return;
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
   gameState.game.ball.y += gameState.game.ball.dy;
@@ -93,14 +95,14 @@ function gameLoop(gameState: IGameState): void {
   else if (gameState.game.ball.x - 10 <= 0) {
     gameState.game.rightPaddle.score++;
     if (gameState.game.rightPaddle.score === 5) {
-      endGame(gameState);
+      gameOver(gameState);
     } else {
       resetBallPos(gameState);
     }
   } else if (gameState.game.ball.x + 10 >= GAME_WIDTH) {
     gameState.game.leftPaddle.score++;
     if (gameState.game.leftPaddle.score === 5) {
-      endGame(gameState);
+      gameOver(gameState);
     } else {
       resetBallPos(gameState);
     }
@@ -109,7 +111,7 @@ function gameLoop(gameState: IGameState): void {
   ioInstance.to(gameState.id).emit('gameStateUpdate', gameState.game);
 }
 
-export function endGame(gameState: IGameState): void {
+function gameOver(gameState: IGameState): void {
   if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
     gameState.winner_id = gameState.player1.id;
     gameState.game.winner = 'player1';
@@ -118,10 +120,19 @@ export function endGame(gameState: IGameState): void {
     gameState.game.winner = 'player2';
   }
   gameState.game.status = 'ended';
+  gameState.player1.ready = false;
+  gameState.player2.ready = false;
   ioInstance.emit('gameOver');
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
+}
+
+export function deleteGame(gameState: IGameState): void {
+  if (gameState.game.status === 'playing') {
+    gameState.game.status = 'ended';
+  }
+  delete getAllGames().games[gameState.id];
 }
