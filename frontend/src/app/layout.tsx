@@ -36,7 +36,7 @@ export default function RootLayout({
       >
         <LayoutProvider>
           <Sidebar />
-          <Header />
+          {/* <Header /> */}
           <main className='mt-[100px] md:ml-[72px]'>{children}</main>
         </LayoutProvider>
       </body>

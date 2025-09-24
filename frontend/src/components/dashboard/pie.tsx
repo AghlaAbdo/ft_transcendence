@@ -70,8 +70,8 @@ export default function DoughnutChart({
     };
 
     return (
-        <div className="relative w-[10%]">
-            <Doughnut data={data} options={options} />
+        <div className="relative w-[10%] h-[100px]">
+            <Doughnut data={data} options={options}/>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <span className="text-gray-300 font-medium text-[.8rem]">
                     {total === 0 ? 'No Games' : 'Winrate'}

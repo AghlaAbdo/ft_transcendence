@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-export default function Table({players, numOfPages, page, lastPage}) {
+export default function Table({players, numOfPages, page}) {
     return (
         <div className="m-10">
             <div className="
