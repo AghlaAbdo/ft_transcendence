@@ -17,4 +17,4 @@ CREATE TABLE messages (
     receiver INTEGER NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+); 

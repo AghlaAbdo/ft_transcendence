@@ -1,8 +1,9 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { Server as SocketIOServer } from "socket.io";
-import { getMessages, insert_message, getMessage } from "./database/conversations.js";
-import { getChats } from "./database/chats.js";
+import { getMessages, insert_message, getMessage } from "./database/conversations.ts";
+import { getChats } from "./database/chats.ts";
+import { getFriends, getUser } from "./database/user.ts";
 
 const fastify = Fastify();
 fastify.register(cors, { origin: "*" });
@@ -67,6 +68,16 @@ fastify.get("/api/chat/messages/:chatId", (request) => {
 fastify.get("/api/chat/message/:MessageId", (request) => {
   const { MessageId } = request.params as { MessageId: string };
   return getMessage(parseInt(MessageId));
+});
+
+fastify.get("/api/chat/friends/:userId", (request) => {
+  const { userId } = request.params as { userId: string };
+  return getFriends(parseInt(userId));
+});
+
+fastify.get("/api/chat/user/:userId", (request) => {
+  const { userId } = request.params as { userId: string };
+  return getUser(parseInt(userId));
 });
 
 fastify.get("/api/chat/chats/:userId", (request) => {
