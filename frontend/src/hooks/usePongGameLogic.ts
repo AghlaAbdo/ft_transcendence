@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { redirect } from 'next/navigation';
+
 import * as PIXI from 'pixi.js';
 
 import { socket } from '@/app/(protected)/lib/socket';
@@ -23,6 +25,7 @@ interface returnType {
   winner: string;
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
+  handleClose: () => void;
 }
 
 export const usePongGameLogic = (): returnType => {
@@ -302,12 +305,17 @@ export const usePongGameLogic = (): returnType => {
       dialogRef.current?.showModal();
     });
 
-    socket.on('opponentQuit', () => {
-      isPlaying.current = false;
-      endTextRef.current!.text = 'You Won';
-      setWinner(playerRole.current!);
-      setTimeout(() => dialogRef.current?.showModal(), 2000);
-    });
+    socket.on(
+      'opponentQuit',
+      (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
+        isPlaying.current = false;
+        if (gameStatus === 'playing') {
+          endTextRef.current!.text = 'You Won';
+          setWinner(playerRole.current!);
+          setTimeout(() => dialogRef.current?.showModal(), 2000);
+        }
+      }
+    );
 
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
@@ -326,27 +334,28 @@ export const usePongGameLogic = (): returnType => {
 
     window.addEventListener('resize', resize);
 
-    // const handleBeforeUnload = () => {
-    //   window.removeEventListener('keydown', keydownEvent);
-    //   window.removeEventListener('keyup', keyupEvent);
-    //   window.removeEventListener('resize', resize);
-    //   console.log("sent quit event");
-    //   // if (isPlaying.current)
-    //     socket.emit('quit', gameId.current);
-    //   // socket.off();
-    //   socket.disconnect();
-    // };
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+      console.log('sent quit event');
+      if (isPlaying.current) socket.emit('quit', gameId.current);
+      window.removeEventListener('keydown', keydownEvent);
+      window.removeEventListener('keyup', keyupEvent);
+      window.removeEventListener('resize', resize);
+      socket.off();
+      socket.disconnect();
+    };
 
-    // window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);
-      // window.removeEventListener("beforeunload", handleBeforeUnload);
-      // if (isPlaying.current) {
-      //   socket.emit('quit', gameId.current);
-      // }
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (isPlaying.current) {
+        socket.emit('quit', gameId.current);
+      }
       socket.off();
       socket.disconnect();
     };
@@ -373,6 +382,11 @@ export const usePongGameLogic = (): returnType => {
       pressedKeys.current.delete(event.key);
   }
 
+  function handleClose() {
+    socket.emit('quit', gameId.current);
+    redirect('/game');
+  }
+
   return {
     containerRef,
     dialogRef,
@@ -382,5 +396,6 @@ export const usePongGameLogic = (): returnType => {
     winner,
     gameId: gameId.current,
     playerRole: playerRole.current,
+    handleClose,
   };
 };

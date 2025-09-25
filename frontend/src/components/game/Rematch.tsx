@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { socket } from '@/app/(protected)/lib/socket';
 import { useLayout } from '@/context/LayoutContext';
 
-export default function ({
+export default function Rematch({
   rematch,
   setRematch,
   gameId,
@@ -32,7 +32,7 @@ export default function ({
       console.log('Opponent quit!');
       setRematch((prev) => [...prev, 'rejected']);
     });
-    socket.on('playAgain', ()=>{
+    socket.on('playAgain', () => {
       dialogRef.current?.close();
       setRematch([]);
     });

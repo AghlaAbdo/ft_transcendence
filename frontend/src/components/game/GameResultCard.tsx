@@ -13,13 +13,13 @@ import { IPlayer } from '@/constants/game';
 import Avatar from '../Avatar';
 import Rematch from './Rematch';
 
-export default function ({
+export default function GameResultCard({
   ref,
   leftUser,
   rightUser,
   winner,
   gameId,
-  playerRole
+  playerRole,
 }: {
   ref: React.RefObject<HTMLDialogElement | null>;
   leftUser: IPlayer;
@@ -28,22 +28,7 @@ export default function ({
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
 }) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const [rematch, setRematch] = useState<"sent" | "accepted" | "rejected" | "recived" | null>(null);
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [rematch, setRematch] = useState<string[]>([]);
-
-  // if (rematch && !rematchStates.current.includes(rematch))
-  //   rematchStates.current.push(rematch);
-  // console.log("pushed: ", rematchStates.current.at(rematchStates.current.length -1));
-
-  const showDialog = () => {
-    setIsOpen(true);
-  };
-
-  const closeDialog = () => {
-    setIsOpen(false);
-  };
 
   return (
     <dialog
@@ -54,7 +39,7 @@ export default function ({
         <div className='relative flex-1 flex flex-col gap-2 items-center'>
           <div>
             <span
-              className={`${winner !== 'player1' ? 'invisible' : ''} text-gold text-5xl font-bold`}
+              className={`${winner !== playerRole ? 'invisible' : ''} text-gold text-5xl font-bold`}
             >
               Winner
             </span>
@@ -85,13 +70,19 @@ export default function ({
         </div>
 
         <div className='relative flex-1 flex flex-col gap-4 items-center self-end pb-8'>
-          <Rematch rematch={rematch} setRematch={setRematch} gameId={gameId} playerRole={playerRole} dialogRef={ref} />
+          <Rematch
+            rematch={rematch}
+            setRematch={setRematch}
+            gameId={gameId}
+            playerRole={playerRole}
+            dialogRef={ref}
+          />
         </div>
 
         <div className='relative flex-1 flex flex-col gap-2 items-center'>
           <div>
             <span
-              className={`${winner !== 'player2' ? 'invisible' : ''} text-gold text-5xl font-bold`}
+              className={`${winner === playerRole ? 'invisible' : ''} text-gold text-5xl font-bold`}
             >
               Winner
             </span>

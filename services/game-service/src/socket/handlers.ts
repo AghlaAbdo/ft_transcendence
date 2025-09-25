@@ -101,9 +101,10 @@ export function handleQuit(socket: Socket, gameId: string): void {
     console.log('gameId is Null');
     return;
   }
-  socket.to(gameId).emit('opponentQuit');
   const gameState = getGameState(gameId);
-  if (gameState) deleteGame(gameState);
+  socket.to(gameId).emit('opponentQuit', gameState? gameState.game.status : null);
+  if (gameState)
+    deleteGame(gameState);
 
   console.log('player quit');
 }
