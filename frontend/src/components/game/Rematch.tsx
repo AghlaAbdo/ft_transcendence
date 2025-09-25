@@ -60,13 +60,13 @@ export default function Rematch({
         <>
           <button
             onClick={handleRematch}
-            className='w-full max-w-30 text-center bg-green py-1 px-2 rounded-[8px] text-[20px] text-gray-50 font-bold cursor-pointer'
+            className='w-full max-w-24 md:max-w-30 text-center bg-green py-[2px] 500:py-1 px-1 500:px-2 rounded-[8px] text-[14px] 500:text-[20px] text-gray-50 font-bold cursor-pointer'
           >
             Rematch
           </button>
           <button
             onClick={handleReturn}
-            className='w-full max-w-30 text-center bg-red py-1 px-2 rounded-[8px] text-[20px] text-gray-50 font-bold cursor-pointer'
+            className='w-full max-w-30 text-center bg-red py-[2px] 500:py-1 px-1 500:px-2 rounded-[8px] text-[14px] 500:text-[20px] text-gray-50 font-bold cursor-pointer'
           >
             Return
           </button>
@@ -76,13 +76,13 @@ export default function Rematch({
         <>
           <button
             onClick={handleRematch}
-            className='w-full max-w-30 text-center bg-green py-1 px-2 rounded-[8px] text-[20px] text-gray-50 font-bold cursor-pointer'
+            className='w-full max-w-30 text-center bg-green py-[2px] 500:py-1 px-1 500:px-2 rounded-[8px] text-[14px] 500:text-[20px] text-gray-50 font-bold cursor-pointer'
           >
             Rematch
           </button>
           <button
             onClick={handleReturn}
-            className='w-full max-w-30 text-center bg-red py-1 px-2 rounded-[8px] text-[20px] text-gray-50 font-bold cursor-pointer'
+            className='w-full max-w-30 text-center bg-red py-[2px] 500:py-1 px-1 500:px-2 rounded-[8px] text-[14px] 500:text-[20px] text-gray-50 font-bold cursor-pointer'
           >
             Return
           </button>
@@ -94,7 +94,7 @@ export default function Rematch({
           <>
             <button
               onClick={handleReturn}
-              className='w-full max-w-30 text-center bg-red py-1 px-2 rounded-[8px] text-[20px] text-gray-50 font-bold cursor-pointer'
+              className='w-full max-w-30 text-center bg-red py-[2px] 500:py-1 px-1 500:px-2 rounded-[8px] text-[14px] 500:text-[20px] text-gray-50 font-bold cursor-pointer'
             >
               Return
             </button>
@@ -116,7 +116,7 @@ export default function Rematch({
         <>
           <button
             onClick={handleReturn}
-            className='w-full max-w-30 text-center bg-red py-1 px-2 rounded-[8px] text-[20px] text-gray-50 font-bold cursor-pointer'
+            className='w-full max-w-30 text-center bg-red py-[2px] 500:py-1 px-1 500:px-2 rounded-[8px] text-[14px] 500:text-[20px] text-gray-50 font-bold cursor-pointer'
           >
             Return
           </button>

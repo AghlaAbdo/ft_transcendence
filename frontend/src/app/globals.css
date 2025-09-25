@@ -42,6 +42,7 @@
   --color-gold: var(--gold);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --breakpoint-500: 500px;
 }
 
 @media (prefers-color-scheme: dark) {
