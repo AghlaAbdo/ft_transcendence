@@ -8,45 +8,39 @@ import { toast } from "sonner";
 import { redirect, useRouter } from 'next/navigation';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
+import * as z from 'zod'
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-// function SignupForm() {
-//   const [email, setEmail] = useState("");
-//   const [error, setError] = useState("");
+const schema = z.object({
+  username: z.string().min(6, "Username must be at least 6 characters"),
+  email: z.string().email("Invalid email"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Must contain uppercase letter")
+    .regex(/[a-z]/, "Must contain lowercase letter")
+    .regex(/[0-9]/, "Must contain a number")
+    .regex(/[^A-Za-z0-9]/, "Must contain special character"),
+});
 
-//   const validateEmail = (value) => {
-//     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     if (!regex.test(value)) setError("Invalid email");
-//     else setError("");
-//   };
 
-//   return (
-//     <div>
-//       <input
-//         type="email"
-//         value={email}
-//         onChange={(e) => {
-//           setEmail(e.target.value);
-//           validateEmail(e.target.value);
-//         }}
-//         placeholder="Email"
-//       />
-//       {error && <span style={{ color: "red" }}>{error}</span>}
-//     </div>
-//   );
-// }
+type FormData = z.infer<typeof schema>;
 
 const SignUpPage = () => {
   const router = useRouter();
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // const [username, setUsername] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   // const [isLoading, setIsLoading] = useState(false);
 
-  console.log(username, email, password);
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+      resolver: zodResolver(schema),
+    });
+
   
-    const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+    const handleSignUp = async (data: FormData) => {
+      // e.preventDefault();
       // setIsLoading(true);
       setMessage('');
   
@@ -55,11 +49,10 @@ const SignUpPage = () => {
         const response = await fetch('http://localhost:8080/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify(data),
           credentials: "include"  // allow cookies
         });
   
-        // console.log("data --> ", data.status, data.message);
         
         if (response.ok) {
           toast.success("✅ Logged in successfully!");
@@ -80,38 +73,49 @@ const SignUpPage = () => {
       // }
     }
 
-    const { handleGoogleLogin } = useGoogleAuth();
+  const { handleGoogleLogin } = useGoogleAuth();
 
   return (
     <div className='flex justify-center items-center min-h-screen'>
     <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
       <div className='text-4xl font-bold text-center mb-5'>Sign Up</div>
 
-      <form className='space-y-4' onSubmit={handleSignUp}>
-
+      <form className='space-y-4' onSubmit={handleSubmit(handleSignUp)}>
+        <div>
           <Input
             icon={User}
             type="text"
             placeholder="Username"
-            value={username}
-            onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            // value={username}
+            // onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            {...register("username")}
           />
-          
+          {errors.username && <p className="text-red-500">{errors.username.message}</p>}
+        </div>
+        
+        <div>
           <Input
             icon={Mail}
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          />
-
+            // value={email}
+            // onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            {...register("email")}
+            
+            />
+          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+        </div>
+        <div>
           <Input
             icon={Lock}
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            // value={password}
+            // onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            {...register("password")}
           />
+          {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+        </div>
 
 
           <button

@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
     "jose": "^6.1.0",
@@ -19,10 +20,12 @@
     "pixi.js": "^8.13.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-hook-form": "^7.63.0",
     "react-lineicons": "^3.0.0",
     "socket.io-client": "^4.8.1",
     "sonner": "^2.0.7",
-    "tailwind-scrollbar": "^4.0.2"
+    "tailwind-scrollbar": "^4.0.2",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
