@@ -20,6 +20,11 @@ export default function ChatPage() {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+
+  useEffect(() => {
+    console.log("Search query changed:", searchQuery);
+  }, [searchQuery]);
+  
   useEffect(() => {
     if (selectedChatId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`) //protect with async, axios

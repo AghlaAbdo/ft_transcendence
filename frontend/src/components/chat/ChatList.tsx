@@ -60,12 +60,12 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
         </div>
 
         <div className="p-4">
-          <div className="relative">
-            <Search_Input 
-            onsearchchange_2 = {onSearchChange}
-            searchquery_2={searchQuery}
-            />
-          </div>
+            <div className="relative">
+              <Search_Input 
+              onsearchchange_2 = {onSearchChange}
+              searchquery_2={searchQuery}
+              />
+            </div>
         </div>
 
         <div className="px-4 pb-4">
