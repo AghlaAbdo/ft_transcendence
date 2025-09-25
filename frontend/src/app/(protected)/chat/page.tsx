@@ -36,8 +36,6 @@ export default function ChatPage() {
       console.log("fetched conv: ", conv_);
     }
   }, [selectedChatId]);
-
-  const [text, setText] = useState("");
   const socketRef = useRef<Socket | null>(null);
 
   const handleSendMessage = (messageContent: string) => {
@@ -76,7 +74,6 @@ useEffect(() => {
     SetUser(parseInt(userFromUrl))
   console.log('user is: ', userFromUrl);
 }, [])
-
 
 return (
   <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
