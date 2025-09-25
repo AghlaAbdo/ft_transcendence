@@ -228,6 +228,11 @@ export const usePongGameLogic = (): returnType => {
     };
   }, [waiting]);
 
+  const transformX = useCallback((x: number, playerRole: "player1" | "player2"):number =>{
+    if (playerRole === "player1") return x;
+    return GAME_WIDTH - x;
+  }, []);
+
   useEffect(() => {
     socket.connect();
     socket.on('connect', () => {
@@ -277,19 +282,20 @@ export const usePongGameLogic = (): returnType => {
       if (!pixiApp.current) return;
 
       if (ballRef.current) {
-        ballRef.current.x = gameState.ball.x;
+        ballRef.current.x = transformX(gameState.ball.x, playerRole.current!);
         ballRef.current.y = gameState.ball.y;
       }
 
       if (leftPaddleRef.current) {
-        leftPaddleRef.current.y = gameState.leftPaddle.y;
+        leftPaddleRef.current.y = playerRole.current === 'player2' ? gameState.rightPaddle.y : gameState.leftPaddle.y;
       }
       if (rightPaddleRef.current) {
-        rightPaddleRef.current.y = gameState.rightPaddle.y;
+        rightPaddleRef.current.y = playerRole.current === 'player2' ? gameState.leftPaddle.y : gameState.rightPaddle.y;
       }
 
-      if (scoreTextRef.current) {
-        scoreTextRef.current.text = `${gameState.leftPaddle.score}    ${gameState.rightPaddle.score}`;
+      if (gameState.scoreUpdate && scoreTextRef.current) {
+        scoreTextRef.current.text = `${playerRole.current === 'player2' ? gameState.rightPaddle.score + "   " + gameState.leftPaddle.score
+          : gameState.leftPaddle.score + "   " + gameState.rightPaddle.score}`;
       }
 
       if (gameState.status === 'ended' && endTextRef.current) {

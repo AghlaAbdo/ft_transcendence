@@ -38,6 +38,7 @@ export function generateGameState(gameId: string): IGameState {
         score: 0,
       },
       winner: null,
+      scoreUpdate: false,
     },
     player1: {
       id: 45,

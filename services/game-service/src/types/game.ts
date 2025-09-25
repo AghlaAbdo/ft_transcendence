@@ -36,6 +36,7 @@ export interface IGameState {
     leftPaddle: IPaddle;
     rightPaddle: IPaddle;
     winner: string | null;
+    scoreUpdate: boolean;
   };
 }
 

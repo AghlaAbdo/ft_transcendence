@@ -94,6 +94,7 @@ function gameLoop(gameState: IGameState): void {
   // check for loss
   else if (gameState.game.ball.x - 10 <= 0) {
     gameState.game.rightPaddle.score++;
+    gameState.game.scoreUpdate = true;
     if (gameState.game.rightPaddle.score === 5) {
       gameOver(gameState);
     } else {
@@ -101,14 +102,15 @@ function gameLoop(gameState: IGameState): void {
     }
   } else if (gameState.game.ball.x + 10 >= GAME_WIDTH) {
     gameState.game.leftPaddle.score++;
+    gameState.game.scoreUpdate = true;
     if (gameState.game.leftPaddle.score === 5) {
       gameOver(gameState);
     } else {
       resetBallPos(gameState);
     }
   }
-
   ioInstance.to(gameState.id).emit('gameStateUpdate', gameState.game);
+  gameState.game.scoreUpdate = false;
 }
 
 function gameOver(gameState: IGameState): void {
