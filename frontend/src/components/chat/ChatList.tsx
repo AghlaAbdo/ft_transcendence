@@ -5,8 +5,6 @@ import { Plus, Search } from "lucide-react";
 import { Search_Input } from "./Search_Input";
 import { formatDistanceToNow } from "date-fns";
 
-
-
 interface Message {
   id: number;
   chat_id: number;
@@ -37,7 +35,6 @@ interface ChatlistProps {
 
 export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv, searchQuery, onSearchChange}: ChatlistProps) => {
   const [chats, setChats] = useState<Chat[]>([]);
-
   useEffect(() => {
     if (userId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`)
@@ -58,7 +55,6 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
             <Plus className="h-5 w-5 text-white" />
           </button>
         </div>
-
         <div className="p-4">
             <div className="relative">
               <Search_Input 
@@ -67,7 +63,6 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
               />
             </div>
         </div>
-
         <div className="px-4 pb-4">
           {chats.map((chat) => {
             const otherUserId =
