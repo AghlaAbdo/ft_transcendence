@@ -31,6 +31,7 @@ export default function Sidebar() {
     } catch (error) {
       toast.error('Network error during logout');
       console.error('Logout error:', error);
+      // router.push('/login');
     }
   }
 

@@ -17,7 +17,7 @@ const authPlugin = async (fastify, options) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', //local: http , production: https
             sameSite: 'strict', // CSRF protection  // sameSite: 'lax'
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            maxAge: 7 * 24 * 60 * 60 // 7 days 
         });
     });
 

@@ -7,10 +7,10 @@ const HomePage = () => {
 
   const { user, isLoading } = useAuth();
 
-  if (isLoading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-
-  }
+  // if (isLoading) {
+  //   return <div className="">Loading...</div>
+  // }
+  
   return (
     <div>
       <h1> Welcome {user?.username}</h1>

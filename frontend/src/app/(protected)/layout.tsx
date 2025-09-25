@@ -1,3 +1,4 @@
+import RouteGuard from '@/components/auth/RouteGuard';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import { LayoutProvider } from '@/context/LayoutContext';
@@ -13,11 +14,16 @@ const AppLayout = ({
       // {children}
     // </div>
     <div className='text-white'>
-      <LayoutProvider>
-        <Sidebar />
-        <Header />
-        <main className='mt-[100px] md:ml-[72px]'>{children}</main>
-      </LayoutProvider>
+      {/* <RouteGuard > */}
+        {/* <RouteGuard> */}
+
+        <LayoutProvider>
+          <Sidebar />
+          <Header />
+          <main className='mt-[100px] md:ml-[72px]'>{children}</main>
+        </LayoutProvider>
+        {/* </RouteGuard> */}
+
     </div>
   )
 }

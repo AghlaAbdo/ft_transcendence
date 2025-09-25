@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
-// import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { jwtVerify } from 'jose';
  
@@ -21,45 +20,45 @@ const SKIP_MIDDLEWARE_ROUTES = [
   "/signup",
   "/oauth/",
   "/callback",  // OAuth callback routes
-  "/home"
+  "/success"
 ];
 
+import { useAuth } from './hooks/useAuth';
+
 export default async function middleware(req: NextRequest) {
-    // const token = req.cookies.get('token')?.value;
+
+
     const path = req.nextUrl.pathname;
 
-    if (SKIP_MIDDLEWARE_ROUTES.some(route => path.startsWith(route))) {
+
+    if (matchesRoutes(path, SKIP_MIDDLEWARE_ROUTES)) {
         return NextResponse.next();
     }
-    let isValid = false;
 
     const tokenCookie = req.cookies.get('token');
     const token = tokenCookie?.value;
     
-    // console.log("Raw cookie:", tokenCookie);
-    // console.log("Token value:", token);
-    // console.log("Token type:", typeof token);
-    // console.log("Token length:", token?.length);
+    let isValid = false;
     
-
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
             console.log("JWT payload:", payload);
-
-
+            
+            
             isValid = true;
         } catch (error) {
             console.log("Invalid token: ", error);
-            // NextResponse.next();
             const response  = NextResponse.redirect(new URL("/login", req.url));
-
             response.cookies.delete('token');
             return response;
-            
         }
     }
-
+    
+    // if (isValid && path === '/login') {
+    //     return NextResponse.redirect(new URL('/home', req.url));
+    // }
+        // If user has token and tries to access login page
         
     if (!isValid && matchesRoutes(path, protectedRoutes)) {
         return NextResponse.redirect(new URL('/login', req.url))

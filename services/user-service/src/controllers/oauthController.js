@@ -68,7 +68,7 @@ const handleGoogleCallback = async (request, reply) => {
 
         if (!userInfo.ok) {
             // return reply.status(400).send({status: false,  error: 'Failed to retrieve userInfo' });
-            return reply.redirect('http://localhost:8080/login?error=userinfo_failed');
+            return reply.redirect('http://localhost:8080/login');
         }
 
         const userInfoData = await userInfo.json();
@@ -137,7 +137,8 @@ const handleGoogleCallback = async (request, reply) => {
         //     }
         // });
 
-        return reply.redirect('http://localhost:8080/home');
+        return reply.redirect('http://localhost:8080/success');
+        // return reply.redirect(302, `${process.env.FRONTEND_URL}/success`);
 
     } catch (error) {
         console.error('An error occurred:', error);
@@ -146,7 +147,7 @@ const handleGoogleCallback = async (request, reply) => {
         //     status: false, 
         //     message: error.message,
         //     error: "Internal Server Error" });
-        return reply.redirect('http://localhost:8080/login?error=auth_failed');
+        return reply.redirect('http://localhost:8080/login');
     }
 }
 
