@@ -23,13 +23,12 @@ export function getFriends(userId: number) {
     }
 }
 
-
 export function getUser(userId: number) {
     try {
         const stmt = db.prepare(`
             SELECT *
             FROM USERS F
-            WHERE user_id = ?
+            WHERE id = ?
         `);
         const res = stmt.all(userId);
         return res;
@@ -38,4 +37,3 @@ export function getUser(userId: number) {
         throw err;
     }
 }
-

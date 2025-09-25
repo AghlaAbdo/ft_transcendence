@@ -18,6 +18,7 @@ interface conversation {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     if (selectedChatId) {
@@ -80,6 +81,8 @@ return (
       userId={UserId}
       onReceiveChange={SetUser_2}
       conv={conv_}
+      searchQuery={searchQuery}           
+      onSearchChange={setSearchQuery}
     />
     <div className="flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2">
       <ChatWindow SelectedChatId={selectedChatId} userId={UserId} conv={conv_} />

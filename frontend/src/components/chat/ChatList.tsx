@@ -1,7 +1,7 @@
 // "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search } from "lucide-react";
+// import { Plus, Search } from "lucide-react";
 import { Search_Input } from "./Search_Input";
 import { formatDistanceToNow } from "date-fns";
 
@@ -31,15 +31,11 @@ interface ChatlistProps {
   selectedChatId: number | null;
   userId: number | null;
   conv: Message[];
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
-export const Chatlist = ({
-  onSelect,
-  selectedChatId,
-  userId,
-  onReceiveChange,
-  conv,
-}: ChatlistProps) => {
+export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv, searchQuery, onSearchChange}: ChatlistProps) => {
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
@@ -47,12 +43,11 @@ export const Chatlist = ({
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`)
         .then((res) => res.json())
         .then((data: Chat[]) => {
-          console.log("chats fetched from backend:", data);
           setChats(data);
         })
         .catch((err) => console.error("Failed to fetch chats:", err));
     }
-  }, [selectedChatId, userId, conv]);
+  }, [userId, conv]);
 
   return (
     <>
@@ -66,7 +61,10 @@ export const Chatlist = ({
 
         <div className="p-4">
           <div className="relative">
-            <Search_Input />
+            <Search_Input 
+            onsearchchange_2 = {onSearchChange}
+            searchquery_2={searchQuery}
+            />
           </div>
         </div>
 

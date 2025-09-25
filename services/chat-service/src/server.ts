@@ -1,13 +1,13 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { Server as SocketIOServer } from "socket.io";
+import { Server } from "socket.io";
 import { getMessages, insert_message, getMessage } from "./database/conversations.ts";
 import { getChats } from "./database/chats.ts";
 import { getFriends, getUser } from "./database/user.ts";
 
 const fastify = Fastify();
 fastify.register(cors, { origin: "*" });
-const io = new SocketIOServer(fastify.server, { cors: { origin: "*" } });
+const io = new Server(fastify.server, { cors: { origin: "*" } });
 declare module "socket.io" {
   interface Socket {
     userId?: number;
@@ -34,7 +34,7 @@ io.on("connection", (socket: Socket) => {
     );
     if (!newMessage)
         return ;
-    socket.emit("ChatMessage", newMessage); // here check if the user if a freind
+    socket.emit("ChatMessage", newMessage); // here check fi the user if a freind
     const receiverSocket = onlineUsers.get(data.receiver);
     if (receiverSocket) {
       receiverSocket.emit("ChatMessage", newMessage);
@@ -80,9 +80,9 @@ fastify.get("/api/chat/user/:userId", (request) => {
   return getUser(parseInt(userId));
 });
 
-fastify.get("/api/chat/chats/:userId", (request) => {
+fastify.get("/api/chat/chats/:userId", (request, reply) => {
   const { userId } = request.params as { userId: string };
-  // if (!Number.isInteger(userId))
-  // return reply.status(400).send({ error: "invalid userId" });
+  if (!Number.isInteger(parseInt(userId)))
+  return reply.status(400).send({ error: "invalid userId" });
   return getChats(parseInt(userId));
 });
