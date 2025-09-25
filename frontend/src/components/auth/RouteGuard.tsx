@@ -1,46 +1,46 @@
-// components/RouteGuard.tsx
 "use client";
 
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import AuthSuccess from '@/app/(auth)/success/page';
+import HomePage from '@/app/(protected)/home/page';
+import { useAuth } from '@/hooks/useAuth';
 
-const publicRoutes = ["/login", "/signup"];
+interface RouteGuardProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
 
-export default function RouteGuard({ children }: { children: React.ReactNode }) {
+export const RouteGuard: React.FC<RouteGuardProps> = ({ 
+  children, 
+  fallback = null 
+}) => {
   const { user, isLoading } = useAuth();
-  const pathname = usePathname();
 
-  useEffect(() => {
-    if (isLoading) return;
+  if (isLoading) {
+    return <>{fallback}</> || <div>Loading...</div>;
+  }
 
-    const isPublicRoute = publicRoutes.includes(pathname);
-    
-    // If user is not authenticated and trying to access protected route
-    if (!user && !isPublicRoute) {
-      // The redirect will happen in the useAuth hook
-      return;
-    }
+  if (!user) {
+    return <>{fallback}</> || <div>Redirecting to login...</div>;
+  }
 
-    // If user is authenticated and trying to access public auth routes
-    if (user && isPublicRoute) {
-      window.location.href = '/home'; // Use window.location to avoid hook conflicts
-    }
-  }, [user, isLoading, pathname]);
+  return <>{children}</>;
+};
+
+export const PublicRouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl">Loading...</div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  // Show children only if:
-  // - User is authenticated AND accessing protected route
-  // - OR accessing public route (login/signup) without authentication
-  const shouldShowContent = (user && !publicRoutes.includes(pathname)) || 
-                           (!user && publicRoutes.includes(pathname));
+  // If user is authenticated, redirect to dashboard
+  if (user) {
+    return <AuthSuccess/>
+  }
 
-  return shouldShowContent ? <>{children}</> : null;
-}
+  return <>{children}</>;
+};

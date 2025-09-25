@@ -23,7 +23,6 @@ const SKIP_MIDDLEWARE_ROUTES = [
   "/success"
 ];
 
-import { useAuth } from './hooks/useAuth';
 
 export default async function middleware(req: NextRequest) {
 
