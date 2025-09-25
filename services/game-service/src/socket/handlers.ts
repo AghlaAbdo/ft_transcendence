@@ -24,7 +24,7 @@ export function handlePlay(socket: Socket): void {
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
     allGames.games[gameId] = generateGameState(gameId);
-    console.log("\ncurr time: ", allGames.games[gameId].startDate, "\n");
+    console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
     socket.emit('playerRole', 'player1');
     socket.join(gameId);
     allGames.lobyGame = gameId;
@@ -32,10 +32,12 @@ export function handlePlay(socket: Socket): void {
     allGames.games[allGames.lobyGame].playersNb++;
     socket.join(allGames.lobyGame);
     socket.emit('playerRole', 'player2');
-    socket.to(allGames.lobyGame).emit('matchFound', {username: "user_123", avatar: "random"});
-    socket.emit('matchFound', {username: "user_234", avatar: "random"});
+    socket
+      .to(allGames.lobyGame)
+      .emit('matchFound', { username: 'user_123', avatar: 'random' });
+    socket.emit('matchFound', { username: 'user_234', avatar: 'random' });
     const lobyGame = allGames.lobyGame;
-    setTimeout(()=> {
+    setTimeout(() => {
       // if (!lobyGame) return;
       socket.to(lobyGame).emit('startGame', lobyGame);
       socket.emit('startGame', lobyGame);

@@ -16,7 +16,7 @@ services:
       context: ./frontend
     networks:
       - main_net
-    
+
   game-service:
     container_name: game-service
     image: game-service:1.0.0

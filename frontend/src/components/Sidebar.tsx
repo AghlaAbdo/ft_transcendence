@@ -67,8 +67,8 @@ export default function Sidebar() {
 
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
-            className={`${linkBase} ${pathName.startsWith('/dashboard') ? linkActive : ''}`}
-            href='/dashboard'
+            className={`${linkBase} ${(pathName == '/') ? linkActive : ''}`}
+            href='/'
           >
             {/* Dashboard Icon */}
             <svg

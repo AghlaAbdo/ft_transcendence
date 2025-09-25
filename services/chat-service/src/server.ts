@@ -16,22 +16,17 @@ declare module "socket.io" {
 io.on("connection", (socket) => {
   const use__rId = socket.handshake.auth.user_id;
    if (!use__rId) return socket.disconnect();
-  // 2. attach it to the socket object (so you can use it later)
   socket.userId = use__rId;
-
   console.log("User connected:", socket.userId);
-
   socket.on("ChatMessage", (data) => {
     const chat_id = data.chatId;
     const content = data.message;
-    // 1. Call insert_message and store the complete message object
     const newMessage = insert_message(
       chat_id,
       data.sender,
       data.receiver,
       content
     );
-    // console.log(newMessage)
     if (newMessage) {
       io.to(`chat:${chat_id}`).emit("ChatMessage", newMessage);
     }
@@ -48,7 +43,7 @@ io.on("connection", (socket) => {
 const start = async () => {
   try {
     await fastify.listen({ port: 4545, host: "0.0.0.0" });
-    console.log("server running on: localhost:4545");
+    console.log("Chat-service running on port: 4545");
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);
@@ -56,14 +51,6 @@ const start = async () => {
 };
 
 start();
-fastify.get("/", (req, rep) => {
-  rep.send("hello world pro");
-});
-
-fastify.get("/shutdown", (req, rep) => {
-  // fucking linux make me do this
-  process.exit(0);
-});
 
 fastify.get("/api/chat/messages/:chatId", (request, reply) => {
   const { chatId } = request.params as { chatId: string };
@@ -77,7 +64,6 @@ fastify.get("/api/chat/message/:MessageId", (request, reply) => {
 
 fastify.get("/api/chat/chats/:userId", (request, reply) => {
   const { userId } = request.params as { userId: string };
-  // console.log("user ", + userId + "asks for chats list");
   // if (!Number.isInteger(userId))
   // return reply.status(400).send({ error: "invalid userId" });
   return getChats(parseInt(userId));

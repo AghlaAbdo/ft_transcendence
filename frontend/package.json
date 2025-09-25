@@ -21,7 +21,8 @@
     "react-dom": "19.1.0",
     "react-lineicons": "^3.0.0",
     "socket.io-client": "^4.8.1",
-    "tailwind-scrollbar": "^4.0.2"
+    "tailwind-scrollbar": "^4.0.2",
+    "sonner": "^2.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

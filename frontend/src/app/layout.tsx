@@ -29,17 +29,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
-        suppressHydrationWarning
-      >
-        <LayoutProvider>
-          <Sidebar />
-          {/* <Header /> */}
-          <main className='mt-[100px] md:ml-[72px]'>{children}</main>
-        </LayoutProvider>
-      </body>
+    // <html lang='en'>
+    //   <body
+    //     className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
+    //   >
+    //     <LayoutProvider>
+    //       <Sidebar />
+    //       <Header />
+    //       <main className='md:ml-[72px] md:mt-[72px]'>{children}</main>
+    //     </LayoutProvider>
+    //   </body>
+    // </html>
+
+    <html lang="en">
+        <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
+        >
+            {children}
+        </body>
     </html>
   );
 }

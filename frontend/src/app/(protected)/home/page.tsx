@@ -7,7 +7,7 @@ import Statistic from "@/components/dashboard/statistic"
 import Statistics from "@/components/dashboard/statistics"
 import Image from "next/image"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { GetGames } from "@/app/lib/dashboard"
+import { GetGames } from "@/app/(protected)/lib/dashboard"
 import { game } from "@/constants/dashboard"
 
 export default function Dashboard() {

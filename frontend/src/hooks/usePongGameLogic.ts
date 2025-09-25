@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import * as PIXI from 'pixi.js';
 
-import { socket } from '@/app/lib/socket';
+import { socket } from '@/app/(protected)/lib/socket';
 import {
   BALL_RADIUS,
   GAME_HEIGHT,
@@ -38,8 +38,33 @@ export const usePongGameLogic = (): returnType => {
   const rightPaddleRef = useRef<PIXI.Graphics | null>(null);
   const scoreTextRef = useRef<PIXI.Text | null>(null);
   const endTextRef = useRef<PIXI.Text | null>(null);
+  const coundDownRef = useRef<PIXI.Text | null>(null);
 
   const { setHideHeaderSidebar } = useLayout();
+
+  const showCountDown = useCallback((num: number) => {
+    if (!coundDownRef.current) return;
+    coundDownRef.current.text = num.toString();
+    coundDownRef.current.alpha = 1;
+    coundDownRef.current.scale.set(1);
+
+    let elapsed = 0;
+
+    const animate = (ticker: PIXI.Ticker) => {
+      if (!coundDownRef.current) return;
+      const delta = ticker.deltaTime / 60;
+      elapsed += delta;
+
+      coundDownRef.current.scale.set(1 + elapsed * 0.5);
+      coundDownRef.current.alpha = Math.max(1 - elapsed, 0);
+
+      if (elapsed >= 1) {
+        pixiApp.current?.ticker.remove(animate);
+      }
+    };
+
+    pixiApp.current?.ticker.add(animate);
+  }, []);
 
   useEffect(() => {
     if (waiting) return;
@@ -113,6 +138,22 @@ export const usePongGameLogic = (): returnType => {
         endText.y = GAME_HEIGHT / 2;
         app.stage.addChild(endText);
         endTextRef.current = endText;
+
+        const countdownText = new PIXI.Text({
+          text: '',
+          style: {
+            fontFamily: 'Arial',
+            fontSize: 120,
+            fill: 0x111827,
+            align: 'center',
+          },
+        });
+
+        countdownText.anchor.set(0.5);
+        countdownText.x = app.screen.width / 2;
+        countdownText.y = app.screen.height / 2;
+        app.stage.addChild(countdownText);
+        coundDownRef.current = countdownText;
       } catch (error) {
         console.error('Failed to initialize PixiJS app:', error);
         if (pixiApp.current) {
@@ -152,6 +193,12 @@ export const usePongGameLogic = (): returnType => {
       }
       playerRole.current = msg;
     });
+
+    socket.on('starting', (count) => {
+      console.log('starting: ', count);
+      showCountDown(count);
+    });
+
     socket.on('startGame', (id) => {
       isPlaying.current = true;
       console.log('Stared the game !!!!!');

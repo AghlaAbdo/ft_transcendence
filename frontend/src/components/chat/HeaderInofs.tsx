@@ -3,11 +3,8 @@ export const HeaderInfos = () => {
   return (
     <>
       <div className="flex py-2.5 px-5 items-center rounded-t-[20px] bg-[#1F2937]">
-        {/* chat header infos */}
-        {/* here to put the name and online status */}
-
         <img
-          src="/avatars/avatar6.png"
+          src="/avatars/avatar3.png"
           alt="Imad"
           className="w-12 h-12 rounded-full mr-3"
         />
