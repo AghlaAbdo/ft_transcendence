@@ -50,14 +50,96 @@ services:
   #   networks:
   #     - main_net
 
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - main_net
+    depends_on:
+      - nginx
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:v0.23.0
+    container_name: alertmanager
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    networks:
+      - main_net
+
+  discord-alerts:
+    image: benjojo/alertmanager-discord
+    container_name: discord-alerts
+    environment:
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
+    networks:
+      - main_net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana-certs:/etc/grafana/certs
+      - certs-ca:/etc/grafana/certs/ca
+      - grafana-conf:/usr/share/grafana/conf/provisioning/datasources
+    networks:
+      - main_net
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SERVER_ROOT_URL=https://localhost:3000/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
+      - GF_SECURITY_COOKIE_SAMESITE=lax
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SERVER_PROTOCOL=http
+      - GF_SERVER_HTTP_PORT=3000
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_AUTH_PROXY_ENABLED=false
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+
+  node-exporter:
+    image: bitnami/node-exporter:1.9.1-debian-12-r12
+    container_name: node-exporter
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host:ro
+
+  cadviser:
+    image: cadvisor:monitoring
+    container_name: cadvisor
+    build:
+      context: ./monitoring/cadvisor
+      dockerfile: Dockerfile
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - main_net
+
+
 networks:
   main_net:
     name: main_net
 
   
 volumes:
+  prometheus_data:
+  grafana_data:
   certs:
   grafana-certs:
   certs-ca:
   grafana-conf:
-
