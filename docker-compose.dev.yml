@@ -2,12 +2,7 @@ services:
   nginx:
     build:
       target: base
-    volumes:
-      - ./services/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - chat-service
-      # - game-service
-      # - user-service
       - nextjs
 
   nextjs:

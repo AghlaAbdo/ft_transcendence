@@ -1,13 +1,22 @@
 services:
   nginx:
-    container_name: nginx
     image: nginx
     build:
       context: ./services/nginx
+      dockerfile: Dockerfile
+    container_name: nginx
     networks:
       - main_net
+    env_file:
+      - .env
     ports:
       - "443:443"
+      - "9090:9090"
+    volumes:
+      - certs:/certs
+      - grafana-certs:/certs/grafana-certs
+      - certs-ca:/certs/ca
+      - grafana-conf:/usr/share/grafana/conf/provisioning/datasources
 
   nextjs:
     container_name: nextjs
@@ -44,3 +53,11 @@ services:
 networks:
   main_net:
     name: main_net
+
+  
+volumes:
+  certs:
+  grafana-certs:
+  certs-ca:
+  grafana-conf:
+
