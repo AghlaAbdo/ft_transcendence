@@ -1,13 +1,40 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 
 import { useLayout } from '@/context/LayoutContext';
+import { toast } from 'sonner';
 
 export default function Sidebar() {
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    
+    try {
+      const response = await fetch('https://localhost:8080/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        toast.error(data.message);
+        return ;
+      }
+
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      toast.error('Network error during logout');
+      console.error('Logout error:', error);
+      // router.push('/login');
+    }
+  }
+
   const pathName = usePathname();
   const linkBase =
     'p-[14px] hover:[&>svg]:stroke-gray-50 flex items-center justify-center';
@@ -262,9 +289,12 @@ export default function Sidebar() {
             />
           </svg>
         </Link>
-        <Link
+
+        <button
+          type='button'
+          onClick={handleLogout}
           className={`${linkBase} ${pathName === '/logout' ? linkActive : ''}`}
-          href='/logout'
+
         >
           {/* Logout Icon */}
           <svg
@@ -288,7 +318,11 @@ export default function Sidebar() {
               strokeLinejoin='round'
             />
           </svg>
-        </Link>
+        </button>
+        {/* <Link
+          href='/logout'
+        >
+        </Link> */}
       </div>
     </motion.nav>
   );

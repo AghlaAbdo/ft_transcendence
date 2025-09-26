@@ -7,15 +7,15 @@ services:
     container_name: nginx
     networks:
       - main_net
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     ports:
-      - "443:443"
-    volumes:
-      - certs:/certs
-      - grafana-certs:/certs/grafana-certs
-      - certs-ca:/certs/ca
-      - grafana-conf:/usr/share/grafana/conf/provisioning/datasources
+      - "8080:8080"
+    # volumes:
+    #   - certs:/certs
+    #   - grafana-certs:/certs/grafana-certs
+    #   - certs-ca:/certs/ca
+    #   - grafana-conf:/usr/share/grafana/conf/provisioning/datasources
 
   nextjs:
     container_name: nextjs
@@ -33,13 +33,13 @@ services:
     networks:
       - main_net
 
-  # user-service:
-  #   container_name: user-service
-  #   image: user-service:v2.0.0
-  #   build:
-  #     context: ./services/user-service
-  #   networks:
-  #     - main_net
+  user-service:
+    container_name: user-service
+    image: user-service:v2.0.0
+    build:
+      context: ./services/user-service
+    networks:
+      - main_net
 
   # chat-service:
   #   container_name: chat-service
@@ -49,177 +49,177 @@ services:
   #   networks:
   #     - main_net
 
-  prometheus:
-    image: prom/prometheus:v3.5.0
-    container_name: prometheus
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    networks:
-      - main_net
-    depends_on:
-      - alertmanager
+  # prometheus:
+  #   image: prom/prometheus:v3.5.0
+  #   container_name: prometheus
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #   networks:
+  #     - main_net
+  #   depends_on:
+  #     - alertmanager
 
-  alertmanager:
-    image: prom/alertmanager:v0.23.0
-    container_name: alertmanager
-    volumes:
-      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
-    command:
-      - "--config.file=/etc/alertmanager/alertmanager.yml"
-    networks:
-      - main_net
+  # alertmanager:
+  #   image: prom/alertmanager:v0.23.0
+  #   container_name: alertmanager
+  #   volumes:
+  #     - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+  #   command:
+  #     - "--config.file=/etc/alertmanager/alertmanager.yml"
+  #   networks:
+  #     - main_net
 
-  discord-alerts:
-    image: benjojo/alertmanager-discord
-    container_name: discord-alerts
-    environment:
-      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
-    networks:
-      - main_net
+  # discord-alerts:
+  #   image: benjojo/alertmanager-discord
+  #   container_name: discord-alerts
+  #   environment:
+  #     - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
+  #   networks:
+  #     - main_net
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - grafana-certs:/etc/grafana/certs
-      - certs-ca:/etc/grafana/certs/ca
-      - grafana-conf:/usr/share/grafana/conf/provisioning/datasources
-    networks:
-      - main_net
-    depends_on:
-      - prometheus
-    environment:
-      - GF_SERVER_ROOT_URL=https://localhost:3000/grafana
-      - GF_SERVER_SERVE_FROM_SUB_PATH=false
-      - GF_SECURITY_COOKIE_SAMESITE=lax
-      - GF_SECURITY_COOKIE_SECURE=true
-      - GF_SERVER_PROTOCOL=http
-      - GF_SERVER_HTTP_PORT=3000
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-      - GF_AUTH_PROXY_ENABLED=false
-      - GF_USERS_ALLOW_SIGN_UP=false
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - grafana-certs:/etc/grafana/certs
+  #     - certs-ca:/etc/grafana/certs/ca
+  #     - grafana-conf:/usr/share/grafana/conf/provisioning/datasources
+  #   networks:
+  #     - main_net
+  #   depends_on:
+  #     - prometheus
+  #   environment:
+  #     - GF_SERVER_ROOT_URL=https://localhost:3000/grafana
+  #     - GF_SERVER_SERVE_FROM_SUB_PATH=false
+  #     - GF_SECURITY_COOKIE_SAMESITE=lax
+  #     - GF_SECURITY_COOKIE_SECURE=true
+  #     - GF_SERVER_PROTOCOL=http
+  #     - GF_SERVER_HTTP_PORT=3000
+  #     - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+  #     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+  #     - GF_AUTH_PROXY_ENABLED=false
+  #     - GF_USERS_ALLOW_SIGN_UP=false
 
 
-  node-exporter:
-    image: bitnami/node-exporter:1.9.1-debian-12-r12
-    container_name: node-exporter
-    network_mode: host
-    pid: host
-    volumes:
-      - /:/host:ro
+  # node-exporter:
+  #   image: bitnami/node-exporter:1.9.1-debian-12-r12
+  #   container_name: node-exporter
+  #   network_mode: host
+  #   pid: host
+  #   volumes:
+  #     - /:/host:ro
 
-  cadviser:
-    image: cadvisor:monitoring
-    container_name: cadvisor
-    build:
-      context: ./monitoring/cadvisor
-      dockerfile: Dockerfile
-    volumes:
-      - /:/rootfs:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      - main_net
+  # cadviser:
+  #   image: cadvisor:monitoring
+  #   container_name: cadvisor
+  #   build:
+  #     context: ./monitoring/cadvisor
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   networks:
+  #     - main_net
 
-  elasticsearch:
-    image: elasticsearch:tran
-    container_name: elasticsearch
-    build:
-      context: elk-stack/elasticsearch
-      dockerfile: Dockerfile
-    volumes: 
-    - els_data:/usr/share/elasticsearch/data
-    - ca:/usr/share/elasticsearch/config/certs/ca
-    - elasticsearch_certs:/usr/share/elasticsearch/config/certs/elasticsearch
-    environment:
-        - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-        - ACCESS_KEY_ID=${ACCESS_KEY_ID}
-        - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
-    depends_on:
-      setup:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -u elastic:${ELASTIC_PASSWORD} -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
-      interval: 10s
-      timeout: 10s
-      retries: 9
-      start_period: 30s
-    networks:
-      - main_net
+  # elasticsearch:
+  #   image: elasticsearch:tran
+  #   container_name: elasticsearch
+  #   build:
+  #     context: elk-stack/elasticsearch
+  #     dockerfile: Dockerfile
+  #   volumes: 
+  #   - els_data:/usr/share/elasticsearch/data
+  #   - ca:/usr/share/elasticsearch/config/certs/ca
+  #   - elasticsearch_certs:/usr/share/elasticsearch/config/certs/elasticsearch
+  #   environment:
+  #       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+  #       - ACCESS_KEY_ID=${ACCESS_KEY_ID}
+  #       - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
+  #   depends_on:
+  #     setup:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -u elastic:${ELASTIC_PASSWORD} -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 9
+  #     start_period: 30s
+  #   networks:
+  #     - main_net
 
-  setup:
-    image: setup:tran
-    container_name: setup
-    build:
-      context: elk-stack/setup
-      dockerfile: Dockerfile
-    environment:
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-      - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
-      - KIBANA_ENCRYPTION_KEY=${KIBANA_ENCRYPTION_KEY}
-    volumes:
-      - ca:/usr/share/elasticsearch/config/certs/ca
-      - elasticsearch_certs:/usr/share/elasticsearch/config/certs/elasticsearch
-      - logstash_certs:/usr/share/elasticsearch/config/certs/logstash
-      - kibana_certs:/usr/share/elasticsearch/config/certs/kibana
-      - ./elk-stack/setup/utils/instances.yml:/usr/share/elasticsearch/config/instances.yml
-      - ./elk-stack/setup/dashboard.ndjson:/usr/share/kibana/dashboard.ndjson
-    healthcheck:
-      test: ["CMD", "test", "-f", "/tmp/certs_ready"]
-      interval: 3s
-      retries: 7
-      start_period: 2s
-      timeout: 3s
-    networks:
-      - main_net
+  # setup:
+  #   image: setup:tran
+  #   container_name: setup
+  #   build:
+  #     context: elk-stack/setup
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+  #     - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+  #     - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
+  #     - KIBANA_ENCRYPTION_KEY=${KIBANA_ENCRYPTION_KEY}
+  #   volumes:
+  #     - ca:/usr/share/elasticsearch/config/certs/ca
+  #     - elasticsearch_certs:/usr/share/elasticsearch/config/certs/elasticsearch
+  #     - logstash_certs:/usr/share/elasticsearch/config/certs/logstash
+  #     - kibana_certs:/usr/share/elasticsearch/config/certs/kibana
+  #     - ./elk-stack/setup/utils/instances.yml:/usr/share/elasticsearch/config/instances.yml
+  #     - ./elk-stack/setup/dashboard.ndjson:/usr/share/kibana/dashboard.ndjson
+  #   healthcheck:
+  #     test: ["CMD", "test", "-f", "/tmp/certs_ready"]
+  #     interval: 3s
+  #     retries: 7
+  #     start_period: 2s
+  #     timeout: 3s
+  #   networks:
+  #     - main_net
 
-  logstash:
-    image: logstash:tran
-    container_name: logstash
-    build:
-      context: elk-stack/logstash
-      dockerfile: Dockerfile
-    depends_on:
-      setup:
-        condition: service_healthy
-    volumes:
-      - ./elk-stack/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./elk-stack/logstash/pipeline:/usr/share/logstash/pipeline
-      - ca:/usr/share/logstash/config/certs/ca
-      - logstash_certs:/usr/share/logstash/config/certs/logstash
-      - ./elk-stack/logs:/var/log/app-logs
-    environment:
-      - LOGSTASH_PASSWORD=$LOGSTASH_PASSWORD
-    networks:
-      - main_net
+  # logstash:
+  #   image: logstash:tran
+  #   container_name: logstash
+  #   build:
+  #     context: elk-stack/logstash
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     setup:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./elk-stack/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+  #     - ./elk-stack/logstash/pipeline:/usr/share/logstash/pipeline
+  #     - ca:/usr/share/logstash/config/certs/ca
+  #     - logstash_certs:/usr/share/logstash/config/certs/logstash
+  #     - ./elk-stack/logs:/var/log/app-logs
+  #   environment:
+  #     - LOGSTASH_PASSWORD=$LOGSTASH_PASSWORD
+  #   networks:
+  #     - main_net
 
-  kibana:
-    image: kibana:tran
-    build:
-      context: elk-stack/kibana
-      dockerfile: Dockerfile
-    container_name: kibana
-    depends_on:
-      setup:
-        condition: service_healthy
-    environment:
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-      - KIBANA_ENCRYPTION_KEY=${KIBANA_ENCRYPTION_KEY}
-    volumes:
-      - ca:/usr/share/kibana/config/certs/ca
-      - kibana_certs:/usr/share/kibana/config/certs/kibana
-    # ports:
-    # - "5601:5601"
-    networks:
-      - main_net
+  # kibana:
+  #   image: kibana:tran
+  #   build:
+  #     context: elk-stack/kibana
+  #     dockerfile: Dockerfile
+  #   container_name: kibana
+  #   depends_on:
+  #     setup:
+  #       condition: service_healthy
+  #   environment:
+  #     - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+  #     - KIBANA_ENCRYPTION_KEY=${KIBANA_ENCRYPTION_KEY}
+  #   volumes:
+  #     - ca:/usr/share/kibana/config/certs/ca
+  #     - kibana_certs:/usr/share/kibana/config/certs/kibana
+  #   # ports:
+  #   # - "5601:5601"
+  #   networks:
+  #     - main_net
 
 
 networks:
@@ -227,15 +227,15 @@ networks:
     name: main_net
 
  
-volumes:
-  prometheus_data:
-  grafana_data:
-  certs:
-  grafana-certs:
-  certs-ca:
-  grafana-conf:
-  els_data:
-  ca:
-  elasticsearch_certs:
-  kibana_certs:
-  logstash_certs:
+# volumes:
+#   prometheus_data:
+#   grafana_data:
+#   certs:
+#   grafana-certs:
+#   certs-ca:
+#   grafana-conf:
+#   els_data:
+#   ca:
+#   elasticsearch_certs:
+#   kibana_certs:
+#   logstash_certs:

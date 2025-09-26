@@ -46,46 +46,46 @@ rm certs/ca/ca.key
 # envsubst < nginx.conf > /etc/nginx/nginx.conf
 
 
-create prometheus data_source
+# create prometheus data_source
 
 
-echo "Waiting for Grafana to start..."
-until curl -s "http://grafana:3000/api/health" | grep -q '"database": "ok"'; do
-  sleep 3
-done
+# echo "Waiting for Grafana to start..."
+# until curl -s "http://grafana:3000/api/health" | grep -q '"database": "ok"'; do
+#   sleep 3
+# done
 
 
 
-CA_CERT=$(awk '{printf "%s\\n", $0}' certs/ca/ca.crt)
-CLIENT_CERT=$(awk '{printf "%s\\n", $0}' certs/grafana-certs/grafana.crt)
-CLIENT_KEY=$(awk '{printf "%s\\n", $0}' certs/grafana-certs/grafana.key)
+# CA_CERT=$(awk '{printf "%s\\n", $0}' certs/ca/ca.crt)
+# CLIENT_CERT=$(awk '{printf "%s\\n", $0}' certs/grafana-certs/grafana.crt)
+# CLIENT_KEY=$(awk '{printf "%s\\n", $0}' certs/grafana-certs/grafana.key)
 
-curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/datasources \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"name\": \"Prometheus\",
-    \"type\": \"prometheus\",
-    \"url\": \"https://nginx:9090\",
-    \"access\": \"proxy\",
-    \"jsonData\": {
-      \"tlsAuth\": true,
-      \"tlsAuthWithCACert\": true,
-      \"tlsSkipVerify\": false
-    },
-    \"secureJsonData\": {
-      \"tlsCACert\": \"$CA_CERT\",
-      \"tlsClientCert\": \"$CLIENT_CERT\",
-      \"tlsClientKey\": \"$CLIENT_KEY\"
-    }
-  }"
+# curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/datasources \
+#   -H "Content-Type: application/json" \
+#   -d "{
+#     \"name\": \"Prometheus\",
+#     \"type\": \"prometheus\",
+#     \"url\": \"https://nginx:9090\",
+#     \"access\": \"proxy\",
+#     \"jsonData\": {
+#       \"tlsAuth\": true,
+#       \"tlsAuthWithCACert\": true,
+#       \"tlsSkipVerify\": false
+#     },
+#     \"secureJsonData\": {
+#       \"tlsCACert\": \"$CA_CERT\",
+#       \"tlsClientCert\": \"$CLIENT_CERT\",
+#       \"tlsClientKey\": \"$CLIENT_KEY\"
+#     }
+#   }"
 
 
-curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/dashboards/db \
-  -H "Content-Type: application/json" \
-  -d @Server-Health-Dashboard.json
+# curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/dashboards/db \
+#   -H "Content-Type: application/json" \
+#   -d @Server-Health-Dashboard.json
 
-curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/dashboards/db \
-  -H "Content-Type: application/json" \
-  -d @Docker-Monitoring.json
+# curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/dashboards/db \
+#   -H "Content-Type: application/json" \
+#   -d @Docker-Monitoring.json
 
 nginx -g "daemon off;"

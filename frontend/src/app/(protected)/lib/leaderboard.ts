@@ -19,7 +19,7 @@ export async function get_leaderboard(page, offset, onlyTop): Promise<Player[]> 
         }))
     }
 
-    const res = await fetch('http://localhost:4000/leaderboard');
+    const res = await fetch('https://localhost:4000/leaderboard');
     if (!res.ok) throw new Error('Failure fetching leaderboard!')
     return res.json()
 }

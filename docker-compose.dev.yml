@@ -4,8 +4,10 @@ services:
       target: base
     depends_on:
       - nextjs
-      - prometheus
-      - kibana
+      - user-service
+      - game-service
+      # - prometheus
+      # - kibana
 
   nextjs:
     build:
@@ -35,11 +37,11 @@ services:
     volumes:
       - ./services/user-service/:/app
 
-  chat-service:
-    build:
-      target: base
-    env_file:
-      ./services/chat-service/.env
+  # chat-service:
+  #   build:
+  #     target: base
+  #   env_file:
+  #     ./services/chat-service/.env
     # volumes:
     #   - ./chat-service/back-end/src:/app/src
     #   - ./chat-service/back-end/chat.db:/app/chat.db
