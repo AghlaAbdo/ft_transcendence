@@ -18,13 +18,6 @@ interface conversation {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-
-
-  useEffect(() => {
-    console.log("Search query changed:", searchQuery);
-  }, [searchQuery]);
-  
   useEffect(() => {
     if (selectedChatId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`) //protect with async, axios
@@ -58,8 +51,6 @@ export default function ChatPage() {
     });
   socketRef.current = socket;
   socket.on("ChatMessage", (data) => {
-    console.log("testing: " + selectedChatId)
-    console.log("a message arries : " + data.content + " from chat: " + data.chat_id + " and id = " + data.id)
       set_conv((prevMessages) => [...prevMessages, data])
   });
   return () => {
@@ -83,8 +74,6 @@ return (
       userId={UserId}
       onReceiveChange={SetUser_2}
       conv={conv_}
-      searchQuery={searchQuery}           
-      onSearchChange={setSearchQuery}
     />
     <div className="flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2">
       <ChatWindow SelectedChatId={selectedChatId} userId={UserId} conv={conv_} />

@@ -29,12 +29,17 @@ interface ChatlistProps {
   selectedChatId: number | null;
   userId: number | null;
   conv: Message[];
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
 }
 
-export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv, searchQuery, onSearchChange}: ChatlistProps) => {
+export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv}: ChatlistProps) => {
   const [chats, setChats] = useState<Chat[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");  
+  const filteredChats = chats.filter((chat) => {
+    if (!searchQuery) return true;
+    const otherUserId = chat.sender === userId ? chat.receiver : chat.sender;
+    const userIdString = otherUserId.toString();
+    return userIdString.includes(searchQuery);
+});
   useEffect(() => {
     if (userId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`)
@@ -58,13 +63,13 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
         <div className="p-4">
             <div className="relative">
               <Search_Input 
-              onsearchchange_2 = {onSearchChange}
+              onsearchchange_2 = {setSearchQuery}
               searchquery_2={searchQuery}
               />
             </div>
         </div>
         <div className="px-4 pb-4">
-          {chats.map((chat) => {
+          {filteredChats.map((chat) => {
             const otherUserId =
               chat.sender === userId ? chat.receiver : chat.sender;
             return (
@@ -84,7 +89,6 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
                   alt={`User ${otherUserId}`}
                   className="w-12 h-12 rounded-full mr-3"
                 />
-
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-white">

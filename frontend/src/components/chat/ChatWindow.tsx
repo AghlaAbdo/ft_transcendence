@@ -33,7 +33,8 @@ export const ChatWindow = ({
       <div className="flex-1 flex flex-col min-h-0">
         {SelectedChatId ? (
           <>
-            <HeaderInfos />
+          {/* here pass the user object to render infos about the other chat */}
+            <HeaderInfos /> 
             {/* messages container */}
             <div
               className="flex-1 p-3 overflow-y-auto
