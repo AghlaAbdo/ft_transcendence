@@ -242,9 +242,7 @@ export const usePongGameLogic = (): returnType => {
 
     console.log('Play Now');
     socket.emit('play');
-    isPlaying.current = true;
-    if (!animationFrameId.current)
-      animationFrameId.current = requestAnimationFrame(gameLoop);
+    // isPlaying.current = true;
 
     socket.on('playerRole', (msg) => {
       console.log('player role: ', msg);
@@ -262,15 +260,20 @@ export const usePongGameLogic = (): returnType => {
 
     socket.on('starting', (count) => {
       console.log('starting: ', count);
+      if (waiting) {
+        console.log("set waiting once!!!!!!!!!!\n");
+        setWaiting(false);
+      }
       showCountDown(count);
     });
 
     socket.on('startGame', (id) => {
       isPlaying.current = true;
-      console.log('Stared the game !!!!!');
       gameId.current = id;
-      setWaiting(false);
       setHideHeaderSidebar(true);
+      if (!animationFrameId.current)
+        animationFrameId.current = requestAnimationFrame(gameLoop);
+      console.log('Stared the game !!!!!');
     });
 
     socket.on('matchFound', (opponent: IPlayer) => {
@@ -341,7 +344,7 @@ export const usePongGameLogic = (): returnType => {
     window.addEventListener('resize', resize);
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
+      // e.preventDefault();
       e.returnValue = '';
       console.log('sent quit event');
       if (isPlaying.current) socket.emit('quit', gameId.current);
@@ -373,7 +376,10 @@ export const usePongGameLogic = (): returnType => {
     } else if (pressedKeys.current.has('ArrowDown')) {
       socket.emit('movePaddle', gameId.current, playerRole.current, 'down');
     }
-    animationFrameId.current = requestAnimationFrame(gameLoop);
+    if (isPlaying.current)
+      animationFrameId.current = requestAnimationFrame(gameLoop);
+    else
+      animationFrameId.current = null;
   };
 
   function keydownEvent(event: KeyboardEvent) {

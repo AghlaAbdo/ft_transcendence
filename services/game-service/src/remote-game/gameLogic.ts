@@ -13,6 +13,7 @@ import {
 import { IGameState } from '../types/game';
 import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
+import { getCurrDate } from '../utils/dates';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -41,7 +42,9 @@ export function startGame(gameState: IGameState) {
 
       if (j === 1) {
         setTimeout(() => {
-          // console.log("started!!!!!!!!!");
+          ioInstance.to(gameState.id).emit('startGame', gameState.id);
+          ioInstance.emit('startGame', gameState.id);
+          gameState.startDate = getCurrDate();
           gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),

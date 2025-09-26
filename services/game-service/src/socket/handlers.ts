@@ -43,10 +43,6 @@ export function handlePlay(socket: Socket): void {
     socket.emit('matchFound', player);
     const lobyGame = allGames.lobyGame;
     setTimeout(() => {
-      // if (!lobyGame) return;
-      socket.to(lobyGame).emit('startGame', lobyGame);
-      socket.emit('startGame', lobyGame);
-      allGames.games[lobyGame].startDate = getCurrDate();
       startGame(allGames.games[lobyGame]);
     }, 3000);
     allGames.lobyGame = null;
@@ -87,9 +83,9 @@ export function handleRematch(
       // if (!lobyGame) return;
       socket.to(gameId).emit('playAgain');
       socket.emit('playAgain');
-      socket.to(gameId).emit('startGame', gameId);
-      socket.emit('startGame', gameId);
-      gameState.startDate = getCurrDate();
+      // socket.to(gameId).emit('startGame', gameId);
+      // socket.emit('startGame', gameId);
+      // gameState.startDate = getCurrDate();
       startGame(gameState);
     }, 2000);
   }

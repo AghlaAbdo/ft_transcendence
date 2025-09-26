@@ -52,22 +52,12 @@ export default function GamePage() {
             gameId={gameId}
             playerRole={playerRole}
           />
-          {/* <dialog ref={closeDialRef} className='flex flex-col gap-6 mx-auto my-auto bg-dark-blue rounded-[8px] border-[1px] border-gray-700 pt-4 pb-2 px-6'>
-            <div>
-              <p className='text-2xl text-gold text-center font-bold'>Are you sure you want to quit?</p>
-              <p className='text-[16px] text-gray-200 text-center '>You will lose this game!</p>
-            </div>
-            <div className='flex justify-between'>
-              <button className='w-full max-w-[88px] bg-green px-3 py-[2px] rounded-[8px] text-[18px] text-gray-50 font-bold'>Cancel</button>
-              <button className='w-full max-w-[88px] bg-red px-3 py-[2px] rounded-[8px] text-[18px] text-gray-50 font-bold'>Quit</button>
-            </div>
-          </dialog> */}
 
           <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
             <GamePlayers leftUser={player!} rightUser={opponent!} />
             <div
               ref={containerRef}
-              className='w-full max-w-[1000px] aspect-[3/2] rounded-[8px] overflow-hidden border-2 border-pink shadow-[0_0_14px_4px_rgba(236,72,135,1)]'
+              className='mx-auto rounded-[8px] overflow-hidden border-2 border-pink aspect-[3/2] w-[min(100%,1600px,calc((100vh-140px)*(3/2)))] shadow-[0_0_14px_4px_rgba(236,72,135,1)]'
             ></div>
             <GameResultCard
               ref={dialogRef}
