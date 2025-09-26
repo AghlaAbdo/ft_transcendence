@@ -128,12 +128,105 @@ services:
     networks:
       - main_net
 
+  elasticsearch:
+    image: elasticsearch:tran
+    container_name: elasticsearch
+    build:
+      context: elk-stack/elasticsearch
+      dockerfile: Dockerfile
+    volumes: 
+    - els_data:/usr/share/elasticsearch/data
+    - ca:/usr/share/elasticsearch/config/certs/ca
+    - elasticsearch_certs:/usr/share/elasticsearch/config/certs/elasticsearch
+    environment:
+        - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+        - ACCESS_KEY_ID=${ACCESS_KEY_ID}
+        - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
+    depends_on:
+      setup:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u elastic:${ELASTIC_PASSWORD} -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 9
+      start_period: 30s
+    networks:
+      - main_net
+
+  setup:
+    image: setup:tran
+    container_name: setup
+    build:
+      context: elk-stack/setup
+      dockerfile: Dockerfile
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
+      - KIBANA_ENCRYPTION_KEY=${KIBANA_ENCRYPTION_KEY}
+    volumes:
+      - ca:/usr/share/elasticsearch/config/certs/ca
+      - elasticsearch_certs:/usr/share/elasticsearch/config/certs/elasticsearch
+      - logstash_certs:/usr/share/elasticsearch/config/certs/logstash
+      - kibana_certs:/usr/share/elasticsearch/config/certs/kibana
+      - ./elk-stack/setup/utils/instances.yml:/usr/share/elasticsearch/config/instances.yml
+      - ./elk-stack/setup/dashboard.ndjson:/usr/share/kibana/dashboard.ndjson
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/certs_ready"]
+      interval: 3s
+      retries: 7
+      start_period: 2s
+      timeout: 3s
+    networks:
+      - main_net
+
+  logstash:
+    image: logstash:tran
+    container_name: logstash
+    build:
+      context: elk-stack/logstash
+      dockerfile: Dockerfile
+    depends_on:
+      setup:
+        condition: service_healthy
+    volumes:
+      - ./elk-stack/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./elk-stack/logstash/pipeline:/usr/share/logstash/pipeline
+      - ca:/usr/share/logstash/config/certs/ca
+      - logstash_certs:/usr/share/logstash/config/certs/logstash
+      - ./elk-stack/logs:/var/log/app-logs
+    environment:
+      - LOGSTASH_PASSWORD=$LOGSTASH_PASSWORD
+    networks:
+      - main_net
+
+  kibana:
+    image: kibana:tran
+    build:
+      context: elk-stack/kibana
+      dockerfile: Dockerfile
+    container_name: kibana
+    depends_on:
+      setup:
+        condition: service_healthy
+    environment:
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - KIBANA_ENCRYPTION_KEY=${KIBANA_ENCRYPTION_KEY}
+    volumes:
+      - ca:/usr/share/kibana/config/certs/ca
+      - kibana_certs:/usr/share/kibana/config/certs/kibana
+    # ports:
+    # - "5601:5601"
+    networks:
+      - main_net
+
 
 networks:
   main_net:
     name: main_net
 
-  
+ 
 volumes:
   prometheus_data:
   grafana_data:
@@ -141,3 +234,8 @@ volumes:
   grafana-certs:
   certs-ca:
   grafana-conf:
+  els_data:
+  ca:
+  elasticsearch_certs:
+  kibana_certs:
+  logstash_certs:

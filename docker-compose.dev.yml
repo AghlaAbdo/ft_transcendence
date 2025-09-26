@@ -5,6 +5,7 @@ services:
     depends_on:
       - nextjs
       - prometheus
+      - kibana
 
   nextjs:
     build:
