@@ -11,7 +11,6 @@ services:
       - .env
     ports:
       - "443:443"
-      - "9090:9090"
     volumes:
       - certs:/certs
       - grafana-certs:/certs/grafana-certs
@@ -62,7 +61,6 @@ services:
     networks:
       - main_net
     depends_on:
-      - nginx
       - alertmanager
 
   alertmanager:

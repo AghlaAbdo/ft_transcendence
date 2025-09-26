@@ -1,6 +1,10 @@
 # SSL
 
-
+if [ -e "certs/ca/ca.crt" ]; then
+  echo "certs found!"
+  nginx -g "daemon off;"
+  exit 0
+fi
 
 mkdir -p certs/ca
 mkdir -p certs/grafana-certs
