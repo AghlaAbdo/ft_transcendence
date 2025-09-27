@@ -3,6 +3,7 @@
 import { Chatlist } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { MessageInput } from "@/components/chat/MessageInput";
+import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -18,6 +19,8 @@ interface conversation {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const { user } = useAuth();
+  console.log("user  : ", user);
   useEffect(() => {
     if (selectedChatId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`) //protect with async, axios
