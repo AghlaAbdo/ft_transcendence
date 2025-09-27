@@ -19,8 +19,8 @@ interface conversation {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const { user } = useAuth();
-  console.log("user  : ", user);
+  // const { user } = useAuth();
+  // console.log("user is : ", user)
   useEffect(() => {
     if (selectedChatId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`) //protect with async, axios
