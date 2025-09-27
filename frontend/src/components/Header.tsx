@@ -23,7 +23,7 @@ export default function Header() {
       }}
       className='fixed h-[72px] w-[calc(100%-72px)] top-0 left-[72px] bg-bg-color flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
     >
-      <div className='flex justify-between items-center gap-4'>
+      <div className='z-1000 flex justify-between items-center gap-4'>
         <Image src={avatar} alt='Avatar' className='w-10' />
         <span className='text-[20px] font-bold text-gray-50'>
           Welcome user_x

@@ -8,6 +8,8 @@ const authRoutes = async (fastify, options) => {
     fastify.post('/login', authController.login);
     fastify.post('/logout', { onRequest: [fastify.authenticate] }, authController.logout);
 
+    fastify.get('/me', { onRequest: [fastify.authenticate] }, authController.getMe);
+
     fastify.post('/verify-email', authController.verifyEmail);
 
     

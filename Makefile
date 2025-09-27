@@ -2,11 +2,12 @@ DOCKER_COMPOSE_BASE=docker-compose.yml
 DOCKER_COMPOSE_DEV=docker-compose.dev.yml
 DOCKER_COMPOSE_PROD=docker-compose.prod.yml
 
+dev:
+	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV) up --build
+	
 prod:
 	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_PROD) up --build
 
-dev:
-	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV) up --build
 
 down:
 	docker compose -f $(DOCKER_COMPOSE_BASE) down

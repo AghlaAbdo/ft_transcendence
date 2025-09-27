@@ -7,6 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import { LayoutProvider } from '@/context/LayoutContext';
 
 import './globals.css';
+import RouteGuard from '@/components/auth/RouteGuard';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -45,7 +46,7 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
         >
-            {children}
+          {children}
         </body>
     </html>
   );

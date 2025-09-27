@@ -1,113 +1,121 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import Input from '../../../components/auth/Input'
 import { Mail, Lock, User } from 'lucide-react'
 import Link from 'next/link';
 import { toast } from "sonner";
+import { redirect, useRouter } from 'next/navigation';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+
+import * as z from 'zod'
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const schema = z.object({
+  username: z.string().min(6, "Username must be at least 6 characters"),
+  email: z.string().email("Invalid email"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Must contain uppercase letter")
+    .regex(/[a-z]/, "Must contain lowercase letter")
+    .regex(/[0-9]/, "Must contain a number")
+    .regex(/[^A-Za-z0-9]/, "Must contain special character"),
+});
 
 
-// function SignupForm() {
-//   const [email, setEmail] = useState("");
-//   const [error, setError] = useState("");
-
-//   const validateEmail = (value) => {
-//     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     if (!regex.test(value)) setError("Invalid email");
-//     else setError("");
-//   };
-
-//   return (
-//     <div>
-//       <input
-//         type="email"
-//         value={email}
-//         onChange={(e) => {
-//           setEmail(e.target.value);
-//           validateEmail(e.target.value);
-//         }}
-//         placeholder="Email"
-//       />
-//       {error && <span style={{ color: "red" }}>{error}</span>}
-//     </div>
-//   );
-// }
+type FormData = z.infer<typeof schema>;
 
 const SignUpPage = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const router = useRouter();
+  // const [username, setUsername] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
-  console.log(username, email, password);
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+      resolver: zodResolver(schema),
+    });
+
   
-    const handleSignUp = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsLoading(true);
+    const handleSignUp = async (data: FormData) => {
+      // e.preventDefault();
+      // setIsLoading(true);
       setMessage('');
   
       try {
         // Changed from 'http://localhost:5000/api/auth/signup' to relative path
-        const response = await fetch('https://34.175.183.78/api/auth/signup', {
+        const response = await fetch('https://localhost:8080/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify(data),
+          credentials: "include"  // allow cookies
         });
   
-        const data = await response.json();
-        console.log(data);
         
         if (response.ok) {
           toast.success("✅ Logged in successfully!");
-
+          router.push('/home');
           setMessage('Signup successful!');
-          // Optional: Clear form or redirect
-          // setUsername('');
-          // setEmail('');
-          // setPassword('');
+          
         } else {
+          const data = await response.json();
+          toast.error(`❌ ${data.message}`);
           setMessage(data.error || 'Signup failed.');
         }
       } catch (error) {
-        console.error('Signup error:', error);
-        toast.error("❌ Invalid credentials");
+        toast.error(`❌ Network error. Please check your connection and try again.`);
         setMessage('Network error. Please check your connection and try again.');
-      } finally {
-        setIsLoading(false);
-      }
+      } 
+      // finally {
+        // setIsLoading(false);
+      // }
     }
+
+  const { handleGoogleLogin } = useGoogleAuth();
 
   return (
     <div className='flex justify-center items-center min-h-screen'>
     <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
       <div className='text-4xl font-bold text-center mb-5'>Sign Up</div>
 
-      <form className='space-y-4' onSubmit={handleSignUp}>
-
+      <form className='space-y-4' onSubmit={handleSubmit(handleSignUp)}>
+        <div>
           <Input
             icon={User}
             type="text"
             placeholder="Username"
-            value={username}
-            onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            // value={username}
+            // onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            {...register("username")}
           />
-          
+          {errors.username && <p className="text-red-500">{errors.username.message}</p>}
+        </div>
+        
+        <div>
           <Input
             icon={Mail}
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          />
-
+            // value={email}
+            // onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            {...register("email")}
+            
+            />
+          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+        </div>
+        <div>
           <Input
             icon={Lock}
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            // value={password}
+            // onChange={ (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            {...register("password")}
           />
+          {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+        </div>
 
 
           <button
@@ -135,8 +143,8 @@ const SignUpPage = () => {
 
           
           <button 
-              type='submit'
-              // onClick={handleGoogleLogin}
+              type='button'
+              onClick={handleGoogleLogin}
               className='flex justify-center items-center border-2 border-slate-700
                   p-2 rounded-lg shadow-md w-full gap-3 hover:shadow-sky-500
                   focus:outline-2 focus:outline-offset-2 focus:outline-sky-500 bg-gray-700' >
@@ -146,13 +154,14 @@ const SignUpPage = () => {
 
       </form>
       {/* {message && <p className="text-center text-white mt-4">{message}</p>} */}
-      {message && (
+      {
+        message && (
           <p className={`text-center mt-4 ${
             message.includes('successful') ? 'text-green-400' : 'text-red-400'
           }`}>
             {message}
-          </p>
-      )}
+          </p>)
+      }
     </div>
   </div>
   )

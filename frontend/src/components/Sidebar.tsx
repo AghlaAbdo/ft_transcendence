@@ -1,13 +1,40 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 
 import { useLayout } from '@/context/LayoutContext';
+import { toast } from 'sonner';
 
 export default function Sidebar() {
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    
+    try {
+      const response = await fetch('https://localhost:8080/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        toast.error(data.message);
+        return ;
+      }
+
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      toast.error('Network error during logout');
+      console.error('Logout error:', error);
+      // router.push('/login');
+    }
+  }
+
   const pathName = usePathname();
   const linkBase =
     'p-[14px] hover:[&>svg]:stroke-gray-50 flex items-center justify-center';
@@ -26,7 +53,7 @@ export default function Sidebar() {
       }}
       className={` bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center `}
     >
-      <div className='flex flex-col items-center gap-[70px]'>
+      <div className='flex flex-col items-center gap-[70px] z-1000'>
         <Link href='/'>
           {/* Logo Icon*/}
           <svg
@@ -67,26 +94,38 @@ export default function Sidebar() {
 
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
-            className={`${linkBase} ${(pathName === '/home' || pathName == '/') ? linkActive : ''}`}
-            href='/home'
+            className={`${linkBase} ${(pathName == '/') ? linkActive : ''}`}
+            href='/'
           >
-            {/* Home Icon*/}
+            {/* Dashboard Icon */}
             <svg
               width='22'
               height='22'
-              viewBox='0 0 17 16'
+              viewBox='0 0 16 16'
               fill='none'
               stroke='#6B7280'
               xmlns='http://www.w3.org/2000/svg'
             >
               <path
-                d='M10.67 14V8.66667C10.67 8.48986 10.5997 8.32029 10.4747 8.19526C10.3497 8.07024 10.1801 8 10.0033 8H7.33665C7.15984 8 6.99027 8.07024 6.86525 8.19526C6.74022 8.32029 6.66998 8.48986 6.66998 8.66667V14'
+                d='M2 2H7.33333V7.33333H2V2Z'
                 strokeWidth='1.33333'
                 strokeLinecap='round'
                 strokeLinejoin='round'
               />
               <path
-                d='M2.66998 6.66667C2.66994 6.47271 2.71221 6.28108 2.79384 6.10514C2.87548 5.92921 2.99451 5.7732 3.14265 5.648L7.80932 1.64867C8.04997 1.44527 8.35489 1.33368 8.66998 1.33368C8.98508 1.33368 9.28999 1.44527 9.53065 1.64867L14.1973 5.648C14.3455 5.7732 14.4645 5.92921 14.5461 6.10514C14.6278 6.28108 14.67 6.47271 14.67 6.66667V12.6667C14.67 13.0203 14.5295 13.3594 14.2795 13.6095C14.0294 13.8595 13.6903 14 13.3366 14H4.00332C3.64969 14 3.31056 13.8595 3.06051 13.6095C2.81046 13.3594 2.66998 13.0203 2.66998 12.6667V6.66667Z'
+                d='M8.66667 2H14V7.33333H8.66667V2Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M8.66667 8.66667H14V14H8.66667V8.66667Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M2 8.66667H7.33333V14H2V8.66667Z'
                 strokeWidth='1.33333'
                 strokeLinecap='round'
                 strokeLinejoin='round'
@@ -186,6 +225,39 @@ export default function Sidebar() {
               />
             </svg>
           </Link>
+          <Link
+            className={`${linkBase} ${pathName.startsWith('/leaderboard') ? linkActive : ''}`}
+            href='/leaderboard'
+          >
+            {/* Leaderboard Icon */}
+            <svg
+              width='22'
+              height='22'
+              viewBox='0 0 16 16'
+              fill='none'
+              stroke='#6B7280'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M5.33333 6V14H2.66667C2.31304 14 1.97391 13.8595 1.72386 13.6095C1.47381 13.3594 1.33333 13.0203 1.33333 12.6667V7.33333C1.33333 6.97971 1.47381 6.64057 1.72386 6.39052C1.97391 6.14048 2.31304 6 2.66667 6H5.33333Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M10.6667 4V14H5.33337V4C5.33337 3.64638 5.47385 3.30724 5.7239 3.05719C5.97395 2.80714 6.31309 2.66667 6.66671 2.66667H9.33337C9.687 2.66667 10.0261 2.80714 10.2762 3.05719C10.5262 3.30724 10.6667 3.64638 10.6667 4Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+              <path
+                d='M14.6667 8V14H10.6667V8C10.6667 7.64638 10.8071 7.30724 11.0572 7.05719C11.3072 6.80714 11.6464 6.66667 12 6.66667H13.3333C13.687 6.66667 14.0261 6.80714 14.2761 7.05719C14.5262 7.30724 14.6667 7.64638 14.6667 8Z'
+                strokeWidth='1.33333'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+          </Link>
         </div>
       </div>
 
@@ -217,9 +289,12 @@ export default function Sidebar() {
             />
           </svg>
         </Link>
-        <Link
+
+        <button
+          type='button'
+          onClick={handleLogout}
           className={`${linkBase} ${pathName === '/logout' ? linkActive : ''}`}
-          href='/logout'
+
         >
           {/* Logout Icon */}
           <svg
@@ -243,7 +318,11 @@ export default function Sidebar() {
               strokeLinejoin='round'
             />
           </svg>
-        </Link>
+        </button>
+        {/* <Link
+          href='/logout'
+        >
+        </Link> */}
       </div>
     </motion.nav>
   );

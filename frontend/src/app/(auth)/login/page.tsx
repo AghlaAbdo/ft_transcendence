@@ -1,10 +1,18 @@
+"use client";
+
 import React from 'react'
 import { Lock, Mail, User } from 'lucide-react'
 import Link from 'next/link'
 import Input from '@/components/auth/Input'
+import { useGoogleAuth } from '@/hooks/useGoogleAuth'
 
 
 const LoginPage = () => {
+
+  // const handleGoogleLogin = async (e: React.FormEvent) => {
+  //   window.location.href = 'http://localhost:8080/api/auth/google';
+  // }
+  const { handleGoogleLogin } = useGoogleAuth(); 
   return (
     <div className='flex justify-center items-center min-h-screen'>
       <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
@@ -53,7 +61,7 @@ const LoginPage = () => {
             
             <button 
                 type='button'
-                // onClick={handleGoogleLogin}
+                onClick={handleGoogleLogin}
                 className='flex justify-center items-center border-2 border-slate-700
                     p-2 rounded-lg shadow-md w-full gap-3 hover:shadow-sky-500
                     focus:outline-2 focus:outline-offset-2 focus:outline-sky-500 bg-gray-700' >
