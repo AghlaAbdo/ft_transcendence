@@ -36,6 +36,7 @@ const VerifyEmailPage = () => {
             
             if (data.error && (data.error === 'TOKEN_EXPIRED')) {
               setShowResend(true);
+              return ;
             }
             toast.error((data.message || "Verification failed"));
             setShowResend(false);
