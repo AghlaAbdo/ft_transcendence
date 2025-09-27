@@ -27,4 +27,12 @@ export interface IGameState {
   players: { plr1Socket: string | null; plr2Socket: string | null };
   playersNb: number;
   winner: string | null;
+  scoreUpdate: boolean;
+}
+
+export interface IPlayer {
+  username: string;
+  avatar: string;
+  frame: string;
+  level: string;
 }

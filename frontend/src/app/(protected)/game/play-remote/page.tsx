@@ -1,36 +1,71 @@
 'use client';
 
+import { useRef } from 'react';
+
 import Image from 'next/image';
 
-import Avatar from '@/components/Avatar';
 import Matching from '@/components/Matching';
+import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
+import GameResultCard from '@/components/game/GameResultCard';
 
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 
 export default function GamePage() {
-  const { containerRef, waiting, opponent } = usePongGameLogic();
-  const leftUser = {
-    username: 'user_13445',
-    avatar: '/avatars/avatar1.png',
-    frame: 'gold2',
-    level: '145',
-  };
-  const rightUser = {
-    username: 'user_2548',
-    avatar: '/avatars/avatar2.png',
-    frame: 'silver3',
-    level: '10',
-  };
+  const {
+    containerRef,
+    dialogRef,
+    matching,
+    player,
+    opponent,
+    winner,
+    gameId,
+    playerRole,
+  } = usePongGameLogic();
+  const closeDialRef = useRef<HTMLDialogElement | null>(null);
+
+  function handleClose() {
+    closeDialRef.current?.showModal();
+  }
   return (
     <>
-      {waiting ? (
-        <Matching opponent={opponent} />
-      ) : (
-        <div className='flex flex-col gap-4 justify-center'>
-          <GamePlayers leftUser={leftUser} rightUser={rightUser} />
-          <div ref={containerRef} className='flex justify-center'></div>
-        </div>
+      {!player && <div></div>}
+      {player && matching && (
+        <Matching player={player} opponent={opponent} gameId={gameId!} />
+      )}
+      {!matching && (
+        <>
+          <button
+            onClick={handleClose}
+            className='fixed top-4 left-4 w-10 bg-red rounded-[4px]  cursor-pointer'
+          >
+            <Image
+              width={80}
+              height={80}
+              src='/icons/close.png'
+              alt='close'
+              className='w-full'
+            />
+          </button>
+          {/* Close dialog */}
+          <CloseGameDialog dialogRef={closeDialRef} gameId={gameId} />
+
+          <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
+            <GamePlayers leftUser={player!} rightUser={opponent!} />
+            <div
+              ref={containerRef}
+              className='mx-auto rounded-[8px] overflow-hidden border-2 border-pink aspect-[3/2] w-[min(100%,1600px,calc((100vh-140px)*(3/2)))] shadow-[0_0_14px_4px_rgba(236,72,135,1)]'
+            ></div>
+            <GameResultCard
+              ref={dialogRef}
+              leftUser={player!}
+              rightUser={opponent!}
+              winner={winner}
+              gameId={gameId}
+              playerRole={playerRole}
+            />
+          </div>
+        </>
       )}
     </>
   );

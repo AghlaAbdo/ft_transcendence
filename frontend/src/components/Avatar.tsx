@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 export default function Avatar({
   width,
@@ -9,10 +9,22 @@ export default function Avatar({
   url: string;
   frame: string;
 }) {
-  return(
+  return (
     <div className={`w-full relative`}>
-      <Image width={width} height={width} src={url} alt='Avatar' className="w-full p-[12%]" />
-      <Image width={width} height={width} src={`/frames/${frame}.png`} alt='Frame' className="absolute inset-0 w-full pointer-events-none" />
+      <Image
+        width={width}
+        height={width}
+        src={url}
+        alt='Avatar'
+        className='w-full p-[12%]'
+      />
+      <Image
+        width={width}
+        height={width}
+        src={`/frames/${frame}.png`}
+        alt='Frame'
+        className='absolute inset-0 w-full pointer-events-none'
+      />
     </div>
   );
 }

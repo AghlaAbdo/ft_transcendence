@@ -21,7 +21,7 @@ export default function Header() {
         duration: 0.3,
         ease: 'easeInOut',
       }}
-      className='fixed h-[72px] w-[calc(100%-72px)] top-0 left-[72px] bg-bg-color flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
+      className='fixed h-[72px] w-full md:w-[calc(100%-72px)] top-0 left-0 md:left-[72px] bg-bg-color flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
     >
       <div className='z-1000 flex justify-between items-center gap-4'>
         <Image src={avatar} alt='Avatar' className='w-10' />

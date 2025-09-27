@@ -1,7 +1,11 @@
-'use client';
+import { redirect } from 'next/navigation';
 
 import { motion } from 'framer-motion';
-import Avatar from './Avatar';
+
+import Avatar from '@/components/Avatar';
+
+import { socket } from '@/app/(protected)/lib/socket';
+import { IPlayer } from '@/constants/game';
 
 const avatars = [
   '/avatars/avatar1.png',
@@ -11,20 +15,38 @@ const avatars = [
 ];
 
 export default function Matching({
+  player,
   opponent,
+  gameId,
 }: {
-  opponent: null | { username: string; avatar: string };
+  player: IPlayer;
+  opponent: null | IPlayer;
+  gameId: string;
 }) {
+  function handleCancel() {
+    if (!opponent) {
+      socket.emit('cancelMatching', gameId);
+      redirect('/game');
+    }
+  }
   return (
-    <div className='h-[calc(100vh-100px)] flex justify-center items-center gap-2 sm:gap-12  px-2'>
-      <div className='w-30 sm:w-48 flex flex-col gap-6 items-center'>
-        <Avatar width={192} url='/avatars/avatar1.png' frame='gold2' />
-        <span className='bg-gray-800 px-3 py-1 rounded-[8px] border-1 border-gray-500'>
-          user_9823
+    <div className='h-[calc(100vh-100px)] fixed left-auto right-auto w-full flex justify-center items-center gap-2 sm:gap-12  px-2'>
+      <motion.div
+        className={`${!player ? 'invisible' : 'visible'} w-30 sm:w-48 flex flex-col gap-6 items-center`}
+        initial={{ opacity: 0, scale: 0.6 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.6,
+          scale: { type: 'spring', bounce: 0.4, duration: 0.6 },
+        }}
+      >
+        <Avatar width={192} url={player.avatar} frame={player.frame} />
+        <span className='bg-gray-800 px-1 py-[2px] sm:px-3 sm:py-1 rounded-[8px] border-1 border-gray-500'>
+          {player.username}
         </span>
-      </div>
+      </motion.div>
 
-      <div className='w-20 sm:w-30 md:w-36'>
+      <div className='w-20 sm:w-30 md:w-36 flex flex-col gap-4 items-center'>
         <motion.img
           src='/images/vs.png'
           alt='VS'
@@ -36,6 +58,14 @@ export default function Matching({
             ease: 'easeInOut',
           }}
         />
+        {!opponent && (
+          <button
+            onClick={handleCancel}
+            className='bg-red rounded-[8px] px-1 py-[2px] sm:px-3 sm:py-1 text-sm sm:text-[20px] text-gray-50 font-bold cursor-pointer'
+          >
+            Cancel
+          </button>
+        )}
       </div>
 
       <div className='w-30 sm:w-48 flex flex-col gap-6 items-center'>
@@ -49,10 +79,14 @@ export default function Matching({
                 scale: { type: 'spring', bounce: 0.5, duration: 1 },
               }}
             >
-              <Avatar width={192} url='/avatars/avatar2.png' frame='silver3' />
+              <Avatar
+                width={192}
+                url={`${opponent ? opponent.avatar : '/avatars/avatar2.png'}`}
+                frame={`${opponent ? opponent.frame : 'silver3'}`}
+              />
             </motion.div>
 
-            <span className='bg-gray-800 px-3 py-1 rounded-[8px] border-1 border-gray-500'>
+            <span className='bg-gray-800 px-1 py-[2px] sm:px-3 sm:py-1 rounded-[4px] sm:rounded-[8px] border-1 border-gray-500'>
               {opponent ? opponent.username : 'guest_9850'}
             </span>
           </>

@@ -12,6 +12,8 @@ import {
 } from '../config/game';
 import { IGameState } from '../types/game';
 import { Server } from 'socket.io';
+import { getAllGames } from './AllGames';
+import { getCurrDate } from '../utils/dates';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -31,6 +33,7 @@ export function setIoInstance(io: Server): void {
 export function startGame(gameState: IGameState) {
   if (gameIntervals[gameState.id]) return;
 
+  ioInstance.to(gameState.id).emit('prepare');
   for (let i = 1; i <= 3; i++) {
     const j = 4 - i;
 
@@ -40,8 +43,10 @@ export function startGame(gameState: IGameState) {
 
       if (j === 1) {
         setTimeout(() => {
-          // console.log("started!!!!!!!!!");
-          gameState.status = 'playing';
+          ioInstance.to(gameState.id).emit('startGame');
+          ioInstance.emit('startGame');
+          gameState.startDate = getCurrDate();
+          gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),
             GAME_INTERVAL_MS,
@@ -53,75 +58,89 @@ export function startGame(gameState: IGameState) {
 }
 
 function gameLoop(gameState: IGameState): void {
+  if (gameState.game.status !== 'playing') return;
   //check for top and bottom collision
-  gameState.ball.x += gameState.ball.dx;
-  gameState.ball.y += gameState.ball.dy;
+  gameState.game.ball.x += gameState.game.ball.dx;
+  gameState.game.ball.y += gameState.game.ball.dy;
   if (
-    gameState.ball.y - BALL_RADIUS / 2 < 0 ||
-    gameState.ball.y + BALL_RADIUS >= GAME_HEIGHT
+    gameState.game.ball.y - BALL_RADIUS / 2 < 0 ||
+    gameState.game.ball.y + BALL_RADIUS >= GAME_HEIGHT
   ) {
-    gameState.ball.dy *= -1;
+    gameState.game.ball.dy *= -1;
   }
 
   // check collision with left paddle
   if (
-    gameState.ball.x - BALL_RADIUS / 2 <= PADDLE_WIDTH &&
-    gameState.ball.y >= gameState.leftPaddle.y &&
-    gameState.ball.y <= gameState.leftPaddle.y + PADDLE_HEIGHT
+    gameState.game.ball.x - BALL_RADIUS / 2 <= PADDLE_WIDTH &&
+    gameState.game.ball.y >= gameState.game.leftPaddle.y &&
+    gameState.game.ball.y <= gameState.game.leftPaddle.y + PADDLE_HEIGHT
   ) {
     const relativeIntersectY =
-      gameState.leftPaddle.y + PADDLE_HEIGHT / 2 - gameState.ball.y;
+      gameState.game.leftPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.ball.dx = BALL_SPEED * Math.cos(bounceAngle);
-    gameState.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    gameState.game.ball.dx = BALL_SPEED * Math.cos(bounceAngle);
+    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
   }
   // check collision with right paddle
   else if (
-    gameState.ball.x + BALL_RADIUS / 2 >= GAME_WIDTH - PADDLE_WIDTH &&
-    gameState.ball.y >= gameState.rightPaddle.y &&
-    gameState.ball.y <= gameState.rightPaddle.y + PADDLE_HEIGHT
+    gameState.game.ball.x + BALL_RADIUS / 2 >= GAME_WIDTH - PADDLE_WIDTH &&
+    gameState.game.ball.y >= gameState.game.rightPaddle.y &&
+    gameState.game.ball.y <= gameState.game.rightPaddle.y + PADDLE_HEIGHT
   ) {
     const relativeIntersectY =
-      gameState.rightPaddle.y + PADDLE_HEIGHT / 2 - gameState.ball.y;
+      gameState.game.rightPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.ball.dx = -BALL_SPEED * Math.cos(bounceAngle);
-    gameState.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    gameState.game.ball.dx = -BALL_SPEED * Math.cos(bounceAngle);
+    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
   }
   // check for loss
-  else if (gameState.ball.x - 10 <= 0) {
-    gameState.rightPaddle.score++;
-    if (gameState.rightPaddle.score === 5) {
-      endGame(gameState);
+  else if (gameState.game.ball.x - 10 <= 0) {
+    gameState.game.rightPaddle.score++;
+    gameState.game.scoreUpdate = true;
+    if (gameState.game.rightPaddle.score === 5) {
+      gameOver(gameState);
     } else {
       resetBallPos(gameState);
     }
-  } else if (gameState.ball.x + 10 >= GAME_WIDTH) {
-    gameState.leftPaddle.score++;
-    if (gameState.leftPaddle.score === 5) {
-      endGame(gameState);
+  } else if (gameState.game.ball.x + 10 >= GAME_WIDTH) {
+    gameState.game.leftPaddle.score++;
+    gameState.game.scoreUpdate = true;
+    if (gameState.game.leftPaddle.score === 5) {
+      gameOver(gameState);
     } else {
       resetBallPos(gameState);
     }
   }
-
-  ioInstance.to(gameState.id).emit('gameStateUpdate', gameState);
+  ioInstance.to(gameState.id).emit('gameStateUpdate', gameState.game);
+  gameState.game.scoreUpdate = false;
 }
 
-export function endGame(gameState: IGameState): void {
-  if (gameState.leftPaddle.score > gameState.rightPaddle.score) {
-    gameState.winner_id = gameState.player1_id;
-    gameState.winner = 'player1';
+function gameOver(gameState: IGameState): void {
+  if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
+    gameState.winner_id = gameState.player1.id;
+    gameState.game.winner = 'player1';
   } else {
-    gameState.winner_id = gameState.player2_id;
-    gameState.winner = 'player2';
+    gameState.winner_id = gameState.player2.id;
+    gameState.game.winner = 'player2';
   }
-  gameState.status = 'ended';
+  gameState.game.status = 'ended';
+  gameState.player1.ready = false;
+  gameState.player2.ready = false;
   ioInstance.emit('gameOver');
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
+}
+
+export function deleteGame(gameState: IGameState): void {
+  if (!gameState)
+    return;
+  if (gameState.game.status === 'playing') {
+    gameState.game.status = 'ended';
+  }
+  delete getAllGames().games[gameState.id];
 }

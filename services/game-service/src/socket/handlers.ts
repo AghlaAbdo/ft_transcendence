@@ -5,8 +5,9 @@ import {
   generateGameState,
   paddleMoveDown,
   paddleMoveUp,
+  resetGameState,
 } from '../remote-game/gameState';
-import { startGame, setIoInstance } from '../remote-game/gameLogic';
+import { startGame, setIoInstance, deleteGame } from '../remote-game/gameLogic';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
 import crypto from 'crypto';
 
@@ -21,27 +22,35 @@ export function handleDisconnect(socket: Socket, reason: string): void {
 
 export function handlePlay(socket: Socket): void {
   const allGames = getAllGames();
+
+  const player1 = {
+    username: 'user_123',
+    avatar: '/avatars/avatar1.png',
+    frame: 'sapphire3',
+    level: '47',
+  };
+  const player2 = {
+    username: 'user_456',
+    avatar: '/avatars/avatar2.png',
+    frame: 'gold2',
+    level: '145',
+  };
+
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
     allGames.games[gameId] = generateGameState(gameId);
     console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
-    socket.emit('playerRole', 'player1');
+    socket.emit('playerData', {playerRole: 'player1',gameId, player: player1});
     socket.join(gameId);
     allGames.lobyGame = gameId;
   } else {
     allGames.games[allGames.lobyGame].playersNb++;
     socket.join(allGames.lobyGame);
-    socket.emit('playerRole', 'player2');
-    socket
-      .to(allGames.lobyGame)
-      .emit('matchFound', { username: 'user_123', avatar: 'random' });
-    socket.emit('matchFound', { username: 'user_234', avatar: 'random' });
+    socket.emit('playerData', {playerRole: 'player2', gameId: allGames.lobyGame, player: player2});
+    socket.to(allGames.lobyGame).emit('matchFound', player2);
+    socket.emit('matchFound', player1);
     const lobyGame = allGames.lobyGame;
     setTimeout(() => {
-      // if (!lobyGame) return;
-      socket.to(lobyGame).emit('startGame', lobyGame);
-      socket.emit('startGame', lobyGame);
-      allGames.games[lobyGame].startDate = getCurrDate();
       startGame(allGames.games[lobyGame]);
     }, 3000);
     allGames.lobyGame = null;
@@ -60,4 +69,50 @@ export function handleMovePaddle(
 
 export function handleGameOver(): void {
   // TODO
+}
+
+export function handleRematch(
+  socket: Socket,
+  gameId: string,
+  playerRole: 'player1' | 'player2' | null,
+): void {
+  console.log('Recived rematch!!');
+  if (!playerRole) {
+    console.log('playerRole is null!!');
+    return;
+  }
+  socket.to(gameId).emit('rematch');
+  const gameState = getGameState(gameId);
+  if (playerRole === 'player1') gameState.player1.ready = true;
+  else gameState.player2.ready = true;
+  if (gameState.player1.ready && gameState.player2.ready) {
+    resetGameState(gameState);
+    setTimeout(() => {
+      // if (!lobyGame) return;
+      socket.to(gameId).emit('playAgain');
+      socket.emit('playAgain');
+      // socket.to(gameId).emit('startGame', gameId);
+      // socket.emit('startGame', gameId);
+      // gameState.startDate = getCurrDate();
+      startGame(gameState);
+    }, 2000);
+  }
+}
+
+export function handleQuit(socket: Socket, gameId: string): void {
+  console.log('revived quit event!!');
+  if (!gameId) {
+    console.log('gameId is Null');
+    return;
+  }
+  const gameState = getGameState(gameId);
+  socket.to(gameId).emit('opponentQuit', gameState? gameState.game.status : null);
+  if (gameState)
+    deleteGame(gameState);
+  console.log('player quit');
+}
+
+export function handleCancelMatching(gameId: string) {
+  deleteGame(getGameState(gameId));
+  getAllGames().lobyGame = null;
 }
