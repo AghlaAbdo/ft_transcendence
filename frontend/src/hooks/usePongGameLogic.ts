@@ -233,7 +233,7 @@ export const usePongGameLogic = (): returnType => {
     []
   );
 
-  const gameLoop = useCallback(()=> {
+  const gameLoop = useCallback(() => {
     if (pressedKeys.current.has('ArrowUp')) {
       socket.emit('movePaddle', gameId.current, playerRole.current, 'up');
     } else if (pressedKeys.current.has('ArrowDown')) {
@@ -270,11 +270,13 @@ export const usePongGameLogic = (): returnType => {
       gameId.current = currGameId;
     });
 
+    socket.on('prepare', () => {
+      setMatching(false);
+    });
     socket.on('starting', (count) => {
       console.log('starting: ', count);
       if (matching) {
         console.log('set matching once!!!!!!!!!!\n');
-        setMatching(false);
       }
       showCountDown(count);
     });
@@ -388,7 +390,7 @@ export const usePongGameLogic = (): returnType => {
       socket.off();
       socket.disconnect();
     };
-  }, [gameLoop, matching, setHideHeaderSidebar, showCountDown, transformX]);
+  }, []);
 
   function keydownEvent(event: KeyboardEvent) {
     event.preventDefault();

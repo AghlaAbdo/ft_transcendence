@@ -33,6 +33,7 @@ export function setIoInstance(io: Server): void {
 export function startGame(gameState: IGameState) {
   if (gameIntervals[gameState.id]) return;
 
+  ioInstance.to(gameState.id).emit('prepare');
   for (let i = 1; i <= 3; i++) {
     const j = 4 - i;
 
