@@ -8,11 +8,12 @@ import { toast } from 'sonner';
 const VerifyEmailPage = () => {
   const [email, setEmail] = useState<string>("");
   const [code, setCode] = useState<string>("");
+  const [showResend, setShowResend] = useState<boolean>(false)
 //   const [message, setMessage] = useState<string>("");
 
   const handleVerifyEmail = async (e: FormEvent<HTMLFormElement>) =>{
     e.preventDefault();
-
+    setShowResend(true);
     try {
         const response = await fetch('https://localhost:8080/api/auth/verify-email', {
             method: 'POST', 
@@ -28,14 +29,22 @@ const VerifyEmailPage = () => {
         } else {
             const data: { success?: boolean; message?: string; error?: string } = await response.json();
 
-            // if (data)
-            console.log("--> ", data.error);
+            console.log("sdfsdf", data.error);
+            
+            if (data.error && (data.error === 'TOKEN_EXPIRED')) {
+              console.log('--------------------here-----------------');
+              
+              setShowResend(true);
+            }
             toast.error((data.message || "Verification failed"));
+            setShowResend(false);
             // setMessage((data.message || "Verification failed"));
         }
 
     } catch (error: unknown) {
+        setShowResend(false);
         toast.error('Network error. Please try again.');
+
         // if (error instanceof Error) {
             // setMessage(error.message);
         // } else {
@@ -43,6 +52,27 @@ const VerifyEmailPage = () => {
         // }
     }
   }
+
+  const handleResend = async () => {
+    try {
+        const response = await fetch(`https://localhost:8080/api/auth/resend-verification`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({email}),
+          credentials: "include",
+        });
+    
+        if (response.ok) {
+          setShowResend(false);
+          toast.success("📧 New verification email sent!");
+        } else {
+          const data = await response.json();
+          toast.error("❌ " + data.message);
+        }
+    } catch (error: unknown) {
+        toast.error('Network error. Please try again.');
+    }
+  };
 
   return (
     <div className='flex justify-center items-center min-h-screen'>
@@ -67,12 +97,23 @@ const VerifyEmailPage = () => {
             />
 
             <div className='flex justify-center items-center'>
-            <button 
+            {/* {hidden && <p>{hidden}</p>} */}
+            {showResend ?
+              (<button 
+                  type='button'
+                  onClick={handleResend}
+                  className='flex justify-center items-center border-2 border-slate-700
+                      p-2 rounded-lg hover:bg-blue-600 bg-blue-500 px-10 w-full' >
+                <span className='font-medium'>Resend verification email</span>
+              </button>)
+            : 
+              (<button 
                 type='submit'
                 className='flex justify-center items-center border-2 border-slate-700
                     p-2 rounded-lg hover:bg-blue-600 bg-blue-500 px-10 w-full' >
               <span className='font-medium'>Verify</span>
-            </button>
+              </button>)
+            }
             </div>
 
         </form>
@@ -83,4 +124,4 @@ const VerifyEmailPage = () => {
   )
 }
 
-export default VerifyEmailPage;
+export default VerifyEmailPage
