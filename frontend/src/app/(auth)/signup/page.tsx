@@ -56,7 +56,7 @@ const SignUpPage = () => {
         
         if (response.ok) {
           toast.success("✅ Logged in successfully!");
-          router.push('/home');
+          router.push('/verifyEmail');
           setMessage('Signup successful!');
           
         } else {

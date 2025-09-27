@@ -25,13 +25,13 @@ services:
     networks:
       - main_net
 
-  game-service:
-    container_name: game-service
-    image: game-service:1.0.0
-    build:
-      context: ./services/game-service
-    networks:
-      - main_net
+  # game-service:
+  #   container_name: game-service
+  #   image: game-service:1.0.0
+  #   build:
+  #     context: ./services/game-service
+  #   networks:
+  #     - main_net
 
   user-service:
     container_name: user-service

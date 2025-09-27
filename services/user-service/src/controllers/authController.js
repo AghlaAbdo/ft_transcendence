@@ -1,9 +1,12 @@
 import userModel from "../models/userModel.js";
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
-import { log } from "console";
+
+const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
+const COOKIE_NAME = 'token';
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -152,31 +155,44 @@ const getMe = async (request, reply) => {
 }
 
 const verifyEmail = async (request, reply) => {
-    const { token } = request.body;
+    const { email, token } = request.body;
+    
+    console.log("-----> ", request.body);
+    console.log(email, token);
+    
+    
 
     try {
-        if (!token)
-            throw new Error('Verification token is required.');
+        if (!email || !token)
+            throw new Error('Email and verification token are required');
         // Verification token is invalid or expired
 
         const db = request.server.db;
-        const now = new Date().toISOString();
+        
         
         const user = db.prepare(`
-            SELECT id, username, email
+            SELECT id, username, email, verificationTokenExpiresAt, isAccountVerified
             FROM USERS
-            WHERE verificationToken = ?
-            and verificationTokenExpiresAt > ?
-            and isAccountVerified = 0
-        `).get(token, now);
-
+            WHERE email = ?
+            AND verificationToken = ?
+            AND isAccountVerified = 0`
+        ).get(email, token);
+        
         if (!user) {
             return reply.code(400).send({
                 status: false,
-                message: 'Invalid or expired verification token'
+                message: 'Invalid email or verification token '
             });
         }
-
+        const now = new Date().toISOString();
+        
+        if (new Date(user.verificationTokenExpiresAt).toISOString() <= now) {
+            return reply.code(400).send({
+                success: false,
+                error: "TOKEN_EXPIRED",
+                message: "Verification token has expired",
+            });
+        }
         // verifiedAt = CURRENT_TIMESTAMP,
         db.prepare(`
             UPDATE USERS
@@ -190,7 +206,7 @@ const verifyEmail = async (request, reply) => {
             id: user.id,
             username: user.username,
             email: user.email,
-            isAccountVerified: user.isAccountVerified
+            isAccountVerified: true
         });
 
         request.server.setAuthCookie(reply, newToken);

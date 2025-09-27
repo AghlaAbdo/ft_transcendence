@@ -1,34 +1,79 @@
 "use client";
 
-import React from 'react'
+import React, { FormEvent, useState } from 'react'
 import { Lock, Mail, User } from 'lucide-react'
 import Link from 'next/link'
 import Input from '@/components/auth/Input'
 import { useGoogleAuth } from '@/hooks/useGoogleAuth'
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 
 const LoginPage = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [message, setMessage] = useState('');
+  const router = useRouter();
+  
+  
+  const { handleGoogleLogin } = useGoogleAuth();
 
-  // const handleGoogleLogin = async (e: React.FormEvent) => {
-  //   window.location.href = 'http://localhost:8080/api/auth/google';
-  // }
-  const { handleGoogleLogin } = useGoogleAuth(); 
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setMessage('');
+  
+      try {
+        // Changed from 'http://localhost:5000/api/auth/signup' to relative path
+        const response = await fetch('https://localhost:8080/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify( {email, password} ),
+          credentials: "include"  // allow cookies
+        });
+  
+        
+        if (response.ok) {
+          toast.success("✅ Logged in successfully!");
+          router.push('/home');
+          setMessage('Signup successful!');
+          
+        } else {
+          const data = await response.json();
+          if (data.error === 'EMAIL_NOT_VERIFIED') {
+            router.push('/verifyEmail')
+            // console.log(data);
+          }  
+          toast.error(`❌ ${data.message}`);
+          setMessage(data.error || 'Login failed.');
+        }
+      } catch (error) {
+        toast.error(`❌ Network error. Please check your connection and try again.`);
+        setMessage('Network error. Please check your connection and try again.');
+      } 
+  }
   return (
     <div className='flex justify-center items-center min-h-screen'>
       <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
         <div className='text-4xl font-bold text-center mb-5'>Login</div>
-        <form className='space-y-4'>
+        <form className='space-y-4' onSubmit={handleLogin}>
 
             <Input
               icon={Mail}
               type="email"
               placeholder="Email"
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+
             />
 
             <Input
               icon={Lock}
               type="password"
               placeholder="Password"
+              value={password}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+
             />
 
             <h2 className='font-medium hover:text-sky-500'> 
