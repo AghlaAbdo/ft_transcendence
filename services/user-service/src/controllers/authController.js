@@ -1,12 +1,8 @@
 import userModel from "../models/userModel.js";
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
 import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
-
-const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
-const COOKIE_NAME = 'token';
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -40,13 +36,14 @@ const signup = async (request, reply) => {
             tokenExpiry,
             // location
         });
-        
+
         // generateTokenAndSetCookie(reply, userId, username, email);
 
         const token = request.server.signToken( {
             id: userId,
             username: username,
-            email: email
+            email: email,
+            isAccountVerified: false
         });
         
         request.server.setAuthCookie(reply, token);
@@ -101,13 +98,13 @@ const login = async (request, reply) => {
         // update online_status = ;
         if (!user.online_status) {
             userModel.updateOnlineStatus(db, user.id, 1);
-            console.log('-------> only one time when the is not online');
+            user.isAccountVerified = 1;
         }
-
         const token = request.server.signToken({
             id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isAccountVerified: user.isAccountVerified
         });
 
         request.server.setAuthCookie(reply, token);
@@ -202,14 +199,14 @@ const verifyEmail = async (request, reply) => {
             WHERE id = ?
         `).run(user.id);
 
-        const newToken = request.server.signToken({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            isAccountVerified: true
-        });
+        // const newToken = request.server.signToken({
+        //     id: user.id,
+        //     username: user.username,
+        //     email: user.email,
+        //     isAccountVerified: true
+        // });
 
-        request.server.setAuthCookie(reply, newToken);
+        // request.server.setAuthCookie(reply, newToken);
 
 
         reply.code(200).send({ 

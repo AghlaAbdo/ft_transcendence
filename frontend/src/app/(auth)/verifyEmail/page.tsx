@@ -2,6 +2,7 @@
 
 import Input from '@/components/auth/Input';
 import { KeyRound, Mail } from 'lucide-react';
+import { log } from 'node:console';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -23,17 +24,17 @@ const VerifyEmailPage = () => {
         });
 
         if (response.ok) {
-            toast.success("✅ Email verified! Redirecting...");
-            // setMessage("✅ Email verified! Redirecting...");
-            window.location.href = '/home';
+          console.log("------------------------------------- redirect/login----------");
+          
+            toast.success("✅ Your email has been verified. Please log in");
+            window.location.href = '/login';
+            setShowResend(false);
         } else {
             const data: { success?: boolean; message?: string; error?: string } = await response.json();
 
             console.log("sdfsdf", data.error);
             
             if (data.error && (data.error === 'TOKEN_EXPIRED')) {
-              console.log('--------------------here-----------------');
-              
               setShowResend(true);
             }
             toast.error((data.message || "Verification failed"));

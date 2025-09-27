@@ -42,10 +42,16 @@ export default async function middleware(req: NextRequest) {
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
-            console.log("JWT payload:", payload);
+            console.log("JWT payload:", payload.isAccountVerified);
             
+            if (payload.isAccountVerified === false) {
+                const response  = NextResponse.redirect(new URL("/login", req.url));
+                response.cookies.delete('token');
+                return response;
+            }
             
             isValid = true;
+
         } catch (error) {
             console.log("Invalid token: ", error);
             const response  = NextResponse.redirect(new URL("/login", req.url));
