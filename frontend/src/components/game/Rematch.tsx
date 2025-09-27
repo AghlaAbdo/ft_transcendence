@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { motion } from 'framer-motion';
@@ -39,7 +38,7 @@ export default function Rematch({
     return () => {
       setHideHeaderSidebar(false);
     };
-  }, []);
+  }, [dialogRef, setHideHeaderSidebar, setRematch]);
 
   const handleRematch = () => {
     console.log('rematch!!');

@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { redirect } from 'next/navigation';
-
 import * as PIXI from 'pixi.js';
 
 import { socket } from '@/app/(protected)/lib/socket';
@@ -25,7 +23,6 @@ interface returnType {
   winner: string;
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
-  handleClose: () => void;
 }
 
 export const usePongGameLogic = (): returnType => {
@@ -236,6 +233,17 @@ export const usePongGameLogic = (): returnType => {
     []
   );
 
+  const gameLoop = useCallback(()=> {
+    if (pressedKeys.current.has('ArrowUp')) {
+      socket.emit('movePaddle', gameId.current, playerRole.current, 'up');
+    } else if (pressedKeys.current.has('ArrowDown')) {
+      socket.emit('movePaddle', gameId.current, playerRole.current, 'down');
+    }
+    if (isPlaying.current)
+      animationFrameId.current = requestAnimationFrame(gameLoop);
+    else animationFrameId.current = null;
+  }, []);
+
   useEffect(() => {
     socket.connect();
     socket.on('connect', () => {
@@ -380,18 +388,7 @@ export const usePongGameLogic = (): returnType => {
       socket.off();
       socket.disconnect();
     };
-  }, []);
-
-  const gameLoop = () => {
-    if (pressedKeys.current.has('ArrowUp')) {
-      socket.emit('movePaddle', gameId.current, playerRole.current, 'up');
-    } else if (pressedKeys.current.has('ArrowDown')) {
-      socket.emit('movePaddle', gameId.current, playerRole.current, 'down');
-    }
-    if (isPlaying.current)
-      animationFrameId.current = requestAnimationFrame(gameLoop);
-    else animationFrameId.current = null;
-  };
+  }, [gameLoop, matching, setHideHeaderSidebar, showCountDown, transformX]);
 
   function keydownEvent(event: KeyboardEvent) {
     event.preventDefault();
@@ -405,11 +402,6 @@ export const usePongGameLogic = (): returnType => {
       pressedKeys.current.delete(event.key);
   }
 
-  function handleClose() {
-    socket.emit('quit', gameId.current);
-    redirect('/game');
-  }
-
   return {
     containerRef,
     dialogRef,
@@ -419,6 +411,5 @@ export const usePongGameLogic = (): returnType => {
     winner,
     gameId: gameId.current,
     playerRole: playerRole.current,
-    handleClose,
   };
 };

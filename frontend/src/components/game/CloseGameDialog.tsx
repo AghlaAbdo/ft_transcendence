@@ -7,11 +7,9 @@ import { socket } from '@/app/(protected)/lib/socket';
 export default function CloseGameDialog({
   dialogRef,
   gameId,
-  playerRole,
 }: {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   gameId: string | null;
-  playerRole: 'player1' | 'player2' | null;
 }) {
   function handleCancel() {
     dialogRef.current?.close();

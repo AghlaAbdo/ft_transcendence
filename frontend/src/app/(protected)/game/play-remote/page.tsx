@@ -21,11 +21,10 @@ export default function GamePage() {
     winner,
     gameId,
     playerRole,
-    handleClose,
   } = usePongGameLogic();
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
 
-  function close() {
+  function handleClose() {
     closeDialRef.current?.showModal();
   }
   return (
@@ -37,7 +36,7 @@ export default function GamePage() {
       {!matching && (
         <>
           <button
-            onClick={close}
+            onClick={handleClose}
             className='fixed top-4 left-4 w-10 bg-red rounded-[4px]  cursor-pointer'
           >
             <Image
@@ -52,7 +51,6 @@ export default function GamePage() {
           <CloseGameDialog
             dialogRef={closeDialRef}
             gameId={gameId}
-            playerRole={playerRole}
           />
 
           <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>

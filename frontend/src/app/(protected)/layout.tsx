@@ -1,11 +1,10 @@
 'use client';
 
-import React, { Children } from 'react';
+import React from 'react';
 
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 
-import { LayoutProvider } from '@/context/LayoutContext';
 import { useLayout } from '@/context/LayoutContext';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {

@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-import { HtmlContext } from 'next/dist/server/route-modules/pages/vendored/contexts/entrypoints';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { motion } from 'framer-motion';
 
