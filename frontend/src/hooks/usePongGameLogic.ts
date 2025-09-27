@@ -255,29 +255,28 @@ export const usePongGameLogic = (): returnType => {
     socket.emit('play');
     // isPlaying.current = true;
 
-    socket.on('playerRole', (palerRole, currGameId) => {
-      console.log('player role: ', palerRole);
-      if (palerRole === 'player1' && endTextRef.current) {
-        endTextRef.current.text = 'matching';
+    socket.on(
+      'playerData',
+      (data: {
+        playerRole: 'player1' | 'player2';
+        gameId: string;
+        player: IPlayer;
+      }) => {
+        console.log('player role: ', data.playerRole);
+        if (data.playerRole === 'player1' && endTextRef.current) {
+          endTextRef.current.text = 'matching';
+        }
+        playerRole.current = data.playerRole;
+        setPlayer(data.player);
+        gameId.current = data.gameId;
       }
-      playerRole.current = palerRole;
-      setPlayer({
-        username: 'user_13445',
-        avatar: '/avatars/avatar1.png',
-        frame: 'gold2',
-        level: '145',
-      });
-      gameId.current = currGameId;
-    });
+    );
 
     socket.on('prepare', () => {
       setMatching(false);
     });
     socket.on('starting', (count) => {
       console.log('starting: ', count);
-      if (matching) {
-        console.log('set matching once!!!!!!!!!!\n');
-      }
       showCountDown(count);
     });
 
