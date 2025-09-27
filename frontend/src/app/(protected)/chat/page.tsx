@@ -19,67 +19,62 @@ interface conversation {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  // const { user } = useAuth();
-  // console.log("user is : ", user)
+  const { user } = useAuth();
   useEffect(() => {
-    if (selectedChatId) {
+    if (user) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`) //protect with async, axios
-        .then((res) => res.json())
-        .then((data: conversation[]) => {
-          set_conv(data);
-        })
-        .catch((err) => console.log("faild because of: ", err));
+      .then((res) => res.json())
+      .then((data: conversation[]) => {
+        set_conv(data);
+      })
+      .catch((err) => console.log("faild because of: ", err));
       console.log("fetched conv: ", conv_);
     }
   }, [selectedChatId]);
   const socketRef = useRef<Socket | null>(null);
-
+  
   const handleSendMessage = (messageContent: string) => {
-    console.log("Message sent:", messageContent + ", to chat: " + selectedChatId);
-    if (socketRef.current && selectedChatId && messageContent.trim()) {
+    // console.log("Message sent:", messageContent + ", to chat: " + selectedChatId);
+    if (socketRef.current && selectedChatId && messageContent.trim() && user) {
       socketRef.current.emit("ChatMessage", {
         chatId: selectedChatId,
         message: messageContent,
-        sender: UserId,
+        sender: user.id,
         receiver: UserId_2,
-      });
+      }); 
     }
   };
-  const [UserId, SetUser] = useState<number | null>(null)
+  // const [UserId, SetUser] = useState<number | null>(null)
   const [UserId_2, SetUser_2] = useState<number | null>(null) //second user which is the receiver
   useEffect(() => {
+    if (!user)
+        return ;
     const socket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`, {
       path: '/ws/chat/socket.io/',
-      auth: { user_id: UserId }
+      auth: { user_id: user?.id }
     });
-  socketRef.current = socket;
-  socket.on("ChatMessage", (data) => {
+    socketRef.current = socket;
+    socket.on("ChatMessage", (data) => {
       set_conv((prevMessages) => [...prevMessages, data])
-  });
-  return () => {
-    socket.disconnect();
-  };
-}, [UserId]);
-
-useEffect(() => {
-  const userset = new URLSearchParams(window.location.search);
-  const userFromUrl = userset.get('user')
-  if (userFromUrl)
-    SetUser(parseInt(userFromUrl))
-  console.log('user is: ', userFromUrl);
-}, [])
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
+  
+  if (!user) return <div>Loading chat...</div>;
 
 return (
   <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
     <Chatlist
       onSelect={setSelectedChatId}
       selectedChatId={selectedChatId}
-      userId={UserId}
+      userId={user.id}
       onReceiveChange={SetUser_2}
       conv={conv_}
     />
     <div className="flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2">
-      <ChatWindow SelectedChatId={selectedChatId} userId={UserId} conv={conv_} />
+      <ChatWindow SelectedChatId={selectedChatId} userId={user.id} conv={conv_} />
       {selectedChatId && <MessageInput onSendMessage={handleSendMessage} />}
     </div>
   </div>
