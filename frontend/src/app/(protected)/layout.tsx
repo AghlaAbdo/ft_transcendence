@@ -17,7 +17,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <div className='text-white'>
       <Sidebar />
       <Header />
-      <main className={`md:ml-[72px] ${!hideHeaderSidebar ? 'mt-[72px]' : ''}`}>
+      <main className={`${!hideHeaderSidebar ? 'md:ml-[72px] mt-[72px]' : ''}`}>
         {children}
       </main>
     </div>

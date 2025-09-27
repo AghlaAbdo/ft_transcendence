@@ -42,8 +42,8 @@ export function startGame(gameState: IGameState) {
 
       if (j === 1) {
         setTimeout(() => {
-          ioInstance.to(gameState.id).emit('startGame', gameState.id);
-          ioInstance.emit('startGame', gameState.id);
+          ioInstance.to(gameState.id).emit('startGame');
+          ioInstance.emit('startGame');
           gameState.startDate = getCurrDate();
           gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
@@ -136,6 +136,8 @@ function gameOver(gameState: IGameState): void {
 }
 
 export function deleteGame(gameState: IGameState): void {
+  if (!gameState)
+    return;
   if (gameState.game.status === 'playing') {
     gameState.game.status = 'ended';
   }

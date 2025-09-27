@@ -19,7 +19,7 @@ import { useLayout } from '@/context/LayoutContext';
 interface returnType {
   containerRef: React.RefObject<HTMLDivElement | null>;
   dialogRef: React.RefObject<HTMLDialogElement | null>;
-  waiting: boolean;
+  matching: boolean;
   player: null | IPlayer;
   opponent: null | IPlayer;
   winner: string;
@@ -29,7 +29,7 @@ interface returnType {
 }
 
 export const usePongGameLogic = (): returnType => {
-  const [waiting, setWaiting] = useState(true);
+  const [matching, setMatching] = useState(true);
   const [opponent, setOpponent] = useState<IPlayer | null>(null);
   const [player, setPlayer] = useState<IPlayer | null>(null);
   const [winner, setWinner] = useState<string>('');
@@ -78,7 +78,7 @@ export const usePongGameLogic = (): returnType => {
   }, []);
 
   useEffect(() => {
-    if (waiting) return;
+    if (matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
       try {
@@ -145,7 +145,7 @@ export const usePongGameLogic = (): returnType => {
         // Ball
         const ball = new PIXI.Graphics();
         ball.circle(0, 0, BALL_RADIUS);
-        ball.fill(0x689b8a);
+        ball.fill(0xec4899);
         ball.x = GAME_WIDTH / 2;
         ball.y = GAME_HEIGHT / 2;
         gameContainer.addChild(ball);
@@ -226,12 +226,15 @@ export const usePongGameLogic = (): returnType => {
         pixiApp.current = null;
       }
     };
-  }, [waiting]);
+  }, [matching]);
 
-  const transformX = useCallback((x: number, playerRole: "player1" | "player2"):number =>{
-    if (playerRole === "player1") return x;
-    return GAME_WIDTH - x;
-  }, []);
+  const transformX = useCallback(
+    (x: number, playerRole: 'player1' | 'player2'): number => {
+      if (playerRole === 'player1') return x;
+      return GAME_WIDTH - x;
+    },
+    []
+  );
 
   useEffect(() => {
     socket.connect();
@@ -244,33 +247,32 @@ export const usePongGameLogic = (): returnType => {
     socket.emit('play');
     // isPlaying.current = true;
 
-    socket.on('playerRole', (msg) => {
-      console.log('player role: ', msg);
-      if (msg === 'player1' && endTextRef.current) {
-        endTextRef.current.text = 'waiting';
+    socket.on('playerRole', (palerRole, currGameId) => {
+      console.log('player role: ', palerRole);
+      if (palerRole === 'player1' && endTextRef.current) {
+        endTextRef.current.text = 'matching';
       }
-      playerRole.current = msg;
+      playerRole.current = palerRole;
       setPlayer({
         username: 'user_13445',
         avatar: '/avatars/avatar1.png',
         frame: 'gold2',
         level: '145',
       });
+      gameId.current = currGameId;
     });
 
     socket.on('starting', (count) => {
       console.log('starting: ', count);
-      if (waiting) {
-        console.log("set waiting once!!!!!!!!!!\n");
-        setWaiting(false);
+      if (matching) {
+        console.log('set matching once!!!!!!!!!!\n');
+        setMatching(false);
       }
       showCountDown(count);
     });
 
-    socket.on('startGame', (id) => {
+    socket.on('startGame', () => {
       isPlaying.current = true;
-      gameId.current = id;
-      setHideHeaderSidebar(true);
       if (!animationFrameId.current)
         animationFrameId.current = requestAnimationFrame(gameLoop);
       console.log('Stared the game !!!!!');
@@ -278,6 +280,7 @@ export const usePongGameLogic = (): returnType => {
 
     socket.on('matchFound', (opponent: IPlayer) => {
       console.log('Match Found: ', opponent.username);
+      setHideHeaderSidebar(true);
       setOpponent(opponent);
     });
 
@@ -290,15 +293,24 @@ export const usePongGameLogic = (): returnType => {
       }
 
       if (leftPaddleRef.current) {
-        leftPaddleRef.current.y = playerRole.current === 'player2' ? gameState.rightPaddle.y : gameState.leftPaddle.y;
+        leftPaddleRef.current.y =
+          playerRole.current === 'player2'
+            ? gameState.rightPaddle.y
+            : gameState.leftPaddle.y;
       }
       if (rightPaddleRef.current) {
-        rightPaddleRef.current.y = playerRole.current === 'player2' ? gameState.leftPaddle.y : gameState.rightPaddle.y;
+        rightPaddleRef.current.y =
+          playerRole.current === 'player2'
+            ? gameState.leftPaddle.y
+            : gameState.rightPaddle.y;
       }
 
       if (gameState.scoreUpdate && scoreTextRef.current) {
-        scoreTextRef.current.text = `${playerRole.current === 'player2' ? gameState.rightPaddle.score + "   " + gameState.leftPaddle.score
-          : gameState.leftPaddle.score + "   " + gameState.rightPaddle.score}`;
+        scoreTextRef.current.text = `${
+          playerRole.current === 'player2'
+            ? gameState.rightPaddle.score + '   ' + gameState.leftPaddle.score
+            : gameState.leftPaddle.score + '   ' + gameState.rightPaddle.score
+        }`;
       }
 
       if (gameState.status === 'ended' && endTextRef.current) {
@@ -378,8 +390,7 @@ export const usePongGameLogic = (): returnType => {
     }
     if (isPlaying.current)
       animationFrameId.current = requestAnimationFrame(gameLoop);
-    else
-      animationFrameId.current = null;
+    else animationFrameId.current = null;
   };
 
   function keydownEvent(event: KeyboardEvent) {
@@ -402,7 +413,7 @@ export const usePongGameLogic = (): returnType => {
   return {
     containerRef,
     dialogRef,
-    waiting,
+    matching,
     player,
     opponent,
     winner,

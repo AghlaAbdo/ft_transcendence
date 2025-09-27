@@ -15,7 +15,7 @@ export default function GamePage() {
   const {
     containerRef,
     dialogRef,
-    waiting,
+    matching,
     player,
     opponent,
     winner,
@@ -31,8 +31,10 @@ export default function GamePage() {
   return (
     <>
       {!player && <div></div>}
-      {player && waiting && <Matching player={player} opponent={opponent} />}
-      {!waiting && (
+      {player && matching && (
+        <Matching player={player} opponent={opponent} gameId={gameId!} />
+      )}
+      {!matching && (
         <>
           <button
             onClick={close}

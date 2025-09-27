@@ -26,13 +26,13 @@ export function handlePlay(socket: Socket): void {
     const gameId = crypto.randomUUID();
     allGames.games[gameId] = generateGameState(gameId);
     console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
-    socket.emit('playerRole', 'player1');
+    socket.emit('playerRole', 'player1', gameId);
     socket.join(gameId);
     allGames.lobyGame = gameId;
   } else {
     allGames.games[allGames.lobyGame].playersNb++;
     socket.join(allGames.lobyGame);
-    socket.emit('playerRole', 'player2');
+    socket.emit('playerRole', 'player2', allGames.lobyGame);
     const player = {
       username: 'user_123',
       avatar: '/avatars/avatar4.png',
@@ -101,6 +101,10 @@ export function handleQuit(socket: Socket, gameId: string): void {
   socket.to(gameId).emit('opponentQuit', gameState? gameState.game.status : null);
   if (gameState)
     deleteGame(gameState);
-
   console.log('player quit');
+}
+
+export function handleCancelMatching(gameId: string) {
+  deleteGame(getGameState(gameId));
+  getAllGames().lobyGame = null;
 }
