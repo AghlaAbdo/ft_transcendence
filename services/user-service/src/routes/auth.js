@@ -13,10 +13,11 @@ const authRoutes = async (fastify, options) => {
     fastify.post('/verify-email', authController.verifyEmail);
 
     
-    fastify.post('/resend-verification', { 
-        onRequest: [fastify.authenticate] 
-    }, authController.resendVerificationEmail);
+    // fastify.post('/resend-verification', { 
+    //     onRequest: [fastify.authenticate] 
+    // }, authController.resendVerificationEmail);
 
+    fastify.post('/resend-verification', authController.resendVerificationEmail);
 
     fastify.post('/forgot-password', authController.forgotPassword);
     fastify.post('/reset-password', authController.resetPassword);

@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs'
 import crypto from 'crypto';
 import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
-import { log } from "console";
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -15,7 +14,33 @@ const signup = async (request, reply) => {
 
         const usernameAlreadyExist = userModel.getUserByUsername(db, username);
         const emailAlreadyExist = userModel.getUserByEmail(db, email);
-    
+
+        if (usernameAlreadyExist && emailAlreadyExist) {
+            if (usernameAlreadyExist.isAccountVerified === 0) {
+
+                const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+                const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
+                
+                const email = emailAlreadyExist.email;
+                const username = usernameAlreadyExist.username;
+                
+                await sendVerificationEmail(email, verificationToken, username);
+                
+                db.prepare(`
+                    UPDATE USERS
+                    SET verificationToken = ?,
+                    verificationTokenExpiresAt = ?
+                    WHERE email = ?
+                    `).run(verificationToken, tokenExpiry, emailAlreadyExist.email);
+
+                await sendVerificationEmail(email, verificationToken, username);
+                    return reply.code(200).send({
+                    status: true,
+                    message: "VERIFICATION_EMAIL_RESENT"
+                });
+            }
+        }
+
         if (usernameAlreadyExist)
             throw new Error('Username already exists');
 
@@ -37,13 +62,14 @@ const signup = async (request, reply) => {
             tokenExpiry,
             // location
         });
-        
+
         // generateTokenAndSetCookie(reply, userId, username, email);
 
         const token = request.server.signToken( {
             id: userId,
             username: username,
-            email: email
+            email: email,
+            isAccountVerified: false
         });
         
         request.server.setAuthCookie(reply, token);
@@ -98,13 +124,13 @@ const login = async (request, reply) => {
         // update online_status = ;
         if (!user.online_status) {
             userModel.updateOnlineStatus(db, user.id, 1);
-            console.log('-------> only one time when the is not online');
+            user.isAccountVerified = 1;
         }
-
         const token = request.server.signToken({
             id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isAccountVerified: user.isAccountVerified
         });
 
         request.server.setAuthCookie(reply, token);
@@ -152,31 +178,44 @@ const getMe = async (request, reply) => {
 }
 
 const verifyEmail = async (request, reply) => {
-    const { token } = request.body;
+    const { email, token } = request.body;
+    
+    console.log("-----> ", request.body);
+    console.log(email, token);
+    
+    
 
     try {
-        if (!token)
-            throw new Error('Verification token is required.');
+        if (!email || !token)
+            throw new Error('Email and verification token are required');
         // Verification token is invalid or expired
 
         const db = request.server.db;
-        const now = new Date().toISOString();
+        
         
         const user = db.prepare(`
-            SELECT id, username, email
+            SELECT id, username, email, verificationTokenExpiresAt, isAccountVerified
             FROM USERS
-            WHERE verificationToken = ?
-            and verificationTokenExpiresAt > ?
-            and isAccountVerified = 0
-        `).get(token, now);
-
+            WHERE email = ?
+            AND verificationToken = ?
+            AND isAccountVerified = 0`
+        ).get(email, token);
+        
         if (!user) {
             return reply.code(400).send({
                 status: false,
-                message: 'Invalid or expired verification token'
+                message: 'Invalid email or verification token '
             });
         }
-
+        const now = new Date().toISOString();
+        
+        if (new Date(user.verificationTokenExpiresAt).toISOString() <= now) {
+            return reply.code(400).send({
+                success: false,
+                error: "TOKEN_EXPIRED",
+                message: "Verification token has expired",
+            });
+        }
         // verifiedAt = CURRENT_TIMESTAMP,
         db.prepare(`
             UPDATE USERS
@@ -186,14 +225,14 @@ const verifyEmail = async (request, reply) => {
             WHERE id = ?
         `).run(user.id);
 
-        const newToken = request.server.signToken({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            isAccountVerified: user.isAccountVerified
-        });
+        // const newToken = request.server.signToken({
+        //     id: user.id,
+        //     username: user.username,
+        //     email: user.email,
+        //     isAccountVerified: true
+        // });
 
-        request.server.setAuthCookie(reply, newToken);
+        // request.server.setAuthCookie(reply, newToken);
 
 
         reply.code(200).send({ 
@@ -332,7 +371,7 @@ const resetPassword = async (request, reply) => {
     try {
         const { token, newPassword } = request.body;
         const db = request.server.db;
-
+        
         if (!token || !newPassword) {
             return reply.code(400).send({
                 status: false,
@@ -349,7 +388,6 @@ const resetPassword = async (request, reply) => {
         }
 
         const now = new Date().toISOString();
-        console.log("----------------------> ");
 
         const user = db.prepare(`
             SELECT id FROM USERS
@@ -365,8 +403,7 @@ const resetPassword = async (request, reply) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        console.log("----------------------> ", hashedPassword);
-        // updated_at = CURRENT_TIMESTAMP
+        
         db.prepare(`
             UPDATE USERS
             SET password = ?,
@@ -389,23 +426,6 @@ const resetPassword = async (request, reply) => {
         });
     }
 }
-// const checkAuth = async (request, reply) => {
-//     try {
-//         // User data is available in request.user after JWT verification
-//         const userModel = request.server.UserModel(request.server);
 
-//         const user = request.user;
-
-//         const userExist = userModel.getUserByID(user.id);
-//         if (!userExist)
-//             return reply.code(400).send({status:false, message: 'User not found'});
-
-//         return reply.send({ success: true,message: 'You are authenticated', user: user});
-
-//     } catch (error) {
-//         console.log('checkAuth error :', error);
-//         return reply.code(500).send({ status: false, message: 'Server error' });
-//     }
-// }
 
 export default {login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};

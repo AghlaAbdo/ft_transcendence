@@ -55,12 +55,19 @@ const SignUpPage = () => {
   
         
         if (response.ok) {
-          toast.success("✅ Logged in successfully!");
-          router.push('/home');
+          const data  : {message?: string, error?: string} = await response.json();
+          if (data.message === 'VERIFICATION_EMAIL_RESENT') {
+            toast.success("Please verify your email address. We've sent you a new verification email");
+            router.push('/verifyEmail');
+            setMessage('verify your Email');
+            return ;
+          }
+          toast.success("✅ Signup successful!");
+          router.push('/verifyEmail');
           setMessage('Signup successful!');
           
         } else {
-          const data = await response.json();
+          const data  : {message?: string, error?: string} = await response.json();
           toast.error(`❌ ${data.message}`);
           setMessage(data.error || 'Signup failed.');
         }

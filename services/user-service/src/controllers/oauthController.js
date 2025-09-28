@@ -120,7 +120,8 @@ const handleGoogleCallback = async (request, reply) => {
         const token = request.server.signToken({
             id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isAccountVerified: user.isAccountVerified
         });
 
         request.server.setAuthCookie(reply, token);

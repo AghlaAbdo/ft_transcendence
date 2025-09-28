@@ -6,14 +6,8 @@ export default function AuthSuccess() {
   const router = useRouter()
   
   useEffect(() => {
-    // Small delay to ensure cookies/tokens are properly set
-    // const timer = setTimeout(() => {
       router.push('/home');
-    // }, 0) // (1 second delay = 1000)
-    
-    // Cleanup timer
-    // return () => clearTimeout(timer)
-  }, [router])
+  }, [router]);
   
   return (
     <div className="flex items-center justify-center min-h-screen">
