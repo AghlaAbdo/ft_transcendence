@@ -1,6 +1,5 @@
 import Badge from "@/components/leaderboard/Badge";
 import { get_leaderboard } from "../lib/leaderboard";
-import "./page.css"
 import Table from "@/components/leaderboard/Table";
 export default async function Leaderboard({
     searchParams,
@@ -11,7 +10,7 @@ export default async function Leaderboard({
     widthMap.set(1, 30)
     widthMap.set(2, 30)
     widthMap.set(3, 50)
-    const limit = 10
+    const limit = 20
     const page = Number(searchParams.page) || 1
     const numOfPlayers = 50
     const numOfPages = Math.ceil(numOfPlayers / limit)
@@ -19,7 +18,7 @@ export default async function Leaderboard({
     const players = await get_leaderboard(page, offset, false)
     const topPlayers = await get_leaderboard(page, offset, true)
     return (
-        <div>
+        <div className="w-[90%] m-auto">
             <h1 className="text-center text-[2rem] mb-5">Leaderboard</h1>
             <div className={`flex items-end w-[${widthMap.get(topPlayers.length)}%] mx-auto`}>
 

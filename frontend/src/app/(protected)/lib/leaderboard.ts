@@ -9,8 +9,8 @@ export async function get_leaderboard(page, offset, onlyTop): Promise<Player[]> 
     if (onlyTop){
       return sorted.slice(0, 3)  
     } 
-    const start = (page - 1) * 10
-    const end = start + 10
+    const start = (page - 1) * 20
+    const end = start + 20
     const sliced = Players.slice(start, end)
     if (is_mock){
         return sliced.map((player, index) => ({

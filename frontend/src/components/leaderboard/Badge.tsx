@@ -38,8 +38,8 @@ export default function Badge({imgSrc, rank, username, score, showCrown, color, 
         </span>
       </div>
       <div className="mt-7 flex flex-col items-center">
-        <span>{username}</span>
-        <span className="mt-1 text-[.8rem] bg-[#1D293D] border-1 border-[#45556C] px-2 py-1 rounded-[12px]">{score} RP</span>
+        <span className="2xl:text-[1.1rem]">{username}</span>
+        <span className="mt-1 text-[.8rem] bg-[#1D293D] border-1 border-[#45556C] px-2 py-1 rounded-[12px] 2xl:text-[.9rem]">{score} RP</span>
       </div>
     </div>
     )
