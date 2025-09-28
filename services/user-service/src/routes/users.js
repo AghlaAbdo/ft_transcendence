@@ -16,7 +16,9 @@ const userRoutes = async (fastify, options) => {
     // fastify.post('/forgot-password'); // auth 
     
     fastify.get('/:id', { 
+        
         // onRequest: [fastify.authenticate] 
+        // console.log('user service backend request')
     }, userController.getUserById); 
     fastify.get('/',{ 
         // onRequest: [fastify.authenticate] 

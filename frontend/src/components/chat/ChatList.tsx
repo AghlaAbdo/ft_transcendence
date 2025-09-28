@@ -31,8 +31,9 @@ interface ChatlistProps {
   conv: Message[];
 }
 
+
 export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv}: ChatlistProps) => {
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [chats, setChats] =  useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");  
   const filteredChats = chats.filter((chat) => {
     if (!searchQuery) return true;
@@ -42,7 +43,7 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
 });
   useEffect(() => {
     if (userId) {
-      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`)
+      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`) //fetch chats from backend
         .then((res) => res.json())
         .then((data: Chat[]) => {
           setChats(data);
@@ -65,7 +66,7 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
         <div className="p-4">
             <div className="relative">
               <Search_Input 
-              onsearchchange_2 = {setSearchQuery}
+              onsearchchange_2={setSearchQuery}
               searchquery_2={searchQuery}
               />
             </div>

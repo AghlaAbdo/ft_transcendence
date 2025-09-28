@@ -80,8 +80,25 @@ fastify.get("/api/chat/user/:userId", (request) => {
   return getUser(parseInt(userId));
 });
 
-fastify.get("/api/chat/chats/:userId", (request, reply) => {
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  created_at: string;
+};
+
+fastify.get("/api/chat/chats/:userId",  (request, reply) => {
   const { userId } = request.params as { userId: string };
+  try {
+      fetch("http://user-service:5000/users/1")
+        .then((res)=> res.json())
+        .then((user: User)=>{
+          console.log("Fetched user:", user.username);
+        })
+  } catch (err) {
+    console.error('error ---> ',err);
+    // reply.status(500).send({ error: "Failed to fetch user" });
+  }
   if (!Number.isInteger(parseInt(userId)))
   return reply.status(400).send({ error: "invalid userId" });
   return getChats(parseInt(userId));
