@@ -14,13 +14,14 @@ function matchesRoutes(path: string, routes: string[]) {
 }
 
 const SKIP_MIDDLEWARE_ROUTES = [
-  "/api/auth/", // All auth API routes
-  "/auth/",     // All auth pages
+  "/api/auth/",
+  "/auth/", 
   "/login",
   "/signup",
   "/oauth/",
-  "/callback",  // OAuth callback routes
-  "/success"
+  "/callback",
+  "/success",
+//    "/forgotPassword", "/resetPassword"
 ];
 
 
@@ -42,7 +43,6 @@ export default async function middleware(req: NextRequest) {
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
-            console.log("JWT payload:", payload.isAccountVerified);
             
             if (payload.isAccountVerified === false) {
                 const response  = NextResponse.redirect(new URL("/login", req.url));
@@ -60,10 +60,10 @@ export default async function middleware(req: NextRequest) {
         }
     }
     
+    // If user has token and tries to access login page
     // if (isValid && path === '/login') {
     //     return NextResponse.redirect(new URL('/home', req.url));
     // }
-        // If user has token and tries to access login page
         
     if (!isValid && matchesRoutes(path, protectedRoutes)) {
         return NextResponse.redirect(new URL('/login', req.url))
@@ -77,7 +77,6 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
 }
 
-// Routes Middleware should not run on
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
 }

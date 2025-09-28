@@ -3,7 +3,7 @@ import transporter from "./mailer.js";
 const EMAIL = process.env.EMAIL || "ayoubhadiri0320@gmail.com";
 
 export const sendPasswordResetEmail = async (email, resetToken, username) => {
-    const url = `${process.env.BACKEND_BASE_URL}/reset-password?token=${resetToken}`;
+    const url = `${process.env.BACKEND_BASE_URL}/resetPassword?token=${resetToken}`;
 
     const mailOptions = {
         from: EMAIL,

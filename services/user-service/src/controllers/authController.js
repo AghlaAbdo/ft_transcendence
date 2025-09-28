@@ -371,7 +371,7 @@ const resetPassword = async (request, reply) => {
     try {
         const { token, newPassword } = request.body;
         const db = request.server.db;
-
+        
         if (!token || !newPassword) {
             return reply.code(400).send({
                 status: false,
@@ -388,7 +388,6 @@ const resetPassword = async (request, reply) => {
         }
 
         const now = new Date().toISOString();
-        console.log("----------------------> ");
 
         const user = db.prepare(`
             SELECT id FROM USERS
@@ -404,8 +403,7 @@ const resetPassword = async (request, reply) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        console.log("----------------------> ", hashedPassword);
-        // updated_at = CURRENT_TIMESTAMP
+        
         db.prepare(`
             UPDATE USERS
             SET password = ?,
@@ -428,23 +426,6 @@ const resetPassword = async (request, reply) => {
         });
     }
 }
-// const checkAuth = async (request, reply) => {
-//     try {
-//         // User data is available in request.user after JWT verification
-//         const userModel = request.server.UserModel(request.server);
 
-//         const user = request.user;
-
-//         const userExist = userModel.getUserByID(user.id);
-//         if (!userExist)
-//             return reply.code(400).send({status:false, message: 'User not found'});
-
-//         return reply.send({ success: true,message: 'You are authenticated', user: user});
-
-//     } catch (error) {
-//         console.log('checkAuth error :', error);
-//         return reply.code(500).send({ status: false, message: 'Server error' });
-//     }
-// }
 
 export default {login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};
