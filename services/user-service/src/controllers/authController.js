@@ -14,7 +14,33 @@ const signup = async (request, reply) => {
 
         const usernameAlreadyExist = userModel.getUserByUsername(db, username);
         const emailAlreadyExist = userModel.getUserByEmail(db, email);
-    
+
+        if (usernameAlreadyExist && emailAlreadyExist) {
+            if (usernameAlreadyExist.isAccountVerified === 0) {
+
+                const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+                const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
+                
+                const email = emailAlreadyExist.email;
+                const username = usernameAlreadyExist.username;
+                
+                await sendVerificationEmail(email, verificationToken, username);
+                
+                db.prepare(`
+                    UPDATE USERS
+                    SET verificationToken = ?,
+                    verificationTokenExpiresAt = ?
+                    WHERE email = ?
+                    `).run(verificationToken, tokenExpiry, emailAlreadyExist.email);
+
+                await sendVerificationEmail(email, verificationToken, username);
+                    return reply.code(200).send({
+                    status: true,
+                    message: "VERIFICATION_EMAIL_RESENT"
+                });
+            }
+        }
+
         if (usernameAlreadyExist)
             throw new Error('Username already exists');
 
