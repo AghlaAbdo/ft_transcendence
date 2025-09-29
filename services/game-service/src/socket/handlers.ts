@@ -20,7 +20,8 @@ export function handleDisconnect(socket: Socket, reason: string): void {
   console.log('Disconnected id: ', socket.id, ' Because: ', reason);
 }
 
-export function handlePlay(socket: Socket): void {
+export function handlePlay(socket: Socket, userId: string | null): void {
+  console.log("user id: ", userId);
   const allGames = getAllGames();
 
   const player1 = {

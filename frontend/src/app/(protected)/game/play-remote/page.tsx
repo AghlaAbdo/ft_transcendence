@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import Image from 'next/image';
 
@@ -10,27 +10,37 @@ import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
 
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
+import { useAuth } from '@/hooks/useAuth';
+import { IPlayer } from '@/constants/game';
+import { useLayout } from '@/context/LayoutContext';
 
 export default function GamePage() {
   const {
     containerRef,
     dialogRef,
     matching,
-    player,
     opponent,
     winner,
     gameId,
     playerRole,
   } = usePongGameLogic();
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
+  const {user} = useLayout();
+
+  const player: IPlayer = {
+    username: user.username,
+    avatar: user.avatar_url!,
+    frame: 'silver2',
+    level: '34',
+  }
+
 
   function handleClose() {
     closeDialRef.current?.showModal();
   }
   return (
     <>
-      {!player && <div></div>}
-      {player && matching && (
+      {matching && (
         <Matching player={player} opponent={opponent} gameId={gameId!} />
       )}
       {!matching && (

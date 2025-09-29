@@ -13,6 +13,7 @@ import {
   PADDLE_WIDTH,
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
+import { useAuth } from '@/hooks/useAuth';
 
 interface returnType {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -47,6 +48,8 @@ export const usePongGameLogic = (): returnType => {
   const endTextRef = useRef<PIXI.Text | null>(null);
   const coundDownRef = useRef<PIXI.Text | null>(null);
   const gameContainerRef = useRef<PIXI.Container | null>(null);
+
+  const {user} = useAuth();
 
   const { setHideHeaderSidebar } = useLayout();
 
@@ -252,7 +255,7 @@ export const usePongGameLogic = (): returnType => {
     });
 
     console.log('Play Now');
-    socket.emit('play');
+    socket.emit('play', user ? user.id : null);
     // isPlaying.current = true;
 
     socket.on(

@@ -24,7 +24,7 @@ export function initializeSocketIO(server: http.Server): Server {
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');
     handleConnection(socket, io);
-    socket.on('play', () => handlePlay(socket));
+    socket.on('play', (userId) => handlePlay(socket, userId));
     socket.on('movePaddle', (gameId, playerRole, dir) =>
       handleMovePaddle(gameId, playerRole, dir),
     );
