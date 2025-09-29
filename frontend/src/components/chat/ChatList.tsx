@@ -5,6 +5,13 @@ import { Plus, Search } from "lucide-react";
 import { Search_Input } from "./Search_Input";
 import { formatDistanceToNow } from "date-fns";
 
+interface User {
+  id: number;
+  username: string;
+  avatar_url: string;
+  online_status: number;
+}
+
 interface Message {
   id: number;
   chat_id: number;
@@ -16,8 +23,8 @@ interface Message {
 
 interface Chat {
   chat_id: number;
-  sender: number;
-  receiver: number;
+  sender: User;
+  receiver: User;
   last_message_content: string;
   last_message_timestamp: string;
   last_message_id?: number;
@@ -31,14 +38,13 @@ interface ChatlistProps {
   conv: Message[];
 }
 
-
 export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv}: ChatlistProps) => {
   const [chats, setChats] =  useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");  
   const filteredChats = chats.filter((chat) => {
     if (!searchQuery) return true;
-    const otherUserId = chat.sender === userId ? chat.receiver : chat.sender;
-    const userIdString = otherUserId.toString();
+    const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
+    const userIdString = otherUser.username.toString();
     return userIdString.includes(searchQuery);
 });
   useEffect(() => {
@@ -49,6 +55,7 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
           setChats(data);
         })
         .catch((err) => console.error("Failed to fetch chats:", err));
+        console.log("chat fetched: ", chats);
     }
   }, [userId, conv]);
 
@@ -73,14 +80,13 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
         </div>
         <div className="px-4 pb-4">
           {filteredChats.map((chat) => {
-            const otherUserId =
-              chat.sender === userId ? chat.receiver : chat.sender;
+            const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
             return (
               <div
                 key={chat.chat_id}
                 onClick={() => {
                   onSelect(chat.chat_id);
-                  onReceiveChange(otherUserId);
+                  onReceiveChange(otherUser.id);
                 }}
                 className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
                   hover:bg-gray-800 ${
@@ -89,17 +95,17 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
               >
                 <img
                   src="/avatars/avatar3.png"
-                  alt={`User ${otherUserId}`}
+                  alt={`${otherUser.username}`}
                   className="w-12 h-12 rounded-full mr-3"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-white">
-                      User_{otherUserId}
+                      {otherUser.username}
                     </h3>
                     <span className="text-xs text-gray-400">
                       {
-                         formatDistanceToNow(
+                            formatDistanceToNow(
                             new Date(chat.last_message_timestamp + "Z").toLocaleString(),
                               { addSuffix: true }
                           )}

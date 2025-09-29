@@ -84,22 +84,62 @@ type User = {
   id: number;
   username: string;
   email: string;
-  created_at: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
-fastify.get("/api/chat/chats/:userId",  (request, reply) => {
+type ChatRow = {
+  chat_id: number;
+  sender: number;
+  receiver: number;
+  last_message_content: string;
+  last_message_timestamp: string;
+  last_message_id: number;
+}
+
+// hell yeaaaaaah Promise.all is magiiic baby
+
+async function fetchUserFromService(ids: Array<number>)
+{
+  const users = await Promise.all(
+    (ids.map(async (id) => {
+      const res = await fetch(`http://user-service:5000/api/users/${id}`);
+      const data = await res.json();
+      if (!data.status || !data.user) return null; // skip if not found
+      return data.user;
+    })  
+  ));
+  // console.log("fetched users: ", users);
+  return users;
+}
+
+fastify.get("/api/chat/chats/:userId", async (request, reply) => {
   const { userId } = request.params as { userId: string };
-  try {
-      fetch("http://user-service:5000/users/1")
-        .then((res)=> res.json())
-        .then((user: User)=>{
-          console.log("Fetched user:", user.username);
-        })
-  } catch (err) {
-    console.error('error ---> ',err);
-    // reply.status(500).send({ error: "Failed to fetch user" });
+  console.log("user want to fetch: ", userId)
+  if (!Number.isInteger(parseInt(userId))) {
+    return reply.status(400).send({ error: "invalid userId" });
   }
-  if (!Number.isInteger(parseInt(userId)))
-  return reply.status(400).send({ error: "invalid userId" });
-  return getChats(parseInt(userId));
+  try {
+    const result: ChatRow[] = getChats(parseInt(userId));
+    const userIds = Array.from(new Set (
+      result.flatMap((c) => [c.sender, c.receiver]).filter((id) => id != null))
+    );
+    // console.log("user: ",userIds);
+    const users = await fetchUserFromService((userIds));
+    const userMap = new Map(users.map(u => [u.id, u]));
+    // console.log(userMap.get[0])
+    // enrich the chat json with user infos
+    const enrichedChats = result.map(chat => ({
+    ...chat,
+    sender: userMap.get(chat.sender),
+    receiver: userMap.get(chat.receiver),
+  }));
+  console.log('user before: ', result);
+  console.log('users after: ', enrichedChats);
+    // return result;
+    return enrichedChats;
+    } catch (err) {
+    console.error("error ---> ", err);
+    return reply.status(500).send({ error: "Failed to fetch user"});
+  }
 });
