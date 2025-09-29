@@ -2,7 +2,7 @@ import { generatePingPongAvatar } from '../utils/generatePingPongAvatar.js'
 
 const getAllUsers =  (db) => {
     const query = 'SELECT * FROM USERS';
-    const users = db.prepare(query)
+    const users = db.prepare(query);
     return users.all();
 }
 
