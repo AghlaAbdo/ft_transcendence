@@ -7,6 +7,7 @@ export default function Table({players, numOfPages, page}) {
             <div className="
             bg-[#1D293D] border-1 border-[#45556C]
             p-5 rounded-[15px] text-[.9rem]
+            2xl:text-[1.1rem]
             ">
                 <div className="grid grid-cols-5 text-[#7f8ea3] mb-3">
                     <span>Rank</span>
@@ -18,7 +19,7 @@ export default function Table({players, numOfPages, page}) {
                 {
                     players.map((player) => 
                     <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
-                        hover:bg-[#222e43]
+                        hover:bg-[#222e43] transition-colors duration-100 ease-in-out
                     " key={player.username}>
                         <li className="pl-2">{player.rank}</li>
                         <div className="flex items-center">
