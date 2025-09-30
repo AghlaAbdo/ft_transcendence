@@ -7,19 +7,16 @@ interface User {
   id: number;
   username: string;
   email: string;
-  avatar_url: string | null;
+  avatar_url: string;
   isAccountVerified: boolean;
 }
 
 
-// Define the API response type
 interface AuthResponse {
     status: boolean,
     user: User
 }
 
-
-// Define the return type of the hook
 interface UseAuthReturn {
     user: User | null,
     isLoading: boolean
