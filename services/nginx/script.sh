@@ -50,9 +50,18 @@ rm certs/ca/ca.key
 
 
 # echo "Waiting for Grafana to start..."
-# until curl -s "http://grafana:3000/api/health" | grep -q '"database": "ok"'; do
+# timeout=60
+# counter=0
+# until curl -s "http://grafana:3000/api/health" | grep -q '"database": "ok"' || [ $counter -ge $timeout ]; do
 #   sleep 3
+#   counter=$((counter + 3))
 # done
+
+# if [ $counter -ge $timeout ]; then
+#   echo "Grafana not available"
+#   nginx -g "daemon off;"
+#   exit 0
+# fi
 
 
 
