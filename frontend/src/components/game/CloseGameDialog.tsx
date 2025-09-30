@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 
 import { socket } from '@/app/(protected)/lib/socket';
+import { useUser } from '@/context/UserContext';
 
 export default function CloseGameDialog({
   dialogRef,
@@ -11,11 +12,13 @@ export default function CloseGameDialog({
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   gameId: string | null;
 }) {
+  const { user } = useUser();
+
   function handleCancel() {
     dialogRef.current?.close();
   }
   function handleQuit() {
-    socket.emit('quit', gameId);
+    socket.emit('quit', gameId, user.id);
     redirect('/game');
   }
   return (

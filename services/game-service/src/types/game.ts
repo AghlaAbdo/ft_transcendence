@@ -18,16 +18,24 @@ export interface IGameState {
   id: string;
   db_id: number;
   playersNb: number;
-  winner_id: number | null;
+  winner_id: string | null;
   startDate: string | null;
   startAt: number;
   playtime: number | null;
   player1: {
-    id: number;
+    id: string | null;
+    username: string | null;
+    avatar: string | null;
+    frame: string | null;
+    level: string | null;
     ready: boolean;
   };
   player2: {
-    id: number;
+    id: string | null;
+    username: string | null;
+    avatar: string | null;
+    frame: string | null;
+    level: string | null;
     ready: boolean;
   };
   game: {
@@ -45,4 +53,12 @@ export interface IGmaes {
   games: {
     [gameId: string]: IGameState;
   };
+}
+
+export interface IPlayer {
+  id: string;
+  username: string;
+  avatar: string;
+  frame: string;
+  level: string;
 }

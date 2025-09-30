@@ -13,7 +13,7 @@ import {
   PADDLE_WIDTH,
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
-import { useAuth } from '@/hooks/useAuth';
+import { useUser } from '@/context/UserContext';
 
 interface returnType {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -49,8 +49,7 @@ export const usePongGameLogic = (): returnType => {
   const coundDownRef = useRef<PIXI.Text | null>(null);
   const gameContainerRef = useRef<PIXI.Container | null>(null);
 
-  const {user} = useAuth();
-
+  const { user } = useUser();
   const { setHideHeaderSidebar } = useLayout();
 
   const showCountDown = useCallback((num: number) => {
@@ -174,9 +173,12 @@ export const usePongGameLogic = (): returnType => {
           text: '',
           style: {
             fontSize: 48,
-            fill: 0xf9fafb,
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            fill: 0xeab308,
             align: 'center',
           },
+          resolution: 2,
         });
         endText.anchor.set(0.5);
         endText.x = GAME_WIDTH / 2;
@@ -255,8 +257,12 @@ export const usePongGameLogic = (): returnType => {
     });
 
     console.log('Play Now');
-    socket.emit('play', user ? user.id : null);
+    socket.emit('play', user.id);
     // isPlaying.current = true;
+
+    socket.on('inAnotherGame', () => {
+      console.log('Already in another game!!!');
+    });
 
     socket.on(
       'playerData',
@@ -342,8 +348,8 @@ export const usePongGameLogic = (): returnType => {
       'opponentQuit',
       (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
         isPlaying.current = false;
-        if (gameStatus === 'playing') {
-          endTextRef.current!.text = 'You Won';
+        if (gameStatus === 'playing' || gameStatus === 'waiting') {
+          endTextRef.current!.text = 'Opponent Quit';
           setWinner(playerRole.current!);
           setTimeout(() => dialogRef.current?.showModal(), 2000);
         }
@@ -371,7 +377,7 @@ export const usePongGameLogic = (): returnType => {
       // e.preventDefault();
       e.returnValue = '';
       console.log('sent quit event');
-      if (isPlaying.current) socket.emit('quit', gameId.current);
+      if (isPlaying.current) socket.emit('quit', gameId.current, user.id);
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);
@@ -387,7 +393,7 @@ export const usePongGameLogic = (): returnType => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (isPlaying.current) {
-        socket.emit('quit', gameId.current);
+        socket.emit('quit', gameId.current, user.id);
       }
       socket.off();
       socket.disconnect();

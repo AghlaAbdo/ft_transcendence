@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 
 import { socket } from '@/app/(protected)/lib/socket';
 import { useLayout } from '@/context/LayoutContext';
+import { useUser } from '@/context/UserContext';
 
 export default function Rematch({
   rematch,
@@ -21,6 +22,7 @@ export default function Rematch({
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }) {
   const { setHideHeaderSidebar } = useLayout();
+  const { user } = useUser();
 
   useEffect(() => {
     socket.on('rematch', () => {
@@ -48,7 +50,7 @@ export default function Rematch({
 
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
-    socket.emit('quit', gameId);
+    socket.emit('quit', gameId, user.id);
     setTimeout(() => redirect('/game'), 1000);
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 
@@ -9,10 +9,9 @@ import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
 
-import { usePongGameLogic } from '@/hooks/usePongGameLogic';
-import { useAuth } from '@/hooks/useAuth';
 import { IPlayer } from '@/constants/game';
-import { useLayout } from '@/context/LayoutContext';
+import { useUser } from '@/context/UserContext';
+import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 
 export default function GamePage() {
   const {
@@ -25,15 +24,14 @@ export default function GamePage() {
     playerRole,
   } = usePongGameLogic();
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
-  const {user} = useLayout();
+  const { user } = useUser();
 
   const player: IPlayer = {
     username: user.username,
     avatar: user.avatar_url!,
     frame: 'silver2',
     level: '34',
-  }
-
+  };
 
   function handleClose() {
     closeDialRef.current?.showModal();

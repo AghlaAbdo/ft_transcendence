@@ -14,6 +14,7 @@ import { IGameState } from '../types/game';
 import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
 import { getCurrDate } from '../utils/dates';
+import { removeUserActiveGame } from './userActiveGame';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -43,6 +44,10 @@ export function startGame(gameState: IGameState) {
 
       if (j === 1) {
         setTimeout(() => {
+          if (gameState.game.status === 'ended') {
+            deleteGame(gameState);
+            return;
+          }
           ioInstance.to(gameState.id).emit('startGame');
           ioInstance.emit('startGame');
           gameState.startDate = getCurrDate();
@@ -58,7 +63,7 @@ export function startGame(gameState: IGameState) {
 }
 
 function gameLoop(gameState: IGameState): void {
-  if (gameState.game.status !== 'playing') return;
+  if (!gameState || gameState.game.status !== 'playing') return;
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
   gameState.game.ball.y += gameState.game.ball.dy;
@@ -118,6 +123,8 @@ function gameLoop(gameState: IGameState): void {
 }
 
 function gameOver(gameState: IGameState): void {
+  removeUserActiveGame(gameState.player1.id);
+  removeUserActiveGame(gameState.player2.id);
   if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
     gameState.winner_id = gameState.player1.id;
     gameState.game.winner = 'player1';

@@ -33,7 +33,7 @@ export function initializeSocketIO(server: http.Server): Server {
     socket.on('rematch', (gameId, playerRole) =>
       handleRematch(socket, gameId, playerRole),
     );
-    socket.on('quit', (gameId) => handleQuit(socket, gameId));
+    socket.on('quit', (gameId, userId) => handleQuit(socket, gameId, userId));
     socket.on('cancelMatching', (gameId) => handleCancelMatching(gameId));
   });
 

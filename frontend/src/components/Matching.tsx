@@ -78,6 +78,7 @@ export default function Matching({
                 duration: 1,
                 scale: { type: 'spring', bounce: 0.5, duration: 1 },
               }}
+              className='w-full'
             >
               <Avatar
                 width={192}
