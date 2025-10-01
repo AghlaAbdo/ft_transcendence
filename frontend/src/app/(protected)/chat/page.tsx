@@ -33,9 +33,8 @@ export default function ChatPage() {
     }
   }, [selectedChatId]);
   const socketRef = useRef<Socket | null>(null);
-  
+
   const handleSendMessage = (messageContent: string) => {
-    // console.log("Message sent:", messageContent + ", to chat: " + selectedChatId);
     if (socketRef.current && selectedChatId && messageContent.trim() && user) {
       socketRef.current.emit("ChatMessage", {
         chatId: selectedChatId,

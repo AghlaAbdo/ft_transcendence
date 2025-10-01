@@ -97,7 +97,7 @@ type ChatRow = {
   last_message_id: number;
 }
 
-// hell yeaaaaaah Promise.all is magiiic baby
+// hell yeaaaaaah Promise.all its magiiic baby
 
 async function fetchUserFromService(ids: Array<number>)
 {
