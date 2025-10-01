@@ -28,6 +28,8 @@ export default function GameResultCard({
 }) {
   const [rematch, setRematch] = useState<string[]>([]);
 
+  console.log('reached game reslut card!!!');
+
   return (
     <dialog
       ref={ref}

@@ -32,7 +32,7 @@ export function setIoInstance(io: Server): void {
 }
 
 export function startGame(gameState: IGameState) {
-  if (gameIntervals[gameState.id]) return;
+  if (!gameState || gameIntervals[gameState.id]) return;
 
   ioInstance.to(gameState.id).emit('prepare');
   for (let i = 1; i <= 3; i++) {
@@ -144,8 +144,7 @@ function gameOver(gameState: IGameState): void {
 }
 
 export function deleteGame(gameState: IGameState): void {
-  if (!gameState)
-    return;
+  if (!gameState) return;
   if (gameState.game.status === 'playing') {
     gameState.game.status = 'ended';
   }

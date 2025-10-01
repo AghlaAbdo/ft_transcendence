@@ -25,6 +25,7 @@ export default function Rematch({
   const { user } = useUser();
 
   useEffect(() => {
+    console.log('REached Rematch componentn!!');
     socket.on('rematch', () => {
       console.log('Opponent wants to play again');
       setRematch((prev) => [...prev, 'recived']);

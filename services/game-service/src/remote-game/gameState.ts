@@ -9,7 +9,11 @@ import {
   BALL_SPEED,
 } from '../config/game';
 
-export function generateGameState(gameId: string, player1: IPlayer): IGameState {
+export function generateGameState(
+  gameId: string,
+  player1: IPlayer,
+  plr1SocketId: string,
+): IGameState {
   const direction = Math.random() < 0.5 ? 1 : -1;
   const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
   return {
@@ -42,6 +46,7 @@ export function generateGameState(gameId: string, player1: IPlayer): IGameState 
     },
     player1: {
       id: player1.id,
+      socketId: plr1SocketId,
       username: player1.username,
       avatar: player1.avatar,
       frame: player1.frame,
@@ -50,6 +55,7 @@ export function generateGameState(gameId: string, player1: IPlayer): IGameState 
     },
     player2: {
       id: null,
+      socketId: null,
       username: null,
       avatar: null,
       frame: null,

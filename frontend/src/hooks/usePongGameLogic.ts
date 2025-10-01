@@ -349,7 +349,8 @@ export const usePongGameLogic = (): returnType => {
       (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
         isPlaying.current = false;
         if (gameStatus === 'playing' || gameStatus === 'waiting') {
-          endTextRef.current!.text = 'Opponent Quit';
+          console.log('opponent has quit!!');
+          if (endTextRef.current) endTextRef.current.text = 'Opponent Quit';
           setWinner(playerRole.current!);
           setTimeout(() => dialogRef.current?.showModal(), 2000);
         }
@@ -377,7 +378,7 @@ export const usePongGameLogic = (): returnType => {
       // e.preventDefault();
       e.returnValue = '';
       console.log('sent quit event');
-      if (isPlaying.current) socket.emit('quit', gameId.current, user.id);
+      // if (isPlaying.current) socket.emit('quit', gameId.current, user.id);
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);

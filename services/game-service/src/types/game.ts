@@ -24,6 +24,7 @@ export interface IGameState {
   playtime: number | null;
   player1: {
     id: string | null;
+    socketId: string | null;
     username: string | null;
     avatar: string | null;
     frame: string | null;
@@ -32,6 +33,7 @@ export interface IGameState {
   };
   player2: {
     id: string | null;
+    socketId: string | null;
     username: string | null;
     avatar: string | null;
     frame: string | null;
