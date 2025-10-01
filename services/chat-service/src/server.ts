@@ -106,10 +106,11 @@ async function fetchUserFromService(ids: Array<number>)
       const res = await fetch(`http://user-service:5000/api/users/${id}`);
       const data = await res.json();
       if (!data.status || !data.user) return null; // skip if not found
+      // console.log('user fetched: ', data.user);
       return data.user;
-    })  
+    })
   ));
-  // console.log("fetched users: ", users);
+  
   return users;
 }
 
@@ -126,6 +127,8 @@ fastify.get("/api/chat/chats/:userId", async (request, reply) => {
     );
     // console.log("user: ",userIds);
     const users = await fetchUserFromService((userIds));
+    console.log('users: ', users);
+    
     const userMap = new Map(users.map(u => [u.id, u]));
     // console.log(userMap.get[0])
     // enrich the chat json with user infos
