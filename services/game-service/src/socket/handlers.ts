@@ -15,6 +15,7 @@ import {
   removeUserActiveGame,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
+import { getCurrDate, getDiffInMin } from '../utils/dates';
 
 let ioInstance: Server;
 
@@ -39,7 +40,13 @@ export function handleDisconnect(socket: Socket, reason: string): void {
       gameToQuit.player1.socketId === socket.id ? 'player1' : 'player2';
     const opponentRole = quitterRole === 'player1' ? 'player2' : 'player1';
 
-    gameToQuit.game.winner = opponentRole;
+    gameToQuit.winner_id =
+      quitterRole === 'player1' ? gameToQuit.player2.id : gameToQuit.player1.id;
+    gameToQuit.playtime = gameToQuit.startAt
+      ? getDiffInMin(gameToQuit.startAt)
+      : 0;
+    if (!gameToQuit.startDate) gameToQuit.startDate = getCurrDate();
+    postGame(gameToQuit);
 
     const opponentSocketId =
       opponentRole === 'player1'
@@ -217,6 +224,12 @@ export function handleQuit(
     .emit('opponentQuit', gameState ? gameState.game.status : null);
   if (gameState) {
     gameState.game.status = 'ended';
+    gameState.winner_id =
+      gameState.player1.id === userId
+        ? gameState.player2.id
+        : gameState.player1.id;
+    gameState.playtime = getDiffInMin(gameState.startAt);
+    postGame(gameState);
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
     deleteGame(gameState);
