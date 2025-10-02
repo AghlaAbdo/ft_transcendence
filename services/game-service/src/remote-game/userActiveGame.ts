@@ -10,7 +10,10 @@ export function getUserActiveGame(userId: string | null): string | undefined {
   return userActiveGame.get(userId);
 }
 
-export function removeUserActiveGame(userId: string | null): void {
-  if (!userId) return;
-  userActiveGame.delete(userId);
+export function removeUserActiveGame(
+  userId: string | null,
+  gameId: string | null,
+): void {
+  if (!userId || !gameId) return;
+  if (getUserActiveGame(userId) === gameId) userActiveGame.delete(userId);
 }

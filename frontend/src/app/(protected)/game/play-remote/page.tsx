@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 
 import Matching from '@/components/Matching';
+import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
@@ -22,6 +24,7 @@ export default function GamePage() {
     winner,
     gameId,
     playerRole,
+    inAnotherGame,
   } = usePongGameLogic();
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
@@ -36,6 +39,8 @@ export default function GamePage() {
   function handleClose() {
     closeDialRef.current?.showModal();
   }
+
+  if (inAnotherGame) return <AlreadyInGame />;
   return (
     <>
       {matching && (

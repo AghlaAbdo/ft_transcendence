@@ -1,5 +1,4 @@
 import { Server, Socket } from 'socket.io';
-import { getCurrDate } from '../utils/dates';
 import { postGame } from '../models/game.model';
 import {
   generateGameState,
@@ -15,7 +14,6 @@ import {
   setUserActiveGame,
   removeUserActiveGame,
 } from '../remote-game/userActiveGame';
-import { fetchUser } from '../api/userService';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 
 let ioInstance: Server;
@@ -59,13 +57,17 @@ export function handleDisconnect(socket: Socket, reason: string): void {
         }, 1000);
       } else ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
     }
-    gameToQuit.game.status = 'ended';
-    removeUserActiveGame(gameToQuit.player1.id);
-    removeUserActiveGame(gameToQuit.player2.id);
-    deleteGame(gameToQuit);
-
-    if (allGames.lobyGame === gameToQuit.id) {
-      allGames.lobyGame = null;
+    const gameStatus = gameToQuit.game.status;
+    if (gameStatus === 'waiting' || gameStatus === 'playing') {
+      gameToQuit.game.status = 'ended';
+      removeUserActiveGame(gameToQuit.player1.id, gameToQuit.id);
+      removeUserActiveGame(gameToQuit.player2.id, gameToQuit.id);
+      if (allGames.lobyGame === gameToQuit.id) {
+        allGames.lobyGame = null;
+      }
+      deleteGame(gameToQuit);
+    } else {
+      deleteGame(gameToQuit);
     }
   }
 }
@@ -99,6 +101,7 @@ export async function handlePlay(socket: Socket, userId: string) {
 
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
+    setUserActiveGame(userId, gameId);
     allGames.games[gameId] = generateGameState(gameId, user, socket.id);
     console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
     socket.emit('playerData', {
@@ -108,31 +111,35 @@ export async function handlePlay(socket: Socket, userId: string) {
     });
     socket.join(gameId);
     allGames.lobyGame = gameId;
-    setUserActiveGame(userId, gameId);
   } else {
-    allGames.games[allGames.lobyGame].playersNb++;
-    allGames.games[allGames.lobyGame].player2.id = user.id;
-    allGames.games[allGames.lobyGame].player2.username = user.username;
-    allGames.games[allGames.lobyGame].player2.avatar = user.avatar;
-    allGames.games[allGames.lobyGame].player2.frame = user.frame;
-    allGames.games[allGames.lobyGame].player2.level = user.level;
-    allGames.games[allGames.lobyGame].player2.socketId = socket.id;
-    socket.join(allGames.lobyGame);
+    const lobyGameId = allGames.lobyGame;
+    if (allGames.games[lobyGameId].player1.id === user.id) {
+      deleteGame(allGames.games[lobyGameId]);
+      allGames.lobyGame = null;
+      return;
+    }
+    setUserActiveGame(userId, lobyGameId);
+    allGames.games[lobyGameId].playersNb++;
+    allGames.games[lobyGameId].player2.id = user.id;
+    allGames.games[lobyGameId].player2.username = user.username;
+    allGames.games[lobyGameId].player2.avatar = user.avatar;
+    allGames.games[lobyGameId].player2.frame = user.frame;
+    allGames.games[lobyGameId].player2.level = user.level;
+    allGames.games[lobyGameId].player2.socketId = socket.id;
+    socket.join(lobyGameId);
     socket.emit('playerData', {
       playerRole: 'player2',
-      gameId: allGames.lobyGame,
+      gameId: lobyGameId,
       player: player2,
     });
     socket
-      .to(allGames.lobyGame)
-      .emit('matchFound', allGames.games[allGames.lobyGame].player2);
-    socket.emit('matchFound', allGames.games[allGames.lobyGame].player1);
-    const lobyGame = allGames.lobyGame;
+      .to(lobyGameId)
+      .emit('matchFound', allGames.games[lobyGameId].player2);
+    socket.emit('matchFound', allGames.games[lobyGameId].player1);
     setTimeout(() => {
-      startGame(allGames.games[lobyGame]);
+      startGame(allGames.games[lobyGameId]);
     }, 3000);
     allGames.lobyGame = null;
-    setUserActiveGame(userId, allGames.lobyGame!);
   }
 }
 
@@ -161,8 +168,21 @@ export function handleRematch(
     console.log('playerRole is null!!');
     return;
   }
+
   const gameState = getGameState(gameId);
   if (!gameState) return;
+
+  const userId =
+    playerRole === 'player1' ? gameState.player1.id : gameState.player2.id;
+  const activeGame = getUserActiveGame(userId);
+  if (activeGame && activeGame !== gameId) {
+    socket.emit('inAnotherGame');
+    socket.to(gameState.id).emit('opponentQuit', gameState.game.status);
+    removeUserActiveGame(gameState.player1.id, gameState.id);
+    removeUserActiveGame(gameState.player2.id, gameState.id);
+    return;
+  }
+
   socket.to(gameId).emit('rematch');
   if (playerRole === 'player1') {
     gameState.player1.ready = true;
@@ -197,8 +217,8 @@ export function handleQuit(
     .emit('opponentQuit', gameState ? gameState.game.status : null);
   if (gameState) {
     gameState.game.status = 'ended';
-    removeUserActiveGame(gameState.player1.id);
-    removeUserActiveGame(gameState.player2.id);
+    removeUserActiveGame(gameState.player1.id, gameState.id);
+    removeUserActiveGame(gameState.player2.id, gameState.id);
     deleteGame(gameState);
   }
   console.log('player quit');
@@ -207,8 +227,8 @@ export function handleQuit(
 export function handleCancelMatching(gameId: string) {
   const gameState = getGameState(gameId);
   if (gameState) {
-    removeUserActiveGame(gameState.player1.id);
-    removeUserActiveGame(gameState.player2.id);
+    removeUserActiveGame(gameState.player1.id, gameState.id);
+    removeUserActiveGame(gameState.player2.id, gameState.id);
   }
   deleteGame(getGameState(gameId));
   getAllGames().lobyGame = null;

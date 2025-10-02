@@ -24,6 +24,7 @@ interface returnType {
   winner: string;
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
+  inAnotherGame: boolean;
 }
 
 export const usePongGameLogic = (): returnType => {
@@ -31,6 +32,7 @@ export const usePongGameLogic = (): returnType => {
   const [opponent, setOpponent] = useState<IPlayer | null>(null);
   const [player, setPlayer] = useState<IPlayer | null>(null);
   const [winner, setWinner] = useState<string>('');
+  const [inAnotherGame, setInAnotherGame] = useState<boolean>(false);
   const pressedKeys = useRef<Set<string>>(new Set());
   const animationFrameId = useRef<number | null>(null);
   const gameId = useRef<string>(null);
@@ -262,6 +264,7 @@ export const usePongGameLogic = (): returnType => {
 
     socket.on('inAnotherGame', () => {
       console.log('Already in another game!!!');
+      setInAnotherGame(true);
     });
 
     socket.on(
@@ -422,5 +425,6 @@ export const usePongGameLogic = (): returnType => {
     winner,
     gameId: gameId.current,
     playerRole: playerRole.current,
+    inAnotherGame,
   };
 };

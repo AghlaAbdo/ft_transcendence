@@ -123,8 +123,8 @@ function gameLoop(gameState: IGameState): void {
 }
 
 function gameOver(gameState: IGameState): void {
-  removeUserActiveGame(gameState.player1.id);
-  removeUserActiveGame(gameState.player2.id);
+  removeUserActiveGame(gameState.player1.id, gameState.id);
+  removeUserActiveGame(gameState.player2.id, gameState.id);
   if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
     gameState.winner_id = gameState.player1.id;
     gameState.game.winner = 'player1';

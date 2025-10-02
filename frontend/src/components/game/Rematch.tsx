@@ -46,7 +46,7 @@ export default function Rematch({
   const handleRematch = () => {
     console.log('rematch!!');
     setRematch((prev) => [...prev, 'sent']);
-    socket.emit('rematch', gameId, playerRole);
+    socket.emit('rematch', gameId, playerRole, user.id);
   };
 
   const handleReturn = () => {
