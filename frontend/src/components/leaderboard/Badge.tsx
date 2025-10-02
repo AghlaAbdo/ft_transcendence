@@ -1,7 +1,16 @@
 import Image from "next/image"
 
-export default function Badge({imgSrc, rank, username, score, showCrown, color, imageSrc}) {
-  const position = rank !== 1 ? "transfrom translate-y-5" : "";
+interface BadgeProps {
+    imgSrc: string;
+    rank: number;
+    username: string;
+    score: number;
+    showCrown: boolean;
+    color: string;
+}
+
+export default function Badge({imgSrc, rank, username, score, showCrown, color}: BadgeProps) {
+  const position: string = rank !== 1 ? "transfrom translate-y-5" : "";
     return (
     <div className={`flex flex-col items-center w-fit mx-auto ${position}`}>
       {

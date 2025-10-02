@@ -1,7 +1,15 @@
 import Image from "next/image"
 import Link from "next/link"
+import { Player } from "@/constants/leaderboard";
 
-export default function Table({players, numOfPages, page}) {
+
+interface TableProps {
+    players: Player[];
+    numOfPages: number;
+    page: number;
+}
+
+export default function Table({players, numOfPages, page}: TableProps) {
     return (
         <div className="m-10">
             <div className="
@@ -17,11 +25,11 @@ export default function Table({players, numOfPages, page}) {
                     <span>Games</span>
                 </div>
                 {
-                    players.map((player) => 
+                    players.map((player, index) => 
                     <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
                         hover:bg-[#222e43] transition-colors duration-100 ease-in-out
                     " key={player.username}>
-                        <li className="pl-2">{player.rank}</li>
+                        <li className="pl-2">{index + 1}</li>
                         <div className="flex items-center">
                             <Image
                             src="/avatars/avatar1.png"

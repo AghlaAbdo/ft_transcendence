@@ -3,7 +3,7 @@
 import Badge from "@/components/leaderboard/Badge";
 import { get_leaderboard } from "../lib/leaderboard";
 import Table from "@/components/leaderboard/Table";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Player } from "@/constants/leaderboard";
 export default function Leaderboard({
     searchParams,

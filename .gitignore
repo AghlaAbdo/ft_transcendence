@@ -1,3 +1,5 @@
+*.tldr
+
 # Logs
 logs
 *.log
