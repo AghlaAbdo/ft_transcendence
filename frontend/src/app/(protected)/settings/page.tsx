@@ -3,7 +3,7 @@
 import Input from '@/components/auth/Input'
 import TwoFactorAuth from '@/components/auth/TwoFactorAuth';
 import { Mail, Lock, User } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 import * as z from 'zod'
 import { useForm } from 'react-hook-form';
@@ -40,6 +40,9 @@ type ResetPasswordInput = z.infer<typeof changePasswordSchema>;
 
 
 const SettingsPage = () => {
+  const [avatar, setAvatar] = useState<string>("./avatars/avatar2.png");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [activeTab, setActiveTab] = useState<"info" | "security">("info");
 
   const {
@@ -58,6 +61,36 @@ const SettingsPage = () => {
     resolver: zodResolver(changePasswordSchema),
   });
 
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file  = e.target.files[0];
+      console.log("file : ", file);
+      
+      setAvatar(URL.createObjectURL(file));
+
+      const formData = new FormData();
+
+      console.log(formData);
+
+      formData.append("avatar", file); // files comes from <input type="file">
+
+      try {
+        const response = await fetch("https://localhost:8080/api/users/");
+      } catch (error) {
+        
+      }
+
+    }
+  }
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  }
+
+  const handleRemove = () => {
+    setAvatar(null as any);
+    // sent request to backend to remove avatar
+  }
   const handleUpdateInfo = async (data: FormData) => {
 
   }
@@ -84,10 +117,21 @@ const SettingsPage = () => {
                   <div className="flex flex-row items-center gap-20 -mt-5">
                     <div className="relative">
                       <div className="rounded-full border-6 border-purple-500 overflow-hidden shadow-2xl">
-                        <img
-                          src="./avatars/avatar4.png"
-                          alt="avatar"
-                          className="w-50 h-50 object-cover"
+                        
+                        {avatar && (
+                            <img
+                              src={avatar}
+                              alt="avatar"
+                              className="w-50 h-50 object-cover"
+                            />
+                        )}
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          className="hidden"
                         />
                       </div>
                       <span className="absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full"></span>
@@ -97,10 +141,14 @@ const SettingsPage = () => {
                       <p className="text-2xl">Choose a new profile picture</p>
 
                       <div className="flex flex-row gap-6">
-                        <button className="px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xl shadow-lg transition">
+                        <button 
+                          onClick={handleUploadClick}
+                          className="px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xl shadow-lg transition">
                           Upload
                         </button>
-                        <button className="px-8 py-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xl shadow-lg transition">
+                        <button 
+                          onClick={handleRemove}
+                          className="px-8 py-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xl shadow-lg transition">
                           Remove
                         </button>
                       </div>
