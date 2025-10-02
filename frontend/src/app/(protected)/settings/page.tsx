@@ -75,11 +75,11 @@ const SettingsPage = () => {
 
       formData.append("avatar", file); // files comes from <input type="file">
 
-      try {
-        const response = await fetch("https://localhost:8080/api/users/");
-      } catch (error) {
+      // try {
+      //   const response = await fetch("https://localhost:8080/api/users/");
+      // } catch (error) {
         
-      }
+      // }
 
     }
   }
