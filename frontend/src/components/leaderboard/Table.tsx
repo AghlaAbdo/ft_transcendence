@@ -29,7 +29,7 @@ export default function Table({players, numOfPages, page}: TableProps) {
                     <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
                         hover:bg-[#222e43] transition-colors duration-100 ease-in-out
                     " key={player.username}>
-                        <li className="pl-2">{index + 1}</li>
+                        <li className="pl-2">{player.rank}</li>
                         <div className="flex items-center">
                             <Image
                             src="/avatars/avatar1.png"

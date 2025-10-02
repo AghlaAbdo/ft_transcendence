@@ -3,13 +3,14 @@
 import Badge from "@/components/leaderboard/Badge";
 import { get_leaderboard } from "../lib/leaderboard";
 import Table from "@/components/leaderboard/Table";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Player } from "@/constants/leaderboard";
 export default function Leaderboard({
     searchParams,
 }: {
-    searchParams: { page?: string }
+    searchParams: Promise<{ page?: string }>
 }) {
+    const resolvedSearchParams = use(searchParams)
     const [players, setPlayers] = useState<Player[]>([])
     const [topPlayers, setTopPlayers] = useState<Player[]>([])
     const [loading, setLoading] = useState(true)
@@ -18,7 +19,7 @@ export default function Leaderboard({
     widthMap.set(2, 30)
     widthMap.set(3, 50)
     const limit = 20
-    const page = Number(searchParams.page) || 1
+    const page: number = Number(resolvedSearchParams.page) || 1
     const numOfPlayers = 50
     const numOfPages = Math.ceil(numOfPlayers / limit)
     const offset = (page - 1) * limit
@@ -32,6 +33,14 @@ export default function Leaderboard({
         }
         getLeaderboard()
     }, [])
+    useEffect(() => {
+        async function getLeaderboard() {
+            const players = await get_leaderboard(page, offset, false)
+            console.log(players)
+            setPlayers(players)
+        }
+        getLeaderboard()
+    }, [page])
     return (
         loading ? (
             <div className="flex justify-center items-center h-[100vh]">
