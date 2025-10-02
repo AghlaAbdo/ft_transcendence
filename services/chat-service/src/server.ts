@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { getMessages, insert_message, getMessage } from "./database/conversations.ts";
 import { getChats } from "./database/chats.ts";
 import { getFriends, getUser } from "./database/user.ts";
@@ -23,7 +23,7 @@ io.on("connection", (socket: Socket) => {
   socket.userId = user__id;
   onlineUsers.set(user__id, socket); // store socket
   console.log("User connected:", socket.userId);
-  socket.on("ChatMessage", (data) => {
+  socket.on("ChatMessage", (data:any) => {
     const chat_id = data.chatId;
     const content = data.message;
     const newMessage = insert_message(
@@ -34,7 +34,7 @@ io.on("connection", (socket: Socket) => {
     );
     if (!newMessage)
         return ;
-    socket.emit("ChatMessage", newMessage); // here check fi the user if a freind
+    socket.emit("ChatMessage", newMessage); // here check if the user if a freind
     const receiverSocket = onlineUsers.get(data.receiver);
     if (receiverSocket) {
       receiverSocket.emit("ChatMessage", newMessage);
@@ -80,13 +80,6 @@ fastify.get("/api/chat/user/:userId", (request) => {
   return getUser(parseInt(userId));
 });
 
-type User = {
-  id: number;
-  username: string;
-  email: string;
-  createdAt: string;
-  updatedAt: string;
-};
 
 type ChatRow = {
   chat_id: number;

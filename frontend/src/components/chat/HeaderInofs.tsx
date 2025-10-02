@@ -2,26 +2,9 @@ import { MoreVertical } from "lucide-react";
 export const HeaderInfos = () => {
   return (
     <>
-      <div className="flex py-2.5 px-5 items-center rounded-t-[20px] bg-[#1F2937]">
-        <img
-          src="/avatars/avatar3.png"
-          alt="Imad"
-          className="w-12 h-12 rounded-full mr-3"
-        />
-        <div className="flex-1">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="font-semibold"> user_name</h3>
-              <p className="text-sm text-gray-400 truncate">Online</p>
-            </div>
-            <div>
-              <button className="cursor-pointer">
-                <MoreVertical />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      I am a recent graduate of 1337 (42 Network) and I would like to contribute my full-stack development skills — including React, Next.js, Node.js, and Docker — to your team.
+
+Through my projects, I have built complete web applications, implemented real-time features, and deployed scalable environments with Docker. Curious and adaptable, I can quickly learn the technologies used in your company and contribute effectively.
     </>
   );
 };
