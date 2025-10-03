@@ -58,10 +58,38 @@ services:
   #     - prometheus_data:/prometheus
   #   command:
   #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--storage.tsdb.retention.size=50GB'
+  #     - '--storage.tsdb.retention.time=6m'
+  #     - '--storage.tsdb.min-block-duration=2m'
+  #     - '--storage.tsdb.max-block-duration=2m'
   #   networks:
   #     - main_net
   #   depends_on:
   #     - alertmanager
+  #   # ports:
+  #   #   - "9090:9090"
+    
+  # thanos:
+  #   image: rancher/thanos:v0.10.1
+  #   container_name: thanos
+  #   volumes:
+  #     - prometheus_data:/prometheus
+  #     - ./monitoring/objstore.yml.template:/etc/thanos/objstore.yml.template
+  #     - ./monitoring/thanos-entrypoint.sh:/entrypoint.sh
+  #   entrypoint: ["/entrypoint.sh"]
+  #   command:
+  #     - sidecar
+  #     - --tsdb.path=/prometheus
+  #     - --objstore.config-file=/etc/thanos/objstore.yml
+  #     - --prometheus.url=http://prometheus:9090
+  #   networks:
+  #     - main_net
+  #   environment:
+  #     - ACCESS_KEY_ID=${ACCESS_KEY_ID2}
+  #     - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY2}
+  #   depends_on:
+  #     - prometheus
 
   # alertmanager:
   #   image: prom/alertmanager:v0.23.0
@@ -107,7 +135,7 @@ services:
 
 
   # node-exporter:
-  #   image: bitnami/node-exporter:1.9.1-debian-12-r12
+  #   image: rancher/prom-node-exporter:v1.3.1
   #   container_name: node-exporter
   #   network_mode: host
   #   pid: host
