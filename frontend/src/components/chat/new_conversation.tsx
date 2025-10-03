@@ -31,6 +31,8 @@ export default function Modal({
     document.body.appendChild(el);
     return () => {
       if (el.parentElement) document.body.removeChild(el);
+      const prevFilter = document.body.style.filter;
+      document.body.style.filter = "blur(4px)";
       portalRef.current = null;
     };
   }, []);
@@ -101,8 +103,8 @@ export default function Modal({
       className="fixed inset-0 z-50 bg-[#021024]"
       aria-modal="true"
       role="dialog"
-      aria-labelledby={title ? "modal-title" : undefined}
-      aria-describedby={description ? "modal-desc" : undefined}
+      // aria-labelledby={title ? "modal-title" : undefined}
+      // aria-describedby={description ? "modal-desc" : undefined}
     >
       {/* overlay */}
       <div

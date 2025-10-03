@@ -28,7 +28,8 @@ type User = {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const { user } = useAuth();
+  const  {user}  = useAuth();
+  // console.log(username, allo);
   const [otherUser, setOtherUser] = useState<User | null>(null);
   useEffect(() => {
     if (user && selectedChatId) {
