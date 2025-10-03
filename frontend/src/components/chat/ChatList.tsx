@@ -59,9 +59,8 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
       console.log("chat fetched: ", chats);
     }
   }, [userId, conv]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  
+    
+
   return (
     <>
       <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 ">
@@ -69,37 +68,15 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
           <h2 className="text-lg font-semibold text-white">Messages</h2>
 
 
-
-
-          <button
+          {/* <button
             className="bg-purple-600 hover:bg-purple-700 rounded-lg p-2 transition-colors"
-            onClick={() => setIsModalOpen(true)} // open modal
+            // onClick={() => setIsModalOpen(true)} // open modal
           >
             <Plus className="h-5 w-5 text-white font-semibold" />
-          </button>
+          </button> */}
 
           {/* Modal */}
-          <Modal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)} // close modal
-            title="New Message"
-            description="Search your friends and start a chat"
-            initialFocusRef={inputRef}
-          >
-            {/* Your modal content */}
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search friends..."
-              className="w-full p-2 rounded border bg-white dark:bg-gray-800"
-            />
-            <p className="text-sm text-gray-500 mt-2">
-              This is where your friend list would go.
-            </p>
-          </Modal>
-
-
-
+          
 
         </div>
         <div className="p-4">

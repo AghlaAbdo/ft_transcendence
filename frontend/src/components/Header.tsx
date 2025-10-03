@@ -2,14 +2,19 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import avatar from '@/../public/avatars/avatar1.png';
 import { useLayout } from '@/context/LayoutContext';
+import Modal from './chat/new_conversation';
 
 export default function Header() {
   const { hideHeaderSidebar } = useLayout();
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  
   return (
     <motion.div
       initial={false}
@@ -30,7 +35,7 @@ export default function Header() {
         </span>
       </div>
       <div className='flex justify-between items-center gap-4'>
-        <Link href='#'>
+        <button onClick={() => setIsModalOpen(true)} className='cursor-pointer'>
           {/* Search Icon*/}
           <svg
             className='fill-gray-50'
@@ -39,10 +44,25 @@ export default function Header() {
             viewBox='0 0 14 14'
             fill='none'
             xmlns='http://www.w3.org/2000/svg'
-          >
+            >
             <path d='M6 0C9.312 0 12 2.688 12 6C12 9.312 9.312 12 6 12C2.688 12 0 9.312 0 6C0 2.688 2.688 0 6 0ZM6 10.6667C8.578 10.6667 10.6667 8.578 10.6667 6C10.6667 3.422 8.578 1.33333 6 1.33333C3.422 1.33333 1.33333 3.422 1.33333 6C1.33333 8.578 3.422 10.6667 6 10.6667ZM11.6567 10.714L13.5427 12.5993L12.5993 13.5427L10.714 11.6567L11.6567 10.714Z' />
           </svg>
-        </Link>
+        </button>
+         <Modal
+                  isOpen={isModalOpen}
+                  onClose={() => setIsModalOpen(false)}
+                  initialFocusRef={inputRef}
+                >
+                  {/* Your modal content */}
+                  <input
+                    ref={inputRef}
+                    type='text'
+                    placeholder='Username...'
+                    className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
+                  />
+                  <p className='text-sm text-gray-500 mt-2'>Users list</p>
+                </Modal>
+
         <Link href='#'>
           {/* Notification Icon */}
           <svg
