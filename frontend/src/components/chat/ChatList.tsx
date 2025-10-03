@@ -1,9 +1,10 @@
 // "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, Search } from "lucide-react";
 import { Search_Input } from "./Search_Input";
 import { formatDistanceToNow } from "date-fns";
+import Modal from "./new_conversation";
 
 interface User {
   id: number;
@@ -38,15 +39,15 @@ interface ChatlistProps {
   conv: Message[];
 }
 
-export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, conv}: ChatlistProps) => {
-  const [chats, setChats] =  useState<Chat[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");  
+export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, conv }: ChatlistProps) => {
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const filteredChats = chats.filter((chat) => {
     if (!searchQuery) return true;
     const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
     const userIdString = otherUser.username.toString();
     return userIdString.includes(searchQuery);
-});
+  });
   useEffect(() => {
     if (userId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`) //fetch chats from backend
@@ -55,28 +56,59 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
           setChats(data);
         })
         .catch((err) => console.error("Failed to fetch chats:", err));
-        console.log("chat fetched: ", chats);
+      console.log("chat fetched: ", chats);
     }
   }, [userId, conv]);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  
   return (
     <>
       <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 ">
         <div className="flex items-center justify-between p-4 border-b border-gray-600">
           <h2 className="text-lg font-semibold text-white">Messages</h2>
 
-          <button className="bg-purple-600 hover:bg-purple-700 rounded-lg p-2 transition-colors">
+
+
+
+          <button
+            className="bg-purple-600 hover:bg-purple-700 rounded-lg p-2 transition-colors"
+            onClick={() => setIsModalOpen(true)} // open modal
+          >
             <Plus className="h-5 w-5 text-white font-semibold" />
           </button>
 
+          {/* Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)} // close modal
+            title="New Message"
+            description="Search your friends and start a chat"
+            initialFocusRef={inputRef}
+          >
+            {/* Your modal content */}
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search friends..."
+              className="w-full p-2 rounded border bg-white dark:bg-gray-800"
+            />
+            <p className="text-sm text-gray-500 mt-2">
+              This is where your friend list would go.
+            </p>
+          </Modal>
+
+
+
+
         </div>
         <div className="p-4">
-            <div className="relative">
-              <Search_Input 
+          <div className="relative">
+            <Search_Input
               onsearchchange_2={setSearchQuery}
               searchquery_2={searchQuery}
-              />
-            </div>
+            />
+          </div>
         </div>
         <div className="px-4 pb-4">
           {filteredChats.map((chat) => {
@@ -89,8 +121,7 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
                   onReceiveChange(otherUser.id);
                 }}
                 className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
-                  hover:bg-gray-800 ${
-                    selectedChatId === chat.chat_id ? "bg-gray-700" : ""
+                  hover:bg-gray-800 ${selectedChatId === chat.chat_id ? "bg-gray-700" : ""
                   }`}
               >
                 <img
@@ -105,10 +136,10 @@ export const Chatlist = ({onSelect, selectedChatId, userId, onReceiveChange, con
                     </h3>
                     <span className="text-xs text-gray-400">
                       {
-                            formatDistanceToNow(
-                            new Date(chat.last_message_timestamp + "Z").toLocaleString(),
-                              { addSuffix: true }
-                          )}
+                        formatDistanceToNow(
+                          new Date(chat.last_message_timestamp + "Z").toLocaleString(),
+                          { addSuffix: true }
+                        )}
                     </span>
                   </div>
                   <p className="text-sm text-gray-400 truncate">
