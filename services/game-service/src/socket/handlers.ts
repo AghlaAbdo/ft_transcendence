@@ -16,6 +16,12 @@ import {
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { getCurrDate, getDiffInMin } from '../utils/dates';
+import {
+  createNewTournament,
+  getTournament,
+  getAllWaitingTournaments,
+} from '../tournament/tournamentManager';
+import { ITournament } from '@/types/types';
 
 let ioInstance: Server;
 
@@ -245,4 +251,95 @@ export function handleCancelMatching(gameId: string) {
   }
   deleteGame(getGameState(gameId));
   getAllGames().lobyGame = null;
+}
+
+export async function handleCreateTournament(
+  socket: Socket,
+  userId: string,
+  maxPlayers: number = 4,
+  name: string,
+): Promise<void> {
+  console.log('called create tournament!!!');
+  const user = await getPlayerInfo(userId);
+  if (!user) return;
+
+  if (getUserActiveGame(userId)) {
+    socket.emit('inAnotherGame');
+    return;
+  }
+
+  const newTournament = createNewTournament(userId, maxPlayers, name);
+  console.log('Tournament Created: ', newTournament);
+  const playerJoined = joinPlayerToTournament(
+    newTournament,
+    userId,
+    user,
+    socket,
+  );
+
+  if (playerJoined) {
+    setUserActiveGame(userId, newTournament.id);
+    socket.emit('tournamentCreated', {
+      tournament: newTournament,
+      player: user,
+    });
+    ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
+  }
+}
+
+export async function handleJoinTournament(
+  socket: Socket,
+  userId: string,
+  tournamentId: string,
+): Promise<void> {
+  const tournament = getTournament(tournamentId);
+  const user = await getPlayerInfo(userId);
+
+  if (!tournament || !user) {
+    return;
+  }
+
+  if (
+    tournament.status !== 'waiting' ||
+    tournament.players.size >= tournament.maxPlayers
+  ) {
+    socket.emit('tournamentFull');
+    return;
+  }
+
+  if (getUserActiveGame(userId)) {
+    socket.emit('inAnotherGame');
+    return;
+  }
+
+  const playerJoined = joinPlayerToTournament(tournament, userId, user, socket);
+
+  if (playerJoined) {
+    setUserActiveGame(userId, tournamentId);
+
+    socket.emit('tournamentJoined', { tournament: tournament, player: user });
+    ioInstance.to(tournamentId).emit('tournamentPlayerUpdate', {
+      playerId: userId,
+      action: 'joined',
+    });
+
+    if (tournament.players.size === tournament.maxPlayers) {
+      // startTournament(tournament);
+      ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
+    }
+  }
+}
+
+function joinPlayerToTournament(
+  tournament: ITournament,
+  userId: string,
+  user: any,
+  socket: Socket,
+): boolean {
+  if (tournament.players.has(userId)) return false;
+
+  tournament.players.set(userId, user);
+  socket.join(tournament.id);
+
+  return true;
 }

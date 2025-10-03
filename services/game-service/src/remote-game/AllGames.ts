@@ -1,4 +1,4 @@
-import { IGameState, IGmaes } from '../types/game';
+import { IGameState, IGmaes } from '../types/types';
 
 const allGames: IGmaes = {
   lobyGame: null,

@@ -10,7 +10,7 @@ import {
   BALL_SPEED,
   GAME_INTERVAL_MS,
 } from '../config/game';
-import { IGameState } from '../types/game';
+import { IGameState } from '../types/types';
 import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
 import { getCurrDate } from '../utils/dates';

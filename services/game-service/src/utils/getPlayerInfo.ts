@@ -1,5 +1,5 @@
 import { fetchUser } from '../api/userService';
-import { IPlayer } from '../types/game';
+import { IPlayer } from '../types/types';
 
 export async function getPlayerInfo(userId: string): Promise<IPlayer> {
   const response = await fetchUser(userId);

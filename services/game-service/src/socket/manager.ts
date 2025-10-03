@@ -10,6 +10,8 @@ import {
   handleRematch,
   handleQuit,
   handleCancelMatching,
+  handleJoinTournament,
+  handleCreateTournament,
 } from './handlers';
 
 export function initializeSocketIO(server: http.Server): Server {
@@ -35,6 +37,14 @@ export function initializeSocketIO(server: http.Server): Server {
     );
     socket.on('quit', (gameId, userId) => handleQuit(socket, gameId, userId));
     socket.on('cancelMatching', (gameId) => handleCancelMatching(gameId));
+    socket.on(
+      'createTournament',
+      (userId: string, maxPlayer: number, name: string) =>
+        handleCreateTournament(socket, userId, maxPlayer, name),
+    );
+    socket.on('joinTournament', (userId, tournamentId) =>
+      handleJoinTournament(socket, userId, tournamentId),
+    );
   });
 
   return io;

@@ -1,4 +1,4 @@
-import { IGameState, IPlayer } from '../types/game';
+import { IGameState, IPlayer } from '../types/types';
 import {
   GAME_WIDTH,
   GAME_HEIGHT,

@@ -64,3 +64,31 @@ export interface IPlayer {
   frame: string;
   level: string;
 }
+
+// ----------- Tournament -----------
+
+export interface ITournament {
+  id: string;
+  creatorId: string;
+  name: string;
+  status: 'waiting' | 'live' | 'completed';
+  maxPlayers: number;
+  players: Map<string, IPlayer>;
+  bracket: IRound[];
+}
+
+export interface IMatch {
+  id: string;
+  round: number;
+  player1Id: string | null;
+  player2Id: string | null;
+  gameId: string | null;
+  winnerId: string | null;
+  status: 'pending' | 'ready' | 'playing' | 'completed';
+  nextMatchId: string | null;
+}
+
+export interface IRound {
+  roundNumber: number;
+  matches: IMatch[];
+}
