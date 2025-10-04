@@ -56,6 +56,7 @@ const SettingsPage = () => {
     register: registerInfo,
     handleSubmit: handleSubmitInfo,
     formState: { errors: errorsInfo },
+    reset: resetInfo
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
@@ -64,6 +65,7 @@ const SettingsPage = () => {
     register: registerSecurity,
     handleSubmit: handleSubmitSecurity,
     formState: { errors: errorsSecurity },
+    reset: resetSecurity
   } = useForm<ResetPasswordInput>({
     resolver: zodResolver(changePasswordSchema),
   });
@@ -114,11 +116,48 @@ const SettingsPage = () => {
   }
 
   const handleUpdateInfo = async (data: FormData) => {
+    try {
+      const response = await fetch('https://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify( data ),
+        credentials: "include"  // allow cookies
+      });
 
+      
+      if (response.ok) {
+
+        
+      } else {
+
+      }
+    } catch (error) {
+      toast.error(`❌ Network error. Please check your connection and try again.`);
+    }
   }
 
   const handleChangePasswod = async (data: ResetPasswordInput) => {
+    try {
+      const response = await fetch('https://localhost:8080/api/users/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify( {
+          currentPassword: data.currentPassword, 
+          newPassword: data.newPassword 
+        }),
+        credentials: "include"  // allow cookies
+      });
 
+      const dataResponse = await response.json();
+      if (response.ok && dataResponse.status) {
+        toast.success(dataResponse.message);
+        resetSecurity(); 
+      } else {
+        toast.error(dataResponse.message);
+      }
+    } catch (error) {
+      toast.error(`❌ Network error. Please check your connection and try again.`);
+    }
   }
   return (
         <div className="h-[calc(100vh_-_72px)] text-white flex px-2 gap-2 ">

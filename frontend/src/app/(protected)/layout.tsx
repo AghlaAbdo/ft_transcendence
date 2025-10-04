@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 
 import { useLayout } from '@/context/LayoutContext';
+import { Toaster } from 'sonner';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { hideHeaderSidebar } = useLayout();
@@ -21,6 +22,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <Header />
         <main className={`${!hideHeaderSidebar ? 'md:ml-[72px] mt-[72px]' : ''}`}>
           {children}
+          <Toaster richColors position="top-right" />
         </main>
       </div>
     </RouteGuard>

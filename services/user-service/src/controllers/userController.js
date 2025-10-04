@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import userModel from '../models/userModel.js';
 import fs from "fs";
 import path from "path";
@@ -110,6 +111,74 @@ const uploadAvatar = async (request, reply) => {
     }
 }
 
+const changePassword = async (request, reply) => {
+    try {
+        const user = request.user;
+        
+        const { currentPassword, newPassword } = request.body;
+        
+        if (!currentPassword || !newPassword) {
+            return reply.code(400).send({
+                status: false,
+                message: "Current password and new password are required"
+            });
+        }
+
+        const db = request.server.db;
+
+        const currentUser = db.prepare(`
+            SELECT password
+            FROM USERS
+            WHERE id = ?
+        `).get(user.id);
+
+        if (!currentUser) {
+            return reply.code(404).send({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(currentPassword, currentUser.password);
+        if(!isPasswordValid) {
+            return reply.code(401).send({
+                status: false,
+                message: "Current password is incorrect"
+            });
+        }
+
+
+        const isSamePassword = await bcrypt.compare(newPassword, currentUser.password);
+        if (isSamePassword) {
+            return reply.code(400).send({
+                status: false,
+                message: "New password must be different from current password"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        db.prepare(`
+            UPDATE USERS
+            SET password = ?
+            WHERE id = ?
+        `).run(hashedPassword, user.id);
+        
+
+        reply.send({
+            status: true,
+            message: "Password updated successfully"
+        });
+
+    } catch (error) {
+        console.error("Password change failed:", error);
+        return reply.status(500).send({ 
+            status: false,
+            message: "Internal Server Error" 
+        });
+    }
+}
+
 const  getProfile = async (request, reply) => {
 }
 
@@ -119,4 +188,4 @@ const  updateProfile = async (request, reply) => {
 const  deleteAccount = async (request, reply) => {
 }
 
-export default { getUserById, getAllUsers, getProfile, updateProfile, deleteAccount, uploadAvatar };
+export default { getUserById, getAllUsers, getProfile, updateProfile, deleteAccount, uploadAvatar, changePassword };
