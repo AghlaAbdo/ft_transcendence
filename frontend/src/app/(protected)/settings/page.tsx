@@ -73,7 +73,11 @@ const SettingsPage = () => {
     if (e.target.files && e.target.files[0]) {
       const file  = e.target.files[0];
       // console.log("file : ", file);
-      
+      // 10MB
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
       setAvatar(URL.createObjectURL(file));
 
       const formData = new FormData();
@@ -90,7 +94,10 @@ const SettingsPage = () => {
           credentials: "include", // sends the token cookie automatically no Authorization header is required, the browser send token automatically
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (response.ok && data.status) {
+          
           toast.success("Avatar uploaded successfully!");
         } else {
           toast.error("Failed to upload avatar");
@@ -106,10 +113,6 @@ const SettingsPage = () => {
     fileInputRef.current?.click();
   }
 
-  const handleRemove = () => {
-    setAvatar("./avatars/avatar2.png");
-    // sent request to backend to remove avatar
-  }
   const handleUpdateInfo = async (data: FormData) => {
 
   }
@@ -141,7 +144,8 @@ const SettingsPage = () => {
                             <img
                               src={avatar}
                               alt="avatar"
-                              className="w-50 h-50 object-cover"
+                              className="w-45 h-45 object-cover"
+                              
                             />
                         )}
 
@@ -159,16 +163,11 @@ const SettingsPage = () => {
                     <div className="flex flex-col items-start space-y-6 text-gray-300">
                       <p className="text-2xl">Choose a new profile picture</p>
 
-                      <div className="flex flex-row gap-6">
+                      <div className="flex flex-row gap-6 mx-auto">
                         <button 
                           onClick={handleUploadClick}
                           className="px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xl shadow-lg transition">
                           Upload
-                        </button>
-                        <button 
-                          onClick={handleRemove}
-                          className="px-8 py-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xl shadow-lg transition">
-                          Remove
                         </button>
                       </div>
                     </div>
