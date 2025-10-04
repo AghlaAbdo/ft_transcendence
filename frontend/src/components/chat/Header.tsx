@@ -10,7 +10,7 @@ import Modal from './new_conversation';
 // import Styles from './Header.module.css'; // remove this one later
 
 export default function Header() {
-  
+
   return (
     <div
       // id={Styles.container}
@@ -50,6 +50,7 @@ export default function Header() {
             className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
           />
           <p className='text-sm text-gray-500 mt-2'>friends list</p>
+         
         </Modal>
         <Link href='#'>
           {/* Notification Icon */}

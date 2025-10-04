@@ -23,19 +23,21 @@ export default function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [search, setsearch] = useState<string>("");
-  const [users, setusers]  = useState<User[]>([])
+  const [users, setusers] = useState<User[]>([])
 
-  useEffect(()=>{
+  useEffect(() => {
     fetch(`https://localhost:8080/api/users`)
       .then((res) => res.json())
       .then((u) => setusers(u.users))
       .catch((err) => console.log('users fetching failed because of: ', err));
-      console.log('users=', users);
-      
-    }, [])
-    const onsearch_change = (search_input: string) => {
-    if (search_input && search_input.trim())
-    {
+
+  }, [])
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(search.toLowerCase())
+  );
+  const onsearch_change = (search_input: string) => {
+    if (search_input && search_input.trim()) {
+      console.log('users=', filteredUsers);
       setsearch(search_input);
       console.log("search: ", search_input);
     }
@@ -69,25 +71,48 @@ export default function Header() {
             viewBox='0 0 14 14'
             fill='none'
             xmlns='http://www.w3.org/2000/svg'
-            >
+          >
             <path d='M6 0C9.312 0 12 2.688 12 6C12 9.312 9.312 12 6 12C2.688 12 0 9.312 0 6C0 2.688 2.688 0 6 0ZM6 10.6667C8.578 10.6667 10.6667 8.578 10.6667 6C10.6667 3.422 8.578 1.33333 6 1.33333C3.422 1.33333 1.33333 3.422 1.33333 6C1.33333 8.578 3.422 10.6667 6 10.6667ZM11.6567 10.714L13.5427 12.5993L12.5993 13.5427L10.714 11.6567L11.6567 10.714Z' />
           </svg>
         </button>
-         <Modal
-                  isOpen={isModalOpen}
-                  onClose={() => setIsModalOpen(false)}
-                  initialFocusRef={inputRef}
-                >
-                  {/* Your modal content */}
-                  <input
-                    ref={inputRef}
-                    type='text'
-                    onChange={(e) =>{onsearch_change(e.target.value.trim())}}
-                    placeholder='Username...'
-                    className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
-                  />
-                  <p className='text-sm text-gray-500 mt-2'>Users list</p>
-                </Modal>
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          initialFocusRef={inputRef}
+        >
+          {/* Your modal content */}
+          <input
+            ref={inputRef}
+            type='text'
+            onChange={(e) => { onsearch_change(e.target.value.trim()) }}
+            placeholder='Username...'
+            className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
+          />
+          {/* <p className='text-sm text-gray-500 mt-2'>Users list</p> */}
+          {/* <div
+            key={filteredUsers.user?.id}
+            onClick={() => {
+              // onSelect(chat.chat_id);
+              // onReceiveChange(otherUser.id);
+            }}
+            // className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
+            //                 hover:bg-gray-800 ${selectedChatId === chat.chat_id ? "bg-gray-700" : ""
+            //   }`}
+          >
+            <img
+              src="/avatars/avatar3.png"
+              alt={`${otherUser.username}`}
+              className="w-12 h-12 rounded-full mr-3"
+            />
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-white">
+                  {otherUser.username}
+                </h3>
+              </div>
+            </div>
+          </div> */}
+        </Modal>
 
         <Link href='#'>
           {/* Notification Icon */}
