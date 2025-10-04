@@ -39,7 +39,7 @@ export default function ChatPage() {
           set_conv(data);
           const otherId = data[0].sender === user.id ? data[0].receiver : data[0].sender;
           if (otherId) {
-            console.log("other user id:", otherId);
+            // console.log("other user id:", otherId);
             fetch(`https://localhost:8080/api/users/${otherId}`)
               .then((res) => res.json())
               .then((u) => setOtherUser(u.user));

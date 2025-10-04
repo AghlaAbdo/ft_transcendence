@@ -2,19 +2,44 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import avatar from '@/../public/avatars/avatar1.png';
 import { useLayout } from '@/context/LayoutContext';
 import Modal from './chat/new_conversation';
+import { Target } from 'lucide-react';
+
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export default function Header() {
   const { hideHeaderSidebar } = useLayout();
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  
+  const [search, setsearch] = useState<string>("");
+  const [users, setusers]  = useState<User[]>([])
+
+  useEffect(()=>{
+    fetch(`https://localhost:8080/api/users`)
+      .then((res) => res.json())
+      .then((u) => setusers(u.users))
+      .catch((err) => console.log('users fetching failed because of: ', err));
+      console.log('users=', users);
+      
+    }, [])
+    const onsearch_change = (search_input: string) => {
+    if (search_input && search_input.trim())
+    {
+      setsearch(search_input);
+      console.log("search: ", search_input);
+    }
+  }
   return (
     <motion.div
       initial={false}
@@ -57,6 +82,7 @@ export default function Header() {
                   <input
                     ref={inputRef}
                     type='text'
+                    onChange={(e) =>{onsearch_change(e.target.value.trim())}}
                     placeholder='Username...'
                     className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
                   />
