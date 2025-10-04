@@ -90,7 +90,7 @@ export default function Modal({
           {/* panel */}
           <motion.div
             ref={panelRef}
-            className='absolute top-4 right-4 z-10 w-1/4 bg-[#021024] rounded-lg p-4 shadow-lg'
+            className='absolute top-4 right-4 z-10 w-[90vw] max-w-lg md:max-w-md bg-[#021024] rounded-lg p-4 shadow-lg'
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}

@@ -1,14 +1,18 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+
 import { motion } from 'framer-motion';
+import { Eye, UserPlus } from 'lucide-react';
+import { Target } from 'lucide-react';
 
 import avatar from '@/../public/avatars/avatar1.png';
 import { useLayout } from '@/context/LayoutContext';
+
 import Modal from './chat/new_conversation';
-import { Target } from 'lucide-react';
 
 type User = {
   id: number;
@@ -16,32 +20,31 @@ type User = {
   email: string;
   createdAt: string;
   updatedAt: string;
+  avatar_url: string;
+  online_status: number;
 };
 
 export default function Header() {
   const { hideHeaderSidebar } = useLayout();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [search, setsearch] = useState<string>("");
-  const [users, setusers] = useState<User[]>([])
-
+  const [users, setusers] = useState<User[]>([]);
+  const [filteredUsers, setfilteredusers] = useState<User[]>([]);
   useEffect(() => {
     fetch(`https://localhost:8080/api/users`)
       .then((res) => res.json())
       .then((u) => setusers(u.users))
       .catch((err) => console.log('users fetching failed because of: ', err));
-
-  }, [])
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(search.toLowerCase())
-  );
-  const onsearch_change = (search_input: string) => {
+  }, []);
+  const onsearch_change = async (search_input: string) => {
     if (search_input && search_input.trim()) {
-      console.log('users=', filteredUsers);
-      setsearch(search_input);
-      console.log("search: ", search_input);
-    }
-  }
+      setfilteredusers(
+        users.filter((user) =>
+          user.username.toLowerCase().includes(search_input.toLowerCase())
+        )
+      );
+    } else setfilteredusers([]);
+  };
   return (
     <motion.div
       initial={false}
@@ -62,7 +65,13 @@ export default function Header() {
         </span>
       </div>
       <div className='flex justify-between items-center gap-4'>
-        <button onClick={() => setIsModalOpen(true)} className='cursor-pointer'>
+        <button
+          onClick={() => {
+            setIsModalOpen(true);
+            setfilteredusers([]);
+          }}
+          className='cursor-pointer'
+        >
           {/* Search Icon*/}
           <svg
             className='fill-gray-50'
@@ -84,34 +93,83 @@ export default function Header() {
           <input
             ref={inputRef}
             type='text'
-            onChange={(e) => { onsearch_change(e.target.value.trim()) }}
+            onChange={(e) => {
+              onsearch_change(e.target.value.trim());
+            }}
             placeholder='Username...'
             className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
           />
           {/* <p className='text-sm text-gray-500 mt-2'>Users list</p> */}
-          {/* <div
-            key={filteredUsers.user?.id}
-            onClick={() => {
-              // onSelect(chat.chat_id);
-              // onReceiveChange(otherUser.id);
-            }}
-            // className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
-            //                 hover:bg-gray-800 ${selectedChatId === chat.chat_id ? "bg-gray-700" : ""
-            //   }`}
-          >
-            <img
-              src="/avatars/avatar3.png"
-              alt={`${otherUser.username}`}
-              className="w-12 h-12 rounded-full mr-3"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-white">
-                  {otherUser.username}
-                </h3>
-              </div>
-            </div>
-          </div> */}
+
+          <div className=''>
+            {filteredUsers.map((chat) => {
+              return (
+                <div
+                  key={chat.id}
+                  className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between p-3 my-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors overflow-hidden"
+                >
+                  {/* User Info */}
+                 <div className="flex items-center space-x-4 min-w-0 flex-1">
+                    <img
+                      src={chat.avatar_url}
+                      alt={chat.username}
+                      className='w-12 h-12 rounded-full mr-4 object-cover border-2 border-gray-600'
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <h3 className="text-white font-semibold text-lg truncate overflow-hidden whitespace-nowrap">
+                        {chat.username}
+                      </h3>
+                      <p className='text-gray-400 text-sm truncate'>
+                        {/* Optional: add status or subtitle */}
+
+                        {chat.online_status === 1
+                          ? 'Online'
+                          : chat.online_status === 2
+                            ? 'In Game'
+                            : 'Offline'}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Buttons */}
+                  <div className='flex space-x-2 flex-shrink-0'>
+                    {/* View Profile */}
+                    <div className='relative group'>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // handle view profile
+                        }}
+                        className='p-2 text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors'
+                      >
+                        <Eye className='w-5 h-5' />
+                      </button>
+                      {/* Tooltip */}
+                      <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded-md shadow-lg'>
+                        View Profile
+                      </span>
+                    </div>
+
+                    {/* Add Friend */}
+                    <div className='relative group'>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // handle add friend
+                        }}
+                        className='p-2 text-white bg-green-600 rounded-lg hover:bg-green-500 transition-colors'
+                      >
+                        <UserPlus className='w-5 h-5' />
+                      </button>
+                      {/* Tooltip */}
+                      <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded-md shadow-lg'>
+                        Add Friend
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </Modal>
 
         <Link href='#'>

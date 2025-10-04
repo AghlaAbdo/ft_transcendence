@@ -102,7 +102,7 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
                   }`}
               >
                 <img
-                  src="/avatars/avatar3.png"
+                  src={chat.receiver.avatar_url}
                   alt={`${otherUser.username}`}
                   className="w-12 h-12 rounded-full mr-3"
                 />

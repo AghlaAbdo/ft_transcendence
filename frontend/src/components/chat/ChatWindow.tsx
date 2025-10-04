@@ -21,6 +21,7 @@ type User = {
   email: string;
   createdAt: string;
   updatedAt: string;
+  avatar_url: string;
 };
 
 interface ChatWindowProps {
@@ -49,7 +50,7 @@ export const ChatWindow = ({
           <>
             <div className='flex py-2.5 px-5 items-center rounded-t-[20px] bg-[#1F2937]'>
               <img
-                src='/avatars/avatar3.png'
+                src={other_User?.avatar_url}
                 alt='Imad'
                 className='w-12 h-12 rounded-full mr-3'
               />

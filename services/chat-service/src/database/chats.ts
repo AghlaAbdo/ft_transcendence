@@ -14,7 +14,12 @@ type ChatRow = {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const db = new Database(path.join(__dirname, "../database/chat.db"));
+
+// try
+
+  const db = new Database(path.join(__dirname, "../database/chat.db"));
+
+
 
 export function getChats(userId: number) : ChatRow[]{
   const stmt = db.prepare(`
