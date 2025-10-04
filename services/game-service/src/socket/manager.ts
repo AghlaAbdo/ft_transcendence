@@ -12,6 +12,9 @@ import {
   handleCancelMatching,
   handleJoinTournament,
   handleCreateTournament,
+  handleRequestTournaments,
+  handleRequestTournamentDetails,
+  handleLeaveTournamentLobby,
 } from './handlers';
 
 export function initializeSocketIO(server: http.Server): Server {
@@ -44,6 +47,15 @@ export function initializeSocketIO(server: http.Server): Server {
     );
     socket.on('joinTournament', (userId, tournamentId) =>
       handleJoinTournament(socket, userId, tournamentId),
+    );
+    socket.on('requestTournaments', () => handleRequestTournaments(socket));
+    socket.on(
+      'requestTournamentDetails',
+      (userId: string, tournamentId: string) =>
+        handleRequestTournamentDetails(socket, userId, tournamentId),
+    );
+    socket.on('leaveTournamentLobby', (userId: string, tournamentId: string) =>
+      handleLeaveTournamentLobby(socket, userId, tournamentId),
     );
   });
 

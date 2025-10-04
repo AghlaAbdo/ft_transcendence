@@ -69,8 +69,9 @@ export interface IPlayer {
 
 export interface ITournament {
   id: string;
-  creatorId: string;
   name: string;
+  creatorId: string;
+  creatorUsername: string;
   status: 'waiting' | 'live' | 'completed';
   maxPlayers: number;
   players: Map<string, IPlayer>;

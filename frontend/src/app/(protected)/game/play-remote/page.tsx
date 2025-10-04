@@ -30,6 +30,7 @@ export default function GamePage() {
   const { user } = useUser();
 
   const player: IPlayer = {
+    id: user.id,
     username: user.username,
     avatar: user.avatar_url!,
     frame: 'silver2',

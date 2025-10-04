@@ -7,7 +7,7 @@ export async function getPlayerInfo(userId: string): Promise<IPlayer> {
   // console.log("user in getPlayerInfo: ", user);
 
   return {
-    id: user.id,
+    id: String(user.id),
     username: user.username,
     avatar: user.avatar_url,
     frame: 'silver2',
