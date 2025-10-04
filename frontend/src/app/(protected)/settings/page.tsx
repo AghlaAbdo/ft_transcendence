@@ -117,19 +117,22 @@ const SettingsPage = () => {
 
   const handleUpdateInfo = async (data: FormData) => {
     try {
-      const response = await fetch('https://localhost:8080/api/auth/login', {
+      const response = await fetch('https://localhost:8080/api/users/update-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify( data ),
+        body: JSON.stringify( {
+          username: data.username,
+          email: data.email
+        }),
         credentials: "include"  // allow cookies
       });
 
-      
+      const dataResponse = await response.json();
       if (response.ok) {
-
-        
+        toast.success(dataResponse.message);
+        resetInfo();        
       } else {
-
+        toast.error(dataResponse.message);
       }
     } catch (error) {
       toast.error(`❌ Network error. Please check your connection and try again.`);

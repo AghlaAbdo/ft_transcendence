@@ -32,6 +32,9 @@ const userRoutes = async (fastify, options) => {
         onRequest: [fastify.authenticate]
     }, userController.changePassword);
 
+    fastify.post('/update-info', {
+        onRequest: [fastify.authenticate]
+    }, userController.updateInfo);
 }
 
 export default userRoutes;

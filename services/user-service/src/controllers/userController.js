@@ -179,6 +179,75 @@ const changePassword = async (request, reply) => {
     }
 }
 
+const updateInfo = async (request, reply) => {
+    try {
+        const user = request.user;
+        const { username, email } = request.body;
+
+        if (!username || !email) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username and email are required"
+            });
+        }
+
+        const db = request.server.db;
+
+        const currentUser = db.prepare(`
+            SELECT username, email 
+            FROM USERS 
+            WHERE id = ? 
+        `).get(user.id);
+
+        if (currentUser.username === username && currentUser.email === email) {
+            return reply.code(400).send({
+                status: false,
+                message: "No changes detected"
+            });
+        }
+
+        if (username !== currentUser.username) {
+            const usernameAlreadyExist = userModel.getUserByUsername(db, username);
+            if (usernameAlreadyExist) {
+                return reply.code(409).send({
+                    status: false,
+                    message: "Username is already taken"
+                });
+            }
+        }
+
+        if (email !== currentUser.email) {
+            const emailAlreadyExist = userModel.getUserByEmail(db, email);
+            if (emailAlreadyExist) { 
+                return reply.code(409).send({
+                    status: false,
+                    message: "Email is already registered"
+                });
+            }
+        }
+
+        db.prepare(`
+            UPDATE USERS
+            SET username = ?,
+                email = ?
+            WHERE id = ?
+        `).run(username, email, user.id);
+
+        reply.send({
+            status: true,
+            message: "Profile updated successfully",
+        });
+
+
+    } catch (error) {
+        console.error("Info change failed:", error);
+        return reply.status(500).send({ 
+            status: false,
+            message: "Internal Server Error" 
+        });
+    }
+}
+
 const  getProfile = async (request, reply) => {
 }
 
@@ -188,4 +257,13 @@ const  updateProfile = async (request, reply) => {
 const  deleteAccount = async (request, reply) => {
 }
 
-export default { getUserById, getAllUsers, getProfile, updateProfile, deleteAccount, uploadAvatar, changePassword };
+export default { 
+    getUserById, 
+    getAllUsers, 
+    getProfile, 
+    updateProfile, 
+    deleteAccount, 
+    uploadAvatar, 
+    changePassword,
+    updateInfo 
+};
