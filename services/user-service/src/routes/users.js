@@ -21,6 +21,11 @@ const userRoutes = async (fastify, options) => {
     fastify.get('/',{ 
         // onRequest: [fastify.authenticate] 
     },  userController.getAllUsers); 
+
+
+    fastify.post('/upload-avatar', {
+        onRequest: [fastify.authenticate]
+    }, userController.uploadAvatar);
 }
 
 export default userRoutes;

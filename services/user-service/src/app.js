@@ -8,7 +8,9 @@ import authRoutes from './routes/auth.js';
 import oauthPlugin from './plugins/oauth.js';
 import userRoutes from './routes/users.js';
 import dotenv from 'dotenv';
-
+import multipart from "@fastify/multipart";
+import fastifyStatic from '@fastify/static';
+import path from "path";
 
 const createApp = () => {
     const fastify = Fastify({
@@ -16,7 +18,22 @@ const createApp = () => {
     });
     
     dotenv.config();
+
+    fastify.register(multipart);
+    // fastify.register(fastifyStatic, {
+    //     root: path.join(process.cwd(), "uploads"),
+    //     prefix: "/uploads"
+    // });
+
+    // fastify.register(fastifyStatic, {
+    //     root: path.join(process.cwd(), "uploads"),
+    //     prefix: "/uploads/",
+    // });
     
+    fastify.register(fastifyStatic, {
+        root: path.join(process.cwd(), 'uploads'),
+        prefix: '/uploads/', // URL prefix
+        });
     // fastify.register(fastifyCookie);
     // Session management
     // fastify.register(fastifyCORS, {

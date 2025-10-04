@@ -1,4 +1,6 @@
 import userModel from '../models/userModel.js';
+import fs from "fs";
+import path from "path";
 
 const getUserById = async (request, reply) => {
     const { id } = request.params;
@@ -64,6 +66,50 @@ const  getAllUsers = async (request, reply) => {
     }
 }
 
+const uploadAvatar = async (request, reply) => {
+    try {
+        const user = request.user;
+        const file = await request.file();
+        
+        if (!file) {
+            return reply.code(400).send({
+                status: false,
+                message: "No file uploaded"
+            });
+        }
+
+        const uploadDir = path.join(process.cwd(), "uploads", "avatars");
+
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true});
+        }
+
+        const filePath = path.join(uploadDir, `${user.id}-${file.filename}`);
+
+        const buffer = await file.toBuffer();
+        await fs.promises.writeFile(filePath, buffer);
+        
+        // const avatar_url = `https://localhost:8080/uploads/avatars/${user.id}-${file.filename}`;
+        const avatar_url = `/uploads/avatars/${user.id}-${file.filename}`;    
+        const db = request.server.db;
+
+        db.prepare(`
+            UPDATE USERS
+            SET avatar_url = ?
+            WHERE id = ?
+        `).run(avatar_url,user.id);
+
+        reply.send({
+            status: true,
+            message: "Avatar uploaded successfully"
+        });
+
+    } catch (error) {
+        console.error("Avatar upload failed:", err);
+        return reply.status(500).send( { status: false, error: "Internal Server Error" });
+    }
+}
+
 const  getProfile = async (request, reply) => {
 }
 
@@ -73,4 +119,4 @@ const  updateProfile = async (request, reply) => {
 const  deleteAccount = async (request, reply) => {
 }
 
-export default { getUserById, getAllUsers, getProfile, updateProfile, deleteAccount };
+export default { getUserById, getAllUsers, getProfile, updateProfile, deleteAccount, uploadAvatar };

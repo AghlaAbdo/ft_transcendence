@@ -3,11 +3,13 @@
 import Input from '@/components/auth/Input'
 import TwoFactorAuth from '@/components/auth/TwoFactorAuth';
 import { Mail, Lock, User } from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import * as z from 'zod'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 
 const schema = z.object({
@@ -40,11 +42,16 @@ type ResetPasswordInput = z.infer<typeof changePasswordSchema>;
 
 
 const SettingsPage = () => {
-  const [avatar, setAvatar] = useState<string>("./avatars/avatar2.png");
+  const {user, isLoading} = useAuth();
+  const [avatar, setAvatar] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [activeTab, setActiveTab] = useState<"info" | "security">("info");
-
+  useEffect(() => {
+    if (user?.avatar_url) {
+      setAvatar(user.avatar_url);
+    }
+  }, [user?.avatar_url]);
   const {
     register: registerInfo,
     handleSubmit: handleSubmitInfo,
@@ -65,21 +72,33 @@ const SettingsPage = () => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file  = e.target.files[0];
-      console.log("file : ", file);
+      // console.log("file : ", file);
       
       setAvatar(URL.createObjectURL(file));
 
       const formData = new FormData();
 
-      console.log(formData);
-
       formData.append("avatar", file); // files comes from <input type="file">
 
-      // try {
-      //   const response = await fetch("https://localhost:8080/api/users/");
-      // } catch (error) {
-        
-      // }
+      try {
+        const response = await fetch("https://localhost:8080/api/users/upload-avatar", {
+          method: "POST",
+          // headers: {
+          //   Authorization: `Bearer ${token}`
+          // },
+          body: formData,
+          credentials: "include", // sends the token cookie automatically no Authorization header is required, the browser send token automatically
+        });
+
+        if (response.ok) {
+          toast.success("Avatar uploaded successfully!");
+        } else {
+          toast.error("Failed to upload avatar");
+        }
+      } catch (error) {
+        console.error("Upload failed:", error);
+        toast.error("Failed to upload avatar. Please try again.");
+      }
 
     }
   }
@@ -88,7 +107,7 @@ const SettingsPage = () => {
   }
 
   const handleRemove = () => {
-    setAvatar(null as any);
+    setAvatar("./avatars/avatar2.png");
     // sent request to backend to remove avatar
   }
   const handleUpdateInfo = async (data: FormData) => {

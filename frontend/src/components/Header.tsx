@@ -13,6 +13,10 @@ export default function Header() {
   const { user, isLoading } = useAuth();
   const { hideHeaderSidebar } = useLayout();
 
+  if (user) {
+    console.log(user.avatar_url);
+    
+  }
   return (
     <motion.div
       initial={false}
@@ -34,6 +38,7 @@ export default function Header() {
               width={45}
               height={45}
               className="w-10 h-10 rounded-full object-cover"
+              unoptimized
           />
           <span className='font-bold text-gray-50'>
             Welcome {user.username}
