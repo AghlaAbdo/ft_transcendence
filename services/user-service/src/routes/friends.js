@@ -5,7 +5,12 @@ const friendRoutes = (fastify, options) => {
     fastify.get("/", {
         onRequest: [fastify.authenticate] 
     }, friendController.getAllFriends);
+    
+    fastify.get("/pending", {
+        onRequest: [fastify.authenticate] 
+    }, friendController.getPendingRequests);
 
+    
     fastify.post("/request", {
         onRequest: [fastify.authenticate] 
     }, friendController.sendFriendRequest);
@@ -25,9 +30,6 @@ const friendRoutes = (fastify, options) => {
         onRequest: [fastify.authenticate] 
     }, friendController.removeFriendRequest);
 
-    fastify.get("/pending", {
-        onRequest: [fastify.authenticate] 
-    }, friendController.getPendingRequests);
 
 
     // fastify.post("/friends/send", { onRequest: [fastify.authenticate] }, friendController.sendFriendRequest);

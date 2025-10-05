@@ -1,5 +1,6 @@
 import Friends from '@/components/profile/Friends';
 import { GameHistory1 } from '@/components/profile/GameHistory';
+import UserCard from '@/components/profile/UserCard';
 import React from 'react';
 
 const ProfilePage = () => {
@@ -110,9 +111,16 @@ const ProfilePage = () => {
 
           </div>
 
-          {/* <div className='relative bg-[#021024] rounded-3xl -mt-7 p-8 overflow-hidden border border-slate-800 flex-1'>
+          <div className='relative bg-[#021024] rounded-3xl -mt-7 p-8 overflow-hidden border border-slate-800 flex-1'>
+            <div className='mx-auto'>
+              <UserCard 
+                id={6}
+                username='ayoub'
+                avatar_url="https://ui-avatars.com/api/?name=AY&background=004d7a&color=fff&size=150"
 
-          </div> */}
+              />
+            </div>
+          </div>
       </div>
     </div>    
   )
