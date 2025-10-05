@@ -12,13 +12,18 @@ import {
 export function generateGameState(
   gameId: string,
   player1: IPlayer,
-  plr1SocketId: string,
+  player2: IPlayer | null,
+  tournamentId: string | null,
+  tournamentMatchId: string | null,
 ): IGameState {
   const direction = Math.random() < 0.5 ? 1 : -1;
   const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
   return {
     id: gameId,
     db_id: 0,
+    isTournamentGame: tournamentId ? true : false,
+    tournamentId: tournamentId,
+    tournamentMatchId: tournamentMatchId,
     game: {
       status: 'waiting',
       ball: {
@@ -46,7 +51,7 @@ export function generateGameState(
     },
     player1: {
       id: player1.id,
-      socketId: plr1SocketId,
+      socketId: player1.socketId,
       username: player1.username,
       avatar: player1.avatar,
       frame: player1.frame,
@@ -54,12 +59,12 @@ export function generateGameState(
       ready: false,
     },
     player2: {
-      id: null,
-      socketId: null,
-      username: null,
-      avatar: null,
-      frame: null,
-      level: null,
+      id: player2 ? player2.id : null,
+      socketId: player2 ? player2.socketId : null,
+      username: player2 ? player2.username : null,
+      avatar: player2 ? player2.avatar :null,
+      frame: player2 ? player2.frame : null,
+      level: player2 ? player2.level : null,
       ready: false,
     },
     playersNb: 1,

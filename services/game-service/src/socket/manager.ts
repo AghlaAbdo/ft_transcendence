@@ -10,12 +10,14 @@ import {
   handleRematch,
   handleQuit,
   handleCancelMatching,
+} from './handlers';
+import {
   handleJoinTournament,
   handleCreateTournament,
   handleRequestTournaments,
   handleRequestTournamentDetails,
   handleLeaveTournamentLobby,
-} from './handlers';
+} from './tournamentHandlers';
 
 let ioInstance: Server;
 

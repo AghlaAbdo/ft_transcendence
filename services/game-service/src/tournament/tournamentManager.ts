@@ -1,5 +1,7 @@
+import { generateGameState } from '../remote-game/gameState';
 import { getIoInstance } from '../socket/manager';
 import { ITournament, IRound, IMatch } from '../types/types';
+import { getAllGames } from '../remote-game/AllGames';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -132,4 +134,45 @@ export function startTournament(tournament: ITournament) {
     tournamentId: tournament.id,
     bracket: tournament.bracket,
   });
+
+  const round1 = tournament.bracket[0];
+  if (round1) {
+    round1.matches.forEach((match) => {
+      if (match.player1Id && match.player2Id) {
+        startTournamentMatch(tournament, match);
+      }
+    });
+  }
+}
+
+function startTournamentMatch(tournament: ITournament, match: IMatch) {
+  if (!match.player1Id || !match.player2Id) {
+    console.error(
+      `Match ${match.id} in tournament ${tournament.id} is not ready to start (missing players).`,
+    );
+    return;
+  }
+  const io = getIoInstance();
+
+  const gameId = crypto.randomUUID();
+  const player1Info = tournament.players.get(match.player1Id);
+  const player2Info = tournament.players.get(match.player2Id);
+
+  if (!player1Info || !player2Info) {
+    console.error(`Missing player info for match ${match.id}.`);
+    return;
+  }
+
+  io.sockets.sockets.get(player1Info.socketId)?.join(gameId);
+  io.sockets.sockets.get(player2Info.socketId)?.join(gameId);
+
+  const gameState = generateGameState(gameId, player1Info, player2Info, tournament.id, match.id);
+  getAllGames().games[gameId] = gameState;
+
+  match.gameId = gameId;
+  match.status = 'playing';
+
+  io.to(player1Info.socketId).emit('playerData', {playerRole: 'player1', gameId, player: player1Info});
+  io.to(player2Info.socketId).emit('playerData', {playerRole: 'player2', gameId, player: player2Info});
+
 }

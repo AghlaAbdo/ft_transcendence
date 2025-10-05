@@ -17,6 +17,9 @@ export interface IPaddle {
 export interface IGameState {
   id: string;
   db_id: number;
+  isTournamentGame: boolean;
+  tournamentId: string | null;
+  tournamentMatchId: string | null;
   playersNb: number;
   winner_id: string | null;
   startDate: string | null;
@@ -59,6 +62,7 @@ export interface IGmaes {
 
 export interface IPlayer {
   id: string;
+  socketId: string;
   username: string;
   avatar: string;
   frame: string;
