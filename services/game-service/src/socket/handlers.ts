@@ -21,6 +21,7 @@ import {
   getTournament,
   getAllWaitingTournaments,
   removePlayerFromTournamentLobby,
+  startTournament,
 } from '../tournament/tournamentManager';
 import { ITournament } from '@/types/types';
 
@@ -329,7 +330,7 @@ export async function handleJoinTournament(
     });
 
     if (tournament.players.size === tournament.maxPlayers) {
-      // startTournament(tournament);
+      startTournament(tournament);
       ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
     }
   }

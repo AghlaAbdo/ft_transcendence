@@ -66,9 +66,10 @@ export default function SpecificTournamentPage() {
     });
 
     socket.on(
-      'tournamentStarted',
+      'startTournament',
       (data: { tournamentId: string; bracket: IRound[] }) => {
         console.log('Tournament started:', data.tournamentId);
+        console.log('tournament.bracket: ', data.bracket);
         setHideHeaderSidebar(true);
         setTournament((prev) =>
           prev ? { ...prev, status: 'running', bracket: data.bracket } : null

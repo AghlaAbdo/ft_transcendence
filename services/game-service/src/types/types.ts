@@ -87,6 +87,7 @@ export interface IMatch {
   winnerId: string | null;
   status: 'pending' | 'ready' | 'playing' | 'completed';
   nextMatchId: string | null;
+  nextMatchSlot: string | null;
 }
 
 export interface IRound {

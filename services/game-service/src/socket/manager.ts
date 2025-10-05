@@ -17,6 +17,12 @@ import {
   handleLeaveTournamentLobby,
 } from './handlers';
 
+let ioInstance: Server;
+
+export function getIoInstance() {
+  return ioInstance;
+}
+
 export function initializeSocketIO(server: http.Server): Server {
   const io: Server = new Server(server, {
     path: '/ws/game',
@@ -25,6 +31,7 @@ export function initializeSocketIO(server: http.Server): Server {
       methods: ['GET', 'POST'],
     },
   });
+  ioInstance = io;
 
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');
