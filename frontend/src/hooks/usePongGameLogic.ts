@@ -27,7 +27,10 @@ interface returnType {
   inAnotherGame: boolean;
 }
 
-export const usePongGameLogic = (): returnType => {
+export const usePongGameLogic = (
+  tournamentId: string | null,
+  matchGameId: string | null
+): returnType => {
   const [matching, setMatching] = useState(true);
   const [opponent, setOpponent] = useState<IPlayer | null>(null);
   const [player, setPlayer] = useState<IPlayer | null>(null);
@@ -39,6 +42,7 @@ export const usePongGameLogic = (): returnType => {
   const isPlaying = useRef<boolean>(false);
   const playerRole = useRef<'player1' | 'player2'>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const isTournamentGame = useRef<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pixiApp = useRef<PIXI.Application | null>(null);
@@ -79,7 +83,10 @@ export const usePongGameLogic = (): returnType => {
   }, []);
 
   useEffect(() => {
-    if (matching) return;
+    if (tournamentId) {
+      isTournamentGame.current = true;
+      gameId.current = matchGameId;
+    } else if (matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
       try {
@@ -252,15 +259,14 @@ export const usePongGameLogic = (): returnType => {
   }, []);
 
   useEffect(() => {
-    socket.connect();
+    if (!isTournamentGame.current) socket.connect();
     socket.on('connect', () => {
       console.log('Connected to Socket.IO server!');
       console.log('Socket ID:', socket.id);
     });
 
     console.log('Play Now');
-    socket.emit('play', user.id);
-    // isPlaying.current = true;
+    if (!isTournamentGame.current) socket.emit('play', user.id);
 
     socket.on('inAnotherGame', () => {
       console.log('Already in another game!!!');
@@ -274,7 +280,7 @@ export const usePongGameLogic = (): returnType => {
         gameId: string;
         player: IPlayer;
       }) => {
-        console.log('player role: ', data.playerRole);
+        console.log('palyer Data: ', data);
         if (data.playerRole === 'player1' && endTextRef.current) {
           endTextRef.current.text = 'matching';
         }
@@ -399,8 +405,10 @@ export const usePongGameLogic = (): returnType => {
       if (isPlaying.current) {
         socket.emit('quit', gameId.current, user.id);
       }
-      socket.off();
-      socket.disconnect();
+      if (!isTournamentGame.current) {
+        socket.off();
+        socket.disconnect();
+      }
     };
   }, []);
 

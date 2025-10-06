@@ -31,6 +31,7 @@ export async function handleCreateTournament(
     return;
   }
 
+  user.socketId = socket.id;
   const newTournament = createNewTournament(
     userId,
     user.username,
@@ -79,6 +80,7 @@ export async function handleJoinTournament(
     return;
   }
 
+  user.socketId = socket.id;
   const playerJoined = joinPlayerToTournament(tournament, userId, user, socket);
 
   if (playerJoined) {
@@ -92,7 +94,7 @@ export async function handleJoinTournament(
     });
 
     if (tournament.players.size === tournament.maxPlayers) {
-      startTournament(tournament);
+      setTimeout(() => startTournament(tournament), 2000);
       ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
     }
   }

@@ -25,7 +25,7 @@ export default function GamePage() {
     gameId,
     playerRole,
     inAnotherGame,
-  } = usePongGameLogic();
+  } = usePongGameLogic(null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
 

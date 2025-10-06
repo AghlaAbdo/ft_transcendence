@@ -62,7 +62,7 @@ export function generateGameState(
       id: player2 ? player2.id : null,
       socketId: player2 ? player2.socketId : null,
       username: player2 ? player2.username : null,
-      avatar: player2 ? player2.avatar :null,
+      avatar: player2 ? player2.avatar : null,
       frame: player2 ? player2.frame : null,
       level: player2 ? player2.level : null,
       ready: false,

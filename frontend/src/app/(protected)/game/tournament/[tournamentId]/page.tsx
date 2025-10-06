@@ -80,15 +80,12 @@ export default function SpecificTournamentPage() {
 
     socket.on(
       'matchReady',
-      (data: {
-        gameId: string;
-        tournamentId: string;
-        playerRole: string;
-        opponent: IPlayer;
-      }) => {
+      (data: { gameId: string; tournamentId: string; opponent: IPlayer }) => {
         console.log('Match Ready! Navigating to game:', data.gameId);
         setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent });
-        // router.push(`/tournament/${data.tournamentId}/match/${data.gameId}`);
+        router.push(
+          `/game/tournament/${data.tournamentId}/match/${data.gameId}`
+        );
       }
     );
 
@@ -123,7 +120,7 @@ export default function SpecificTournamentPage() {
       socket.off('leftTournamentLobby');
       socket.off('tournamentError');
       socket.off('redirect');
-      socket.emit('leaveTournamentLobby', user.id, tournamentId);
+      // socket.emit('leaveTournamentLobby', user.id, tournamentId);
     };
   }, [user?.id, tournamentId, router, requestDetails]);
 

@@ -2,6 +2,7 @@ import { generateGameState } from '../remote-game/gameState';
 import { getIoInstance } from '../socket/manager';
 import { ITournament, IRound, IMatch } from '../types/types';
 import { getAllGames } from '../remote-game/AllGames';
+import { startGame } from '../remote-game/gameLogic';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -129,6 +130,7 @@ function generateBracket(tournament: ITournament): void {
 export function startTournament(tournament: ITournament) {
   const io = getIoInstance();
 
+  tournament.status = 'live';
   generateBracket(tournament);
   io.to(tournament.id).emit('startTournament', {
     tournamentId: tournament.id,
@@ -163,16 +165,54 @@ function startTournamentMatch(tournament: ITournament, match: IMatch) {
     return;
   }
 
-  io.sockets.sockets.get(player1Info.socketId)?.join(gameId);
-  io.sockets.sockets.get(player2Info.socketId)?.join(gameId);
+  const player1Socket = io.sockets.sockets.get(player1Info.socketId);
+  const player2Socket = io.sockets.sockets.get(player2Info.socketId);
+  if (!player1Socket || !player2Socket) {
+    console.error("Couldn't get players sockets !!!");
+    return;
+  }
 
-  const gameState = generateGameState(gameId, player1Info, player2Info, tournament.id, match.id);
+  player1Socket.join(gameId);
+  player2Socket.join(gameId);
+
+  const gameState = generateGameState(
+    gameId,
+    player1Info,
+    player2Info,
+    tournament.id,
+    match.id,
+  );
   getAllGames().games[gameId] = gameState;
 
   match.gameId = gameId;
   match.status = 'playing';
 
-  io.to(player1Info.socketId).emit('playerData', {playerRole: 'player1', gameId, player: player1Info});
-  io.to(player2Info.socketId).emit('playerData', {playerRole: 'player2', gameId, player: player2Info});
+  // console.log("player 1 socketId: ", player1Info.socketId);
+  // console.log("player 2 socketId: ", player2Info.socketId);
+  player1Socket.emit('matchReady', {
+    gameId,
+    tournamentId: tournament.id,
+    opponent: player2Info,
+  });
+  player2Socket.emit('matchReady', {
+    gameId,
+    tournamentId: tournament.id,
+    opponent: player1Info,
+  });
 
+  setTimeout(() => {
+    player1Socket.emit('playerData', {
+      playerRole: 'player1',
+      gameId,
+      player: player1Info,
+    });
+    player2Socket.emit('playerData', {
+      playerRole: 'player2',
+      gameId,
+      player: player2Info,
+    });
+    player1Socket.emit('matchFound', player2Info);
+    player2Socket.emit('matchFound', player1Info);
+    startGame(gameState);
+  }, 2000);
 }
