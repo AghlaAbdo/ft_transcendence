@@ -23,13 +23,15 @@ type User = {
   email: string;
   createdAt: string;
   updatedAt: string;
+  avatar_url: string;
 };
 
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const  {user}  = useAuth();
-  // console.log(username, allo);
+  // const [itsmobile, setmobile] = useState<boolean>(false)
+
   const [otherUser, setOtherUser] = useState<User | null>(null);
   useEffect(() => {
     if (user && selectedChatId) {
@@ -84,7 +86,7 @@ export default function ChatPage() {
     );
   return (
     <div className='h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 '>
-      {user && (
+      {!user && (
         <Chatlist
           onSelect={setSelectedChatId}
           selectedChatId={selectedChatId}
@@ -94,7 +96,7 @@ export default function ChatPage() {
         />
       )}
       <div className='flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2'>
-        {user && otherUser && (
+        {user  && (
           <ChatWindow
             SelectedChatId={selectedChatId}
             userId={user!.id}

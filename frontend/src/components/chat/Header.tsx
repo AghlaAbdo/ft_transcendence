@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import avatar from '@/../public/avatars/avatar1.png';
 
-import Modal from './new_conversation';
+import Modal from '../global_search';
 
 // import Styles from './Header.module.css'; // remove this one later
 

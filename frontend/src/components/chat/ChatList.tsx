@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Plus, Search } from "lucide-react";
 import { Search_Input } from "./Search_Input";
 import { formatDistanceToNow } from "date-fns";
-import Modal from "./new_conversation";
 
 interface User {
   id: number;
@@ -63,7 +62,7 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
 
   return (
     <>
-      <div className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 ">
+      <div  className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 ">
         <div className="flex items-center justify-between p-4 border-b border-gray-600">
           <h2 className="text-lg font-semibold text-white">Messages</h2>
 
