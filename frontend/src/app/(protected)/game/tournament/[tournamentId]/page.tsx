@@ -257,6 +257,7 @@ export default function SpecificTournamentPage() {
             <TournamentBracket
               bracket={tournament.bracket}
               currentUserId={user?.id}
+              players={tournament.players}
             />
           </div>
         </>

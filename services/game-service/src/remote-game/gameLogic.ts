@@ -15,6 +15,7 @@ import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
 import { getCurrDate } from '../utils/dates';
 import { removeUserActiveGame } from './userActiveGame';
+import { advancePlayerInTournament } from '../tournament/tournamentManager';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -141,6 +142,14 @@ function gameOver(gameState: IGameState): void {
   gameIntervals[gameState.id] = null;
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
+  if (gameState.isTournamentGame) {
+    advancePlayerInTournament(
+      gameState.tournamentId!,
+      gameState.tournamentMatchId!,
+      gameState.winner_id!,
+    );
+    deleteGame(gameState);
+  }
 }
 
 export function deleteGame(gameState: IGameState): void {

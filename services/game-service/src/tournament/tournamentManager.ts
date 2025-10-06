@@ -3,6 +3,7 @@ import { getIoInstance } from '../socket/manager';
 import { ITournament, IRound, IMatch } from '../types/types';
 import { getAllGames } from '../remote-game/AllGames';
 import { startGame } from '../remote-game/gameLogic';
+import { match } from 'assert';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -215,4 +216,46 @@ function startTournamentMatch(tournament: ITournament, match: IMatch) {
     player2Socket.emit('matchFound', player1Info);
     startGame(gameState);
   }, 2000);
+}
+
+function findMatchById(
+  tournament: ITournament,
+  matchId: string | null,
+): IMatch | undefined {
+  if (!matchId) return undefined;
+  for (const round of tournament.bracket) {
+    const match = round.matches.find((m) => m.id === matchId);
+    if (match) return match;
+  }
+  return undefined;
+}
+
+export function advancePlayerInTournament(
+  tournamentId: string,
+  matchId: string,
+  winnerId: string,
+) {
+  const io = getIoInstance();
+  const tournament = getTournament(tournamentId);
+  if (!tournament) return;
+
+  const currMatch = findMatchById(tournament, matchId);
+  if (!currMatch) return;
+
+  currMatch.status = 'completed';
+  currMatch.winnerId = winnerId;
+
+  if (!currMatch.nextMatchId) {
+    // TODO
+    // the final match
+  }
+
+  const nextMatch = findMatchById(tournament, currMatch.nextMatchId);
+  if (!nextMatch) return;
+
+  if (currMatch.nextMatchSlot === 'player1Id') nextMatch.player1Id = winnerId;
+  else if (currMatch.nextMatchSlot === 'player2Id')
+    nextMatch.player2Id = winnerId;
+
+  io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
 }

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { redirect } from 'next/navigation';
+
 import * as PIXI from 'pixi.js';
 
 import { socket } from '@/app/(protected)/lib/socket';
@@ -351,6 +353,9 @@ export const usePongGameLogic = (
     socket.on('gameOver', () => {
       isPlaying.current = false;
       dialogRef.current?.showModal();
+      setTimeout(() => {
+        redirect(`/game/tournament/${tournamentId}`);
+      }, 2000);
     });
 
     socket.on(

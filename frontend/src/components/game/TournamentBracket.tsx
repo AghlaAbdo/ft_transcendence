@@ -5,13 +5,15 @@ import { IMatch, IRound } from '@/constants/game';
 
 interface TournamentBracketProps {
   bracket: IRound[];
-  currentUserId?: string;
+  currentUserId: string;
+  players: IPlayer[];
 }
 
-const MatchCard: React.FC<{ match: IMatch; currentUserId?: string }> = ({
-  match,
-  currentUserId,
-}) => {
+const MatchCard: React.FC<{
+  match: IMatch;
+  currentUserId?: string;
+  players: IPlayer[];
+}> = ({ match, currentUserId, players }) => {
   const getPlayerDisplay = (playerId: string | null) => {
     if (!playerId) return 'TBD';
     const isCurrentUser = currentUserId && playerId === currentUserId;
@@ -19,7 +21,9 @@ const MatchCard: React.FC<{ match: IMatch; currentUserId?: string }> = ({
       <span
         className={isCurrentUser ? 'font-bold text-pink-400' : 'text-gray-200'}
       >
-        {isCurrentUser ? 'You' : playerId.slice(0, 8) + '...'}
+        {isCurrentUser
+          ? 'You'
+          : players.find((p) => p.id === playerId)?.username}
         {match.winnerId === playerId && ' (W)'}
       </span>
     );
@@ -71,6 +75,7 @@ const MatchCard: React.FC<{ match: IMatch; currentUserId?: string }> = ({
 const TournamentBracket: React.FC<TournamentBracketProps> = ({
   bracket,
   currentUserId,
+  players,
 }) => {
   return (
     <div className='flex justify-center items-start space-x-8 min-w-max'>
@@ -85,6 +90,7 @@ const TournamentBracket: React.FC<TournamentBracketProps> = ({
                 key={match.id}
                 match={match}
                 currentUserId={currentUserId}
+                players={players}
               />
             ))}
           </div>
