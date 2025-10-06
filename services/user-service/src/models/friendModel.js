@@ -13,16 +13,17 @@ const getAllFriends =  (db, id) => {
 }
 
 
-const getPendingRequests = (db, id) => {
+const getPendingRequests = (db, userID) => {
     const query =  `
-        SELECT u.id, u.username, u.online_status, f.status
+        SELECT u.id, u.username, u.online_status, u.avatar_url, f.status, f.created_at
         FROM FRIENDS f
         JOIN USERS u ON u.id = f.friend_id
-        WHERE f.user_id = ?
-        AND f.status = 'pending';
+        WHERE f.friend_id = ?
+        AND f.status = 'pending'
+        ORDER BY f.created_at DESC;
     `;
 
-    return db.prepare(query).all(id);
+    return db.prepare(query).all(userID);
 }
 
 

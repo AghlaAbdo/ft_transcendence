@@ -3,7 +3,25 @@ import friendModel from "../models/friendModel.js";
 const getAllFriends = async (request, reply) => {
 }
 
+// Get friend requests RECEIVED by me
 const getPendingRequests = async (request, reply) => {
+    try {
+        const user_id = request.user.id;
+        const db = request.server.db;
+
+        const requests = friendModel.getPendingRequests(db, user_id);
+
+        reply.code(200).send( {
+            status: true,
+            data: requests,
+            count: requests.length
+        });
+    } catch (error) {
+        return reply.code(500).send({
+            status: false,
+            message: error.message
+        });
+    }
 }
 
 
