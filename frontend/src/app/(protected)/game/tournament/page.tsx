@@ -15,7 +15,7 @@ export default function TournamentLobbyPage() {
   const { user } = useUser();
   const [tournaments, setTournaments] = useState<TournamentListItem[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newTournamentSize, setNewTournamentSize] = useState<number>(8);
+  const [newTournamentSize, setNewTournamentSize] = useState<number>(4);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

@@ -135,7 +135,7 @@ function gameOver(gameState: IGameState): void {
   gameState.game.status = 'ended';
   gameState.player1.ready = false;
   gameState.player2.ready = false;
-  ioInstance.emit('gameOver');
+  ioInstance.to(gameState.id).emit('gameOver');
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
