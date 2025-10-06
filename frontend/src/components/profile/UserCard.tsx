@@ -10,7 +10,7 @@ interface UserCardProps {
 }
 
 export default function UserCard({ id, username, avatar_url }: UserCardProps) {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const handleAddFriend = async () => {
     try {
@@ -39,7 +39,7 @@ export default function UserCard({ id, username, avatar_url }: UserCardProps) {
 
   return (
     <div className="flex items-center justify-between bg-slate-800 p-4 rounded-2xl shadow-md w-full max-w-md hover:bg-slate-700 transition">
-
+      
       <div className="flex items-center gap-4">
         <img
           src={avatar_url}
@@ -68,7 +68,6 @@ export default function UserCard({ id, username, avatar_url }: UserCardProps) {
         >
           {loading ? "Sending..." : "Add Friend"}
         </button>
-
       </div>
     </div>
   );

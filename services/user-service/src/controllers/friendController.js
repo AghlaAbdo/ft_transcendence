@@ -3,27 +3,163 @@ import friendModel from "../models/friendModel.js";
 const getAllFriends = async (request, reply) => {
 }
 
+const getPendingRequests = async (request, reply) => {
+}
+
+
 const sendFriendRequest = async (request, reply) => {
+    try {
+        const user_id = request.user.id;
+        const { friend_id } = request.body;
+
+        if (!friend_id) {
+            return reply.code(400).send({ status: false, message: "friend_id is required"});
+        }
+
+        const db = request.server.db;
+
+        const id = friendModel.sendFriendRequest(db, { user_id, friend_id });
+
+        reply.send({
+            status: true,
+            message: "Friend request sent successfully!",
+            friendRequestId: id
+        });
+    } catch (error) {
+        const statusCode = error.message.includes('not found') ? 404 :
+                          error.message.includes('already') ? 409 : 500;
+        
+        return reply.code(statusCode).send({
+            status: false,
+            message: error.message
+        });
+    }
 }
 
 const acceptFriendRequest = async (request, reply) => {
+    try {
+        const requester_id = parseInt(request.params.id);
+        const accepter_id = request.user.id;
+
+        if (!requester_id) {
+            return reply.code(400).send({ 
+                status: false, 
+                message: "user_id is required"
+            });
+        }
+
+        if (requester_id === accepter_id) {
+            return reply.code(400).send({ 
+                status: false, 
+                message: "Cannot accept your own request"
+            });
+        }
+
+        const db = request.server.db;
+        
+        friendModel.acceptFriendRequest(db, {
+            user_id : requester_id,
+            friend_id: accepter_id
+        });
+
+        reply.code(200).send({
+            status: true,
+            message: "Friend request accepted successfully"
+        });
+    } catch (error) {
+        const statusCode = error.message.includes('not found') ? 404 : 500;
+        
+        return reply.code(statusCode).send({
+            status: false,
+            message: error.message
+        });
+    }
 }
 
 const rejectFriendRequest = async (request, reply) => {
+    try {
+        const requester_id = parseInt(request.params.id);
+        const accepter_id = request.user.id;
+
+        if (!requester_id) {
+            return reply.code(400).send({ 
+                status: false, 
+                message: "user_id is required"
+            });
+        }
+
+        if (requester_id === accepter_id) {
+            return reply.code(400).send({ 
+                status: false, 
+                message: "Cannot accept your own request"
+            });
+        }
+
+        const db = request.server.db;
+
+        friendModel.rejectFriendRequest(db, {
+            user_id : requester_id,
+            friend_id: accepter_id
+        });
+
+        return reply.code(200).send({
+            status: true,
+            message: "Friend request rejected successfully"
+        });
+    } catch (error) {
+        const statusCode = error.message.includes('not found') ? 404 : 500;
+        return reply.code(statusCode).send({
+            status: false,
+            message: error.message
+        });
+    }
 }
 
-const removeFriendRequest = async (request, reply) => {
+const removeFriend = async (request, reply) => {
+    try {
+        const user_id = request.user.id;
+        const friend_id = parseInt(request.params.friend_id);
+
+        if (!friend_id) {
+            return reply.code(400).send({ 
+                status: false, 
+                message: "friend_id is required"
+            });
+        }
+
+        if (user_id === friend_id) {
+            return reply.code(400).send({ 
+                status: false, 
+                message: "Invalid operation"
+            });
+        }
+
+        const db = request.server.db;
+
+        friendModel.rejectFriend(db, { user_id, friend_id });
+
+        return reply.code(200).send({
+            status: true,
+            message: "Friend removed successfully"
+        });
+        
+    } catch (error) {
+        const statusCode = error.message.includes('not found') ? 404 : 500;
+        
+        return reply.code(statusCode).send({
+            status: false,
+            message: error.message
+        });
+    }
 }
 
 
-const getPendingRequests = async (request, reply) => {
-}
 
 export default {
     getAllFriends,
     sendFriendRequest,
     acceptFriendRequest,
     rejectFriendRequest,
-    removeFriendRequest,
-    removeFriendRequest
+    removeFriend,
+    getPendingRequests
 };

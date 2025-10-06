@@ -16,19 +16,19 @@ const friendRoutes = (fastify, options) => {
     }, friendController.sendFriendRequest);
 
 
-    fastify.post("/accept/:id", {
+    fastify.put("/accept/:id", {
         onRequest: [fastify.authenticate] 
     }, friendController.acceptFriendRequest);
 
 
-    fastify.post("/reject/:id", {
+    fastify.delete("/reject/:id", {
         onRequest: [fastify.authenticate] 
     }, friendController.rejectFriendRequest);
 
 
-    fastify.post("/remove/:id", {
+    fastify.delete("/remove/:friend_id", {
         onRequest: [fastify.authenticate] 
-    }, friendController.removeFriendRequest);
+    }, friendController.removeFriend);
 
 
 
