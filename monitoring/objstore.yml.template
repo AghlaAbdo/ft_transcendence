@@ -1,0 +1,8 @@
+type: S3
+config:
+  bucket: "trans-prometheus-archive"
+  endpoint: "s3.amazonaws.com"
+  region: "eu-north-1"  
+  access_key: "${ACCESS_KEY_ID}"
+  secret_key: "${SECRET_ACCESS_KEY}"
+  insecure: false

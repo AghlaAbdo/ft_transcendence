@@ -1,33 +1,40 @@
 'use client'
 
 import Badge from "@/components/leaderboard/Badge";
-import { get_leaderboard } from "../lib/leaderboard";
+import { get_all_leaderboard, get_top_players, get_paginated_players } from "../lib/leaderboard";
 import Table from "@/components/leaderboard/Table";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState, useMemo, use } from "react";
 import { Player } from "@/constants/leaderboard";
+
+interface PlayerWithRank extends Player {
+    rank: number;
+}
+
 export default function Leaderboard({
     searchParams,
 }: {
-    searchParams: { page?: string }
+    searchParams: Promise<{ page?: string }>
 }) {
-    const [players, setPlayers] = useState<Player[]>([])
-    const [topPlayers, setTopPlayers] = useState<Player[]>([])
+    const resolvedSearchParams = use(searchParams)
+    const [allPlayers, setAllPlayers] = useState<PlayerWithRank[]>([])
     const [loading, setLoading] = useState(true)
     const widthMap: Map<number, number> = new Map()
     widthMap.set(1, 30)
     widthMap.set(2, 30)
     widthMap.set(3, 50)
     const limit = 20
-    const page = Number(searchParams.page) || 1
-    const numOfPlayers = 50
+    const page = Number(resolvedSearchParams.page) || 1
+
+    const numOfPlayers = allPlayers.length
     const numOfPages = Math.ceil(numOfPlayers / limit)
-    const offset = (page - 1) * limit
+
+    const topPlayers = useMemo(() => get_top_players(allPlayers), [allPlayers])
+    const players = useMemo(() => get_paginated_players(allPlayers, page, limit), [allPlayers, page, limit])
+
     useEffect(() => {
         async function getLeaderboard() {
-            const players = await get_leaderboard(page, offset, false)
-            const topPlayers = await get_leaderboard(page, offset, true)
-            setPlayers(players)
-            setTopPlayers(topPlayers)
+            const allPlayersData = await get_all_leaderboard()
+            setAllPlayers(allPlayersData)
             setLoading(false)
         }
         getLeaderboard()
