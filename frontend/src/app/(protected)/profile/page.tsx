@@ -113,7 +113,7 @@ const ProfilePage = () => {
 
           </div>
 
-          <div className='relative bg-[#021024] rounded-3xl -mt-7 p-8 overflow-hidden border border-slate-800 flex-1  gap-2'>
+          {/* <div className='relative bg-[#021024] rounded-3xl -mt-7 p-8 overflow-hidden border border-slate-800 flex-1  gap-2'>
             <div className=' flex flex-col gap-2'>
               <p className='text-2xl font-bold text-center'>send request</p>
               <UserCard 
@@ -136,17 +136,8 @@ const ProfilePage = () => {
                 username='aben-cha1'
                 avatar_url="/uploads/avatars/4-avatar4.png"
               />
-
-            {/* {friendRequests.map(req => (
-              <FriendRequestCard
-                key={req.id}
-                id={req.sender_id}
-                username={req.sender_username}
-                avatar={req.sender_avatar}
-              />
-            ))} */}
             </div>
-          </div>
+          </div> */}
       </div>
     </div>    
   )

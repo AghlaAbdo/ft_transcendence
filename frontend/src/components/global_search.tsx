@@ -57,6 +57,8 @@
 import { Eye, UserPlus, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: number;
@@ -116,7 +118,37 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
       setFilteredUsers([]);
     }
   }, [searchTerm, users, user]);
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
+  const handleViewProfile = (id: number) => {
+    router.push(`/profile/${id}`);
+  }
+  const handleAddFriend = async (user: User) => {
+    try {
+      
+      setLoading(true);
+      
+      const response = await fetch("https://localhost:8080/api/friends/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ friend_id: user.id }),
+      });
+      
+      console.log('friend_id :', user.id);
+      if (response.ok) {
+        toast.success(`Friend request sent to ${user.username}`);
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Failed to send friend request");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="space-y-3">
       {/* Search Header */}
@@ -199,9 +231,9 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
               {/* View Profile */}
               <div className="relative group">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // handle view profile
+                  onClick={() => {
+                    toast.info(`Viewing ${chat.username}'s profile`);
+                    handleViewProfile(chat.id);
                   }}
                   className="p-2 text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors"
                   >
@@ -216,10 +248,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
               {/* Add Friend */}
               <div className="relative group">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // handle add friend
-                  }}
+                  onClick={() => handleAddFriend(chat)}
                   className="p-2 text-white bg-green-600 rounded-lg hover:bg-green-500 transition-colors"
                   >
                   <UserPlus className="w-5 h-5" />
