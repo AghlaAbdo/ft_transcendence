@@ -28,6 +28,15 @@ services:
   #     ./services/game-service/.env.dev
   #   ports:
   #     - "4000:4000"
+  # game-service:
+  #   build:
+  #     target: development
+  #   volumes:
+  #     - ./services/game-service:/app
+  #   env_file:
+  #     ./services/game-service/.env.dev
+  #   ports:
+  #     - "4000:4000"
 
   user-service:
     build:
@@ -37,11 +46,10 @@ services:
     volumes:
       - ./services/user-service/:/app
 
-  # chat-service:
-  #   build:
-  #     target: base
-  #   env_file:
-  #     ./services/chat-service/.env
-    # volumes:
-    #   - ./chat-service/back-end/src:/app/src
-    #   - ./chat-service/back-end/chat.db:/app/chat.db
+  chat-service:
+    build:
+      target: development
+    env_file:
+      ./services/chat-service/.env
+    volumes:
+      - ./services/chat-service/:/app

@@ -13,6 +13,6 @@ CMD ["/usr/local/bin/run_dev.sh"]
 # CMD ["npm", "run", "dev"]
 
 FROM base AS production
-COPY . .
+# COPY . .
 RUN npm run build
 CMD ["npm", "run", "start"]
