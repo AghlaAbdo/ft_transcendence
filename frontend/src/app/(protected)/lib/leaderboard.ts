@@ -33,7 +33,9 @@ export async function get_all_leaderboard(): Promise<PlayerWithRank[]> {
                 score: user.points || 0,
                 winrate: winrate,
                 games: totalGames,
-                avatar_url: user.avatar_url
+                avatar_url: user.avatar_url,
+                wins,
+                losses
             }
         })
 
@@ -57,4 +59,12 @@ export function get_paginated_players(players: PlayerWithRank[], page: number, l
     const start = (page - 1) * limit
     const end = start + limit
     return players.slice(start, end)
+}
+
+export function get_user_by_username(players: PlayerWithRank[], username: string): PlayerWithRank {
+    const user = players.find(player => player.username === username)
+    if (!user) {
+        throw new Error(`User '${username}' not found in leaderboard`)
+    }
+    return user
 }

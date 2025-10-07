@@ -23,7 +23,7 @@ interface WeeklyGamesChartProps {
 }
 
 export default function BarChart({
-    weeklyData = [20, 10, 7, 14]
+    weeklyData = [0, 0, 0, 0]
 }: WeeklyGamesChartProps) {
     const currentDate = new Date();
     const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
