@@ -1,9 +1,11 @@
+import FriendRequestCard from '@/components/profile/FriendRequestCard';
 import Friends from '@/components/profile/Friends';
 import { GameHistory1 } from '@/components/profile/GameHistory';
 import UserCard from '@/components/profile/UserCard';
 import React from 'react';
 
 const ProfilePage = () => {
+
   return (
     <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
       <div className="flex-1 rounded-[20px] flex flex-col mt-10 my-2 gap-2 max-w-7xl mx-auto">
@@ -111,14 +113,38 @@ const ProfilePage = () => {
 
           </div>
 
-          <div className='relative bg-[#021024] rounded-3xl -mt-7 p-8 overflow-hidden border border-slate-800 flex-1'>
-            <div className='mx-auto'>
+          <div className='relative bg-[#021024] rounded-3xl -mt-7 p-8 overflow-hidden border border-slate-800 flex-1  gap-2'>
+            <div className=' flex flex-col gap-2'>
+              <p className='text-2xl font-bold text-center'>send request</p>
               <UserCard 
-                id={6}
-                username='ayoub'
-                avatar_url="https://ui-avatars.com/api/?name=AY&background=004d7a&color=fff&size=150"
-
+                id={4}
+                username='aben-cha1'
+                avatar_url="/uploads/avatars/4-avatar4.png"
               />
+              <p></p>
+              <UserCard 
+                id={5}
+                username='aben-cha2'
+                avatar_url="/uploads/avatars/5-avatar3.png"
+              />
+            </div>
+            <div className='flex flex-col gap-2'>
+              <p className='text-2xl font-bold text-center'>All Pending Requests</p>
+
+              <FriendRequestCard
+                id={4}
+                username='aben-cha1'
+                avatar_url="/uploads/avatars/4-avatar4.png"
+              />
+
+            {/* {friendRequests.map(req => (
+              <FriendRequestCard
+                key={req.id}
+                id={req.sender_id}
+                username={req.sender_username}
+                avatar={req.sender_avatar}
+              />
+            ))} */}
             </div>
           </div>
       </div>

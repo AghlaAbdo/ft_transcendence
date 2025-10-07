@@ -29,7 +29,7 @@ const sendFriendRequest = async (request, reply) => {
     try {
         const user_id = request.user.id;
         const { friend_id } = request.body;
-
+            
         if (!friend_id) {
             return reply.code(400).send({ status: false, message: "friend_id is required"});
         }

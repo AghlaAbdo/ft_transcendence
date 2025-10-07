@@ -10,19 +10,21 @@ interface UserCardProps {
 }
 
 export default function UserCard({ id, username, avatar_url }: UserCardProps) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleAddFriend = async () => {
     try {
+      
       setLoading(true);
-
-      const response = await fetch("https://localhost:8080/api/friends/add", {
+      
+      const response = await fetch("https://localhost:8080/api/friends/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // send cookie/token
+        credentials: "include",
         body: JSON.stringify({ friend_id: id }),
       });
-
+      
+      console.log('friend_id :', id);
       if (response.ok) {
         toast.success(`Friend request sent to ${username}`);
       } else {

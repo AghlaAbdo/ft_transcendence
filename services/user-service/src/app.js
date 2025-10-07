@@ -7,6 +7,7 @@ import authPlugin from './plugins/auth.js';
 import authRoutes from './routes/auth.js';
 import oauthPlugin from './plugins/oauth.js';
 import userRoutes from './routes/users.js';
+import friendRoutes from './routes/friends.js'
 import dotenv from 'dotenv';
 import multipart from "@fastify/multipart";
 import fastifyStatic from '@fastify/static';
@@ -62,6 +63,7 @@ const createApp = () => {
 
     fastify.register(authRoutes, { prefix: '/api/auth' });
     fastify.register(userRoutes, { prefix: '/api/users' });
+    fastify.register(friendRoutes, { prefix: '/api/friends' });
 
     // Health check
     fastify.get('/health', async (request, reply) => {
