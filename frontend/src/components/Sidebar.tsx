@@ -51,7 +51,7 @@ export default function Sidebar() {
         duration: 0.3,
         ease: 'easeInOut',
       }}
-      className={` bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center `}
+      className={` bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full hidden md:flex flex-col justify-between items-center `}
     >
       <div className='flex flex-col items-center gap-[70px] z-1000'>
         <Link href='/'>

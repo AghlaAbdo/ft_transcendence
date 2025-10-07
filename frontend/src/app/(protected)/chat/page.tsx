@@ -6,7 +6,7 @@ import { Chatlist } from '@/components/chat/ChatList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { useAuth } from '@/hooks/useAuth';
-import Loading from './loading';
+import ChatListSkeleton from '@/components/chat/chatlist_loading';
 
 interface conversation {
   id: number;
@@ -29,10 +29,23 @@ type User = {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const  {user}  = useAuth();
-  // const [itsmobile, setmobile] = useState<boolean>(false)
-
+  const {user} = useAuth();
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [showChatList, setShowChatList] = useState(true);
   const [otherUser, setOtherUser] = useState<User | null>(null);
+  
+  // Mobile detection
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024);
+      if (selectedChatId)
+        setShowChatList(false);
+    };
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, [selectedChatId]);
+  
   useEffect(() => {
     if (user && selectedChatId) {
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`) //protect with async, axios
@@ -78,36 +91,84 @@ export default function ChatPage() {
       }
   }, [user]);
 
+  // Navigation handlers
+  const handleChatSelect = (chatId: number) => {
+    setSelectedChatId(chatId);
+    if (isMobile) {
+      setShowChatList(false);
+    }
+  };
+
+  const handleBackToChatList = () => {
+    setShowChatList(true);
+    setSelectedChatId(null);
+  };
+
   if (!user)
     return (
       <>
-        <Loading />
+        <ChatListSkeleton />
       </>
     );
+    
   return (
-    <div className='h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 '>
-      {!user && (
-        <Chatlist
-          onSelect={setSelectedChatId}
-          selectedChatId={selectedChatId}
-          userId={user.id}
-          onReceiveChange={SetUser_2}
-          conv={conv_}
-        />
-      )}
-      <div className='flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2'>
-        {user  && (
-          <ChatWindow
-            SelectedChatId={selectedChatId}
-            userId={user!.id}
+    <div className='h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2'>
+      {/*big screens  */}
+      {!isMobile ? (
+        <>
+          <Chatlist
+            onSelect={handleChatSelect}
+            selectedChatId={selectedChatId}
+            userId={user.id}
+            onReceiveChange={SetUser_2}
             conv={conv_}
-            other_User={otherUser}
           />
-        )}
-        {user && selectedChatId && (
-          <MessageInput onSendMessage={handleSendMessage} />
-        )}
-      </div>
+          <div className='flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2'>
+            {(
+              <ChatWindow
+                SelectedChatId={selectedChatId}
+                userId={user.id}
+                conv={conv_}
+                other_User={otherUser}
+              />
+            )}
+            {selectedChatId && (
+              <MessageInput onSendMessage={handleSendMessage} />
+            )}
+          </div>
+        </>
+      ) : (
+        /*mobile */
+        <>
+          {showChatList ? (
+            <div className='w-full '>
+              <Chatlist
+                onSelect={handleChatSelect}
+                selectedChatId={selectedChatId}
+                userId={user.id}
+                onReceiveChange={SetUser_2}
+                conv={conv_}
+              />
+            </div>
+          ) : (
+            <div className='w-full bg-[#021024] rounded-[20px] flex flex-col my-2'>
+              {(
+                <ChatWindow
+                  SelectedChatId={selectedChatId}
+                  userId={user.id}
+                  conv={conv_}
+                  other_User={otherUser}
+                  onBackClick={handleBackToChatList}
+                  showBackButton={true}
+                />
+              )}
+              {selectedChatId && (
+                <MessageInput onSendMessage={handleSendMessage} />
+              )}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

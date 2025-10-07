@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { motion } from 'framer-motion';
 
@@ -12,9 +11,13 @@ import { useLayout } from '@/context/LayoutContext';
 
 import { GlobalSearch } from './global_search';
 
+import { Notification } from './notifications';
+
 export default function Header() {
   const { hideHeaderSidebar } = useLayout();
   const [isopen, setopen] = useState<boolean>(false);
+  const [not_isopen, set_notopen] = useState<boolean>(false);
+
   useEffect(() =>{
     if (!isopen) return;
     const handleEsckey = (e: KeyboardEvent) =>{
@@ -26,6 +29,19 @@ export default function Header() {
       document.removeEventListener('keydown', handleEsckey);
     }
   },[isopen])
+
+  useEffect(() =>{
+    if (!not_isopen) return;
+    const handleEsckey = (e: KeyboardEvent) =>{
+      if (e.key === 'Escape') 
+        setopen(false)
+    }
+    document.addEventListener('keydown', handleEsckey)
+    return () =>{
+      document.removeEventListener('keydown', handleEsckey);
+    }
+  },[not_isopen])
+
   return (
     <>
       <motion.div
@@ -60,7 +76,7 @@ export default function Header() {
               <path d='M6 0C9.312 0 12 2.688 12 6C12 9.312 9.312 12 6 12C2.688 12 0 9.312 0 6C0 2.688 2.688 0 6 0ZM6 10.6667C8.578 10.6667 10.6667 8.578 10.6667 6C10.6667 3.422 8.578 1.33333 6 1.33333C3.422 1.33333 1.33333 3.422 1.33333 6C1.33333 8.578 3.422 10.6667 6 10.6667ZM11.6567 10.714L13.5427 12.5993L12.5993 13.5427L10.714 11.6567L11.6567 10.714Z' />
             </svg>
           </button>
-          <button className='cursor-pointer'>
+          <button className='cursor-pointer' onClick={()=>set_notopen(true)}>
             {/* Notification Icon */}
             <svg
               className='stroke-gray-50'
@@ -98,12 +114,31 @@ export default function Header() {
         onClick={() => setopen(false)}
       >
         <div
-          className={`absolute xl:right-5 md:ml-5 bg-slate-900 rounded-lg p-2.5 w-full max-w-lg h-fit transform transition-all duration-300 ease-out ${
+          className={`absolute bg-slate-900 rounded-lg p-2.5 h-fit transform transition-all duration-300 ease-out mx-2 w-[calc(100%-16px)] md:right-3 md:mx-0 md:w-full md:max-w-lg ${
             isopen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
           }`}
           onClick={(e) => e.stopPropagation()}
         >
           <GlobalSearch onClose={() => setopen(false)} />
+        </div>
+      </div>
+
+
+      <div
+        className={`fixed inset-0 bg-black/50 z-50 pt-5 transition-opacity duration-200 ease-out ${
+          not_isopen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => set_notopen(false)}
+      >
+        <div
+          className={`absolute bg-slate-900 rounded-lg p-2.5 h-fit transform transition-all duration-300 ease-out mx-2 w-[calc(100%-16px)] md:right-3 md:mx-0 md:w-full md:max-w-lg ${
+            not_isopen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Notification onClose={() => set_notopen(false)} />
         </div>
       </div>
     </>

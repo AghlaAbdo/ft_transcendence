@@ -62,20 +62,9 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
 
   return (
     <>
-      <div  className="w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 ">
+      <div className="lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]">
         <div className="flex items-center justify-between p-4 border-b border-gray-600">
           <h2 className="text-lg font-semibold text-white">Messages</h2>
-
-
-          {/* <button
-            className="bg-purple-600 hover:bg-purple-700 rounded-lg p-2 transition-colors"
-            // onClick={() => setIsModalOpen(true)} // open modal
-          >
-            <Plus className="h-5 w-5 text-white font-semibold" />
-          </button> */}
-
-          {/* Modal */}
-          
 
         </div>
         <div className="p-4">
@@ -86,7 +75,7 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
             />
           </div>
         </div>
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 flex-1 overflow-y-auto">
           {filteredChats.map((chat) => {
             const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
             return (
@@ -107,10 +96,10 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-white">
+                    <h3 className="font-semibold text-white truncate flex-1">
                       {otherUser.username}
                     </h3>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-400 min-w-[60px] flex-shrink-0 ml-2">
                       {
                         formatDistanceToNow(
                           new Date(chat.last_message_timestamp + "Z").toLocaleString(),

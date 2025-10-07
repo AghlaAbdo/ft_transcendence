@@ -29,6 +29,8 @@ interface ChatWindowProps {
   userId: number | null;
   conv: Message[];
   other_User: User | null;
+  onBackClick?: () => void;
+  showBackButton?: boolean;
 }
 
 export const ChatWindow = ({
@@ -36,11 +38,14 @@ export const ChatWindow = ({
   userId,
   conv,
   other_User,
+  onBackClick,
+  showBackButton = false,
 }: ChatWindowProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    console.log('user in chat window: ', other_User?.username);
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // console.log('user in chat window: ', other_User?.username);
+    // messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    messagesEndRef.current?.scrollIntoView();
   }, [conv, SelectedChatId]);
 
   return (
@@ -49,6 +54,26 @@ export const ChatWindow = ({
         {SelectedChatId ? (
           <>
             <div className='flex py-2.5 px-5 items-center rounded-t-[20px] bg-[#1F2937]'>
+              {showBackButton && (
+                <button
+                  onClick={onBackClick}
+                  className='mr-3 text-white hover:text-gray-300 transition-colors duration-200'
+                >
+                  <svg
+                    width='20'
+                    height='20'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  >
+                    <path d='M19 12H5'/>
+                    <path d='M12 19l-7-7 7-7'/>
+                  </svg>
+                </button>
+              )}
               <img
                 src={other_User?.avatar_url}
                 alt='Imad'
@@ -69,7 +94,7 @@ export const ChatWindow = ({
               </div>
             </div>
             <div
-              className='flex-1 p-3 overflow-y-auto
+              className='flex-1 p-3 overflow-y-auto scroll-smooth
   [&::-webkit-scrollbar]:w-2.5
   [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-track]:bg-gray-100

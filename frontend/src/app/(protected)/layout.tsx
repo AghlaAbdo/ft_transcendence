@@ -15,7 +15,7 @@ const AppLayout = ({
     // </div>
     <div className='text-white'>
       <LayoutProvider>
-        <Sidebar />
+        <Sidebar  />
         <Header />
         <main className='mt-[72px] md:ml-[72px]'>{children}</main>
       </LayoutProvider>
