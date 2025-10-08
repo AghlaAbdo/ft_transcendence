@@ -21,20 +21,12 @@ const createApp = () => {
     dotenv.config();
 
     fastify.register(multipart);
-    // fastify.register(fastifyStatic, {
-    //     root: path.join(process.cwd(), "uploads"),
-    //     prefix: "/uploads"
-    // });
 
-    // fastify.register(fastifyStatic, {
-    //     root: path.join(process.cwd(), "uploads"),
-    //     prefix: "/uploads/",
-    // });
     
     fastify.register(fastifyStatic, {
         root: path.join(process.cwd(), 'uploads'),
         prefix: '/uploads/', // URL prefix
-        });
+    });
     // fastify.register(fastifyCookie);
     // Session management
     // fastify.register(fastifyCORS, {

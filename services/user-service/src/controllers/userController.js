@@ -24,7 +24,15 @@ const getUserById = async (request, reply) => {
                 message: 'No user found'
             });
         }
-        const { password, resetPasswordToken, ...userWhitoutPassword } = user;
+        const { password, 
+                resetPasswordToken, 
+                verificationToken, 
+                verificationTokenExpiresAt, 
+                resetPasswordExpiresAt,
+                createdAt,
+                updatedAt,
+                location,
+                ...userWhitoutPassword } = user;
 
         reply.send({
             status: true,

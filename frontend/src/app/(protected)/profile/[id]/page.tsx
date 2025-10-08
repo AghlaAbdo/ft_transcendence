@@ -5,13 +5,57 @@ import Friends from '@/components/profile/Friends';
 import { GameHistory1 } from '@/components/profile/GameHistory';
 import UserCard from '@/components/profile/UserCard';
 import { useParams } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { User } from '@/hooks/useAuth';
+import { toast } from 'sonner';
+import { lookupService } from 'dns';
+// interface User { 
+
+// }
 
 const ProfilePage = () => {
 
   const { id } = useParams();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  console.log("------: id: ", id);
+  // console.log("------: id: ", id);
+
+  useEffect( () => {
+    const fetchUserById = async () => {
+      try {
+        if (!id) 
+          return;
+        const response = await fetch(`https://localhost:8080/api/users/${id}`, {
+          credentials: "include"
+        });
+
+        const data: {status: string, user: User, message: string} = await response.json();
+
+        if (response.ok && data.status) {
+          setUser(data.user);
+        } else {
+          throw new Error(data.message || "Failed to load user");
+        }
+        } catch (error: any) {
+          setError(error.message);
+        } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserById();
+  }, [id]);
+
+  if (loading) 
+    return <p className="text-gray-400">Loading profile...</p>;
+  
+  if (error)
+    return <p className="text-red-500">{error}</p>;
+
+  if (!user) 
+    return <p className="text-gray-500">User not found</p>;
   
   return (
     <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
@@ -24,11 +68,20 @@ const ProfilePage = () => {
               <div className='flex-1 justify-items-center flex justify-center'>
           
                   <img 
-                    src="/avatars/avatar3.png" 
+                    src={user.avatar_url || "/avatars/avatar3.png"} 
                     alt="avatar"
                     className="absolute top-55 w-44 h-44 rounded-full z-2  " 
                     />
-                  <span className='absolute -mt-20 ml-29 w-5 h-5 rounded-full  bg-green-500'></span>
+
+                  <span
+                    className={`absolute -mt-20 ml-29 w-5 h-5 rounded-full z-10 ${
+                      user.online_status === 0
+                        ? "bg-yellow-500"   // offline
+                        : user.online_status === 1
+                        ? "bg-green-500"  // online
+                        : "bg-orange-500"   // ingame
+                    }`}
+                  ></span>
 
               </div>
 
@@ -44,20 +97,20 @@ const ProfilePage = () => {
                         <div className="ml-10 grid grid-cols-3 mt-8 mx-auto gap-10 text-center text-lg md:text-xl">
                           <div>
                             <p className="text-gray-400">Total Game</p>
-                            <p className="font-bold">156</p>
+                            <p className="font-bold">{ user.wins + user.losses }</p>
                           </div>
                           <div>
                             <p className="text-gray-400">Win</p>
-                            <p className="font-bold">85</p>
+                            <p className="font-bold">{user.wins}</p>
                           </div>
                           <div>
                             <p className="text-gray-400">Loss</p>
-                            <p className="font-bold">25</p>
+                            <p className="font-bold">{user.losses}</p>
                           </div>
                         </div>
 
                         <div className="text-lg md:text-xl">
-                          <h2 className="text-center mt-15 font-semibold">username1</h2>
+                          <h2 className="text-center mt-15 font-semibold">{user.username}</h2>
                         </div>
 
                         <div className="mr-10 mx-auto grid grid-cols-2 mt-8 gap-15 text-center text-lg md:text-xl">
@@ -67,7 +120,7 @@ const ProfilePage = () => {
                           </div>
                           <div>
                             <p className="text-gray-400">Rank</p>
-                            <p className="font-bold">15</p>
+                            <p className="font-bold">{ user.rank }</p>
                           </div>
                         </div>
 

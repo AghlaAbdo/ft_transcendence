@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS USERS (
     
     -- Profile info
     location VARCHAR(100),
-    online_status BOOLEAN NOT NULL DEFAULT FALSE,
+    -- online_status BOOLEAN NOT NULL DEFAULT FALSE,
+    online_status INTEGER NOT NULL DEFAULT 0,
+
     
     -- Timestamps
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,

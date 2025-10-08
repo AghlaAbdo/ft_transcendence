@@ -24,7 +24,6 @@ const getPendingRequests = async (request, reply) => {
     }
 }
 
-
 const sendFriendRequest = async (request, reply) => {
     try {
         const user_id = request.user.id;
@@ -170,8 +169,6 @@ const removeFriend = async (request, reply) => {
         });
     }
 }
-
-
 
 export default {
     getAllFriends,

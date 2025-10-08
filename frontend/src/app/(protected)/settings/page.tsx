@@ -162,6 +162,12 @@ const SettingsPage = () => {
       toast.error(`❌ Network error. Please check your connection and try again.`);
     }
   }
+
+  if (isLoading) 
+    return <p className="text-gray-400">Loading profile...</p>;
+
+  if (!user) 
+    return <p className="text-gray-500">User not found</p>;
   return (
         <div className="h-[calc(100vh_-_72px)] text-white flex px-2 gap-2 ">
           <div className="flex-1 rounded-[20px] flex flex-col my-2 gap max-w-6xl mx-auto bg-[#021024]">
@@ -199,7 +205,16 @@ const SettingsPage = () => {
                           className="hidden"
                         />
                       </div>
-                      <span className="absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full"></span>
+                      <span
+                        className={`absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full ${
+                            user.online_status === 0
+                              ? "bg-yellow-500"   // offline
+                              : user.online_status === 1
+                              ? "bg-green-500"  // online
+                              : "bg-orange-500"   // ingame
+                          }`}
+                        ></span>
+                      {/* <span className="absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full"></span> */}
                     </div>
 
                     <div className="flex flex-col items-start space-y-6 text-gray-300">

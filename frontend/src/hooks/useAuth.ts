@@ -3,13 +3,25 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface User {
+export enum OnlineStatus {
+  Offline = 0,
+  Online = 1,
+  InGame = 2
+}
+
+export interface User {
   id: number;
   username: string;
   email: string;
   avatar_url: string;
-  isAccountVerified: boolean;
+  isAccountVerified: number;
+  points: number;
+  wins: number;
+  losses: number;
+  rank: number;
+  online_status: number;
 }
+
 
 
 interface AuthResponse {
