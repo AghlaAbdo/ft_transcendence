@@ -7,8 +7,8 @@ import Statistic from "@/components/dashboard/statistic"
 import Statistics from "@/components/dashboard/statistics"
 import Image from "next/image"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { GetGames, GetStats } from "@/app/(protected)/lib/dashboard"
-import { game, stat, StatWithTimeDict } from "@/constants/dashboard"
+import { GetGames, GetStats, GetWeekStats } from "@/app/(protected)/lib/dashboard"
+import { game, stat, StatWithTimeDict, WeekStats } from "@/constants/dashboard"
 import { PlayerWithRank } from "@/constants/leaderboard"
 import { get_all_leaderboard, get_user_by_username } from "../lib/leaderboard"
 import { useAuth } from "@/hooks/useAuth"
@@ -20,6 +20,7 @@ export default function Dashboard() {
     const [allGames, setAllGames] = useState<game[]>([])
     const [visibleGames, setVisibleGames] = useState<game[]>([])
     const [stats, setStats] = useState<StatWithTimeDict>()
+    const [weeklyStats, setWeeklyStats] = useState<WeekStats[]>([])
     const [user, setUser] = useState<PlayerWithRank>()
     const [loading, setLoading] = useState(1)
     const loadRef = useRef<HTMLDivElement>(null)
@@ -46,6 +47,9 @@ export default function Dashboard() {
             const stats: StatWithTimeDict = await GetStats(authUser.id)
             setStats(stats)
             const allPlayersData = await get_all_leaderboard()
+            const weeklyStats: WeekStats[] = await GetWeekStats(authUser.id)
+            setWeeklyStats(weeklyStats)
+            // console.log(weeklyStats)
             const current_user = get_user_by_username(allPlayersData, authUser.username)!
             setUser(current_user)
             setAllGames(games)
@@ -122,7 +126,7 @@ export default function Dashboard() {
                 <div className="flex">
                     {/* down left */}
                     <div className="h-[50vh] rounded-[10px] m-2 ml-5 mb-5 w-[30%] 2xl:h-[40vh]">
-                        <BarChart />
+                        <BarChart weeklyStats={weeklyStats}/>
                     </div>
                     {/* down right  */}
                     <div className="h-[50vh] rounded-[10px] m-2 mr-5 mb-5 w-[70%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">

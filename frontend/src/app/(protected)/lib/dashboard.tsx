@@ -1,8 +1,12 @@
 import { games } from "@/mocks/dashboard"
-import { game, stat, StatWithTimeDict, TimeDict } from "@/constants/dashboard"
+import { game, stat, StatWithTimeDict, TimeDict, WeekStats } from "@/constants/dashboard"
 import { statSync } from "fs"
 
 export async function GetGames(userId: number): Promise<game[]> {
+    const empty = false
+    if (empty) {
+        userId = 1000
+    }
     const response = await fetch(`/api/game/games?userId=${userId}`)
     if (!response.ok) throw new Error("Error fetching games!")
     const rawData = await response.json()
@@ -38,4 +42,17 @@ export async function GetStats(userId: number): Promise<StatWithTimeDict> {
         avg_play_time: secondsToTimeDict(stats.avg_play_time),
         longest_play_time: secondsToTimeDict(stats.longest_play_time)
     };
+}
+
+export async function GetWeekStats(userId: number): Promise<WeekStats[]> {
+    const response = await fetch(`/api/game/weekly_stats?userId=${userId}`)
+    if (!response.ok) throw new Error("Error fetching weekly stats!")
+    const rawData = await response.json()
+    // console.log(rawData.stats)
+    const stats: WeekStats[] = rawData.stats.map((stat: WeekStats) => ({
+        week: stat.week,
+        games_played: stat.games_played,
+        range: stat.range
+    }))
+    return stats
 }

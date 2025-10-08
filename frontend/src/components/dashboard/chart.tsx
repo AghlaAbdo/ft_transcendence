@@ -9,6 +9,7 @@ import {
     ChartOptions,
     ChartData
 } from 'chart.js';
+import { WeekStats } from '@/constants/dashboard';
 
 ChartJS.register(
     CategoryScale,
@@ -18,13 +19,8 @@ ChartJS.register(
     Tooltip
 );
 
-interface WeeklyGamesChartProps {
-    weeklyData?: number[];
-}
 
-export default function BarChart({
-    weeklyData = [0, 0, 0, 0]
-}: WeeklyGamesChartProps) {
+export default function BarChart({ weeklyStats }: { weeklyStats: WeekStats[] }) {
     const currentDate = new Date();
     const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
     const capitalizedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
@@ -34,7 +30,7 @@ export default function BarChart({
         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
         datasets: [
             {
-                data: weeklyData,
+                data: weeklyStats.map(stat => stat.games_played),
                 backgroundColor: [
                     'rgba(147, 51, 234, 0.8)',
                     'rgba(59, 130, 246, 0.8)',
@@ -92,7 +88,7 @@ export default function BarChart({
             },
             y: {
                 beginAtZero: true,
-                suggestedMax: Math.max(...weeklyData, 5),
+                suggestedMax: Math.max(...weeklyStats.map(stat => stat.games_played), 5),
                 grid: {
                     color: 'rgba(75, 85, 99, 0.3)',
                 },

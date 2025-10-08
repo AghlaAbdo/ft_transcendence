@@ -26,3 +26,9 @@ export interface stat {
     avg_play_time: number;
     longest_play_time: number;
 }
+
+export interface WeekStats {
+  week: number;
+  games_played: number;
+  range: string;
+}
