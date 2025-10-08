@@ -100,7 +100,7 @@ const ProfilePage = () => {
                             <p className="font-bold">{ user.wins + user.losses }</p>
                           </div>
                           <div>
-                            <p className="text-gray-400">Win</p>
+                            <p className="text-gray-400">Wins</p>
                             <p className="font-bold">{user.wins}</p>
                           </div>
                           <div>
