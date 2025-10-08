@@ -1,23 +1,30 @@
+"use client";
+
 import FriendRequestCard from '@/components/profile/FriendRequestCard';
 import Friends from '@/components/profile/Friends';
 import { GameHistory1 } from '@/components/profile/GameHistory';
 import UserCard from '@/components/profile/UserCard';
+import { useParams } from 'next/navigation';
 import React from 'react';
 
 const ProfilePage = () => {
 
+  const { id } = useParams();
+
+  console.log("------: id: ", id);
+  
   return (
     <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
       <div className="flex-1 rounded-[20px] flex flex-col mt-10 my-2 gap-2 max-w-7xl mx-auto">
           <div className="rounded-t-[20px] p-2 flex flex-col">
             <div className="relative w-full">
               <div className='flex-1 px-4'>
-                  <img src="./images/background.jpg" alt="background" className="w-full h-110 rounded-3xl" />
+                  <img src="/images/background.jpg" alt="background" className="w-full h-110 rounded-3xl" />
               </div>
               <div className='flex-1 justify-items-center flex justify-center'>
           
                   <img 
-                    src="./avatars/avatar3.png" 
+                    src="/avatars/avatar3.png" 
                     alt="avatar"
                     className="absolute top-55 w-44 h-44 rounded-full z-2  " 
                     />
@@ -83,7 +90,7 @@ const ProfilePage = () => {
                 <div className='border-b border-slate-800'>
                   <div className='flex'>
                     <div className='px-8 py-4 text-lg font-bold  hover:border-b-4 border-purple-600 flex gap-2 items-center'>
-                      <img src="./icons/gameHistory.png" alt="" width={35} height={35}/>
+                      <img src="/icons/gameHistory.png" alt="" width={35} height={35}/>
                       <span className='text-2xl font-bold'>Match History</span>
                     </div>
                   </div>
@@ -99,7 +106,7 @@ const ProfilePage = () => {
                 <div className='border-b border-slate-800'>
                   <div className='flex'>
                     <div className='px-8 py-4 text-lg font-bold -mt-2 hover:border-b-4  border-purple-600 flex gap-2 items-center'>
-                      <img src="./icons/friends.png" alt="" width={45} height={45}/>
+                      <img src="/icons/friends.png" alt="" width={45} height={45}/>
                       <span className='text-2xl font-bold'>Friends</span>
                     </div>
                   </div>

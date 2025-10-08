@@ -7,10 +7,12 @@ import { motion } from 'framer-motion';
 
 import { useLayout } from '@/context/LayoutContext';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar() {
 
   const router = useRouter();
+  const { user } = useAuth();
 
   const handleLogout = async () => {
     
@@ -94,7 +96,7 @@ export default function Sidebar() {
 
         <div className='navLinks flex flex-col items-center gap-2'>
           <Link
-            className={`${linkBase} ${(pathName == '/') ? linkActive : ''}`}
+            className={`${linkBase} ${((pathName == '/') || (pathName == '/home')) ? linkActive : ''}`}
             href='/'
           >
             {/* Dashboard Icon */}
@@ -134,7 +136,7 @@ export default function Sidebar() {
           </Link>
           <Link
             className={`${linkBase} ${pathName.startsWith('/profile') ? linkActive : ''}`}
-            href='/profile'
+            href={user ? `/profile/${user.id}` : "/login"}
           >
             {/* Profile Icon */}
             <svg

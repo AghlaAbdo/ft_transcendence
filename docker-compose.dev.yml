@@ -46,10 +46,10 @@ services:
     volumes:
       - ./services/user-service/:/app
 
-  chat-service:
-    build:
-      target: development
-    env_file:
-      ./services/chat-service/.env
-    volumes:
-      - ./services/chat-service/:/app
+  # chat-service:
+  #   build:
+  #     target: development
+  #   env_file:
+  #     ./services/chat-service/.env
+  #   volumes:
+  #     - ./services/chat-service/:/app

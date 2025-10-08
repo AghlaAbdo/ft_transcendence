@@ -120,6 +120,8 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
   }, [searchTerm, users, user]);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+
+  
   const handleViewProfile = (id: number) => {
     router.push(`/profile/${id}`);
   }
