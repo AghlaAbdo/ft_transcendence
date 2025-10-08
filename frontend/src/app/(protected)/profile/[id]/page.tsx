@@ -68,7 +68,7 @@ const ProfilePage = () => {
               <div className='flex-1 justify-items-center flex justify-center'>
           
                   <img 
-                    src={user.avatar_url || "/avatars/avatar3.png"} 
+                    src={user.avatar_url || "/avatars/avatar1.png"} 
                     alt="avatar"
                     className="absolute top-55 w-44 h-44 rounded-full z-2  " 
                     />

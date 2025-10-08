@@ -190,7 +190,7 @@ const SettingsPage = () => {
                         
                         {avatar && (
                             <img
-                              src={avatar}
+                              src={avatar || "/avatars/avatar1.png"}
                               alt="avatar"
                               className="w-45 h-45 object-cover"
                               

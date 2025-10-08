@@ -66,7 +66,7 @@ export default function Header() {
         {!isLoading && user && (
         <div className='z-1000 flex justify-between items-center gap-4'>
           <Image 
-              src={user.avatar_url} 
+              src={user.avatar_url || "/avatars/avatar1.png"} 
               alt="Avatar" 
               width={45}
               height={45}
