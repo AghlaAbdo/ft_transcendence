@@ -1,0 +1,162 @@
+{
+    "dashboard": {
+        "id": null,
+        "title": "Nginx Monitoring Dashboard",
+        "tags": [
+            "nginx",
+            "monitoring"
+        ],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+            {
+                "id": 1,
+                "title": "Nginx Status",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "up{job=\"nginx\"}",
+                        "legendFormat": "Nginx Status"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": 0
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "id": 2,
+                "title": "Active Connections",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "nginx_connections_active",
+                        "legendFormat": "Active Connections"
+                    }
+                ],
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 6,
+                    "y": 0
+                }
+            },
+            {
+                "id": 3,
+                "title": "Request Rate",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "rate(nginx_http_requests_total[5m])",
+                        "legendFormat": "Requests/sec"
+                    }
+                ],
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 12,
+                    "y": 0
+                }
+            },
+            {
+                "id": 4,
+                "title": "Total Requests",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "nginx_http_requests_total",
+                        "legendFormat": "Total Requests"
+                    }
+                ],
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 18,
+                    "y": 0
+                }
+            },
+            {
+                "id": 5,
+                "title": "Connections Over Time",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "nginx_connections_active",
+                        "legendFormat": "Active"
+                    },
+                    {
+                        "expr": "nginx_connections_reading",
+                        "legendFormat": "Reading"
+                    },
+                    {
+                        "expr": "nginx_connections_writing",
+                        "legendFormat": "Writing"
+                    },
+                    {
+                        "expr": "nginx_connections_waiting",
+                        "legendFormat": "Waiting"
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 4
+                },
+                "yAxes": [
+                    {
+                        "label": "Connections"
+                    }
+                ]
+            },
+            {
+                "id": 6,
+                "title": "Request Rate Over Time",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "rate(nginx_http_requests_total[1m])",
+                        "legendFormat": "Request Rate"
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 4
+                },
+                "yAxes": [
+                    {
+                        "label": "Requests/sec"
+                    }
+                ]
+            }
+        ],
+        "time": {
+            "from": "now-1h",
+            "to": "now"
+        },
+        "refresh": "5s"
+    }
+}

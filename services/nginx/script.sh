@@ -97,4 +97,8 @@ rm certs/ca/ca.key
 #   -H "Content-Type: application/json" \
 #   -d @Docker-Monitoring.json
 
+# curl -X POST http://${GRAFANA_USER}:${GRAFANA_PASSWORD}@grafana:3000/api/dashboards/db \
+#   -H "Content-Type: application/json" \
+#   -d @Nginx-Dashboard.json
+
 nginx -g "daemon off;"
