@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
-import { initializeSocketIO } from './socket/manager';
+import { initializeGameBrokerHandlers } from './socket/manager';
 import { initializeDb, getDb } from './database/db';
 import apiRouter from './api/router';
 
@@ -19,7 +19,7 @@ const fastify: FastifyInstance = Fastify({
   serverFactory: serverFactory,
 });
 
-initializeSocketIO(httpServer);
+initializeGameBrokerHandlers();
 
 fastify.addHook('onReady', () => {
   initializeDb();

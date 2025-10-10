@@ -46,12 +46,12 @@ export default function Rematch({
   const handleRematch = () => {
     console.log('rematch!!');
     setRematch((prev) => [...prev, 'sent']);
-    socket.emit('rematch', gameId, playerRole, user.id);
+    socket.emit('game:rematch', gameId, playerRole, user.id);
   };
 
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
-    socket.emit('quit', gameId, user.id);
+    socket.emit('game:quit', gameId, user.id);
     setTimeout(() => redirect('/game'), 1000);
   };
 

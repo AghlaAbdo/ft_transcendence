@@ -3,6 +3,6 @@
 import { io } from 'socket.io-client';
 
 export const socket = io({
-  path: '/ws/game',
+  path: '/ws',
   autoConnect: false,
 });

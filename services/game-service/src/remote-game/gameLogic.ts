@@ -15,9 +15,9 @@ import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
 import { getCurrDate } from '../utils/dates';
 import { removeUserActiveGame } from './userActiveGame';
-import { advancePlayerInTournament } from '../tournament/tournamentManager';
+// import { advancePlayerInTournament } from '../tournament/tournamentManager';
 
-let ioInstance: Server;
+// let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
   {};
 
@@ -28,20 +28,23 @@ export function _resetGameIntervalsForTesting(): void {
   gameIntervals.foreach;
 }
 
-export function setIoInstance(io: Server): void {
-  ioInstance = io;
-}
+// export function setIoInstance(io: Server): void {
+//   ioInstance = io;
+// }
 
-export function startGame(gameState: IGameState) {
+export function startGame(gameState: IGameState, sendResponse: (target: string ,clientEvent: string,  responseData?: any) => void) {
   if (!gameState || gameIntervals[gameState.id]) return;
 
-  ioInstance.to(gameState.id).emit('prepare');
+  // ioInstance.to(gameState.id).emit('prepare');\
+  sendResponse(gameState.id, 'prepare');
+
   for (let i = 1; i <= 3; i++) {
     const j = 4 - i;
 
     setTimeout(() => {
-      // console.log("starting:", j);
-      ioInstance.to(gameState.id).emit('starting', j);
+      console.log("starting:", j);
+      // ioInstance.to(gameState.id).emit('starting', j);
+      sendResponse(gameState.id, 'starting', {countDown: j});
 
       if (j === 1) {
         setTimeout(() => {
@@ -49,12 +52,14 @@ export function startGame(gameState: IGameState) {
             deleteGame(gameState);
             return;
           }
-          ioInstance.to(gameState.id).emit('startGame');
-          ioInstance.emit('startGame');
+          // ioInstance.to(gameState.id).emit('startGame');
+          // ioInstance.emit('startGame');
+          sendResponse(gameState.id, 'startGame');
+          console.log("sent startGame!!");
           gameState.startDate = getCurrDate();
           gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
-            () => gameLoop(gameState),
+            () => gameLoop(gameState, sendResponse),
             GAME_INTERVAL_MS,
           );
         }, 1000);
@@ -63,7 +68,7 @@ export function startGame(gameState: IGameState) {
   }
 }
 
-function gameLoop(gameState: IGameState): void {
+function gameLoop(gameState: IGameState, sendResponse: (target: string ,clientEvent: string,  responseData?: any) => void): void {
   if (!gameState || gameState.game.status !== 'playing') return;
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
@@ -106,7 +111,7 @@ function gameLoop(gameState: IGameState): void {
     gameState.game.rightPaddle.score++;
     gameState.game.scoreUpdate = true;
     if (gameState.game.rightPaddle.score === 5) {
-      gameOver(gameState);
+      gameOver(gameState, sendResponse);
     } else {
       resetBallPos(gameState);
     }
@@ -114,16 +119,17 @@ function gameLoop(gameState: IGameState): void {
     gameState.game.leftPaddle.score++;
     gameState.game.scoreUpdate = true;
     if (gameState.game.leftPaddle.score === 5) {
-      gameOver(gameState);
+      gameOver(gameState, sendResponse);
     } else {
       resetBallPos(gameState);
     }
   }
-  ioInstance.to(gameState.id).emit('gameStateUpdate', gameState.game);
+  // ioInstance.to(gameState.id).emit('gameStateUpdate', gameState.game);
+  sendResponse(gameState.id, 'gameStateUpdate', {gameState: gameState.game})
   gameState.game.scoreUpdate = false;
 }
 
-function gameOver(gameState: IGameState): void {
+function gameOver(gameState: IGameState, sendResponse: (target: string ,clientEvent: string,  responseData?: any) => void): void {
   removeUserActiveGame(gameState.player1.id, gameState.id);
   removeUserActiveGame(gameState.player2.id, gameState.id);
   if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
@@ -136,18 +142,20 @@ function gameOver(gameState: IGameState): void {
   gameState.game.status = 'ended';
   gameState.player1.ready = false;
   gameState.player2.ready = false;
-  ioInstance.to(gameState.id).emit('gameOver');
+  // ioInstance.to(gameState.id).emit('gameOver');
+  sendResponse(gameState.id, 'gameOver');
+  
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
   if (gameState.isTournamentGame) {
-    advancePlayerInTournament(
-      gameState.tournamentId!,
-      gameState.tournamentMatchId!,
-      gameState.winner_id!,
-    );
+    // advancePlayerInTournament(
+    //   gameState.tournamentId!,
+    //   gameState.tournamentMatchId!,
+    //   gameState.winner_id!,
+    // );
     deleteGame(gameState);
   }
 }

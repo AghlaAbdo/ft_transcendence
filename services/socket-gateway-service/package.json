@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/server.ts",
     "build": "npx tsc",
     "start": "node dist/server.js",
     "format": "prettier --write .",
@@ -15,8 +15,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/http-proxy": "^11.3.0",
-    "fastify": "^5.5.0"
+    "fastify": "^5.5.0",
+    "ioredis": "^5.8.1",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
