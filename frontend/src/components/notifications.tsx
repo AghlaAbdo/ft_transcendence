@@ -58,6 +58,7 @@ import { Eye, UserPlus, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
+
 interface User {
   id: number;
   username: string;
@@ -70,12 +71,6 @@ interface Notification_props {
 }
 
 export const Notification = ({ onClose }: Notification_props) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
 
   // Fetch all users on component mount
 //   useEffect(() => {
@@ -102,20 +97,6 @@ export const Notification = ({ onClose }: Notification_props) => {
 //     };
 //     fetchUsers();
 //   }, []);
-
-  // Filter users based on search term
-  useEffect(() => {
-    if (searchTerm && searchTerm.trim() && user) {
-      setFilteredUsers(
-        users.filter((_user) =>
-          _user.id !== user.id &&
-          _user.username.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredUsers([]);
-    }
-  }, [searchTerm, users, user]);
 
   return (
     <div className="space-y-3">
