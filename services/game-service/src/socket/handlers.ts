@@ -6,7 +6,7 @@ import {
   paddleMoveUp,
   resetGameState,
 } from '../remote-game/gameState';
-import { startGame, deleteGame } from '../remote-game/gameLogic';
+import { startGame, setIoInstance, deleteGame } from '../remote-game/gameLogic';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
 import crypto from 'crypto';
 import {
@@ -21,7 +21,7 @@ let ioInstance: Server;
 
 export function handleConnection(socket: Socket, io: Server): void {
   socket.emit('welcome', 'Welcom to Pong Wrold');
-  // setIoInstance(io);
+  setIoInstance(io);
   ioInstance = io;
 }
 
@@ -79,15 +79,14 @@ export function handleDisconnect(socket: Socket, reason: string): void {
   }
 }
 
-export async function handlePlay(socketId: string, userId: string, sendResponse: (target: string ,clientEvent: string,  responseData?: any) => void) {
+export async function handlePlay(socket: Socket, userId: string) {
   const user = await getPlayerInfo(userId);
   // console.log("user id: ", userId);
   // console.log("user: ", user);
 
   if (!user) return;
   if (getUserActiveGame(userId)) {
-    // socket.emit('inAnotherGame');
-    sendResponse(socketId, 'inAnotherGame');
+    socket.emit('inAnotherGame');
     return;
   }
 
@@ -110,21 +109,15 @@ export async function handlePlay(socketId: string, userId: string, sendResponse:
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
     setUserActiveGame(userId, gameId);
-    user.socketId = socketId;
+    user.socketId = socket.id;
     allGames.games[gameId] = generateGameState(gameId, user, null, null, null);
     console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
-    // socket.emit('playerData', {
-    //   playerRole: 'player1',
-    //   gameId,
-    //   player: player1,
-    // });
-    sendResponse(socketId, 'playerData', {
+    socket.emit('playerData', {
       playerRole: 'player1',
       gameId,
-      player: player1
+      player: player1,
     });
-    // socket.join(gameId);
-    sendResponse(socketId, 'joinRoom', {roomId: gameId});
+    socket.join(gameId);
     allGames.lobyGame = gameId;
   } else {
     const lobyGameId = allGames.lobyGame;
@@ -140,27 +133,19 @@ export async function handlePlay(socketId: string, userId: string, sendResponse:
     allGames.games[lobyGameId].player2.avatar = user.avatar;
     allGames.games[lobyGameId].player2.frame = user.frame;
     allGames.games[lobyGameId].player2.level = user.level;
-    allGames.games[lobyGameId].player2.socketId = socketId;
-    // socket.join(lobyGameId);
-    sendResponse(socketId, 'joinRoom', {roomId: lobyGameId});
-    // socket.emit('playerData', {
-    //   playerRole: 'player2',
-    //   gameId: lobyGameId,
-    //   player: player2,
-    // });
-    sendResponse(socketId, 'playerData', {
+    allGames.games[lobyGameId].player2.socketId = socket.id;
+    socket.join(lobyGameId);
+    socket.emit('playerData', {
       playerRole: 'player2',
       gameId: lobyGameId,
       player: player2,
-    })
-    // socket
-    //   .to(lobyGameId)
-    //   .emit('matchFound', allGames.games[lobyGameId].player2);
-    sendResponse(allGames.games[lobyGameId].player1.socketId!, 'matchFound', {opponent: allGames.games[lobyGameId].player2});
-    // socket.emit('matchFound', allGames.games[lobyGameId].player1);
-    sendResponse(socketId, 'matchFound', {opponent: allGames.games[lobyGameId].player1});
+    });
+    socket
+      .to(lobyGameId)
+      .emit('matchFound', allGames.games[lobyGameId].player2);
+    socket.emit('matchFound', allGames.games[lobyGameId].player1);
     setTimeout(() => {
-      startGame(allGames.games[lobyGameId], sendResponse);
+      startGame(allGames.games[lobyGameId]);
     }, 3000);
     allGames.lobyGame = null;
   }
@@ -170,8 +155,6 @@ export function handleMovePaddle(
   gameId: string,
   playerRole: string,
   dir: 'up' | 'down',
-  
-
 ) {
   const gameState = getGameState(gameId);
   if (!gameState) return;
@@ -184,10 +167,9 @@ export function handleGameOver(): void {
 }
 
 export function handleRematch(
-  socketId: string,
+  socket: Socket,
   gameId: string,
   playerRole: 'player1' | 'player2' | null,
-  sendResponse: (target: string ,clientEvent: string,  responseData?: any) => void
 ): void {
   console.log('Recived rematch!!');
   if (!playerRole) {
@@ -201,21 +183,15 @@ export function handleRematch(
   const userId =
     playerRole === 'player1' ? gameState.player1.id : gameState.player2.id;
   const activeGame = getUserActiveGame(userId);
-  const opponentSocketId = playerRole === 'player1'? gameState.player2.socketId : gameState.player1.socketId;
   if (activeGame && activeGame !== gameId) {
-    // socket.emit('inAnotherGame');
-    console.log('activeGame !== gameId');
-    sendResponse(socketId, 'inAnotherGame');
-    // socket.to(gameState.id).emit('opponentQuit', gameState.game.status);
-    sendResponse(opponentSocketId!, 'opponentQuit', {gameStatus: gameState.game.status});
+    socket.emit('inAnotherGame');
+    socket.to(gameState.id).emit('opponentQuit', gameState.game.status);
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
     return;
   }
 
-  // socket.to(gameId).emit('rematch');
-  console.log("recieved rematch, opponentId: ", opponentSocketId);
-  sendResponse(opponentSocketId!, 'rematch');
+  socket.to(gameId).emit('rematch');
   if (playerRole === 'player1') {
     gameState.player1.ready = true;
     setUserActiveGame(gameState.player1.id, gameId);
@@ -226,20 +202,17 @@ export function handleRematch(
   if (gameState.player1.ready && gameState.player2.ready) {
     resetGameState(gameState);
     setTimeout(() => {
-      // socket.to(gameId).emit('playAgain');
-      // socket.emit('playAgain');
-      sendResponse(gameId, 'playAgain');
-      startGame(gameState, sendResponse);
+      socket.to(gameId).emit('playAgain');
+      socket.emit('playAgain');
+      startGame(gameState);
     }, 2000);
   }
 }
 
 export function handleQuit(
-  socketId: string,
+  socket: Socket,
   gameId: string,
   userId: string,
-  playerRole: string,
-  sendResponse: (target: string ,clientEvent: string,  responseData?: any) => void
 ): void {
   console.log('revived quit event!!');
   if (!gameId) {
@@ -247,11 +220,9 @@ export function handleQuit(
     return;
   }
   const gameState = getGameState(gameId);
-  // socket
-  //   .to(gameId)
-  //   .emit('opponentQuit', gameState ? gameState.game.status : null);
-  const opponentSocketId = playerRole === 'player1'? gameState.player2.socketId : gameState.player1.socketId;
-  sendResponse(opponentSocketId!, 'opponentQuit', {gameStatus: gameState ? gameState.game.status : null});
+  socket
+    .to(gameId)
+    .emit('opponentQuit', gameState ? gameState.game.status : null);
   if (gameState) {
     gameState.game.status = 'ended';
     gameState.winner_id =

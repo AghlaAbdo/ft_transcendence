@@ -251,9 +251,9 @@ export const usePongGameLogic = (
 
   const gameLoop = useCallback(() => {
     if (pressedKeys.current.has('ArrowUp')) {
-      socket.emit('game:movePaddle', gameId.current, playerRole.current, 'up');
+      socket.emit('movePaddle', gameId.current, playerRole.current, 'up');
     } else if (pressedKeys.current.has('ArrowDown')) {
-      socket.emit('game:movePaddle', gameId.current, playerRole.current, 'down');
+      socket.emit('movePaddle', gameId.current, playerRole.current, 'down');
     }
     if (isPlaying.current)
       animationFrameId.current = requestAnimationFrame(gameLoop);
@@ -268,7 +268,7 @@ export const usePongGameLogic = (
     });
 
     console.log('Play Now');
-    if (!isTournamentGame.current) socket.emit('game:play', user.id);
+    if (!isTournamentGame.current) socket.emit('play', user.id);
 
     socket.on('inAnotherGame', () => {
       console.log('Already in another game!!!');
@@ -295,9 +295,9 @@ export const usePongGameLogic = (
     socket.on('prepare', () => {
       setMatching(false);
     });
-    socket.on('starting', (data: {countDown: number}) => {
-      console.log('starting: ', data.countDown);
-      showCountDown(data.countDown);
+    socket.on('starting', (count) => {
+      console.log('starting: ', count);
+      showCountDown(count);
     });
 
     socket.on('startGame', () => {
@@ -307,45 +307,45 @@ export const usePongGameLogic = (
       console.log('Stared the game !!!!!');
     });
 
-    socket.on('matchFound', (data: {opponent: IPlayer}) => {
-      console.log('Match Found: ', data.opponent.username);
+    socket.on('matchFound', (opponent: IPlayer) => {
+      console.log('Match Found: ', opponent.username);
       setHideHeaderSidebar(true);
-      setOpponent(data.opponent);
+      setOpponent(opponent);
     });
 
-    socket.on('gameStateUpdate', (data: {gameState: IGameState}) => {
+    socket.on('gameStateUpdate', (gameState: IGameState) => {
       if (!pixiApp.current) return;
 
       if (ballRef.current) {
-        ballRef.current.x = transformX(data.gameState.ball.x, playerRole.current!);
-        ballRef.current.y = data.gameState.ball.y;
+        ballRef.current.x = transformX(gameState.ball.x, playerRole.current!);
+        ballRef.current.y = gameState.ball.y;
       }
 
       if (leftPaddleRef.current) {
         leftPaddleRef.current.y =
           playerRole.current === 'player2'
-            ? data.gameState.rightPaddle.y
-            : data.gameState.leftPaddle.y;
+            ? gameState.rightPaddle.y
+            : gameState.leftPaddle.y;
       }
       if (rightPaddleRef.current) {
         rightPaddleRef.current.y =
           playerRole.current === 'player2'
-            ? data.gameState.leftPaddle.y
-            : data.gameState.rightPaddle.y;
+            ? gameState.leftPaddle.y
+            : gameState.rightPaddle.y;
       }
 
-      if (data.gameState.scoreUpdate && scoreTextRef.current) {
+      if (gameState.scoreUpdate && scoreTextRef.current) {
         scoreTextRef.current.text = `${
           playerRole.current === 'player2'
-            ? data.gameState.rightPaddle.score + '   ' + data.gameState.leftPaddle.score
-            : data.gameState.leftPaddle.score + '   ' + data.gameState.rightPaddle.score
+            ? gameState.rightPaddle.score + '   ' + gameState.leftPaddle.score
+            : gameState.leftPaddle.score + '   ' + gameState.rightPaddle.score
         }`;
       }
 
-      if (data.gameState.status === 'ended' && endTextRef.current) {
+      if (gameState.status === 'ended' && endTextRef.current) {
         endTextRef.current.text =
-          data.gameState.winner === playerRole.current ? 'You Won' : 'You Lost';
-        setWinner(data.gameState.winner!);
+          gameState.winner === playerRole.current ? 'You Won' : 'You Lost';
+        setWinner(gameState.winner!);
       } else if (endTextRef.current) {
         endTextRef.current.text = '';
       }
@@ -353,18 +353,16 @@ export const usePongGameLogic = (
     socket.on('gameOver', () => {
       isPlaying.current = false;
       dialogRef.current?.showModal();
-      if (isTournamentGame.current) {
-        setTimeout(() => {
-          redirect(`/game/tournament/${tournamentId}`);
-        }, 2000);
-      }
+      setTimeout(() => {
+        redirect(`/game/tournament/${tournamentId}`);
+      }, 2000);
     });
 
     socket.on(
       'opponentQuit',
-      (data: {gameStatus: 'waiting' | 'playing' | 'ended' | null}) => {
+      (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
         isPlaying.current = false;
-        if (data.gameStatus === 'playing' || data.gameStatus === 'waiting') {
+        if (gameStatus === 'playing' || gameStatus === 'waiting') {
           console.log('opponent has quit!!');
           if (endTextRef.current) endTextRef.current.text = 'Opponent Quit';
           setWinner(playerRole.current!);
@@ -394,7 +392,7 @@ export const usePongGameLogic = (
       // e.preventDefault();
       e.returnValue = '';
       console.log('sent quit event');
-      // if (isPlaying.current) socket.emit('game:quit', gameId.current, user.id);
+      // if (isPlaying.current) socket.emit('quit', gameId.current, user.id);
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);
@@ -410,7 +408,7 @@ export const usePongGameLogic = (
       window.removeEventListener('resize', resize);
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (isPlaying.current) {
-        socket.emit('game:quit', gameId.current, user.id);
+        socket.emit('quit', gameId.current, user.id);
       }
       if (!isTournamentGame.current) {
         socket.off();
