@@ -236,6 +236,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
                   onClick={() => {
                     toast.info(`Viewing ${chat.username}'s profile`);
                     handleViewProfile(chat.id);
+                    onClose();
                   }}
                   className="p-2 text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors"
                   >
