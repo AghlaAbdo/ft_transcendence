@@ -11,9 +11,13 @@ import {
   getAllWaitingTournaments,
   removePlayerFromTournamentLobby,
   startTournament,
+  startTournamentMatch,
 } from '../tournament/tournamentManager';
 import { ITournament } from '../types/types';
 import { getIoInstance } from './manager';
+import { getGameState } from '../remote-game/AllGames';
+import { findMatchById } from '../tournament/tournamentManager';
+import { toUSVString } from 'util';
 
 export async function handleCreateTournament(
   socket: Socket,
@@ -92,11 +96,6 @@ export async function handleJoinTournament(
       action: 'joined',
       user,
     });
-
-    if (tournament.players.size === tournament.maxPlayers) {
-      setTimeout(() => startTournament(tournament), 2000);
-      ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
-    }
   }
   console.log('joined tournamentId: ', tournamentId, ' userId: ', userId);
 }
@@ -113,6 +112,18 @@ function joinPlayerToTournament(
   socket.join(tournament.id);
 
   return true;
+}
+
+export function handleTournPlayerInLoby(socket: Socket, data: {tournamentId: string}) {
+  const tournament = getTournament(data.tournamentId);
+  const ioInstance = getIoInstance();
+
+  if (!tournament) return;
+  tournament.readyPlayers++;
+  if (tournament.readyPlayers === tournament.maxPlayers) {
+    startTournament(tournament)
+    ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
+  }
 }
 
 export function handleRequestTournaments(socket: Socket) {
@@ -184,4 +195,16 @@ export function handleLeaveTournamentLobby(
   if (action === 'tournamentDeleted')
     ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
   socket.emit('leftTournamentLobby', { tournamentId });
+}
+
+export function handleReadyForMatch(socket: Socket, data: {userId: string, tournamentId: string, gameId: string}) {
+  const tournament = getTournament(data.tournamentId);
+  const gameState = getGameState(data.gameId);
+  const match = findMatchById(tournament, gameState.tournamentMatchId);
+
+  if (!match || !tournament) return;
+  data.userId === match.player1Id ? match.isPlayer1Ready = true : match.isPlayer2Ready = true;
+
+  if (match.isPlayer1Ready && match.isPlayer2Ready)
+    startTournamentMatch(tournament, match.id);
 }

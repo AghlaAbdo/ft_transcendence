@@ -230,6 +230,8 @@ export function handleQuit(
         ? gameState.player2.id
         : gameState.player1.id;
     gameState.playtime = getDiffInMin(gameState.startAt);
+    if (!gameState.startDate)
+      gameState.startDate = getCurrDate();
     postGame(gameState);
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);

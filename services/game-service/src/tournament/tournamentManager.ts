@@ -1,7 +1,7 @@
 import { generateGameState } from '../remote-game/gameState';
 import { getIoInstance } from '../socket/manager';
 import { ITournament, IRound, IMatch } from '../types/types';
-import { getAllGames } from '../remote-game/AllGames';
+import { getAllGames, getGameState } from '../remote-game/AllGames';
 import { startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
 
@@ -21,6 +21,7 @@ export function createNewTournament(
     creatorUsername: username,
     status: 'waiting',
     maxPlayers: maxPlayers,
+    readyPlayers: 0,
     players: new Map(),
     bracket: [],
   };
@@ -84,6 +85,8 @@ function generateBracket(tournament: ITournament): void {
       round: 1,
       player1Id: player1.id,
       player2Id: player2.id,
+      isPlayer1Ready: false,
+      isPlayer2Ready: false,
       gameId: null,
       winnerId: null,
       nextMatchId: null,
@@ -106,6 +109,8 @@ function generateBracket(tournament: ITournament): void {
         round: r,
         player1Id: null,
         player2Id: null,
+        isPlayer1Ready: false,
+        isPlayer2Ready: false,
         gameId: null,
         winnerId: null,
         nextMatchId: null,
@@ -142,13 +147,13 @@ export function startTournament(tournament: ITournament) {
   if (round1) {
     round1.matches.forEach((match) => {
       if (match.player1Id && match.player2Id) {
-        startTournamentMatch(tournament, match);
+        notifyPlayersForMatch(tournament, match);
       }
     });
   }
 }
 
-function startTournamentMatch(tournament: ITournament, match: IMatch) {
+function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   if (!match.player1Id || !match.player2Id) {
     console.error(
       `Match ${match.id} in tournament ${tournament.id} is not ready to start (missing players).`,
@@ -173,9 +178,6 @@ function startTournamentMatch(tournament: ITournament, match: IMatch) {
     return;
   }
 
-  player1Socket.join(gameId);
-  player2Socket.join(gameId);
-
   const gameState = generateGameState(
     gameId,
     player1Info,
@@ -184,47 +186,99 @@ function startTournamentMatch(tournament: ITournament, match: IMatch) {
     match.id,
   );
   getAllGames().games[gameId] = gameState;
-
   match.gameId = gameId;
-  match.status = 'playing';
 
-  // console.log("player 1 socketId: ", player1Info.socketId);
-  // console.log("player 2 socketId: ", player2Info.socketId);
-  player1Socket.emit('matchReady', {
-    gameId,
-    tournamentId: tournament.id,
-    opponent: player2Info,
-  });
-  player2Socket.emit('matchReady', {
-    gameId,
-    tournamentId: tournament.id,
-    opponent: player1Info,
-  });
+  player1Socket.emit('matchReady', {gameId, opponent: player2Info});
+  player2Socket.emit('matchReady', {gameId, opponent: player1Info});
+  player1Socket.join(gameId);
+  player2Socket.join(gameId);
 
-  setTimeout(() => {
-    player1Socket.emit('playerData', {
-      playerRole: 'player1',
-      gameId,
-      player: player1Info,
-    });
-    player2Socket.emit('playerData', {
-      playerRole: 'player2',
-      gameId,
-      player: player2Info,
-    });
-    player1Socket.emit('matchFound', player2Info);
-    player2Socket.emit('matchFound', player1Info);
-    setTimeout(()=> {
-       startGame(gameState)
-    }, 2000);
-  }, 2000);
+  setTimeout(()=> {
+    if (!match.isPlayer1Ready || !match.isPlayer2Ready) {
+      console.log("Players not ready for match !!!");
+      return;
+    }
+
+    
+  
+    
+    
+    // console.log("player 1 socketId: ", player1Info.socketId);
+    // console.log("player 2 socketId: ", player2Info.socketId);
+    // player1Socket.emit('matchReady', {
+    //   gameId,
+    //   tournamentId: tournament.id,
+    //   opponent: player2Info,
+    // });
+    // player2Socket.emit('matchReady', {
+    //   gameId,
+    //   tournamentId: tournament.id,
+    //   opponent: player1Info,
+    // });
+  
+    // setTimeout(() => {
+    //   match.status = 'playing';
+    //   player1Socket.emit('playerData', {
+    //     playerRole: 'player1',
+    //     gameId,
+    //     player: player1Info,
+    //   });
+    //   player2Socket.emit('playerData', {
+    //     playerRole: 'player2',
+    //     gameId,
+    //     player: player2Info,
+    //   });
+    //   player1Socket.emit('matchFound', player2Info);
+    //   player2Socket.emit('matchFound', player1Info);
+    //   setTimeout(()=> {
+    //      startGame(gameState)
+    //   }, 2000);
+    // }, 2000);
+
+  }, 60 * 1000);
+
 }
 
-function findMatchById(
-  tournament: ITournament,
+export function startTournamentMatch(tournament: ITournament, matchId: string) {
+  const match = findMatchById(tournament, matchId);
+  if (!match) return;
+
+  const io = getIoInstance();
+  const gameState = getGameState(match.gameId!);
+  const player1Info = tournament.players.get(match.player1Id!);
+  const player2Info = tournament.players.get(match.player2Id!);
+  if (!player1Info || !player2Info) {
+    console.error(`Missing player info for match ${match.id}.`);
+    return;
+  }
+  const player1Socket = io.sockets.sockets.get(player1Info.socketId);
+  const player2Socket = io.sockets.sockets.get(player2Info.socketId);
+  if (!player1Socket || !player2Socket) {
+    console.error("Couldn't get players sockets !!!");
+    return;
+  }
+
+  match.status = 'playing';
+  player1Socket.emit('playerData', {
+    playerRole: 'player1',
+    gameId: gameState.id,
+    player: player1Info,
+  });
+  player2Socket.emit('playerData', {
+    playerRole: 'player2',
+    gameId: gameState.id,
+    player: player2Info,
+  });
+  player1Socket.emit('matchFound', player2Info);
+  player2Socket.emit('matchFound', player1Info);
+  startGame(gameState);
+}
+
+export function findMatchById(
+  tournament: ITournament | undefined,
   matchId: string | null,
 ): IMatch | undefined {
-  if (!matchId) return undefined;
+  if (!matchId || !tournament) return undefined;
   for (const round of tournament.bracket) {
     const match = round.matches.find((m) => m.id === matchId);
     if (match) return match;

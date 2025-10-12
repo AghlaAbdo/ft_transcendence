@@ -36,7 +36,8 @@ export default function SpecificTournamentPage() {
     if (!user?.id || !tournamentId) return;
 
     requestDetails();
-
+    if (tournamentId)
+      socket.emit('tourn:inLoby', {tournamentId});
     socket.on('tournamentDetails', (data: TournamentDetails) => {
       console.log('got Tournament details!!');
       setTournament(data);
@@ -78,16 +79,25 @@ export default function SpecificTournamentPage() {
       }
     );
 
-    socket.on(
-      'matchReady',
-      (data: { gameId: string; tournamentId: string; opponent: IPlayer }) => {
-        console.log('Match Ready! Navigating to game:', data.gameId);
-        setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent });
-        router.push(
-          `/game/tournament/${data.tournamentId}/match/${data.gameId}`
-        );
-      }
-    );
+    socket.on('matchReady', (data: {gameId: string, opponent: IPlayer})=> {
+      console.log("Your match is ready! You have 60s to join the game");
+      setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent })
+    });
+
+    // socket.on(
+    //   'matchReady',
+    //   (data: { gameId: string; tournamentId: string; opponent: IPlayer }) => {
+    //     console.log('Match Ready! Navigating to game:', data.gameId);
+    //     setTimeout(()=> {
+    //       console.log("set next match info!!");
+    //       setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent })
+    //     }, 5000);
+        
+    //     router.push(
+    //       `/game/tournament/${data.tournamentId}/match/${data.gameId}`
+    //     );
+    //   }
+    // );
 
     socket.on(
       'tournamentWinner',
@@ -138,7 +148,7 @@ export default function SpecificTournamentPage() {
 
   const handleGoToMatch = () => {
     if (tournament && nextMatchInfo) {
-      router.push(`/tournament/${tournament.id}/match/${nextMatchInfo.gameId}`);
+      router.push(`/game/tournament/${tournament.id}/match/${nextMatchInfo.gameId}`);
     }
   };
 

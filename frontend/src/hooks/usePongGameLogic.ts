@@ -84,11 +84,15 @@ export const usePongGameLogic = (
     pixiApp.current?.ticker.add(animate);
   }, []);
 
-  useEffect(() => {
+  useEffect(()=> {
     if (tournamentId) {
       isTournamentGame.current = true;
       gameId.current = matchGameId;
-    } else if (matching) return;
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
       try {
@@ -262,6 +266,9 @@ export const usePongGameLogic = (
 
   useEffect(() => {
     if (!isTournamentGame.current) socket.connect();
+    else {
+      socket.emit('tourn:readyForMatch', { userId: user.id, tournamentId, gameId: matchGameId });
+    }
     socket.on('connect', () => {
       console.log('Connected to Socket.IO server!');
       console.log('Socket ID:', socket.id);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -13,6 +13,8 @@ import GameResultCard from '@/components/game/GameResultCard';
 import { IPlayer } from '@/constants/game';
 import { useUser } from '@/context/UserContext';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
+import {socket} from '@/app/(protected)/lib/socket'
+import { Divide } from 'lucide-react';
 
 interface MatchPageParams extends Record<string, string> {
   tournamentId: string;
@@ -28,6 +30,7 @@ export default function GamePage() {
     dialogRef,
     opponent,
     winner,
+    matching,
     gameId,
     playerRole,
     inAnotherGame,
@@ -43,12 +46,20 @@ export default function GamePage() {
     level: '34',
   };
 
+  // useEffect(()=> {
+  //   socket.emit('tourn:readyForMatch', { userId: user.id, tournamentId, gameId: matchGameId });
+  // }, []);
+
   function handleClose() {
     closeDialRef.current?.showModal();
   }
 
   if (inAnotherGame) return <AlreadyInGame />;
-  if (!player || !opponent) return <div></div>;
+  if (!player || !opponent || matching)
+    return (
+      <div className='text-center mt-12'>
+        <h1>Waiting for opponent to join..</h1>
+      </div>);
   return (
     <>
       <button

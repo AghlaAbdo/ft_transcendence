@@ -78,6 +78,7 @@ export interface ITournament {
   creatorUsername: string;
   status: 'waiting' | 'live' | 'completed';
   maxPlayers: number;
+  readyPlayers: number;
   players: Map<string, IPlayer>;
   bracket: IRound[];
 }
@@ -87,6 +88,8 @@ export interface IMatch {
   round: number;
   player1Id: string | null;
   player2Id: string | null;
+  isPlayer1Ready: boolean;
+  isPlayer2Ready: boolean;
   gameId: string | null;
   winnerId: string | null;
   status: 'pending' | 'ready' | 'playing' | 'completed';
