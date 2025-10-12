@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useParams, useRouter } from 'next/navigation';
 
-import Modal from '@/components/game/Modal';
 import TournamentBracket from '@/components/game/TournamentBracket';
 
 import { socket } from '@/app/(protected)/lib/socket';
@@ -36,8 +35,7 @@ export default function SpecificTournamentPage() {
     if (!user?.id || !tournamentId) return;
 
     requestDetails();
-    if (tournamentId)
-      socket.emit('tourn:inLoby', {tournamentId});
+    if (tournamentId) socket.emit('tourn:inLoby', { tournamentId });
     socket.on('tournamentDetails', (data: TournamentDetails) => {
       console.log('got Tournament details!!');
       setTournament(data);
@@ -73,15 +71,15 @@ export default function SpecificTournamentPage() {
         console.log('tournament.bracket: ', data.bracket);
         setHideHeaderSidebar(true);
         setTournament((prev) =>
-          prev ? { ...prev, status: 'running', bracket: data.bracket } : null
+          prev ? { ...prev, status: 'live', bracket: data.bracket } : null
         );
         setError(null);
       }
     );
 
-    socket.on('matchReady', (data: {gameId: string, opponent: IPlayer})=> {
-      console.log("Your match is ready! You have 60s to join the game");
-      setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent })
+    socket.on('matchReady', (data: { gameId: string; opponent: IPlayer }) => {
+      console.log('Your match is ready! You have 60s to join the game');
+      setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent });
     });
 
     // socket.on(
@@ -92,7 +90,7 @@ export default function SpecificTournamentPage() {
     //       console.log("set next match info!!");
     //       setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent })
     //     }, 5000);
-        
+
     //     router.push(
     //       `/game/tournament/${data.tournamentId}/match/${data.gameId}`
     //     );
@@ -103,7 +101,9 @@ export default function SpecificTournamentPage() {
       'tournamentWinner',
       (data: { winnerId: string; message: string }) => {
         console.log('Tournament ended! Winner:', data.winnerId);
-        setTournament((prev) => (prev ? { ...prev, status: 'ended' } : null));
+        setTournament((prev) =>
+          prev ? { ...prev, status: 'completed' } : null
+        );
         setNextMatchInfo(null);
       }
     );
@@ -148,7 +148,9 @@ export default function SpecificTournamentPage() {
 
   const handleGoToMatch = () => {
     if (tournament && nextMatchInfo) {
-      router.push(`/game/tournament/${tournament.id}/match/${nextMatchInfo.gameId}`);
+      router.push(
+        `/game/tournament/${tournament.id}/match/${nextMatchInfo.gameId}`
+      );
     }
   };
 
@@ -164,7 +166,7 @@ export default function SpecificTournamentPage() {
   const isPlayerRegistered = tournament.players.some((p) => p.id === user?.id);
   const isLobbyFull = tournament.players.length === tournament.maxPlayers;
   const isWaitingStatus = tournament.status === 'waiting';
-  const isTournamentRunning = tournament.status === 'running';
+  const isTournamentRunning = tournament.status === 'live';
 
   const currentUserMatch: IMatch | undefined = isTournamentRunning
     ? tournament.bracket
@@ -175,6 +177,10 @@ export default function SpecificTournamentPage() {
             match.status === 'ready'
         )
     : undefined;
+
+  // console.log("nextMatchInfo: ", nextMatchInfo);
+  // console.log("isTournamentRunning: ", isTournamentRunning);
+  // console.log("currentUserMatch: ", currentUserMatch);
 
   return (
     <div className='flex flex-col items-center p-8 bg-gray-900 text-white min-h-screen'>
@@ -235,7 +241,7 @@ export default function SpecificTournamentPage() {
         </p>
       )}
 
-      {!isPlayerRegistered && tournament.status === 'running' && (
+      {!isPlayerRegistered && tournament.status === 'live' && (
         <p className='text-xl text-gray-400 mb-6'>
           Tournament is running. Spectator mode or you've been eliminated.
         </p>

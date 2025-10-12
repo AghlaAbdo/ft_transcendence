@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import * as PIXI from 'pixi.js';
 
@@ -33,6 +33,7 @@ export const usePongGameLogic = (
   tournamentId: string | null,
   matchGameId: string | null
 ): returnType => {
+  const router = useRouter();
   const [matching, setMatching] = useState(true);
   const [opponent, setOpponent] = useState<IPlayer | null>(null);
   const [player, setPlayer] = useState<IPlayer | null>(null);
@@ -84,13 +85,13 @@ export const usePongGameLogic = (
     pixiApp.current?.ticker.add(animate);
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     if (tournamentId) {
       isTournamentGame.current = true;
       gameId.current = matchGameId;
     }
   }, []);
-  
+
   useEffect(() => {
     if (matching) return;
     let isInitialized = false;
@@ -267,7 +268,11 @@ export const usePongGameLogic = (
   useEffect(() => {
     if (!isTournamentGame.current) socket.connect();
     else {
-      socket.emit('tourn:readyForMatch', { userId: user.id, tournamentId, gameId: matchGameId });
+      socket.emit('tourn:readyForMatch', {
+        userId: user.id,
+        tournamentId,
+        gameId: matchGameId,
+      });
     }
     socket.on('connect', () => {
       console.log('Connected to Socket.IO server!');
@@ -361,7 +366,7 @@ export const usePongGameLogic = (
       isPlaying.current = false;
       dialogRef.current?.showModal();
       setTimeout(() => {
-        redirect(`/game/tournament/${tournamentId}`);
+        router.push(`/game/tournament/${tournamentId}`);
       }, 2000);
     });
 

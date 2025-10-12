@@ -5,16 +5,17 @@ import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 
+import { Divide } from 'lucide-react';
+
 import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
 
+import { socket } from '@/app/(protected)/lib/socket';
 import { IPlayer } from '@/constants/game';
 import { useUser } from '@/context/UserContext';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
-import {socket} from '@/app/(protected)/lib/socket'
-import { Divide } from 'lucide-react';
 
 interface MatchPageParams extends Record<string, string> {
   tournamentId: string;
@@ -59,7 +60,8 @@ export default function GamePage() {
     return (
       <div className='text-center mt-12'>
         <h1>Waiting for opponent to join..</h1>
-      </div>);
+      </div>
+    );
   return (
     <>
       <button

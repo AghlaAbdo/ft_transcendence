@@ -114,14 +114,17 @@ function joinPlayerToTournament(
   return true;
 }
 
-export function handleTournPlayerInLoby(socket: Socket, data: {tournamentId: string}) {
+export function handleTournPlayerInLoby(
+  socket: Socket,
+  data: { tournamentId: string },
+) {
   const tournament = getTournament(data.tournamentId);
   const ioInstance = getIoInstance();
 
   if (!tournament) return;
   tournament.readyPlayers++;
   if (tournament.readyPlayers === tournament.maxPlayers) {
-    startTournament(tournament)
+    startTournament(tournament);
     ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
   }
 }
@@ -197,13 +200,18 @@ export function handleLeaveTournamentLobby(
   socket.emit('leftTournamentLobby', { tournamentId });
 }
 
-export function handleReadyForMatch(socket: Socket, data: {userId: string, tournamentId: string, gameId: string}) {
+export function handleReadyForMatch(
+  socket: Socket,
+  data: { userId: string; tournamentId: string; gameId: string },
+) {
   const tournament = getTournament(data.tournamentId);
   const gameState = getGameState(data.gameId);
   const match = findMatchById(tournament, gameState.tournamentMatchId);
 
   if (!match || !tournament) return;
-  data.userId === match.player1Id ? match.isPlayer1Ready = true : match.isPlayer2Ready = true;
+  data.userId === match.player1Id
+    ? (match.isPlayer1Ready = true)
+    : (match.isPlayer2Ready = true);
 
   if (match.isPlayer1Ready && match.isPlayer2Ready)
     startTournamentMatch(tournament, match.id);

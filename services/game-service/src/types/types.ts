@@ -99,5 +99,7 @@ export interface IMatch {
 
 export interface IRound {
   roundNumber: number;
+  matchesInRound: number;
+  PlayedMatches: number;
   matches: IMatch[];
 }

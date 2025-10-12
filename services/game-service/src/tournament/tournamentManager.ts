@@ -95,7 +95,12 @@ function generateBracket(tournament: ITournament): void {
     };
     currentRoundMatches.push(match);
   }
-  tournament.bracket.push({ roundNumber: 1, matches: currentRoundMatches });
+  tournament.bracket.push({
+    roundNumber: 1,
+    matchesInRound: numPlayers / 2,
+    PlayedMatches: 0,
+    matches: currentRoundMatches,
+  });
 
   // --- Subsequent Rounds ---
   for (let r = 2; r <= numRounds; r++) {
@@ -128,7 +133,12 @@ function generateBracket(tournament: ITournament): void {
       prevMatch2.nextMatchId = nextMatchId;
       prevMatch2.nextMatchSlot = 'player2Id';
     }
-    tournament.bracket.push({ roundNumber: r, matches: nextRoundMatches });
+    tournament.bracket.push({
+      roundNumber: r,
+      matchesInRound,
+      PlayedMatches: 0,
+      matches: nextRoundMatches,
+    });
     currentRoundMatches = nextRoundMatches;
   }
 }
@@ -188,55 +198,10 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   getAllGames().games[gameId] = gameState;
   match.gameId = gameId;
 
-  player1Socket.emit('matchReady', {gameId, opponent: player2Info});
-  player2Socket.emit('matchReady', {gameId, opponent: player1Info});
+  player1Socket.emit('matchReady', { gameId, opponent: player2Info });
+  player2Socket.emit('matchReady', { gameId, opponent: player1Info });
   player1Socket.join(gameId);
   player2Socket.join(gameId);
-
-  setTimeout(()=> {
-    if (!match.isPlayer1Ready || !match.isPlayer2Ready) {
-      console.log("Players not ready for match !!!");
-      return;
-    }
-
-    
-  
-    
-    
-    // console.log("player 1 socketId: ", player1Info.socketId);
-    // console.log("player 2 socketId: ", player2Info.socketId);
-    // player1Socket.emit('matchReady', {
-    //   gameId,
-    //   tournamentId: tournament.id,
-    //   opponent: player2Info,
-    // });
-    // player2Socket.emit('matchReady', {
-    //   gameId,
-    //   tournamentId: tournament.id,
-    //   opponent: player1Info,
-    // });
-  
-    // setTimeout(() => {
-    //   match.status = 'playing';
-    //   player1Socket.emit('playerData', {
-    //     playerRole: 'player1',
-    //     gameId,
-    //     player: player1Info,
-    //   });
-    //   player2Socket.emit('playerData', {
-    //     playerRole: 'player2',
-    //     gameId,
-    //     player: player2Info,
-    //   });
-    //   player1Socket.emit('matchFound', player2Info);
-    //   player2Socket.emit('matchFound', player1Info);
-    //   setTimeout(()=> {
-    //      startGame(gameState)
-    //   }, 2000);
-    // }, 2000);
-
-  }, 60 * 1000);
-
 }
 
 export function startTournamentMatch(tournament: ITournament, matchId: string) {
@@ -297,7 +262,6 @@ export function advancePlayerInTournament(
 
   const currMatch = findMatchById(tournament, matchId);
   if (!currMatch) return;
-
   currMatch.status = 'completed';
   currMatch.winnerId = winnerId;
 
@@ -313,5 +277,23 @@ export function advancePlayerInTournament(
   else if (currMatch.nextMatchSlot === 'player2Id')
     nextMatch.player2Id = winnerId;
 
+  const round = tournament.bracket[currMatch.round - 1];
+  // console.log("curr round index: ", currMatch.round - 1);
+  round.PlayedMatches++;
+  if (round.PlayedMatches === round.matchesInRound) {
+    // console.log("playedMatches === roundMatches");
+    const nextRound = tournament.bracket[currMatch.round];
+    if (nextRound) {
+      // console.log("found next round, i: ", currMatch.round);
+      nextRound.matches.forEach((match) => {
+        if (match.player1Id && match.player2Id) {
+          match.status = 'ready';
+          setTimeout(() => {
+            notifyPlayersForMatch(tournament, match);
+          }, 6000);
+        }
+      });
+    }
+  }
   io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
 }

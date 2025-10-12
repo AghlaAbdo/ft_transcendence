@@ -49,12 +49,11 @@ export interface UserInfo {
 export interface TournamentDetails {
   id: string;
   creatorId: string;
-  status: 'waiting' | 'running' | 'ended';
+  status: 'waiting' | 'live' | 'completed';
   maxPlayers: number;
   players: IPlayer[];
   bracket: IRound[];
 }
-
 
 export interface ITournament {
   id: string;
