@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-
-import { Divide } from 'lucide-react';
-
 import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
@@ -26,6 +23,8 @@ export default function GamePage() {
   const params = useParams<MatchPageParams>();
   const tournamentId = params.tournamentId;
   const matchGameId = params.gameId;
+  const { user } = useUser();
+
   const {
     containerRef,
     dialogRef,
@@ -37,7 +36,6 @@ export default function GamePage() {
     inAnotherGame,
   } = usePongGameLogic(tournamentId, matchGameId);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
-  const { user } = useUser();
 
   const player: IPlayer = {
     id: user.id,
@@ -45,11 +43,8 @@ export default function GamePage() {
     avatar: user.avatar_url!,
     frame: 'silver2',
     level: '34',
+    isEliminated: false,
   };
-
-  // useEffect(()=> {
-  //   socket.emit('tourn:readyForMatch', { userId: user.id, tournamentId, gameId: matchGameId });
-  // }, []);
 
   function handleClose() {
     closeDialRef.current?.showModal();
@@ -58,8 +53,8 @@ export default function GamePage() {
   if (inAnotherGame) return <AlreadyInGame />;
   if (!player || !opponent || matching)
     return (
-      <div className='text-center mt-12'>
-        <h1>Waiting for opponent to join..</h1>
+      <div className='text-center mt-12 h-[calc(100vh_-_72px)] flex flex-col justify-center'>
+        <h1 className='text-2xl font-bold mt-4'>Waiting for opponent to join</h1>
       </div>
     );
   return (
@@ -77,7 +72,7 @@ export default function GamePage() {
         />
       </button>
       {/* Close dialog */}
-      <CloseGameDialog dialogRef={closeDialRef} gameId={gameId} />
+      <CloseGameDialog dialogRef={closeDialRef} gameId={gameId} isTournamentGame={true} />
 
       <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
         {player && opponent && (

@@ -108,7 +108,7 @@ function joinPlayerToTournament(
 ): boolean {
   if (tournament.players.has(userId)) return false;
 
-  tournament.players.set(userId, user);
+  tournament.players.set(userId, {...user, isEliminated: false});
   socket.join(tournament.id);
 
   return true;
@@ -206,9 +206,16 @@ export function handleReadyForMatch(
 ) {
   const tournament = getTournament(data.tournamentId);
   const gameState = getGameState(data.gameId);
+  if (!gameState || !tournament) {
+    console.log("!gameState || !tournament in handleReadyForMatch");
+    socket.emit('notInMatch');
+    return;
+  }
+  socket.emit('inMatch');
+  console.log("sent Inmatch??");
   const match = findMatchById(tournament, gameState.tournamentMatchId);
 
-  if (!match || !tournament) return;
+  if (!match) return;
   data.userId === match.player1Id
     ? (match.isPlayer1Ready = true)
     : (match.isPlayer2Ready = true);

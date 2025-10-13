@@ -19,8 +19,6 @@ export default function TournamentLobbyPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    socket.connect();
-
     socket.emit('requestTournaments');
 
     socket.on('tournamentList', (data: TournamentListItem[]) => {

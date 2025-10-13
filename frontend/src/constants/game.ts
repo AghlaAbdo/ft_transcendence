@@ -36,6 +36,7 @@ export interface IPlayer {
   avatar: string;
   frame: string;
   level: string;
+  isEliminated: boolean;
 }
 
 export interface UserInfo {

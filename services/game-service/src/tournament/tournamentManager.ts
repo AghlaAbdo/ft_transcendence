@@ -295,5 +295,13 @@ export function advancePlayerInTournament(
       });
     }
   }
+
+  const opponentId = winnerId === currMatch.player1Id ? currMatch.player2Id : currMatch.player1Id;
+  if (opponentId) {
+    const opponent = tournament.players.get(opponentId);
+    if (opponent)
+      opponent.isEliminated = true;
+  }
+  
   io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
 }

@@ -13,5 +13,6 @@ export async function getPlayerInfo(userId: string): Promise<IPlayer> {
     avatar: user.avatar_url,
     frame: 'silver2',
     level: '17',
+    isEliminated: false,
   };
 }

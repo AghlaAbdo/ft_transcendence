@@ -162,11 +162,14 @@ export default function SpecificTournamentPage() {
     );
   }
 
+  const currentUserStatus = tournament.players.find((p)=> p.id === user.id);
+  const isPlayerEliminated = currentUserStatus?.isEliminated;
   const isCreator = user?.id === tournament.creatorId;
   const isPlayerRegistered = tournament.players.some((p) => p.id === user?.id);
   const isLobbyFull = tournament.players.length === tournament.maxPlayers;
   const isWaitingStatus = tournament.status === 'waiting';
   const isTournamentRunning = tournament.status === 'live';
+
 
   const currentUserMatch: IMatch | undefined = isTournamentRunning
     ? tournament.bracket
@@ -195,6 +198,24 @@ export default function SpecificTournamentPage() {
       </p>
 
       {error && <p className='text-red-500 mb-4'>{error}</p>}
+      {isPlayerEliminated && (
+                <div className='bg-red-700 border-4 border-red-500 p-6 rounded-xl shadow-2xl mb-6 text-center w-full max-w-lg animate-pulse'>
+                    <h2 className='text-3xl font-extrabold text-white mb-2'>ELIMINATED! 😥</h2>
+                    <p className='text-xl text-red-100'>
+                        Your journey ended in Round 'Unknown'.
+                    </p>
+                    <p className='mt-3 text-lg text-red-100'>
+                        Thank you for playing! View the bracket to see the final winner.
+                    </p>
+                    {/* Optionally, add a button to exit the tournament view completely */}
+                    <button 
+                        onClick={() => router.push('/game/tournament')}
+                        className='mt-4 bg-gray-100 text-red-800 font-bold py-2 px-4 rounded-lg'
+                    >
+                        Go to Main Lobby
+                    </button>
+                </div>
+            )}
 
       {isWaitingStatus && isCreator && !isLobbyFull && (
         <p className='text-yellow-400 mb-4'>

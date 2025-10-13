@@ -268,11 +268,14 @@ export const usePongGameLogic = (
   useEffect(() => {
     if (!isTournamentGame.current) socket.connect();
     else {
-      socket.emit('tourn:readyForMatch', {
-        userId: user.id,
-        tournamentId,
-        gameId: matchGameId,
-      });
+      // socket.emit('tourn:readyForMatch', {
+      //   userId: user.id,
+      //   tournamentId,
+      //   gameId: matchGameId,
+      // });
+      console.log("sent readyForMatch!!");
+      console.log("tournamentId: ", tournamentId);
+      console.log("gameId: ", gameId);
     }
     socket.on('connect', () => {
       console.log('Connected to Socket.IO server!');
