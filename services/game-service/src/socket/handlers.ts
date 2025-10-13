@@ -16,6 +16,7 @@ import {
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { getCurrDate, getDiffInMin } from '../utils/dates';
+import { advancePlayerInTournament } from '../tournament/tournamentManager';
 
 let ioInstance: Server;
 
@@ -47,6 +48,13 @@ export function handleDisconnect(socket: Socket, reason: string): void {
       : 0;
     if (!gameToQuit.startDate) gameToQuit.startDate = getCurrDate();
     postGame(gameToQuit);
+    if (gameToQuit.isTournamentGame) {
+      advancePlayerInTournament(
+        gameToQuit.tournamentId!,
+        gameToQuit.tournamentMatchId!,
+        gameToQuit.winner_id!,
+      );
+    }
 
     const opponentSocketId =
       opponentRole === 'player1'
@@ -234,6 +242,13 @@ export function handleQuit(
     postGame(gameState);
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
+    if (gameState.isTournamentGame) {
+      advancePlayerInTournament(
+        gameState.tournamentId!,
+        gameState.tournamentMatchId!,
+        gameState.winner_id!,
+      );
+    }
     deleteGame(gameState);
   }
   console.log('player quit');

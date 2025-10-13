@@ -378,7 +378,15 @@ export const usePongGameLogic = (
           console.log('opponent has quit!!');
           if (endTextRef.current) endTextRef.current.text = 'Opponent Quit';
           setWinner(playerRole.current!);
-          setTimeout(() => dialogRef.current?.showModal(), 2000);
+          setTimeout(() => {
+            dialogRef.current?.showModal();
+            if (isTournamentGame.current) {
+              console.log('isTournament: ', isTournamentGame.current);
+              setTimeout(() => {
+                router.push(`/game/tournament/${tournamentId}`);
+              }, 2000);
+            }
+          }, 2000);
         }
       }
     );

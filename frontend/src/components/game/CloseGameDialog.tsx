@@ -1,8 +1,9 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { socket } from '@/app/(protected)/lib/socket';
+import { useLayout } from '@/context/LayoutContext';
 import { useUser } from '@/context/UserContext';
 
 export default function CloseGameDialog({
@@ -13,13 +14,16 @@ export default function CloseGameDialog({
   gameId: string | null;
 }) {
   const { user } = useUser();
+  const router = useRouter();
+  const { setHideHeaderSidebar } = useLayout();
 
   function handleCancel() {
     dialogRef.current?.close();
   }
   function handleQuit() {
     socket.emit('quit', gameId, user.id);
-    redirect('/game');
+    setHideHeaderSidebar(false);
+    router.push('/game');
   }
   return (
     <dialog

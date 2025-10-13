@@ -94,6 +94,7 @@ export default function GamePage() {
           winner={winner}
           gameId={gameId}
           playerRole={playerRole}
+          isTournamentGame={true}
         />
       </div>
     </>
