@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 
@@ -23,6 +23,7 @@ export default function Rematch({
 }) {
   const { setHideHeaderSidebar } = useLayout();
   const { user } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     console.log('REached Rematch componentn!!');
@@ -52,7 +53,7 @@ export default function Rematch({
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
     socket.emit('quit', gameId, user.id);
-    setTimeout(() => redirect('/game'), 1000);
+    setTimeout(() => router.push('/game'), 1000);
   };
 
   if (rematch.includes('quit')) return <div></div>;

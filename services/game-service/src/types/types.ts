@@ -42,7 +42,6 @@ export interface IGameState {
     frame: string | null;
     level: string | null;
     ready: boolean;
-    
   };
   game: {
     status: 'waiting' | 'playing' | 'ended';

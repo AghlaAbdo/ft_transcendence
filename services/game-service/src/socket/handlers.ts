@@ -16,7 +16,12 @@ import {
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { getCurrDate, getDiffInMin } from '../utils/dates';
-import { advancePlayerInTournament } from '../tournament/tournamentManager';
+import {
+  advancePlayerInTournament,
+  getTournament,
+} from '../tournament/tournamentManager';
+import { getPlayerTournament } from '../utils/getPlayerTournament';
+import { IPlayer, ITournament } from '@/types/types';
 
 let ioInstance: Server;
 
@@ -35,6 +40,15 @@ export function handleDisconnect(socket: Socket, reason: string): void {
       game.player1.socketId === socket.id ||
       game.player2.socketId === socket.id,
   );
+
+  const { player, tournament } = getPlayerTournament(socket.id);
+  if (tournament && player) {
+    console.log('userId to delete: ', player.id);
+    if (tournament && player.id) {
+      tournament.players.delete(player.id);
+      console.log('Did delete user from tournament when disconnect!!');
+    }
+  }
 
   if (gameToQuit) {
     const quitterRole =
@@ -240,8 +254,13 @@ export function handleQuit(
     gameState.playtime = getDiffInMin(gameState.startAt);
     if (!gameState.startDate) gameState.startDate = getCurrDate();
     postGame(gameState);
-    removeUserActiveGame(gameState.player1.id, gameState.id);
-    removeUserActiveGame(gameState.player2.id, gameState.id);
+    if (gameState.isTournamentGame) {
+      removeUserActiveGame(gameState.player1.id, gameState.tournamentId);
+      removeUserActiveGame(gameState.player2.id, gameState.tournamentId);
+    } else {
+      removeUserActiveGame(gameState.player1.id, gameState.id);
+      removeUserActiveGame(gameState.player2.id, gameState.id);
+    }
     if (gameState.isTournamentGame) {
       advancePlayerInTournament(
         gameState.tournamentId!,

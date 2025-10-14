@@ -4,9 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useParams, useRouter } from 'next/navigation';
 
+import LoadingPong from '@/components/LoadingPong';
 import TournamentBracket from '@/components/game/TournamentBracket';
 
 import { socket } from '@/app/(protected)/lib/socket';
+import NotFound from '@/app/not-found';
 import { IMatch, IPlayer, IRound, TournamentDetails } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
 import { useUser } from '@/context/UserContext';
@@ -24,6 +26,7 @@ export default function SpecificTournamentPage() {
     gameId: string;
     opponent: IPlayer;
   } | null>(null);
+  const [notInTournament, setNotInTournament] = useState<boolean>(false);
 
   const requestDetails = useCallback(() => {
     if (user?.id && tournamentId) {
@@ -35,11 +38,16 @@ export default function SpecificTournamentPage() {
     if (!user?.id || !tournamentId) return;
 
     requestDetails();
-    if (tournamentId) socket.emit('tourn:inLoby', { tournamentId });
+    if (tournamentId)
+      socket.emit('tourn:inLoby', { userId: user.id, tournamentId });
     socket.on('tournamentDetails', (data: TournamentDetails) => {
       console.log('got Tournament details!!');
       setTournament(data);
       setError(null);
+    });
+
+    socket.on('notInTournament', () => {
+      setNotInTournament(true);
     });
 
     socket.on(
@@ -142,7 +150,7 @@ export default function SpecificTournamentPage() {
 
   const handleLeaveLobby = () => {
     if (user?.id && tournamentId) {
-      socket.emit('leaveTournamentLobby', user.id, tournamentId);
+      socket.emit('leaveTournamentLobby', { userId: user.id, tournamentId });
     }
   };
 
@@ -154,22 +162,24 @@ export default function SpecificTournamentPage() {
     }
   };
 
-  if (!tournament) {
+  if (notInTournament) {
+    return <NotFound />;
+  } else if (!tournament) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-gray-900 text-white'>
-        Loading Tournament...
+      <div className='flex justify-center items-center min-h-[calc(100vh_-_72px)] bg-gray-900 text-white'>
+        <LoadingPong />
       </div>
     );
   }
 
-  const currentUserStatus = tournament.players.find((p)=> p.id === user.id);
+  const currentUserStatus = tournament.players.find((p) => p.id === user.id);
+  console.log('currentUser: ', currentUserStatus);
   const isPlayerEliminated = currentUserStatus?.isEliminated;
   const isCreator = user?.id === tournament.creatorId;
   const isPlayerRegistered = tournament.players.some((p) => p.id === user?.id);
   const isLobbyFull = tournament.players.length === tournament.maxPlayers;
   const isWaitingStatus = tournament.status === 'waiting';
   const isTournamentRunning = tournament.status === 'live';
-
 
   const currentUserMatch: IMatch | undefined = isTournamentRunning
     ? tournament.bracket
@@ -199,23 +209,25 @@ export default function SpecificTournamentPage() {
 
       {error && <p className='text-red-500 mb-4'>{error}</p>}
       {isPlayerEliminated && (
-                <div className='bg-red-700 border-4 border-red-500 p-6 rounded-xl shadow-2xl mb-6 text-center w-full max-w-lg animate-pulse'>
-                    <h2 className='text-3xl font-extrabold text-white mb-2'>ELIMINATED! 😥</h2>
-                    <p className='text-xl text-red-100'>
-                        Your journey ended in Round 'Unknown'.
-                    </p>
-                    <p className='mt-3 text-lg text-red-100'>
-                        Thank you for playing! View the bracket to see the final winner.
-                    </p>
-                    {/* Optionally, add a button to exit the tournament view completely */}
-                    <button 
-                        onClick={() => router.push('/game/tournament')}
-                        className='mt-4 bg-gray-100 text-red-800 font-bold py-2 px-4 rounded-lg'
-                    >
-                        Go to Main Lobby
-                    </button>
-                </div>
-            )}
+        <div className='bg-red-700 border-4 border-red-500 p-6 rounded-xl shadow-2xl mb-6 text-center w-full max-w-lg animate-pulse'>
+          <h2 className='text-3xl font-extrabold text-white mb-2'>
+            ELIMINATED! 😥
+          </h2>
+          <p className='text-xl text-red-100'>
+            Your journey ended in Round 'Unknown'.
+          </p>
+          <p className='mt-3 text-lg text-red-100'>
+            Thank you for playing! View the bracket to see the final winner.
+          </p>
+          {/* Optionally, add a button to exit the tournament view completely */}
+          <button
+            onClick={() => router.push('/game/tournament')}
+            className='mt-4 bg-gray-100 text-red-800 font-bold py-2 px-4 rounded-lg'
+          >
+            Go to Main Lobby
+          </button>
+        </div>
+      )}
 
       {isWaitingStatus && isCreator && !isLobbyFull && (
         <p className='text-yellow-400 mb-4'>

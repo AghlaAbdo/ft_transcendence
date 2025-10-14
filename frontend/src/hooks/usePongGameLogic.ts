@@ -273,9 +273,9 @@ export const usePongGameLogic = (
       //   tournamentId,
       //   gameId: matchGameId,
       // });
-      console.log("sent readyForMatch!!");
-      console.log("tournamentId: ", tournamentId);
-      console.log("gameId: ", gameId);
+      console.log('sent readyForMatch!!');
+      console.log('tournamentId: ', tournamentId);
+      console.log('gameId: ', gameId);
     }
     socket.on('connect', () => {
       console.log('Connected to Socket.IO server!');
@@ -368,9 +368,11 @@ export const usePongGameLogic = (
     socket.on('gameOver', () => {
       isPlaying.current = false;
       dialogRef.current?.showModal();
-      setTimeout(() => {
-        router.push(`/game/tournament/${tournamentId}`);
-      }, 2000);
+      if (isTournamentGame.current) {
+        setTimeout(() => {
+          router.push(`/game/tournament/${tournamentId}`);
+        }, 2000);
+      }
     });
 
     socket.on(
@@ -436,6 +438,16 @@ export const usePongGameLogic = (
       if (!isTournamentGame.current) {
         socket.off();
         socket.disconnect();
+      } else {
+        socket.off('inAnotherGame');
+        socket.off('playerData');
+        socket.off('prepare');
+        socket.off('starting');
+        socket.off('startGame');
+        socket.off('matchFound');
+        socket.off('gameStateUpdate');
+        socket.off('gameOver');
+        socket.off('opponentQuit');
       }
     };
   }, []);

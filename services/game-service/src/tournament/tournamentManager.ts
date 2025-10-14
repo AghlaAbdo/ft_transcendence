@@ -4,6 +4,7 @@ import { ITournament, IRound, IMatch } from '../types/types';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
 import { startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
+import { removeUserActiveGame } from '../remote-game/userActiveGame';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -51,6 +52,7 @@ export function removePlayerFromTournamentLobby(
 ): 'tournamentDeleted' | null {
   const tournament = activeTournaments.get(tournamentId);
   if (tournament && tournament.status === 'waiting') {
+    tournament.readyPlayers--;
     console.log('players before delte: ', tournament.players);
     tournament.players.delete(userId);
     console.log('players after delete: ', tournament.players);
@@ -270,6 +272,18 @@ export function advancePlayerInTournament(
     // the final match
   }
 
+  const loserId =
+    winnerId === currMatch.player1Id
+      ? currMatch.player2Id
+      : currMatch.player1Id;
+  removeUserActiveGame(loserId, tournament.id);
+  if (loserId) {
+    const loser = tournament.players.get(loserId);
+    if (loser) {
+      loser.isEliminated = true;
+    }
+  }
+
   const nextMatch = findMatchById(tournament, currMatch.nextMatchId);
   if (!nextMatch) return;
 
@@ -296,12 +310,5 @@ export function advancePlayerInTournament(
     }
   }
 
-  const opponentId = winnerId === currMatch.player1Id ? currMatch.player2Id : currMatch.player1Id;
-  if (opponentId) {
-    const opponent = tournament.players.get(opponentId);
-    if (opponent)
-      opponent.isEliminated = true;
-  }
-  
   io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
 }

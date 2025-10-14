@@ -1,19 +1,21 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 
+import LoadingPong from '@/components/LoadingPong';
 import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
+
 import { socket } from '@/app/(protected)/lib/socket';
+import NotFound from '@/app/not-found';
 import { IPlayer } from '@/constants/game';
 import { useUser } from '@/context/UserContext';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
-import LoadingPong from '@/components/LoadingPong';
-import NotFound from '@/app/not-found';
 
 interface MatchPageParams extends Record<string, string> {
   tournamentId: string;
@@ -25,22 +27,29 @@ export default function GamePage() {
   const tournamentId = params.tournamentId;
   const matchGameId = params.gameId;
   const { user } = useUser();
-  const [accessToMatch, setAccessToMatch] = useState<'pending' | 'access' | '404'>('pending');
+  const [accessToMatch, setAccessToMatch] = useState<
+    'pending' | 'access' | '404'
+  >('pending');
 
-   useEffect(()=> {
+  useEffect(() => {
+    console.log('how many times sent readyForMatch??');
     socket.emit('tourn:readyForMatch', {
       userId: user.id,
       tournamentId,
       gameId: matchGameId,
     });
-     socket.on('notInMatch', ()=> {
-      console.log("ever got notInMatch???");
+    socket.on('notInMatch', () => {
+      console.log('ever got notInMatch???');
       setAccessToMatch('404');
     });
-    socket.on('inMatch', ()=> {
-      console.log("ever got InMatch???");
+    socket.on('inMatch', () => {
+      console.log('ever got InMatch???');
       setAccessToMatch('access');
     });
+    return () => {
+      socket.off('inMatch');
+      socket.off('notInMatch');
+    };
   }, []);
 
   const {
@@ -54,9 +63,8 @@ export default function GamePage() {
     inAnotherGame,
   } = usePongGameLogic(tournamentId, matchGameId);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
-  
-  if (accessToMatch === 'pending')
-    return <div></div>;
+
+  if (accessToMatch === 'pending') return <div></div>;
 
   const player: IPlayer = {
     id: user.id,
@@ -67,23 +75,21 @@ export default function GamePage() {
     isEliminated: false,
   };
 
- 
-
   function handleClose() {
     closeDialRef.current?.showModal();
   }
 
   if (inAnotherGame) return <AlreadyInGame />;
   if (accessToMatch === '404') {
-    return (
-      <NotFound />
-    );
+    return <NotFound />;
   }
   if (!player || !opponent || matching)
     return (
       <div className='text-center mt-12 h-[calc(100vh_-_72px)] flex flex-col justify-center'>
         <LoadingPong />
-        <h1 className='text-2xl font-bold mt-4'>Waiting for opponent to join</h1>
+        <h1 className='text-2xl font-bold mt-4'>
+          Waiting for opponent to join
+        </h1>
       </div>
     );
   return (
@@ -101,7 +107,11 @@ export default function GamePage() {
         />
       </button>
       {/* Close dialog */}
-      <CloseGameDialog dialogRef={closeDialRef} gameId={gameId} isTournamentGame={true} />
+      <CloseGameDialog
+        dialogRef={closeDialRef}
+        gameId={gameId}
+        isTournamentGame={true}
+      />
 
       <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
         {player && opponent && (

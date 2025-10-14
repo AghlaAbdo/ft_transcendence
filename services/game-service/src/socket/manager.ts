@@ -19,6 +19,7 @@ import {
   handleLeaveTournamentLobby,
   handleTournPlayerInLoby,
   handleReadyForMatch,
+  handleQuitTournament,
 } from './tournamentHandlers';
 
 let ioInstance: Server;
@@ -65,16 +66,25 @@ export function initializeSocketIO(server: http.Server): Server {
       (userId: string, tournamentId: string) =>
         handleRequestTournamentDetails(socket, userId, tournamentId),
     );
-    socket.on('leaveTournamentLobby', (userId: string, tournamentId: string) =>
-      handleLeaveTournamentLobby(socket, userId, tournamentId),
+    socket.on(
+      'leaveTournamentLobby',
+      (data: { userId: string; tournamentId: string }) =>
+        handleLeaveTournamentLobby(socket, data),
     );
-    socket.on('tourn:inLoby', (data: { tournamentId: string }) =>
-      handleTournPlayerInLoby(socket, data),
+    socket.on(
+      'tourn:inLoby',
+      (data: { userId: string; tournamentId: string }) =>
+        handleTournPlayerInLoby(socket, data),
     );
     socket.on(
       'tourn:readyForMatch',
       (data: { userId: string; tournamentId: string; gameId: string }) =>
         handleReadyForMatch(socket, data),
+    );
+    socket.on(
+      'quitTournament',
+      (data: { userId: string; tournamentId: string }) =>
+        handleQuitTournament(data),
     );
   });
 

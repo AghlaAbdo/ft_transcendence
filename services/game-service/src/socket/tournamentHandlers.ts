@@ -108,7 +108,7 @@ function joinPlayerToTournament(
 ): boolean {
   if (tournament.players.has(userId)) return false;
 
-  tournament.players.set(userId, {...user, isEliminated: false});
+  tournament.players.set(userId, { ...user, isEliminated: false });
   socket.join(tournament.id);
 
   return true;
@@ -116,12 +116,17 @@ function joinPlayerToTournament(
 
 export function handleTournPlayerInLoby(
   socket: Socket,
-  data: { tournamentId: string },
+  data: { userId: string; tournamentId: string },
 ) {
   const tournament = getTournament(data.tournamentId);
   const ioInstance = getIoInstance();
+  if (!tournament || !tournament.players.get(data.userId)) {
+    console.log('Player not in Tournament !!');
+    socket.emit('notInTournament');
+    return;
+  }
 
-  if (!tournament) return;
+  console.log('did increment readyPlayers??');
   tournament.readyPlayers++;
   if (tournament.readyPlayers === tournament.maxPlayers) {
     startTournament(tournament);
@@ -142,14 +147,15 @@ export function handleRequestTournamentDetails(
   const tournament = getTournament(tournamentId);
   console.log('sent tournament details');
   if (!tournament) {
-    console.log('Error: !tournament');
-    console.log('tonrnamentId: ', tournamentId);
-    socket.emit('tournamentError', 'Tournament not found.');
-    // socket.emit('redirect', '/tournament');
+    socket.emit('notInTournament');
     return;
   }
 
-  socket.join(tournamentId);
+  const player = tournament.players.get(userId);
+  if (!player) {
+    socket.emit('notInTournament');
+    return;
+  }
 
   socket.emit('tournamentDetails', {
     id: tournament.id,
@@ -163,17 +169,19 @@ export function handleRequestTournamentDetails(
 
 export function handleLeaveTournamentLobby(
   socket: Socket,
-  userId: string,
-  tournamentId: string,
+  data: {
+    userId: string;
+    tournamentId: string;
+  },
 ): void {
   const ioInstance = getIoInstance();
   console.log(
     'called LeavLobby, userId: ',
-    userId,
+    data.userId,
     ' tournamentId: ',
-    tournamentId,
+    data.tournamentId,
   );
-  const tournament = getTournament(tournamentId);
+  const tournament = getTournament(data.tournamentId);
   if (!tournament) {
     socket.emit('tournamentError', 'Tournament not found.');
     return;
@@ -186,18 +194,21 @@ export function handleLeaveTournamentLobby(
     return;
   }
 
-  const action = removePlayerFromTournamentLobby(tournamentId, userId);
+  const action = removePlayerFromTournamentLobby(
+    data.tournamentId,
+    data.userId,
+  );
 
   console.log('did sent tournment playerUpdate after player remove??');
-  ioInstance.to(tournamentId).emit('tournamentPlayerUpdate', {
-    userId,
+  ioInstance.to(data.tournamentId).emit('tournamentPlayerUpdate', {
+    userId: data.userId,
     action: 'left',
   });
-  removeUserActiveGame(userId, tournamentId);
-  socket.leave(tournamentId);
+  removeUserActiveGame(data.userId, data.tournamentId);
+  socket.leave(data.tournamentId);
   if (action === 'tournamentDeleted')
     ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
-  socket.emit('leftTournamentLobby', { tournamentId });
+  socket.emit('leftTournamentLobby', { tournamentId: data.tournamentId });
 }
 
 export function handleReadyForMatch(
@@ -207,12 +218,13 @@ export function handleReadyForMatch(
   const tournament = getTournament(data.tournamentId);
   const gameState = getGameState(data.gameId);
   if (!gameState || !tournament) {
-    console.log("!gameState || !tournament in handleReadyForMatch");
+    console.log('!gameState || !tournament in handleReadyForMatch');
     socket.emit('notInMatch');
     return;
   }
   socket.emit('inMatch');
-  console.log("sent Inmatch??");
+  console.log('sent Inmatch??');
+  console.log('got readyForMatch, userId: ', data.userId);
   const match = findMatchById(tournament, gameState.tournamentMatchId);
 
   if (!match) return;
@@ -222,4 +234,11 @@ export function handleReadyForMatch(
 
   if (match.isPlayer1Ready && match.isPlayer2Ready)
     startTournamentMatch(tournament, match.id);
+}
+
+export function handleQuitTournament(data: {
+  userId: string;
+  tournamentId: string;
+}) {
+  removeUserActiveGame(data.userId, data.tournamentId);
 }

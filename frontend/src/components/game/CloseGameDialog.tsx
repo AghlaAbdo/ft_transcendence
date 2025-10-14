@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { socket } from '@/app/(protected)/lib/socket';
 import { useLayout } from '@/context/LayoutContext';
@@ -10,7 +10,6 @@ interface MatchPageParams extends Record<string, string> {
   tournamentId: string;
   gameId: string;
 }
-
 
 export default function CloseGameDialog({
   dialogRef,
@@ -34,8 +33,7 @@ export default function CloseGameDialog({
     setHideHeaderSidebar(false);
     if (isTournamentGame)
       router.push(`/game/tournament/${params.tournamentId}`);
-    else
-      router.push('/game');
+    else router.push('/game');
   }
   return (
     <dialog
