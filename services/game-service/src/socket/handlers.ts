@@ -22,83 +22,105 @@ import {
 } from '../tournament/tournamentManager';
 import { getPlayerTournament } from '../utils/getPlayerTournament';
 import { IPlayer, ITournament } from '@/types/types';
+import {
+  removeUserSocket,
+  setUserSocket,
+  setUserSocketNull,
+} from '../utils/userSocketMapping';
 
 let ioInstance: Server;
 
-export function handleConnection(socket: Socket, io: Server): void {
-  socket.emit('welcome', 'Welcom to Pong Wrold');
+export function handleConnection(
+  socket: Socket,
+  io: Server,
+  userId: string,
+): void {
+  console.log('called handleConnection socketId: ', socket.id);
   setIoInstance(io);
+  setUserSocket(userId, socket.id);
+  const userActiveGameId = getUserActiveGame(userId);
+  if (userActiveGameId) {
+    const gameState = getGameState(userActiveGameId);
+    if (gameState) {
+      socket.join(gameState.id);
+    }
+  }
   ioInstance = io;
 }
 
 export function handleDisconnect(socket: Socket, reason: string): void {
   console.log('Disconnected id: ', socket.id, ' Because: ', reason);
-  const allGames = getAllGames();
 
-  const gameToQuit = Object.values(allGames.games).find(
-    (game) =>
-      game.player1.socketId === socket.id ||
-      game.player2.socketId === socket.id,
-  );
+  setUserSocketNull(socket.id);
+  setTimeout(() => removeUserSocket(socket.id), 5000);
+  return;
 
-  const { player, tournament } = getPlayerTournament(socket.id);
-  if (tournament && player) {
-    console.log('userId to delete: ', player.id);
-    if (tournament && player.id) {
-      tournament.players.delete(player.id);
-      console.log('Did delete user from tournament when disconnect!!');
-    }
-  }
+  // const allGames = getAllGames();
 
-  if (gameToQuit) {
-    const quitterRole =
-      gameToQuit.player1.socketId === socket.id ? 'player1' : 'player2';
-    const opponentRole = quitterRole === 'player1' ? 'player2' : 'player1';
+  // const gameToQuit = Object.values(allGames.games).find(
+  //   (game) =>
+  //     game.player1.socketId === socket.id ||
+  //     game.player2.socketId === socket.id,
+  // );
 
-    gameToQuit.winner_id =
-      quitterRole === 'player1' ? gameToQuit.player2.id : gameToQuit.player1.id;
-    gameToQuit.playtime = gameToQuit.startAt
-      ? getDiffInMin(gameToQuit.startAt)
-      : 0;
-    if (!gameToQuit.startDate) gameToQuit.startDate = getCurrDate();
-    postGame(gameToQuit);
-    if (gameToQuit.isTournamentGame) {
-      advancePlayerInTournament(
-        gameToQuit.tournamentId!,
-        gameToQuit.tournamentMatchId!,
-        gameToQuit.winner_id!,
-      );
-    }
+  // const { player, tournament } = getPlayerTournament(socket.id);
+  // if (tournament && player) {
+  //   console.log('userId to delete: ', player.id);
+  //   if (tournament && player.id) {
+  //     tournament.players.delete(player.id);
+  //     console.log('Did delete user from tournament when disconnect!!');
+  //   }
+  // }
 
-    const opponentSocketId =
-      opponentRole === 'player1'
-        ? gameToQuit.player1.socketId
-        : gameToQuit.player2.socketId;
+  // if (gameToQuit) {
+  //   const quitterRole =
+  //     gameToQuit.player1.socketId === socket.id ? 'player1' : 'player2';
+  //   const opponentRole = quitterRole === 'player1' ? 'player2' : 'player1';
 
-    if (opponentSocketId) {
-      console.log('sent opponentQuit event!!');
-      console.log('game.status: ', gameToQuit.game.status);
-      ioInstance.to(opponentSocketId).emit('prepare');
-      const gameStatus = gameToQuit.game.status;
-      if (gameStatus === 'waiting') {
-        setTimeout(() => {
-          ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
-        }, 1000);
-      } else ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
-    }
-    const gameStatus = gameToQuit.game.status;
-    if (gameStatus === 'waiting' || gameStatus === 'playing') {
-      gameToQuit.game.status = 'ended';
-      removeUserActiveGame(gameToQuit.player1.id, gameToQuit.id);
-      removeUserActiveGame(gameToQuit.player2.id, gameToQuit.id);
-      if (allGames.lobyGame === gameToQuit.id) {
-        allGames.lobyGame = null;
-      }
-      deleteGame(gameToQuit);
-    } else {
-      deleteGame(gameToQuit);
-    }
-  }
+  //   gameToQuit.winner_id =
+  //     quitterRole === 'player1' ? gameToQuit.player2.id : gameToQuit.player1.id;
+  //   gameToQuit.playtime = gameToQuit.startAt
+  //     ? getDiffInMin(gameToQuit.startAt)
+  //     : 0;
+  //   if (!gameToQuit.startDate) gameToQuit.startDate = getCurrDate();
+  //   postGame(gameToQuit);
+  //   if (gameToQuit.isTournamentGame) {
+  //     advancePlayerInTournament(
+  //       gameToQuit.tournamentId!,
+  //       gameToQuit.tournamentMatchId!,
+  //       gameToQuit.winner_id!,
+  //     );
+  //   }
+
+  //   const opponentSocketId =
+  //     opponentRole === 'player1'
+  //       ? gameToQuit.player1.socketId
+  //       : gameToQuit.player2.socketId;
+
+  //   if (opponentSocketId) {
+  //     console.log('sent opponentQuit event!!');
+  //     console.log('game.status: ', gameToQuit.game.status);
+  //     ioInstance.to(opponentSocketId).emit('prepare');
+  //     const gameStatus = gameToQuit.game.status;
+  //     if (gameStatus === 'waiting') {
+  //       setTimeout(() => {
+  //         ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
+  //       }, 1000);
+  //     } else ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
+  //   }
+  //   const gameStatus = gameToQuit.game.status;
+  //   if (gameStatus === 'waiting' || gameStatus === 'playing') {
+  //     gameToQuit.game.status = 'ended';
+  //     removeUserActiveGame(gameToQuit.player1.id, gameToQuit.id);
+  //     removeUserActiveGame(gameToQuit.player2.id, gameToQuit.id);
+  //     if (allGames.lobyGame === gameToQuit.id) {
+  //       allGames.lobyGame = null;
+  //     }
+  //     deleteGame(gameToQuit);
+  //   } else {
+  //     deleteGame(gameToQuit);
+  //   }
+  // }
 }
 
 export async function handlePlay(socket: Socket, userId: string) {
@@ -143,6 +165,7 @@ export async function handlePlay(socket: Socket, userId: string) {
     allGames.lobyGame = gameId;
   } else {
     const lobyGameId = allGames.lobyGame;
+    allGames.games[lobyGameId].game.status = 'playing';
     if (allGames.games[lobyGameId].player1.id === user.id) {
       deleteGame(allGames.games[lobyGameId]);
       allGames.lobyGame = null;
@@ -178,6 +201,9 @@ export function handleMovePaddle(
   playerRole: string,
   dir: 'up' | 'down',
 ) {
+  // console.log("on movePaddle, gameId: ", gameId);
+  // console.log("playerRole: ", playerRole);
+  // console.log("dir: ", dir);
   const gameState = getGameState(gameId);
   if (!gameState) return;
   if (dir === 'up') paddleMoveUp(gameState, playerRole);
@@ -223,6 +249,7 @@ export function handleRematch(
   }
   if (gameState.player1.ready && gameState.player2.ready) {
     resetGameState(gameState);
+    gameState.game.status = 'playing';
     setTimeout(() => {
       socket.to(gameId).emit('playAgain');
       socket.emit('playAgain');
@@ -281,4 +308,43 @@ export function handleCancelMatching(gameId: string) {
   }
   deleteGame(getGameState(gameId));
   getAllGames().lobyGame = null;
+}
+
+export function handleRequestGameState(socket: Socket, userId: string) {
+  const gameId = getUserActiveGame(userId);
+  console.log('gameId in handleRequestGameState: ', gameId);
+
+  if (gameId) {
+    const gameState = getGameState(gameId);
+    console.log('gameState is: ', gameState);
+    if (gameState) {
+      let player;
+      let playerRole;
+      let opponent;
+      if (userId === gameState.player1.id) {
+        player = gameState.player1;
+        opponent = gameState.player2.id ? gameState.player2 : null;
+        playerRole = 'player1';
+      } else {
+        player = gameState.player2;
+        opponent = gameState.player1;
+        playerRole = 'player2';
+      }
+      socket.emit('matchDetails', {
+        gameId,
+        gameStatus: gameState.game.status,
+        player,
+        opponent,
+        playerRole,
+      });
+      return;
+    }
+  }
+  socket.emit('matchDetails', {
+    gameId: null,
+    gameStatus: 'notFound',
+    player: null,
+    opponent: null,
+    playerRole: null,
+  });
 }

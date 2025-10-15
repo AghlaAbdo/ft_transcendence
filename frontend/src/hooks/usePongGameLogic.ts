@@ -27,6 +27,7 @@ interface returnType {
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
   inAnotherGame: boolean;
+  gameStatus: 'playing' | 'waiting' | 'notFound' | null;
 }
 
 export const usePongGameLogic = (
@@ -46,6 +47,9 @@ export const usePongGameLogic = (
   const playerRole = useRef<'player1' | 'player2'>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const isTournamentGame = useRef<boolean>(false);
+  const [gameStatus, setGameStatus] = useState<
+    'playing' | 'waiting' | 'notFound' | null
+  >(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pixiApp = useRef<PIXI.Application | null>(null);
@@ -93,7 +97,7 @@ export const usePongGameLogic = (
   }, []);
 
   useEffect(() => {
-    if (matching) return;
+    if (!gameStatus || matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
       try {
@@ -244,7 +248,7 @@ export const usePongGameLogic = (
         pixiApp.current = null;
       }
     };
-  }, [matching]);
+  }, [matching, gameStatus]);
 
   const transformX = useCallback(
     (x: number, playerRole: 'player1' | 'player2'): number => {
@@ -266,8 +270,46 @@ export const usePongGameLogic = (
   }, []);
 
   useEffect(() => {
-    if (!isTournamentGame.current) socket.connect();
-    else {
+    console.log('sent requestGameStatus??');
+    socket.emit('requestMatchDetails', user.id);
+    socket.on(
+      'matchDetails',
+      (data: {
+        gameId: string | null;
+        gameStatus: 'playing' | 'waiting' | 'notFound';
+        player: IPlayer | null;
+        opponent: IPlayer | null;
+        playerRole: 'player1' | 'player2' | null;
+      }) => {
+        console.log('gameStatus recived: ', data);
+        setGameStatus(data.gameStatus);
+        if (!isTournamentGame.current && data.gameStatus === 'notFound') {
+          console.log('sent Play Now');
+          socket.emit('play', user.id);
+        } else if (data.gameStatus === 'playing') {
+          console.log("is gameStatus 'playing' ??");
+          playerRole.current = data.playerRole;
+          gameId.current = data.gameId;
+          setPlayer(data.player);
+          setMatching(false);
+          isPlaying.current = true;
+          if (!animationFrameId.current)
+            animationFrameId.current = requestAnimationFrame(gameLoop);
+          setHideHeaderSidebar(true);
+          if (data.opponent) setOpponent(data.opponent);
+        } else if (data.gameStatus === 'waiting') {
+          console.log('did set player: ', data.player);
+          setPlayer(data.player);
+          playerRole.current = data.playerRole;
+          gameId.current = data.gameId;
+          // gameId.current = data.gameId;
+          // playerRole.current = data.playerRole;
+        }
+      }
+    );
+    // if (!gameStatus) return;
+
+    if (isTournamentGame.current) {
       // socket.emit('tourn:readyForMatch', {
       //   userId: user.id,
       //   tournamentId,
@@ -282,13 +324,12 @@ export const usePongGameLogic = (
       console.log('Socket ID:', socket.id);
     });
 
-    console.log('Play Now');
-    if (!isTournamentGame.current) socket.emit('play', user.id);
+    // if (!isTournamentGame.current && !gameStatus) socket.emit('play', user.id);
 
-    socket.on('inAnotherGame', () => {
-      console.log('Already in another game!!!');
-      setInAnotherGame(true);
-    });
+    // socket.on('inAnotherGame', () => {
+    //   console.log('Already in another game!!!');
+    //   setInAnotherGame(true);
+    // });
 
     socket.on(
       'playerData',
@@ -435,20 +476,21 @@ export const usePongGameLogic = (
       if (isPlaying.current) {
         socket.emit('quit', gameId.current, user.id);
       }
-      if (!isTournamentGame.current) {
-        socket.off();
-        socket.disconnect();
-      } else {
-        socket.off('inAnotherGame');
-        socket.off('playerData');
-        socket.off('prepare');
-        socket.off('starting');
-        socket.off('startGame');
-        socket.off('matchFound');
-        socket.off('gameStateUpdate');
-        socket.off('gameOver');
-        socket.off('opponentQuit');
-      }
+      // if (!isTournamentGame.current) {
+      //   socket.off();
+      //   socket.disconnect();
+      // } else {
+      socket.off('inAnotherGame');
+      socket.off('playerData');
+      socket.off('prepare');
+      socket.off('starting');
+      socket.off('startGame');
+      socket.off('matchFound');
+      socket.off('gameStateUpdate');
+      socket.off('gameOver');
+      socket.off('opponentQuit');
+      socket.off('gameStateDetails');
+      // }
     };
   }, []);
 
@@ -474,5 +516,6 @@ export const usePongGameLogic = (
     gameId: gameId.current,
     playerRole: playerRole.current,
     inAnotherGame,
+    gameStatus,
   };
 };

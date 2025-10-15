@@ -10,6 +10,7 @@ import {
   handleRematch,
   handleQuit,
   handleCancelMatching,
+  handleRequestGameState,
 } from './handlers';
 import {
   handleJoinTournament,
@@ -40,7 +41,9 @@ export function initializeSocketIO(server: http.Server): Server {
 
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');
-    handleConnection(socket, io);
+    socket.on('hello', (userId: string) =>
+      handleConnection(socket, io, userId),
+    );
     socket.on('play', (userId) => handlePlay(socket, userId));
     socket.on('movePaddle', (gameId, playerRole, dir) =>
       handleMovePaddle(gameId, playerRole, dir),
@@ -52,6 +55,11 @@ export function initializeSocketIO(server: http.Server): Server {
     );
     socket.on('quit', (gameId, userId) => handleQuit(socket, gameId, userId));
     socket.on('cancelMatching', (gameId) => handleCancelMatching(gameId));
+    socket.on('requestMatchDetails', (userId: string) =>
+      handleRequestGameState(socket, userId),
+    );
+
+    // -------- Tournament --------
     socket.on(
       'createTournament',
       (userId: string, maxPlayer: number, name: string) =>

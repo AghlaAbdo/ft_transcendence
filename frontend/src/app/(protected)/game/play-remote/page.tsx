@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
+import LoadingPong from '@/components/LoadingPong';
 import Matching from '@/components/Matching';
 import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
@@ -25,6 +26,7 @@ export default function GamePage() {
     gameId,
     playerRole,
     inAnotherGame,
+    gameStatus,
   } = usePongGameLogic(null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
@@ -43,10 +45,27 @@ export default function GamePage() {
   }
 
   if (inAnotherGame) return <AlreadyInGame />;
+  if (!player || !gameId) {
+    return (
+      <div className='flex h-[calc(100vh_-_72px)] justify-center items-center'>
+        <LoadingPong />
+        !player || !gameId
+      </div>
+    );
+  } else if (matching) {
+    return <Matching player={player} opponent={opponent} gameId={gameId} />;
+  } else if (!opponent) {
+    return (
+      <div className='flex h-[100vh] justify-center items-center'>
+        <LoadingPong />
+        !opponent
+      </div>
+    );
+  }
   return (
     <>
       {matching && (
-        <Matching player={player} opponent={opponent} gameId={gameId!} />
+        <Matching player={player} opponent={opponent} gameId={gameId} />
       )}
       {!matching && (
         <>
@@ -70,15 +89,15 @@ export default function GamePage() {
           />
 
           <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
-            <GamePlayers leftUser={player!} rightUser={opponent!} />
+            <GamePlayers leftUser={player} rightUser={opponent} />
             <div
               ref={containerRef}
               className='mx-auto rounded-[8px] overflow-hidden border-2 border-pink aspect-[3/2] w-[min(100%,1600px,calc((100vh-140px)*(3/2)))] shadow-[0_0_14px_4px_rgba(236,72,135,1)]'
             ></div>
             <GameResultCard
               ref={dialogRef}
-              leftUser={player!}
-              rightUser={opponent!}
+              leftUser={player}
+              rightUser={opponent}
               winner={winner}
               gameId={gameId}
               playerRole={playerRole}

@@ -226,6 +226,7 @@ export function startTournamentMatch(tournament: ITournament, matchId: string) {
   }
 
   match.status = 'playing';
+  gameState.game.status = 'playing';
   player1Socket.emit('playerData', {
     playerRole: 'player1',
     gameId: gameState.id,
