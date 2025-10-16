@@ -13,6 +13,7 @@ import {
   getUserActiveGame,
   setUserActiveGame,
   removeUserActiveGame,
+  getUserActiveTournament,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { getCurrDate, getDiffInMin } from '../utils/dates';
@@ -21,7 +22,7 @@ import {
   getTournament,
 } from '../tournament/tournamentManager';
 import { getPlayerTournament } from '../utils/getPlayerTournament';
-import { IPlayer, ITournament } from '@/types/types';
+import { IPlayer, ITournament } from '../types/types';
 import {
   removeUserSocket,
   setUserSocket,
@@ -35,15 +36,18 @@ export function handleConnection(
   io: Server,
   userId: string,
 ): void {
-  console.log('called handleConnection socketId: ', socket.id);
+  console.log('called handleConnection userId: ', userId);
   setIoInstance(io);
   setUserSocket(userId, socket.id);
   const userActiveGameId = getUserActiveGame(userId);
+  const userActiveTournamentId = getUserActiveTournament(userId);
   if (userActiveGameId) {
-    const gameState = getGameState(userActiveGameId);
-    if (gameState) {
-      socket.join(gameState.id);
-    }
+    console.log('did join Socket to gameId again?: ', userActiveGameId);
+    socket.join(userActiveGameId);
+  }
+  if (userActiveTournamentId) {
+    console.log('did join Socket to tourId again?: ', userActiveTournamentId);
+    socket.join(userActiveTournamentId);
   }
   ioInstance = io;
 }
@@ -316,7 +320,7 @@ export function handleRequestGameState(socket: Socket, userId: string) {
 
   if (gameId) {
     const gameState = getGameState(gameId);
-    console.log('gameState is: ', gameState);
+    // console.log('gameState is: ', gameState);
     if (gameState) {
       let player;
       let playerRole;

@@ -3,6 +3,7 @@ import {
   getUserActiveGame,
   setUserActiveGame,
   removeUserActiveGame,
+  setUserActiveTournament,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import {
@@ -51,7 +52,6 @@ export async function handleCreateTournament(
   );
 
   if (playerJoined) {
-    setUserActiveGame(userId, newTournament.id);
     socket.join(newTournament.id);
     socket.emit('tournamentCreated', { tournamentId: newTournament.id });
     ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
@@ -88,8 +88,6 @@ export async function handleJoinTournament(
   const playerJoined = joinPlayerToTournament(tournament, userId, user, socket);
 
   if (playerJoined) {
-    setUserActiveGame(userId, tournamentId);
-
     socket.emit('tournamentJoined', { tournamentId: tournamentId });
     ioInstance.to(tournamentId).emit('tournamentPlayerUpdate', {
       userId: userId,
@@ -108,6 +106,7 @@ function joinPlayerToTournament(
 ): boolean {
   if (tournament.players.has(userId)) return false;
 
+  setUserActiveTournament(userId, tournament.id);
   tournament.players.set(userId, { ...user, isEliminated: false });
   socket.join(tournament.id);
 
@@ -224,6 +223,10 @@ export function handleReadyForMatch(
   }
   socket.emit('inMatch');
   console.log('sent Inmatch??');
+  if (gameState.game.status === 'playing') {
+    console.log("gameStatus is 'playing' in handleReadyForMatch!!");
+    return;
+  }
   console.log('got readyForMatch, userId: ', data.userId);
   const match = findMatchById(tournament, gameState.tournamentMatchId);
 
@@ -241,4 +244,48 @@ export function handleQuitTournament(data: {
   tournamentId: string;
 }) {
   removeUserActiveGame(data.userId, data.tournamentId);
+}
+
+export function handleRequestTournMatchDetails(
+  socket: Socket,
+  data: {
+    userId: string;
+    tournamentId: string;
+    matchGameId: string;
+  },
+) {
+  const tournament = getTournament(data.tournamentId);
+  if (data.matchGameId) {
+    const gameState = getGameState(data.matchGameId);
+    // console.log('gameState is: ', gameState);
+    if (gameState) {
+      let player;
+      let playerRole;
+      let opponent;
+      if (data.userId === gameState.player1.id) {
+        player = gameState.player1;
+        opponent = gameState.player2.id ? gameState.player2 : null;
+        playerRole = 'player1';
+      } else {
+        player = gameState.player2;
+        opponent = gameState.player1;
+        playerRole = 'player2';
+      }
+      socket.emit('tournMatchDetails', {
+        gameId: data.matchGameId,
+        gameStatus: gameState.game.status,
+        player,
+        opponent,
+        playerRole,
+      });
+      return;
+    }
+  }
+  socket.emit('tournMatchDetails', {
+    gameId: null,
+    gameStatus: 'notFound',
+    player: null,
+    opponent: null,
+    playerRole: null,
+  });
 }

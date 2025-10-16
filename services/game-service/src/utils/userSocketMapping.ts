@@ -21,6 +21,10 @@ export function removeUserSocket(socketId: string) {
   socketUserMap.delete(socketId);
 }
 
-export function getUserSocket(userId: string) {
+export function getUserSocketId(userId: string) {
+  console.log('\n------ userSocketMap: --------\n--- UserId: ', userId);
+  userSocketMap.forEach((value, key) =>
+    console.log('key: ', key, ' | value: ', value, '\n'),
+  );
   return userSocketMap.get(userId);
 }

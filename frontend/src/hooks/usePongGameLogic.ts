@@ -271,65 +271,77 @@ export const usePongGameLogic = (
 
   useEffect(() => {
     console.log('sent requestGameStatus??');
-    socket.emit('requestMatchDetails', user.id);
-    socket.on(
-      'matchDetails',
-      (data: {
-        gameId: string | null;
-        gameStatus: 'playing' | 'waiting' | 'notFound';
-        player: IPlayer | null;
-        opponent: IPlayer | null;
-        playerRole: 'player1' | 'player2' | null;
-      }) => {
-        console.log('gameStatus recived: ', data);
-        setGameStatus(data.gameStatus);
-        if (!isTournamentGame.current && data.gameStatus === 'notFound') {
-          console.log('sent Play Now');
-          socket.emit('play', user.id);
-        } else if (data.gameStatus === 'playing') {
-          console.log("is gameStatus 'playing' ??");
-          playerRole.current = data.playerRole;
-          gameId.current = data.gameId;
-          setPlayer(data.player);
-          setMatching(false);
-          isPlaying.current = true;
-          if (!animationFrameId.current)
-            animationFrameId.current = requestAnimationFrame(gameLoop);
-          setHideHeaderSidebar(true);
-          if (data.opponent) setOpponent(data.opponent);
-        } else if (data.gameStatus === 'waiting') {
-          console.log('did set player: ', data.player);
-          setPlayer(data.player);
-          playerRole.current = data.playerRole;
-          gameId.current = data.gameId;
-          // gameId.current = data.gameId;
-          // playerRole.current = data.playerRole;
-        }
-      }
-    );
-    // if (!gameStatus) return;
-
     if (isTournamentGame.current) {
-      // socket.emit('tourn:readyForMatch', {
-      //   userId: user.id,
-      //   tournamentId,
-      //   gameId: matchGameId,
-      // });
-      console.log('sent readyForMatch!!');
-      console.log('tournamentId: ', tournamentId);
-      console.log('gameId: ', gameId);
+      socket.emit('requestTournMatchDetails', {
+        userId: user.id,
+        tournamentId: tournamentId,
+        matchGameId,
+      });
+      socket.on(
+        'tournMatchDetails',
+        (data: {
+          gameId: string | null;
+          gameStatus: 'playing' | 'waiting' | 'notFound';
+          player: IPlayer | null;
+          opponent: IPlayer | null;
+          playerRole: 'player1' | 'player2' | null;
+        }) => {
+          console.log('match DAta received: ', data);
+          setGameStatus(data.gameStatus);
+          if (data.gameStatus === 'playing') {
+            console.log("is gameStatus 'playing' ??");
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+            setPlayer(data.player);
+            setMatching(false);
+            isPlaying.current = true;
+            if (!animationFrameId.current)
+              animationFrameId.current = requestAnimationFrame(gameLoop);
+            setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          }
+        }
+      );
+    } else {
+      socket.emit('requestMatchDetails', user.id);
+      socket.on(
+        'matchDetails',
+        (data: {
+          gameId: string | null;
+          gameStatus: 'playing' | 'waiting' | 'notFound';
+          player: IPlayer | null;
+          opponent: IPlayer | null;
+          playerRole: 'player1' | 'player2' | null;
+        }) => {
+          console.log('gameStatus recived: ', data);
+          setGameStatus(data.gameStatus);
+          if (!isTournamentGame.current && data.gameStatus === 'notFound') {
+            console.log('sent Play Now');
+            socket.emit('play', user.id);
+          } else if (data.gameStatus === 'playing') {
+            console.log("is gameStatus 'playing' ??");
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+            setPlayer(data.player);
+            setMatching(false);
+            isPlaying.current = true;
+            if (!animationFrameId.current)
+              animationFrameId.current = requestAnimationFrame(gameLoop);
+            setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          } else if (data.gameStatus === 'waiting') {
+            console.log('did set player: ', data.player);
+            setPlayer(data.player);
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+          }
+        }
+      );
     }
     socket.on('connect', () => {
       console.log('Connected to Socket.IO server!');
       console.log('Socket ID:', socket.id);
     });
-
-    // if (!isTournamentGame.current && !gameStatus) socket.emit('play', user.id);
-
-    // socket.on('inAnotherGame', () => {
-    //   console.log('Already in another game!!!');
-    //   setInAnotherGame(true);
-    // });
 
     socket.on(
       'playerData',
@@ -489,7 +501,8 @@ export const usePongGameLogic = (
       socket.off('gameStateUpdate');
       socket.off('gameOver');
       socket.off('opponentQuit');
-      socket.off('gameStateDetails');
+      socket.off('tournMatchDetails');
+      socket.off('matchDetails');
       // }
     };
   }, []);

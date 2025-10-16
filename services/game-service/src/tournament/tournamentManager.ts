@@ -4,7 +4,11 @@ import { ITournament, IRound, IMatch } from '../types/types';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
 import { startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
-import { removeUserActiveGame } from '../remote-game/userActiveGame';
+import {
+  removeUserActiveGame,
+  setUserActiveGame,
+} from '../remote-game/userActiveGame';
+import { getUserSocketId } from '../utils/userSocketMapping';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -183,9 +187,9 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
     return;
   }
 
-  const player1Socket = io.sockets.sockets.get(player1Info.socketId);
-  const player2Socket = io.sockets.sockets.get(player2Info.socketId);
-  if (!player1Socket || !player2Socket) {
+  const player1SocketId = getUserSocketId(player1Info.id);
+  const player2SocketId = getUserSocketId(player2Info.id);
+  if (!player1SocketId || !player2SocketId) {
     console.error("Couldn't get players sockets !!!");
     return;
   }
@@ -200,10 +204,12 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   getAllGames().games[gameId] = gameState;
   match.gameId = gameId;
 
-  player1Socket.emit('matchReady', { gameId, opponent: player2Info });
-  player2Socket.emit('matchReady', { gameId, opponent: player1Info });
-  player1Socket.join(gameId);
-  player2Socket.join(gameId);
+  io.to(player1SocketId).emit('matchReady', { gameId, opponent: player2Info });
+  io.to(player2SocketId).emit('matchReady', { gameId, opponent: player1Info });
+  io.in(player1SocketId).socketsJoin(gameId);
+  io.in(player2SocketId).socketsJoin(gameId);
+  // player1Socket.join(gameId);
+  // player2Socket.join(gameId);
 }
 
 export function startTournamentMatch(tournament: ITournament, matchId: string) {
@@ -218,27 +224,29 @@ export function startTournamentMatch(tournament: ITournament, matchId: string) {
     console.error(`Missing player info for match ${match.id}.`);
     return;
   }
-  const player1Socket = io.sockets.sockets.get(player1Info.socketId);
-  const player2Socket = io.sockets.sockets.get(player2Info.socketId);
-  if (!player1Socket || !player2Socket) {
-    console.error("Couldn't get players sockets !!!");
+  setUserActiveGame(player1Info.id, gameState.id);
+  setUserActiveGame(player2Info.id, gameState.id);
+  const player1SocketId = getUserSocketId(player1Info.id);
+  const player2SocketId = getUserSocketId(player2Info.id);
+  if (!player1SocketId || !player2SocketId) {
+    console.error("Couldn't get players sockets in startTournamentMatch !!!");
     return;
   }
 
   match.status = 'playing';
   gameState.game.status = 'playing';
-  player1Socket.emit('playerData', {
+  io.to(player1SocketId).emit('playerData', {
     playerRole: 'player1',
     gameId: gameState.id,
     player: player1Info,
   });
-  player2Socket.emit('playerData', {
+  io.to(player2SocketId).emit('playerData', {
     playerRole: 'player2',
     gameId: gameState.id,
     player: player2Info,
   });
-  player1Socket.emit('matchFound', player2Info);
-  player2Socket.emit('matchFound', player1Info);
+  io.to(player1SocketId).emit('matchFound', player2Info);
+  io.to(player2SocketId).emit('matchFound', player1Info);
   startGame(gameState);
 }
 
