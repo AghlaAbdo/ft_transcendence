@@ -51,7 +51,6 @@ export function generateGameState(
     },
     player1: {
       id: player1.id,
-      socketId: player1.socketId,
       username: player1.username,
       avatar: player1.avatar,
       frame: player1.frame,
@@ -60,7 +59,6 @@ export function generateGameState(
     },
     player2: {
       id: player2 ? player2.id : null,
-      socketId: player2 ? player2.socketId : null,
       username: player2 ? player2.username : null,
       avatar: player2 ? player2.avatar : null,
       frame: player2 ? player2.frame : null,

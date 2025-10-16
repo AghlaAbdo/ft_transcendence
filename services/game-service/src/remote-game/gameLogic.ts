@@ -147,8 +147,8 @@ function gameOver(gameState: IGameState): void {
       gameState.tournamentMatchId!,
       gameState.winner_id!,
     );
-    deleteGame(gameState);
   }
+  deleteGame(gameState);
 }
 
 export function deleteGame(gameState: IGameState): void {

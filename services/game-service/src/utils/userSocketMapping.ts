@@ -28,3 +28,7 @@ export function getUserSocketId(userId: string) {
   );
   return userSocketMap.get(userId);
 }
+
+export function getUserId(socketId: string) {
+  return socketUserMap.get(socketId);
+}

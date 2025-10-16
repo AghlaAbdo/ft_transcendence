@@ -51,8 +51,8 @@ export function initializeSocketIO(server: http.Server): Server {
     );
     socket.on('gameOver', () => handleGameOver());
     socket.on('disconnect', (reason) => handleDisconnect(socket, reason));
-    socket.on('rematch', (gameId, playerRole) =>
-      handleRematch(socket, gameId, playerRole),
+    socket.on('rematch', (gameId, playerRole, userId) =>
+      handleRematch(socket, gameId, playerRole, userId),
     );
     socket.on('quit', (gameId, userId) => handleQuit(socket, gameId, userId));
     socket.on('cancelMatching', (gameId) => handleCancelMatching(gameId));

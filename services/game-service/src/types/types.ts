@@ -27,7 +27,6 @@ export interface IGameState {
   playtime: number | null;
   player1: {
     id: string | null;
-    socketId: string | null;
     username: string | null;
     avatar: string | null;
     frame: string | null;
@@ -36,7 +35,6 @@ export interface IGameState {
   };
   player2: {
     id: string | null;
-    socketId: string | null;
     username: string | null;
     avatar: string | null;
     frame: string | null;
@@ -44,7 +42,7 @@ export interface IGameState {
     ready: boolean;
   };
   game: {
-    status: 'waiting' | 'playing' | 'ended';
+    status: 'waiting' | 'playing' | 'ended' | 'rematching';
     ball: IBall;
     leftPaddle: IPaddle;
     rightPaddle: IPaddle;
@@ -62,7 +60,6 @@ export interface IGmaes {
 
 export interface IPlayer {
   id: string;
-  socketId: string;
   username: string;
   avatar: string;
   frame: string;

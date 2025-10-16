@@ -27,6 +27,8 @@ import {
   removeUserSocket,
   setUserSocket,
   setUserSocketNull,
+  getUserId,
+  getUserSocketId,
 } from '../utils/userSocketMapping';
 
 let ioInstance: Server;
@@ -57,6 +59,18 @@ export function handleDisconnect(socket: Socket, reason: string): void {
 
   setUserSocketNull(socket.id);
   setTimeout(() => removeUserSocket(socket.id), 5000);
+
+  const userId = getUserId(socket.id);
+  if (userId) {
+    const userActiveGameId = getUserActiveGame(userId);
+    if (userActiveGameId) {
+      const gameState = getGameState(userActiveGameId);
+      if (gameState.game.status != 'playing') {
+        handleQuit(socket, userActiveGameId, userId);
+      }
+    }
+  }
+
   return;
 
   // const allGames = getAllGames();
@@ -157,7 +171,6 @@ export async function handlePlay(socket: Socket, userId: string) {
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
     setUserActiveGame(userId, gameId);
-    user.socketId = socket.id;
     allGames.games[gameId] = generateGameState(gameId, user, null, null, null);
     console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
     socket.emit('playerData', {
@@ -182,7 +195,6 @@ export async function handlePlay(socket: Socket, userId: string) {
     allGames.games[lobyGameId].player2.avatar = user.avatar;
     allGames.games[lobyGameId].player2.frame = user.frame;
     allGames.games[lobyGameId].player2.level = user.level;
-    allGames.games[lobyGameId].player2.socketId = socket.id;
     socket.join(lobyGameId);
     socket.emit('playerData', {
       playerRole: 'player2',
@@ -218,48 +230,56 @@ export function handleGameOver(): void {
   // TODO
 }
 
-export function handleRematch(
+export async function handleRematch(
   socket: Socket,
   gameId: string,
   playerRole: 'player1' | 'player2' | null,
-): void {
-  console.log('Recived rematch!!');
+  userId: string,
+) {
+  console.log('Recived rematch!!, gameId: ', gameId);
+  console.log('userId in handle rematch: ', userId);
   if (!playerRole) {
     console.log('playerRole is null!!');
     return;
   }
 
-  const gameState = getGameState(gameId);
-  if (!gameState) return;
-
-  const userId =
-    playerRole === 'player1' ? gameState.player1.id : gameState.player2.id;
-  const activeGame = getUserActiveGame(userId);
-  if (activeGame && activeGame !== gameId) {
-    socket.emit('inAnotherGame');
-    socket.to(gameState.id).emit('opponentQuit', gameState.game.status);
-    removeUserActiveGame(gameState.player1.id, gameState.id);
-    removeUserActiveGame(gameState.player2.id, gameState.id);
-    return;
-  }
-
-  socket.to(gameId).emit('rematch');
-  if (playerRole === 'player1') {
+  const user = await getPlayerInfo(userId);
+  if (!getGameState(gameId)) {
+    const gameState = generateGameState(gameId, user, null, null, null);
+    gameState.game.status = 'rematching';
     gameState.player1.ready = true;
     setUserActiveGame(gameState.player1.id, gameId);
+    getAllGames().games[gameId] = gameState;
   } else {
+    const gameState = getGameState(gameId);
+    if (!gameState) return;
+
+    gameState.game.status = 'rematching';
+    const activeGame = getUserActiveGame(userId);
+    if (activeGame && activeGame !== gameId) {
+      socket.emit('inAnotherGame');
+      socket.to(gameState.id).emit('opponentQuit', gameState.game.status);
+      return;
+    }
+
+    gameState.playersNb++;
+    gameState.player2.id = user.id;
+    gameState.player2.username = user.username;
+    gameState.player2.avatar = user.avatar;
+    gameState.player2.frame = user.frame;
+    gameState.player2.level = user.level;
     gameState.player2.ready = true;
     setUserActiveGame(gameState.player2.id, gameId);
+    if (gameState.player1.ready && gameState.player2.ready) {
+      gameState.game.status = 'playing';
+      setTimeout(() => {
+        socket.to(gameId).emit('playAgain');
+        socket.emit('playAgain');
+        startGame(gameState);
+      }, 2000);
+    }
   }
-  if (gameState.player1.ready && gameState.player2.ready) {
-    resetGameState(gameState);
-    gameState.game.status = 'playing';
-    setTimeout(() => {
-      socket.to(gameId).emit('playAgain');
-      socket.emit('playAgain');
-      startGame(gameState);
-    }, 2000);
-  }
+  socket.to(gameId).emit('rematch');
 }
 
 export function handleQuit(
@@ -272,11 +292,15 @@ export function handleQuit(
     console.log('gameId is Null');
     return;
   }
+  console.log('gameId in handleQuit: ', gameId);
   const gameState = getGameState(gameId);
   socket
     .to(gameId)
     .emit('opponentQuit', gameState ? gameState.game.status : null);
-  if (gameState) {
+  if (gameState && gameState.game.status === 'rematching') {
+    removeUserActiveGame(userId, gameId);
+  } else if (gameState && gameState.game.status === 'playing') {
+    console.log('gameStatus in handleQuit: ', gameState.game.status);
     gameState.game.status = 'ended';
     gameState.winner_id =
       gameState.player1.id === userId
@@ -299,8 +323,8 @@ export function handleQuit(
         gameState.winner_id!,
       );
     }
-    deleteGame(gameState);
   }
+  deleteGame(gameState);
   console.log('player quit');
 }
 
