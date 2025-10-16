@@ -218,6 +218,7 @@ export function startTournamentMatch(tournament: ITournament, matchId: string) {
 
   const io = getIoInstance();
   const gameState = getGameState(match.gameId!);
+  if (!gameState) return;
   const player1Info = tournament.players.get(match.player1Id!);
   const player2Info = tournament.players.get(match.player2Id!);
   if (!player1Info || !player2Info) {

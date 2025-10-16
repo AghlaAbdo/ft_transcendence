@@ -151,7 +151,7 @@ function gameOver(gameState: IGameState): void {
   deleteGame(gameState);
 }
 
-export function deleteGame(gameState: IGameState): void {
+export function deleteGame(gameState: IGameState | undefined): void {
   if (!gameState) return;
   if (gameState.game.status === 'playing') {
     gameState.game.status = 'ended';

@@ -14,6 +14,7 @@ import {
   setUserActiveGame,
   removeUserActiveGame,
   getUserActiveTournament,
+  quitActiveGame,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { getCurrDate, getDiffInMin } from '../utils/dates';
@@ -58,7 +59,10 @@ export function handleDisconnect(socket: Socket, reason: string): void {
   console.log('Disconnected id: ', socket.id, ' Because: ', reason);
 
   setUserSocketNull(socket.id);
-  setTimeout(() => removeUserSocket(socket.id), 5000);
+  setTimeout(() => {
+    quitActiveGame(socket);
+    removeUserSocket(socket.id)
+  }, 5000);
 
   const userId = getUserId(socket.id);
   if (userId) {
@@ -78,73 +82,6 @@ export function handleDisconnect(socket: Socket, reason: string): void {
   }
 
   return;
-
-  // const allGames = getAllGames();
-
-  // const gameToQuit = Object.values(allGames.games).find(
-  //   (game) =>
-  //     game.player1.socketId === socket.id ||
-  //     game.player2.socketId === socket.id,
-  // );
-
-  // const { player, tournament } = getPlayerTournament(socket.id);
-  // if (tournament && player) {
-  //   console.log('userId to delete: ', player.id);
-  //   if (tournament && player.id) {
-  //     tournament.players.delete(player.id);
-  //     console.log('Did delete user from tournament when disconnect!!');
-  //   }
-  // }
-
-  // if (gameToQuit) {
-  //   const quitterRole =
-  //     gameToQuit.player1.socketId === socket.id ? 'player1' : 'player2';
-  //   const opponentRole = quitterRole === 'player1' ? 'player2' : 'player1';
-
-  //   gameToQuit.winner_id =
-  //     quitterRole === 'player1' ? gameToQuit.player2.id : gameToQuit.player1.id;
-  //   gameToQuit.playtime = gameToQuit.startAt
-  //     ? getDiffInMin(gameToQuit.startAt)
-  //     : 0;
-  //   if (!gameToQuit.startDate) gameToQuit.startDate = getCurrDate();
-  //   postGame(gameToQuit);
-  //   if (gameToQuit.isTournamentGame) {
-  //     advancePlayerInTournament(
-  //       gameToQuit.tournamentId!,
-  //       gameToQuit.tournamentMatchId!,
-  //       gameToQuit.winner_id!,
-  //     );
-  //   }
-
-  //   const opponentSocketId =
-  //     opponentRole === 'player1'
-  //       ? gameToQuit.player1.socketId
-  //       : gameToQuit.player2.socketId;
-
-  //   if (opponentSocketId) {
-  //     console.log('sent opponentQuit event!!');
-  //     console.log('game.status: ', gameToQuit.game.status);
-  //     ioInstance.to(opponentSocketId).emit('prepare');
-  //     const gameStatus = gameToQuit.game.status;
-  //     if (gameStatus === 'waiting') {
-  //       setTimeout(() => {
-  //         ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
-  //       }, 1000);
-  //     } else ioInstance.to(opponentSocketId).emit('opponentQuit', gameStatus);
-  //   }
-  //   const gameStatus = gameToQuit.game.status;
-  //   if (gameStatus === 'waiting' || gameStatus === 'playing') {
-  //     gameToQuit.game.status = 'ended';
-  //     removeUserActiveGame(gameToQuit.player1.id, gameToQuit.id);
-  //     removeUserActiveGame(gameToQuit.player2.id, gameToQuit.id);
-  //     if (allGames.lobyGame === gameToQuit.id) {
-  //       allGames.lobyGame = null;
-  //     }
-  //     deleteGame(gameToQuit);
-  //   } else {
-  //     deleteGame(gameToQuit);
-  //   }
-  // }
 }
 
 export async function handlePlay(socket: Socket, userId: string) {
@@ -289,9 +226,13 @@ export function handleQuit(
   }
   console.log('gameId in handleQuit: ', gameId);
   const gameState = getGameState(gameId);
-  socket
-    .to(gameId)
-    .emit('opponentQuit', gameState ? gameState.game.status : null);
+  if (!gameState) return;
+  const opponentId = userId === gameState.player1.id ? gameState.player2.id : gameState.player1.id;
+  const opponentSocketId = getUserSocketId(opponentId!);
+  if (opponentSocketId)
+    ioInstance
+      .to(opponentSocketId)
+      .emit('opponentQuit', gameState ? gameState.game.status : null);
   if (gameState && gameState.game.status === 'rematching') {
     removeUserActiveGame(userId, gameId);
   } else if (gameState && gameState.game.status === 'playing') {

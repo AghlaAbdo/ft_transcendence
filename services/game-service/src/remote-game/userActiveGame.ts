@@ -1,3 +1,11 @@
+import { Socket } from 'socket.io';
+import {
+  getUserId,
+  getUserSocketId,
+} from '../utils/userSocketMapping';
+import { handleQuit } from '../socket/handlers';
+import { getGameState } from './AllGames';
+
 const userActiveGame = new Map<string, string>();
 const userActiveTournament = new Map<string, string>();
 
@@ -41,4 +49,19 @@ export function removeUserActiveTournament(
   if (!userId || !tournamentId) return;
   if (getUserActiveTournament(userId) === tournamentId)
     userActiveTournament.delete(userId);
+}
+
+export function quitActiveGame(socket: Socket) {
+  const userId = getUserId(socket.id);
+  // console.log("called quitActiveGame!!");
+  if (userId) {
+    if (getUserSocketId(userId))
+      return;
+    const activeGameId = getUserActiveGame(userId);
+    const gameState = getGameState(activeGameId);
+    if (gameState) {
+      // console.log("called quit from quitActiveGame");
+      handleQuit(socket, gameState.id, userId);
+    }
+  }
 }
