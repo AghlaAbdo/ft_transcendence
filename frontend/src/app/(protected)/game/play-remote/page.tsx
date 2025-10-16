@@ -12,6 +12,7 @@ import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
 
+import { socket } from '@/app/(protected)/lib/socket';
 import { IPlayer } from '@/constants/game';
 import { useUser } from '@/context/UserContext';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
@@ -30,6 +31,12 @@ export default function GamePage() {
   } = usePongGameLogic(null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
+
+  useEffect(() => {
+    return () => {
+      if (matching) socket.emit('cancelMatching', gameId);
+    };
+  }, []);
 
   const player: IPlayer = {
     id: user.id,

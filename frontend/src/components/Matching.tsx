@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 
@@ -23,10 +23,12 @@ export default function Matching({
   opponent: null | IPlayer;
   gameId: string;
 }) {
+  const router = useRouter();
+
   function handleCancel() {
     if (!opponent) {
       socket.emit('cancelMatching', gameId);
-      redirect('/game');
+      router.push('/game');
     }
   }
   return (

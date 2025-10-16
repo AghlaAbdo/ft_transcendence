@@ -16,6 +16,10 @@ export default function GameLayout({
     if (auth.user) {
       socket.connect();
       socket.emit('hello', String(auth.user.id));
+      return () => {
+        socket.off();
+        socket.disconnect();
+      };
     }
   }, [auth.user]);
 

@@ -65,7 +65,13 @@ export function handleDisconnect(socket: Socket, reason: string): void {
     const userActiveGameId = getUserActiveGame(userId);
     if (userActiveGameId) {
       const gameState = getGameState(userActiveGameId);
-      if (gameState.game.status != 'playing') {
+      if (gameState && gameState.game.status === 'waiting') {
+        if (getUserActiveGame(userId)) {
+          removeUserActiveGame(userId, userActiveGameId);
+          deleteGame(gameState);
+          getAllGames().lobyGame = null;
+        }
+      } else if (gameState && gameState.game.status != 'playing') {
         handleQuit(socket, userActiveGameId, userId);
       }
     }
@@ -155,19 +161,7 @@ export async function handlePlay(socket: Socket, userId: string) {
   const allGames = getAllGames();
   console.log('allGamges length: ', Object.keys(allGames.games).length);
 
-  const player1 = {
-    username: 'user_123',
-    avatar: '/avatars/avatar1.png',
-    frame: 'sapphire3',
-    level: '47',
-  };
-  const player2 = {
-    username: 'user_456',
-    avatar: '/avatars/avatar2.png',
-    frame: 'gold2',
-    level: '145',
-  };
-
+  console.log('lobyGAme in handlePlay: ', allGames.lobyGame);
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
     setUserActiveGame(userId, gameId);
@@ -176,11 +170,12 @@ export async function handlePlay(socket: Socket, userId: string) {
     socket.emit('playerData', {
       playerRole: 'player1',
       gameId,
-      player: player1,
+      player: user,
     });
     socket.join(gameId);
     allGames.lobyGame = gameId;
   } else {
+    console.log('---------- Second player joined!!');
     const lobyGameId = allGames.lobyGame;
     allGames.games[lobyGameId].game.status = 'playing';
     if (allGames.games[lobyGameId].player1.id === user.id) {
@@ -199,7 +194,7 @@ export async function handlePlay(socket: Socket, userId: string) {
     socket.emit('playerData', {
       playerRole: 'player2',
       gameId: lobyGameId,
-      player: player2,
+      player: user,
     });
     socket
       .to(lobyGameId)
@@ -330,12 +325,14 @@ export function handleQuit(
 
 export function handleCancelMatching(gameId: string) {
   const gameState = getGameState(gameId);
+  getAllGames().lobyGame = null;
   if (gameState) {
+    console.log('did remove userActiveGAme in cancelMatching?');
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
   }
-  deleteGame(getGameState(gameId));
-  getAllGames().lobyGame = null;
+  console.log(' ---- called cancel Matching ??');
+  deleteGame(gameState);
 }
 
 export function handleRequestGameState(socket: Socket, userId: string) {
