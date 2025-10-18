@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS USERS (
     -- online_status BOOLEAN NOT NULL DEFAULT FALSE,
     online_status INTEGER NOT NULL DEFAULT 0,
 
+    is_2fa_enabled BOOLEAN DEFAULT 0,
+    totp_secret VARCHAR(255),
     
     -- Timestamps
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,

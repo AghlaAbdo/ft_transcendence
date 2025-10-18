@@ -2,6 +2,9 @@ import bcrypt from 'bcryptjs';
 import userModel from '../models/userModel.js';
 import fs from "fs";
 import path from "path";
+import { authenticator } from 'otplib';
+
+import QRcode from 'qrcode';
 
 const getUserById = async (request, reply) => {
     const { id } = request.params;
@@ -265,6 +268,66 @@ const  updateProfile = async (request, reply) => {
 const  deleteAccount = async (request, reply) => {
 }
 
+const twoFactorAuth = async (request, reply) => {
+    try {
+        const user = request.user;
+        const { enable } = request.body;
+
+        if (enable === undefined) {
+            return reply.code(400).send({
+                status: false,
+                message: "enable required"
+            });
+        }
+
+        console.log("-------> 2fa : ", enable);
+        const db = request.server.db;
+
+
+        
+        if (enable) {
+            const secret = authenticator.generateSecret();
+            console.log("secret: ", secret);
+
+            db.prepare(`
+                UPDATE USERS
+                SET totp_secret = ?
+                WHERE id = ?
+            `).run(secret, user.id);
+            
+            const otpauth = authenticator.keyuri(user.username, 'PingPongGame', secret);
+            const qrCodeDataURL = await QRcode.toDataURL(otpauth);
+
+            return reply.code(200).send({
+                status: true,
+                message: "2FA enabled. Scan this QR code with your authenticator app.",
+                qrCode: qrCodeDataURL
+            });
+        }
+
+        const enableValue = enable ? 1 : 0;
+
+        db.prepare(`
+            UPDATE USERS
+            SET is_2fa_enabled = ?
+            WHERE id = ?
+        `).run(enableValue, user.id);
+
+        return reply.code(200).send({
+            status: true,
+            message: `2FA has been ${enable ? "enabled" : "disabled"} successfully.`
+        });
+
+        
+    } catch (error) {
+        console.error(error);
+        return reply.code(500).send({
+            status: false,
+            message: "Internal server error"
+        });
+    }
+}
+
 export default { 
     getUserById, 
     getAllUsers, 
@@ -273,5 +336,6 @@ export default {
     deleteAccount, 
     uploadAvatar, 
     changePassword,
-    updateInfo 
+    updateInfo,
+    twoFactorAuth
 };

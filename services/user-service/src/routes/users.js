@@ -36,6 +36,11 @@ const userRoutes = async (fastify, options) => {
     fastify.post('/update-info', {
         onRequest: [fastify.authenticate]
     }, userController.updateInfo);
+
+
+    fastify.put('/2fa', {
+        onRequest: [fastify.authenticate]
+    }, userController.twoFactorAuth);
 }
 
 export default userRoutes;
