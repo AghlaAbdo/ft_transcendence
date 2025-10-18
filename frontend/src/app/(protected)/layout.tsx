@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import { LayoutProvider } from '@/context/LayoutContext';
 import React, { Children } from 'react'
+import { Toaster } from "sonner";
 
 const AppLayout = ({
   children,
@@ -17,7 +18,10 @@ const AppLayout = ({
       <LayoutProvider>
         <Sidebar  />
         <Header />
-        <main className='mt-[72px] md:ml-[72px]'>{children}</main>
+        <main className='mt-[72px] md:ml-[72px]'>
+          {children}
+          <Toaster position="top-right" richColors />
+        </main>
       </LayoutProvider>
     </div>
   )

@@ -2,7 +2,7 @@
     CREATE TABLE chats (
         chat_id INTEGER PRIMARY KEY AUTOINCREMENT,
         sender INTEGER NOT NULL,
-        receiver INTEGER NOT NULL,
+        reciever INTEGER NOT NULL,
         last_message_content TEXT NOT NULL,
         last_message_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         last_message_id INTEGER,
@@ -14,7 +14,7 @@
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_id INTEGER NOT NULL,
         sender INTEGER NOT NULL,
-        receiver INTEGER NOT NULL,
+        reciever INTEGER NOT NULL,
         content TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ); 
+    );

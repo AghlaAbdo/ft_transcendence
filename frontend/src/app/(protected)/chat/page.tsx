@@ -60,7 +60,7 @@ export default function ChatPage() {
               .then((u) => setOtherUser(u.user));
           }
         })
-        .catch((err) => console.log('faild because of: ', err));
+        .catch((err) => console.log('failed because of: ', err));
     }
   }, [selectedChatId]);
   const socketRef = useRef<Socket | null>(null);
@@ -75,7 +75,7 @@ export default function ChatPage() {
     }
   };
   const [UserId_2, SetUser_2] = useState<number | null>(null); // second user which is the receiver
-  useEffect(() => {
+  useEffect(() => { // put this in the layout ok??
     if (!user) return;
     const socket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`, {
       path: '/ws/chat/socket.io/',

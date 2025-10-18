@@ -103,14 +103,7 @@ export const ChatWindow = ({
               </div>
             </div>
             <div
-              className='flex-1 p-3 overflow-y-auto scroll-smooth
-  [&::-webkit-scrollbar]:w-2.5
-  [&::-webkit-scrollbar-track]:rounded-full
-  [&::-webkit-scrollbar-track]:bg-gray-100
-  [&::-webkit-scrollbar-thumb]:rounded-full
-  [&::-webkit-scrollbar-thumb]:bg-gray-300
-  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+              className='flex-1 p-3 overflow-y-auto scroll-smooth scrollbar-none [&::-webkit-scrollbar]:hidden'
             >
               {conv
                 .filter((msg) => msg.chat_id === SelectedChatId)

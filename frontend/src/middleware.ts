@@ -42,7 +42,7 @@ export default async function middleware(req: NextRequest) {
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
-            console.log("JWT payload:", payload);
+            // console.log("JWT payload:", payload);
             
             
             isValid = true;

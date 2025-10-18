@@ -1,3 +1,5 @@
+
+// 'use client';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
@@ -5,9 +7,14 @@ import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 
 import { LayoutProvider } from '@/context/LayoutContext';
+// import { SocketProvider } from '@/context/SocketContext';
 
 import './globals.css';
-import RouteGuard from '@/components/auth/RouteGuard';
+// import { useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import useConnectSocket from  '@/lib/useConnectSocket'
+// import { useSocketStore } from '@/store/notifications';
+// import RouteGuard from '@/components/auth/RouteGuard';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,12 +49,12 @@ export default function RootLayout({
     //   </body>
     // </html>
 
-    <html lang="en">
+      <html lang='en'>
         <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-color`}
         >
-          {children}
+            {children}
         </body>
-    </html>
+      </html>
   );
 }
