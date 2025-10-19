@@ -46,7 +46,8 @@ const userRoutes = async (fastify, options) => {
     fastify.get("/notifications/:userId", async (req, reply) => {
       
       const userId = parseInt((req.params).userId);
-      if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
+      if (isNaN(userId)) 
+        return reply.status(400).send({ error: "Invalid userId" });
     
       try {
         const db = req.server.db;
@@ -58,7 +59,6 @@ const userRoutes = async (fastify, options) => {
     });
     
     fastify.put('/notifications/friend_request/mark-as-read', async (req, res) => {
-      console.log('this iissssssss friend');
       
       const {userId} =  req.body;
       const db = req.server.db;
