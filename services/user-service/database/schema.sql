@@ -50,6 +50,40 @@ CREATE TABLE IF NOT EXISTS FRIENDS (
   UNIQUE(user_id, friend_id)
 );
 
+
+-- CREATE TABLE IF NOT EXISTS notifications (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     user_id INTEGER NOT NULL,
+--     actor_id INTEGER,
+--     type TEXT NOT NULL CHECK (type IN (
+--       'friend_request',
+--       'friend_accept',
+--       'game_invite',
+--       'message',
+--       'tournament_invite'
+--     )),
+--     read INTEGER DEFAULT 0,
+--     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--     created_at TEXT DEFAULT (datetime('now'))
+--   );
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  actor_id INTEGER,
+  type TEXT NOT NULL CHECK (type IN (
+    'friend_request',
+    'friend_accept',
+    'game_invite',
+    'message',
+    'tournament_invite'
+  )),
+  read INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
 -- db.exec(`
 -- CREATE TABLE IF NOT EXISTS user (
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,

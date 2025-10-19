@@ -1,86 +1,163 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { Server, Socket } from "socket.io";
-import { getMessages, insert_message, getMessage } from "./database/conversations.ts";
-import { getChats } from "./database/chats.ts";
-import { getFriends, getUser } from "./database/user.ts";
+// import fetch from "node-fetch";
+import { getMessages, insert_message, getMessage } from "./database/conversations.js";
+import { getChats } from "./database/chats.js";
+import { getFriends, getUser } from "./database/user.js";
+import { getnotifications, insert_notification, mark_friend_request_as_read} from "./database/Notifications.js";
 
-const fastify = Fastify();
-fastify.register(cors, { origin: "*" });
-const io = new Server(fastify.server, { cors: { origin: "*" } });
 declare module "socket.io" {
   interface Socket {
     userId?: number;
   }
 }
 
+const fastify = Fastify();
+
+await fastify.register(cors, { origin: "*" });
+
 const onlineUsers: Map<number, Socket> = new Map();
 
-io.on("connection", (socket: Socket) => {
-  const user__id = socket.handshake.auth.user_id;
-  if (!user__id)
+/* ---------------------------- SOCKET.IO ---------------------------- */
+const handleConnection = (socket: Socket) => {
+  const user__id = parseInt(socket.handshake.auth.user_id);
+  if (isNaN(user__id)) {
+    console.log("Invalid user ID — disconnecting socket");
     return socket.disconnect();
+  }
+
   socket.userId = user__id;
-  onlineUsers.set(user__id, socket); // store socket
-  console.log("User connected:", socket.userId);
-  socket.on("ChatMessage", (data:any) => {
-    const chat_id = data.chatId;
-    const content = data.message;
-    const newMessage = insert_message(
-      chat_id,
-      data.sender,
-      data.receiver,
-      content
-    );
-    if (!newMessage)
-        return ;
-    socket.emit("ChatMessage", newMessage); // here check if the user if a freind
-    const receiverSocket = onlineUsers.get(data.receiver);
-    if (receiverSocket) {
-      receiverSocket.emit("ChatMessage", newMessage);
+  onlineUsers.set(user__id, socket);
+  console.log("user connected:", user__id);
+
+  /* ----------------------- Chat Message Event ----------------------- */
+  socket.on("ChatMessage", async (data: any) => {
+    try {
+      const { chatId, sender, receiver, message } = data;
+      if (!chatId || !sender || !receiver || !message) return;
+
+      const newMessage = await insert_message(chatId, sender, receiver, message);
+      if (!newMessage) return;
+
+      socket.emit("ChatMessage", newMessage);
+      const receiverSocket = onlineUsers.get(receiver);
+      if (receiverSocket) receiverSocket.emit("ChatMessage", newMessage);
+    } catch (err) {
+      console.error("ChatMessage error:", err);
+      socket.emit("error", { message: "Failed to send message" });
+    }
+  });start
+
+  /* ---------------------- Notifications Event ----------------------- */
+  socket.on("Notification", async (data: any) => {
+    try {
+      const { user_id, actor_id, type} = data;
+      console.log('db hhhh');
+
+      if (!actor_id  || !type || !user_id) return;
+      // console.log("user: ",user_id);
+      // console.log("actor: ",actor_id);
+      // console.log("message: ",message);
+      // console.log("type : ",type);
+      const new_notification = insert_notification(user_id, actor_id, type);
+      const receiverSocket = onlineUsers.get(actor_id);
+      if (receiverSocket) receiverSocket.emit("Notification", new_notification);
+    } catch (err) {
+      console.error("Notification error:", err);
+      socket.emit("error", { message: "Failed to send notification"});
     }
   });
-    socket.on("disconnect", () => {
+
+  /* -------------------------- Disconnect ---------------------------- */
+
+  socket.on("disconnect", () => {
     if (socket.userId) {
       onlineUsers.delete(socket.userId);
-      console.log(`User ${socket.userId} disconnected and removed from map`);
+      console.log(`User ${socket.userId} disconnected`);
     }
   });
-});
-
-const start = async () => {
-  try {
-    await fastify.listen({ port: 4545, host: "0.0.0.0" });
-    console.log("Chat-service running on port: 4545");
-  } catch (error) {
-    fastify.log.error(error);
-    process.exit(1);
-  }
 };
 
-start();
+/* ----------------------------- ROUTES ------------------------------ */
 
-fastify.get("/api/chat/messages/:chatId", (request) => {
-  const { chatId } = request.params as { chatId: string };
-  return getMessages(parseInt(chatId));
+fastify.get("/api/chat/notifications/:userId", async (req, reply) => {
+  // console.log('allllllo');
+  
+  const userId = parseInt((req.params as any).userId);
+  if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
+
+  try {
+    return  getnotifications(userId);
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send({ error: "Failed to fetch notifications" });
+  }
 });
 
-fastify.get("/api/chat/message/:MessageId", (request) => {
-  const { MessageId } = request.params as { MessageId: string };
-  return getMessage(parseInt(MessageId));
-});
-
-fastify.get("/api/chat/friends/:userId", (request) => {
-  const { userId } = request.params as { userId: string };
-  return getFriends(parseInt(userId));
-});
-
-fastify.get("/api/chat/user/:userId", (request) => {
-  const { userId } = request.params as { userId: string };
-  return getUser(parseInt(userId));
+fastify.put('/api/chat/notifications/friend_request/mark-as-read', async (req, res) => {
+  console.log('this iissssssss friend');
+  
+  const {userId} =  req.body as { userId: number };
+  return mark_friend_request_as_read(userId ,"friend_request");
 });
 
 
+fastify.put('/api/chat/notifications/game/mark-as-read', async (req, res) => {
+  console.log('this iissssssss gamaame');
+  const {userId} =  req.body as { userId: number };
+  return mark_friend_request_as_read(userId, "game_invite");
+});
+
+fastify.get("/api/chat/messages/:chatId", async (req, reply) => {
+  const chatId = parseInt((req.params as any).chatId);
+  if (isNaN(chatId)) return reply.status(400).send({ error: "Invalid chatId" });
+
+  try {
+    return  getMessages(chatId);
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send({ error: "Failed to fetch messages" });
+  }
+});
+
+fastify.get("/api/chat/message/:messageId", async (req, reply) => {
+  const messageId = parseInt((req.params as any).messageId);
+  if (isNaN(messageId)) return reply.status(400).send({ error: "Invalid messageId" });
+
+  try {
+    return  getMessage(messageId);
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send({ error: "Failed to fetch message" });
+  }
+});
+
+fastify.get("/api/chat/friends/:userId", async (req, reply) => {
+  const userId = parseInt((req.params as any).userId);
+  if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
+
+  try {
+    return getFriends(userId);
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send({ error: "Failed to fetch friends" });
+  }
+});
+
+fastify.get("/api/chat/user/:userId", async (req, reply) => {
+  const userId = parseInt((req.params as any).userId);
+  if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
+
+  try {
+    return getUser(userId);
+  } catch (err) {
+    console.error(err);
+    return reply.status(500).send({ error: "Failed to fetch user" });
+  }
+});
+
+/* -------------------------- CHATS ROUTE --------------------------- */
 type ChatRow = {
   chat_id: number;
   sender: number;
@@ -88,54 +165,71 @@ type ChatRow = {
   last_message_content: string;
   last_message_timestamp: string;
   last_message_id: number;
-}
+};
 
-// hell yeaaaaaah Promise.all its magiiic baby
-
-async function fetchUserFromService(ids: Array<number>)
-{
-  const users = await Promise.all(
-    (ids.map(async (id) => {
-      const res = await fetch(`http://user-service:5000/api/users/${id}`);
-      const data = await res.json();
-      if (!data.status || !data.user) return null; // skip if not found
-      // console.log('user fetched: ', data.user);
-      return data.user;
-    })
-  ));
-  
+async function fetchUserFromService(ids: number[]) {
+  const users = (
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const res = await fetch(`http://user-service:5000/api/users/${id}`);
+          if (!res.ok) return null;
+          const data = await res.json();
+          return data.user ?? null;
+        } catch {
+          return null;
+        }
+      })
+    )
+  ).filter(Boolean);
   return users;
 }
 
-fastify.get("/api/chat/chats/:userId", async (request, reply) => {
-  const { userId } = request.params as { userId: string };
-  console.log("user want to fetch: ", userId)
-  if (!Number.isInteger(parseInt(userId))) {
-    return reply.status(400).send({ error: "invalid userId" });
-  }
+fastify.get("/api/chat/chats/:userId", async (req, reply) => {
+  const userId = parseInt((req.params as any).userId);
+  if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
+
   try {
-    const result: ChatRow[] = getChats(parseInt(userId));
-    const userIds = Array.from(new Set (
-      result.flatMap((c) => [c.sender, c.receiver]).filter((id) => id != null))
+    const result: ChatRow[] = await getChats(userId);
+    const userIds = Array.from(
+      new Set(result.flatMap((c) => [c.sender, c.receiver]).filter(Boolean))
     );
-    // console.log("user: ",userIds);
-    const users = await fetchUserFromService((userIds));
-    console.log('users: ', users);
-    
-    const userMap = new Map(users.map(u => [u.id, u]));
-    // console.log(userMap.get[0])
-    // enrich the chat json with user infos
-    const enrichedChats = result.map(chat => ({
-    ...chat,
-    sender: userMap.get(chat.sender),
-    receiver: userMap.get(chat.receiver),
-  }));
-  console.log('user before: ', result);
-  console.log('users after: ', enrichedChats);
-    // return result;
-    return enrichedChats;
-    } catch (err) {
-    console.error("error ---> ", err);
-    return reply.status(500).send({ error: "Failed to fetch user"});
+    const users = await fetchUserFromService(userIds);
+    const userMap = new Map(users.map((u: any) => [u.id, u]));
+
+    const enriched = result.map((chat) => ({
+      ...chat,
+      sender: userMap.get(chat.sender),
+      receiver: userMap.get(chat.receiver),
+    }));
+
+    return enriched;
+  } catch (err) {
+    console.error("Chats error:", err);
+    return reply.status(500).send({ error: "Failed to fetch chats" });
   }
 });
+
+/* ------------------------- ERROR HANDLER -------------------------- */
+fastify.setErrorHandler((error, request, reply) => {
+  console.error("Fastify error:", error);
+  reply.status(500).send({
+    error: "Internal Server Error",
+    message: error.message,
+  });
+});
+/* --------------------------- START SERVER ------------------------- */
+const start = async () => {
+  try {
+    await fastify.listen({ port: 4545, host: "0.0.0.0" });
+    const io = new Server(fastify.server, { cors: { origin: "*" } });
+    io.on("connection", handleConnection);
+    console.log("chat-service running on port 4545");
+  } catch (err) {
+    console.error("Startup error:", err);
+    process.exit(1);
+  }
+};
+
+start();
+

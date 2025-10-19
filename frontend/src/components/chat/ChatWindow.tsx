@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { MoreVertical } from 'lucide-react';
 
+import UserActionsMenu from './UserActionsMenu';
+
 // import { HeaderInfos } from '@/components/chat/HeaderInofs';
 
 interface Message {
@@ -41,6 +43,7 @@ export const ChatWindow = ({
   onBackClick,
   showBackButton = false,
 }: ChatWindowProps) => {
+  const [chat_options, setoptions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     // console.log('user in chat window: ', other_User?.username);
@@ -48,6 +51,7 @@ export const ChatWindow = ({
     messagesEndRef.current?.scrollIntoView();
   }, [conv, SelectedChatId]);
 
+  const [open, setopen] = useState(false);
   return (
     <>
       <div className='flex-1 flex flex-col min-h-0'>
@@ -69,8 +73,8 @@ export const ChatWindow = ({
                     strokeLinecap='round'
                     strokeLinejoin='round'
                   >
-                    <path d='M19 12H5'/>
-                    <path d='M12 19l-7-7 7-7'/>
+                    <path d='M19 12H5' />
+                    <path d='M12 19l-7-7 7-7' />
                   </svg>
                 </button>
               )}
@@ -86,22 +90,20 @@ export const ChatWindow = ({
                     <p className='text-sm text-gray-400 truncate'>Online</p>
                   </div>
                   <div>
-                    <button className='cursor-pointer'>
-                      <MoreVertical />
+                    <button
+                      className='cursor-pointer'
+                      onClick={() => {
+                        setoptions(true);
+                      }}
+                    >
+                      <MoreVertical onClick={() => setopen(true)} />
                     </button>
                   </div>
                 </div>
               </div>
             </div>
             <div
-              className='flex-1 p-3 overflow-y-auto scroll-smooth
-  [&::-webkit-scrollbar]:w-2.5
-  [&::-webkit-scrollbar-track]:rounded-full
-  [&::-webkit-scrollbar-track]:bg-gray-100
-  [&::-webkit-scrollbar-thumb]:rounded-full
-  [&::-webkit-scrollbar-thumb]:bg-gray-300
-  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+              className='flex-1 p-3 overflow-y-auto scroll-smooth scrollbar-none [&::-webkit-scrollbar]:hidden'
             >
               {conv
                 .filter((msg) => msg.chat_id === SelectedChatId)
@@ -158,6 +160,28 @@ export const ChatWindow = ({
             </div>
           </>
         )}
+      </div>
+
+      <div>
+        {open ? (
+          <div
+            className={`fixed inset-0 bg-black/30 z-50 pt-32  transition-opacity duration-300 ease-out ${
+              open
+                ? 'opacity-100 pointer-events-auto'
+                : 'opacity-0 pointer-events-none'
+            }`}
+            onClick={() => setopen(false)}
+          >
+            <div
+              className={`absolute bg-slate-700 rounded-lg p-1 h-fit transform transition-all duration-300 ease-out mx-2 w-[calc(100%-30px)] md:right-3 md:mx-0 md:w-1/5 md:max-w-sm ${
+                open ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <UserActionsMenu onClose={() => setopen(false)} />
+            </div>
+          </div>
+        ) : null}
       </div>
     </>
   );

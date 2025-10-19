@@ -36,7 +36,6 @@ export const getMessage = (MessageId: number) =>
 }
 
 export function insert_message(chat_id: number, sender: number, receiver: number, content: string) {
-  console.log("chat : " + chat_id + ", sender: " + sender + " reciver: " + receiver + " content: " + content);
   const info = insertStmt.run(chat_id, sender, receiver, content);
   const newMessageId = info.lastInsertRowid as number;
   updateChatStmt.run(content, chat_id);
