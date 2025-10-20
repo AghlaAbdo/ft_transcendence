@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Smile, Send } from "lucide-react";
+import { toast } from "sonner";
 
 interface SendMessageProps {
   onSendMessage: (SendMesage: string) => void;
@@ -12,8 +13,11 @@ export const MessageInput = ({onSendMessage}: SendMessageProps) => {
   const handleSendMessage = () => {
     const msg = message.trim();
     if (msg) {
-      // if (msg.length > 1000)
-        // handle it here
+      if (msg.length > 1000)
+      {
+        toast.warning("message too long, try some thing smaller!")
+        return ;
+      }
       onSendMessage(message);
       setMessage("");
     }

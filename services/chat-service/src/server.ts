@@ -5,7 +5,6 @@ import { Server, Socket } from "socket.io";
 import { getMessages, insert_message, getMessage } from "./database/conversations.js";
 import { getChats } from "./database/chats.js";
 import { getFriends, getUser } from "./database/user.js";
-import { getnotifications, insert_notification, mark_friend_request_as_read} from "./database/Notifications.js";
 
 declare module "socket.io" {
   interface Socket {
@@ -49,26 +48,6 @@ const handleConnection = (socket: Socket) => {
     }
   });start
 
-  /* ---------------------- Notifications Event ----------------------- */
-  socket.on("Notification", async (data: any) => {
-    try {
-      const { user_id, actor_id, type} = data;
-      console.log('db hhhh');
-
-      if (!actor_id  || !type || !user_id) return;
-      // console.log("user: ",user_id);
-      // console.log("actor: ",actor_id);
-      // console.log("message: ",message);
-      // console.log("type : ",type);
-      const new_notification = insert_notification(user_id, actor_id, type);
-      const receiverSocket = onlineUsers.get(actor_id);
-      if (receiverSocket) receiverSocket.emit("Notification", new_notification);
-    } catch (err) {
-      console.error("Notification error:", err);
-      socket.emit("error", { message: "Failed to send notification"});
-    }
-  });
-
   /* -------------------------- Disconnect ---------------------------- */
 
   socket.on("disconnect", () => {
@@ -80,34 +59,6 @@ const handleConnection = (socket: Socket) => {
 };
 
 /* ----------------------------- ROUTES ------------------------------ */
-
-fastify.get("/api/chat/notifications/:userId", async (req, reply) => {
-  // console.log('allllllo');
-  
-  const userId = parseInt((req.params as any).userId);
-  if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
-
-  try {
-    return  getnotifications(userId);
-  } catch (err) {
-    console.error(err);
-    return reply.status(500).send({ error: "Failed to fetch notifications" });
-  }
-});
-
-fastify.put('/api/chat/notifications/friend_request/mark-as-read', async (req, res) => {
-  console.log('this iissssssss friend');
-  
-  const {userId} =  req.body as { userId: number };
-  return mark_friend_request_as_read(userId ,"friend_request");
-});
-
-
-fastify.put('/api/chat/notifications/game/mark-as-read', async (req, res) => {
-  console.log('this iissssssss gamaame');
-  const {userId} =  req.body as { userId: number };
-  return mark_friend_request_as_read(userId, "game_invite");
-});
 
 fastify.get("/api/chat/messages/:chatId", async (req, reply) => {
   const chatId = parseInt((req.params as any).chatId);

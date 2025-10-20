@@ -5,8 +5,10 @@ import { Socket, io } from 'socket.io-client';
 import { Chatlist } from '@/components/chat/ChatList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { MessageInput } from '@/components/chat/MessageInput';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, User } from '@/hooks/useAuth';
 import ChatListSkeleton from '@/components/chat/chatlist_loading';
+import { BlockedUserInput } from '@/components/chat/BlockedUser';
+import { BlockingUserInput } from '@/components/chat/BlockingUser';
 
 interface conversation {
   id: number;
@@ -17,14 +19,7 @@ interface conversation {
   created_at: string;
 }
 
-type User = {
-  id: number;
-  username: string;
-  email: string;
-  createdAt: string;
-  updatedAt: string;
-  avatar_url: string;
-};
+
 
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
@@ -133,7 +128,8 @@ export default function ChatPage() {
               />
             )}
             {selectedChatId && (
-              <MessageInput onSendMessage={handleSendMessage} />
+              <BlockingUserInput />
+              // <MessageInput onSendMessage={handleSendMessage} />
             )}
           </div>
         </>
@@ -152,7 +148,7 @@ export default function ChatPage() {
             </div>
           ) : (
             <div className='w-full bg-[#021024] rounded-[20px] flex flex-col my-2'>
-              {(
+              {( 
                 <ChatWindow
                   SelectedChatId={selectedChatId}
                   userId={user.id}
@@ -162,8 +158,9 @@ export default function ChatPage() {
                   showBackButton={true}
                 />
               )}
-              {selectedChatId && (
-                <MessageInput onSendMessage={handleSendMessage} />
+              {selectedChatId && otherUser && (
+              <BlockingUserInput />
+                // <MessageInput onSendMessage={handleSendMessage} />
               )}
             </div>
           )}

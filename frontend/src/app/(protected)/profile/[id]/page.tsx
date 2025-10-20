@@ -9,28 +9,21 @@ import React, { useEffect, useState } from 'react';
 import { User } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { lookupService } from 'dns';
-// interface User { 
-
-// }
 
 const ProfilePage = () => {
-
   const { id } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // console.log("------: id: ", id);
-
   useEffect( () => {
     const fetchUserById = async () => {
       try {
         if (!id) 
-          return;
+          return; 
         const response = await fetch(`https://localhost:8080/api/users/${id}`, {
           credentials: "include"
         });
-
         const data: {status: string, user: User, message: string} = await response.json();
 
         if (response.ok && data.status) {
@@ -44,7 +37,6 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
-
     fetchUserById();
   }, [id]);
 

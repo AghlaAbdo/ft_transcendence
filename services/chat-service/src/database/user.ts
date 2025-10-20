@@ -32,7 +32,7 @@ export function getUser(userId: number) {
         `);
         const res = stmt.all(userId);
         return res;
-    } catch (err) {
+    } catch (err: any) {
         console.error("DB error:", err.message);
         throw err;
     }

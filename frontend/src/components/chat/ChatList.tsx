@@ -1,16 +1,12 @@
 // "use client";
+import { useEffect, useRef, useState } from 'react';
 
-import { useState, useEffect, useRef } from "react";
-import { Plus, Search } from "lucide-react";
-import { Search_Input } from "./Search_Input";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from 'date-fns';
+import { Plus, Search } from 'lucide-react';
 
-interface User {
-  id: number;
-  username: string;
-  avatar_url: string;
-  online_status: number;
-}
+import { User } from '@/hooks/useAuth';
+
+import { Search_Input } from './Search_Input';
 
 interface Message {
   id: number;
@@ -38,9 +34,22 @@ interface ChatlistProps {
   conv: Message[];
 }
 
-export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, conv }: ChatlistProps) => {
+export const Chatlist = ({
+  onSelect,
+  selectedChatId,
+  userId,
+  onReceiveChange,
+  conv,
+}: ChatlistProps) => {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const [chats, setChats] = useState<Chat[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const filteredChats = chats.filter((chat) => {
     if (!searchQuery) return true;
     const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
@@ -54,30 +63,29 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
         .then((data: Chat[]) => {
           setChats(data);
         })
-        .catch((err) => console.error("Failed to fetch chats:", err));
-      console.log("chat fetched: ", chats);
+        .catch((err) => console.error('Failed to fetch chats:', err));
+      console.log('chat fetched: ', chats);
     }
   }, [userId, conv]);
-    
 
   return (
     <>
-      <div className="lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]">
-        <div className="flex items-center justify-between p-4 border-b border-gray-600">
-          <h2 className="text-lg font-semibold text-white">Messages</h2>
-
+      <div className='lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]'>
+        <div className='flex items-center justify-between p-4 border-b border-gray-600'>
+          <h2 className='text-lg font-semibold text-white'>Messages</h2>
         </div>
-        <div className="p-4">
-          <div className="relative">
+        <div className='p-4'>
+          <div className='relative'>
             <Search_Input
               onsearchchange_2={setSearchQuery}
               searchquery_2={searchQuery}
             />
           </div>
         </div>
-        <div className="px-4 pb-4 flex-1 overflow-y-auto">
+        <div className='px-4 pb-4 flex-1 overflow-y-auto'>
           {filteredChats.map((chat) => {
-            const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
+            const otherUser =
+              chat.sender.id === userId ? chat.receiver : chat.sender;
             return (
               <div
                 key={chat.chat_id}
@@ -86,29 +94,36 @@ export const Chatlist = ({ onSelect, selectedChatId, userId, onReceiveChange, co
                   onReceiveChange(otherUser.id);
                 }}
                 className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
-                  hover:bg-gray-800 ${selectedChatId === chat.chat_id ? "bg-gray-700" : ""
+                  hover:bg-gray-800 ${
+                    selectedChatId === chat.chat_id ? 'bg-gray-700' : ''
                   }`}
               >
-                <img
-                  src={chat.receiver.avatar_url}
-                  alt={`${otherUser.username}`}
-                  className="w-12 h-12 rounded-full mr-3"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-white truncate flex-1">
+                <div className='relative mr-3'>
+                  <img
+                    src={otherUser.avatar_url}
+                    alt={`${otherUser.username}`}
+                    className='w-12 h-12 rounded-full'
+                  />
+                  {otherUser.online_status === 1 ? (
+                    <div className='border-2 border-black absolute top-9 right-0 bg-green-500 rounded-full w-3 h-3'></div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <div className='flex items-center justify-between min-w-0'>
+                    <h3 className='font-semibold text-white flex-shrink-0 mr-2 truncate min-w-0 '>
                       {otherUser.username}
                     </h3>
-                    <span className="text-xs text-gray-400 min-w-[60px] flex-shrink-0 ml-2">
-                      {
-                        formatDistanceToNow(
-                          new Date(chat.last_message_timestamp + "Z").toLocaleString(),
-                          { addSuffix: true }
-                        )}
+                    <span className='text-xs text-gray-400 truncate min-w-0'>
+                      {formatDistanceToNow(
+                        new Date(chat.last_message_timestamp + 'Z'),
+                      {addSuffix: true}
+                      )}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-400 truncate">
-                    {chat.last_message_content || "No messages yet"}
+                  <p className='text-sm text-gray-400 truncate min-w-0'>
+                    {chat.last_message_content || 'No messages yet'}
                   </p>
                 </div>
               </div>

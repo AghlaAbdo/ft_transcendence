@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { MoreVertical } from 'lucide-react';
 
+import { User } from '@/hooks/useAuth';
+
 import UserActionsMenu from './UserActionsMenu';
 
 // import { HeaderInfos } from '@/components/chat/HeaderInofs';
@@ -17,14 +19,14 @@ interface Message {
   created_at: string;
 }
 
-type User = {
-  id: number;
-  username: string;
-  email: string;
-  createdAt: string;
-  updatedAt: string;
-  avatar_url: string;
-};
+// type User = {
+//   id: number;
+//   username: string;
+//   email: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   avatar_url: string;
+// };
 
 interface ChatWindowProps {
   SelectedChatId: number | null;
@@ -46,8 +48,6 @@ export const ChatWindow = ({
   const [chat_options, setoptions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    // console.log('user in chat window: ', other_User?.username);
-    // messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
     messagesEndRef.current?.scrollIntoView();
   }, [conv, SelectedChatId]);
 
@@ -55,7 +55,7 @@ export const ChatWindow = ({
   return (
     <>
       <div className='flex-1 flex flex-col min-h-0'>
-        {SelectedChatId ? (
+        {SelectedChatId && other_User ? (
           <>
             <div className='flex py-2.5 px-5 items-center rounded-t-[20px] bg-[#1F2937]'>
               {showBackButton && (
@@ -78,16 +78,29 @@ export const ChatWindow = ({
                   </svg>
                 </button>
               )}
-              <img
-                src={other_User?.avatar_url}
-                alt='Imad'
-                className='w-12 h-12 rounded-full mr-3'
-              />
+              <div className='relative mr-3'>
+                <img
+                  src={other_User.avatar_url}
+                  alt={`${other_User.username}`}
+                  className='w-12 h-12 rounded-full'
+                />
+                {other_User.online_status === 1 ? (
+                  <div className='border-2 border-black absolute top-9 right-0 bg-green-500 rounded-full w-3 h-3'></div>
+                ) : (
+                  <></>
+                )}
+              </div>
               <div className='flex-1'>
                 <div className='flex justify-between items-center'>
                   <div>
                     <h3 className='font-semibold'>{other_User?.username}</h3>
-                    <p className='text-sm text-gray-400 truncate'>Online</p>
+                    <p className='text-sm text-gray-400 truncate'>
+                      {other_User.online_status === 1
+                        ? 'Online'
+                        : other_User.online_status === 2
+                          ? 'In Game'
+                          : 'Offline'}
+                    </p>
                   </div>
                   <div>
                     <button
@@ -102,9 +115,7 @@ export const ChatWindow = ({
                 </div>
               </div>
             </div>
-            <div
-              className='flex-1 p-3 overflow-y-auto scroll-smooth scrollbar-none [&::-webkit-scrollbar]:hidden'
-            >
+            <div className='flex-1 p-3 overflow-y-auto scroll-smooth scrollbar-none [&::-webkit-scrollbar]:hidden'>
               {conv
                 .filter((msg) => msg.chat_id === SelectedChatId)
                 .map((msg) => {
@@ -163,25 +174,30 @@ export const ChatWindow = ({
       </div>
 
       <div>
-        {open ? (
-          <div
-            className={`fixed inset-0 bg-black/30 z-50 pt-32  transition-opacity duration-300 ease-out ${
-              open
-                ? 'opacity-100 pointer-events-auto'
-                : 'opacity-0 pointer-events-none'
-            }`}
-            onClick={() => setopen(false)}
-          >
-            <div
-              className={`absolute bg-slate-700 rounded-lg p-1 h-fit transform transition-all duration-300 ease-out mx-2 w-[calc(100%-30px)] md:right-3 md:mx-0 md:w-1/5 md:max-w-sm ${
-                open ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <UserActionsMenu onClose={() => setopen(false)} />
-            </div>
-          </div>
-        ) : null}
+        {
+          other_User && (
+              <div
+                className={`fixed inset-0 bg-black/30 z-50 pt-32 transition-opacity duration-200 ease-out ${
+                  open
+                    ? 'opacity-100 pointer-events-auto'
+                    : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={() => setopen(false)}
+              >
+                <div
+                  className={`absolute bg-slate-800 rounded-lg p-1 h-fit transform transition-all duration-300 ease-out mx-2 w-[calc(100%-30px)] md:right-3 md:mx-0 md:w-1/5 md:max-w-sm ${
+                    open ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                    <UserActionsMenu
+                      onClose={() => setopen(false)}
+                      _other_user={other_User}
+                    />
+                </div>
+              </div>
+            )
+          }
       </div>
     </>
   );
