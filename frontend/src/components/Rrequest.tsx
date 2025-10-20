@@ -1,5 +1,6 @@
 "use client";
 
+import { log } from "node:console";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -13,7 +14,20 @@ export interface FriendRequestCardProps {
 
 export default function FriendRequestCard({ id, username, avatar_url }: FriendRequestCardProps) {
   const handleAccept = async () => {
-    await fetch(`/api/friends/accept/${id}, { method: "PUT" }`);
+    try {
+      const response = await fetch(`https://localhost:8080//api/friends/accept/${id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+
+      const data: { status: boolean, message: string} = await response.json();
+
+      if (response.ok && data.status) {
+      }
+    } catch (error) {
+      
+    }
+    // await fetch(`/api/friends/accept/${id}, { method: "PUT" }`);
   };
 
   const handleReject = async () => {

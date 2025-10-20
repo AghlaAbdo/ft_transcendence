@@ -227,9 +227,14 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                     <div
                       key={notif.id}
                       className=" transition-all duration-200 hover:bg-slate-750">
-                      <FriendRequestCard
+                      {/* <FriendRequestCard
                         avatar_url='https://ui-avatars.com/api/?name=IM&background=ffa700&color=fff&size=150&bold=true&font-size=0.6'
                         id={notif.id}
+                        username='imad'
+                      /> */}
+                      <FriendRequestCard
+                        avatar_url='https://ui-avatars.com/api/?name=IM&background=ffa700&color=fff&size=150&bold=true&font-size=0.6'
+                        id={notif.user_id}
                         username='imad'
                       />
                     </div>
