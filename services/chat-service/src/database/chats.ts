@@ -20,7 +20,7 @@ try {
   db = new Database(path.join(__dirname, "../database/chat.db"));
 } catch (error) {
   console.error("Failed to open database:", error);
-  process.exit(1); // Exit app if DB can't be opened
+  process.exit(1); 
 }
 
 export function getChats(userId: number): ChatRow[] {

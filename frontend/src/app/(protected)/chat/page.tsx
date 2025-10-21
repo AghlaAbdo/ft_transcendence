@@ -128,8 +128,8 @@ export default function ChatPage() {
               />
             )}
             {selectedChatId && (
-              <BlockingUserInput />
-              // <MessageInput onSendMessage={handleSendMessage} />
+              // <BlockingUserInput />
+              <MessageInput onSendMessage={handleSendMessage} />
             )}
           </div>
         </>
@@ -159,8 +159,8 @@ export default function ChatPage() {
                 />
               )}
               {selectedChatId && otherUser && (
-              <BlockingUserInput />
-                // <MessageInput onSendMessage={handleSendMessage} />
+              // <BlockingUserInput />
+                <MessageInput onSendMessage={handleSendMessage} />
               )}
             </div>
           )}
