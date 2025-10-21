@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import LoadingPong from '@/components/LoadingPong';
 import TournamentBracket from '@/components/game/TournamentBracket';
 
+import { getCurrentMatch } from '@/app/(protected)/lib/game/utils';
 import { socket } from '@/app/(protected)/lib/socket';
 import NotFound from '@/app/not-found';
 import { IMatch, IPlayer, IRound, TournamentDetails } from '@/constants/game';
@@ -24,7 +25,6 @@ export default function SpecificTournamentPage() {
   const [error, setError] = useState<string | null>(null);
   const [nextMatchInfo, setNextMatchInfo] = useState<{
     gameId: string;
-    opponent: IPlayer;
   } | null>(null);
   const [notInTournament, setNotInTournament] = useState<boolean>(false);
 
@@ -38,12 +38,17 @@ export default function SpecificTournamentPage() {
     if (!user?.id || !tournamentId) return;
 
     requestDetails();
-    if (tournamentId)
-      socket.emit('tourn:inLoby', { userId: user.id, tournamentId });
+    // if (tournamentId)
+    //   socket.emit('tourn:inLoby', { userId: user.id, tournamentId });
     socket.on('tournamentDetails', (data: TournamentDetails) => {
       console.log('got Tournament details!!');
       setTournament(data);
       setError(null);
+      if (data.status == 'live') setHideHeaderSidebar(true);
+      const match = getCurrentMatch(data, user.id);
+      if (match && match.status == 'ready') {
+        setNextMatchInfo({ gameId: match.gameId! });
+      }
     });
 
     socket.on('notInTournament', () => {
@@ -85,9 +90,9 @@ export default function SpecificTournamentPage() {
       }
     );
 
-    socket.on('matchReady', (data: { gameId: string; opponent: IPlayer }) => {
+    socket.on('matchReady', (data: { gameId: string }) => {
       console.log('Your match is ready! You have 60s to join the game');
-      setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent });
+      setNextMatchInfo({ gameId: data.gameId });
     });
 
     // socket.on(

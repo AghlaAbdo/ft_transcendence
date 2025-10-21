@@ -14,7 +14,10 @@ import { IGameState } from '../types/types';
 import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
 import { getCurrDate } from '../utils/dates';
-import { removeUserActiveGame } from './userActiveGame';
+import {
+  removeUserActiveGame,
+  removeUserActiveTournament,
+} from './userActiveGame';
 import { advancePlayerInTournament } from '../tournament/tournamentManager';
 
 let ioInstance: Server;
@@ -125,12 +128,15 @@ function gameLoop(gameState: IGameState): void {
 function gameOver(gameState: IGameState): void {
   removeUserActiveGame(gameState.player1.id, gameState.id);
   removeUserActiveGame(gameState.player2.id, gameState.id);
+  let loserId: string;
   if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
     gameState.winner_id = gameState.player1.id;
     gameState.game.winner = 'player1';
+    loserId = gameState.player2.id!;
   } else {
     gameState.winner_id = gameState.player2.id;
     gameState.game.winner = 'player2';
+    loserId = gameState.player1.id!;
   }
   gameState.game.status = 'ended';
   gameState.player1.ready = false;
@@ -142,6 +148,7 @@ function gameOver(gameState: IGameState): void {
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
   if (gameState.isTournamentGame) {
+    removeUserActiveTournament(loserId, gameState.tournamentId);
     advancePlayerInTournament(
       gameState.tournamentId!,
       gameState.tournamentMatchId!,

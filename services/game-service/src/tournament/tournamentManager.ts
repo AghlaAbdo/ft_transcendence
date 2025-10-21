@@ -6,9 +6,11 @@ import { startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
 import {
   removeUserActiveGame,
+  removeUserActiveTournament,
   setUserActiveGame,
 } from '../remote-game/userActiveGame';
 import { getUserSocketId } from '../utils/userSocketMapping';
+import { convertToTournamentDetails } from '../utils/convertTypes';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -154,10 +156,14 @@ export function startTournament(tournament: ITournament) {
 
   tournament.status = 'live';
   generateBracket(tournament);
-  io.to(tournament.id).emit('startTournament', {
-    tournamentId: tournament.id,
-    bracket: tournament.bracket,
-  });
+  // io.to(tournament.id).emit('startTournament', {
+  //   tournamentId: tournament.id,
+  //   bracket: tournament.bracket,
+  // });
+  io.to(tournament.id).emit(
+    'tournamentDetails',
+    convertToTournamentDetails(tournament),
+  );
 
   const round1 = tournament.bracket[0];
   if (round1) {
@@ -280,6 +286,7 @@ export function advancePlayerInTournament(
   if (!currMatch.nextMatchId) {
     // TODO
     // the final match
+    removeUserActiveTournament(currMatch.winnerId, tournamentId);
   }
 
   const loserId =
@@ -301,6 +308,7 @@ export function advancePlayerInTournament(
   else if (currMatch.nextMatchSlot === 'player2Id')
     nextMatch.player2Id = winnerId;
 
+  // Round starting from 1
   const round = tournament.bracket[currMatch.round - 1];
   // console.log("curr round index: ", currMatch.round - 1);
   round.PlayedMatches++;

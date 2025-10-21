@@ -1,8 +1,5 @@
 import { Socket } from 'socket.io';
-import {
-  getUserId,
-  getUserSocketId,
-} from '../utils/userSocketMapping';
+import { getUserId, getUserSocketId } from '../utils/userSocketMapping';
 import { handleQuit } from '../socket/handlers';
 import { getGameState } from './AllGames';
 
@@ -55,8 +52,7 @@ export function quitActiveGame(socket: Socket) {
   const userId = getUserId(socket.id);
   // console.log("called quitActiveGame!!");
   if (userId) {
-    if (getUserSocketId(userId))
-      return;
+    if (getUserSocketId(userId)) return;
     const activeGameId = getUserActiveGame(userId);
     const gameState = getGameState(activeGameId);
     if (gameState) {

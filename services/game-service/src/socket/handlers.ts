@@ -22,7 +22,7 @@ import {
   advancePlayerInTournament,
   getTournament,
 } from '../tournament/tournamentManager';
-import { getPlayerTournament } from '../utils/getPlayerTournament';
+import { getCurrentMatch } from '../utils/getPlayerTournament';
 import { IPlayer, ITournament } from '../types/types';
 import {
   removeUserSocket,
@@ -48,9 +48,16 @@ export function handleConnection(
     console.log('did join Socket to gameId again?: ', userActiveGameId);
     socket.join(userActiveGameId);
   }
+
   if (userActiveTournamentId) {
-    console.log('did join Socket to tourId again?: ', userActiveTournamentId);
     socket.join(userActiveTournamentId);
+    const tournament = getTournament(userActiveTournamentId);
+    if (tournament) {
+      const match = getCurrentMatch(tournament, userId);
+      if (match && match.gameId) {
+        socket.join(match.gameId);
+      }
+    }
   }
   ioInstance = io;
 }
@@ -61,7 +68,7 @@ export function handleDisconnect(socket: Socket, reason: string): void {
   setUserSocketNull(socket.id);
   setTimeout(() => {
     quitActiveGame(socket);
-    removeUserSocket(socket.id)
+    removeUserSocket(socket.id);
   }, 5000);
 
   const userId = getUserId(socket.id);
@@ -227,7 +234,10 @@ export function handleQuit(
   console.log('gameId in handleQuit: ', gameId);
   const gameState = getGameState(gameId);
   if (!gameState) return;
-  const opponentId = userId === gameState.player1.id ? gameState.player2.id : gameState.player1.id;
+  const opponentId =
+    userId === gameState.player1.id
+      ? gameState.player2.id
+      : gameState.player1.id;
   const opponentSocketId = getUserSocketId(opponentId!);
   if (opponentSocketId)
     ioInstance

@@ -101,3 +101,12 @@ export interface IRound {
   PlayedMatches: number;
   matches: IMatch[];
 }
+
+export interface TournamentDetails {
+  id: string;
+  creatorId: string;
+  status: 'waiting' | 'live' | 'completed';
+  maxPlayers: number;
+  players: IPlayer[];
+  bracket: IRound[];
+}

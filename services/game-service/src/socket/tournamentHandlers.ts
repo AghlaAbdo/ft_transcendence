@@ -92,6 +92,10 @@ export async function handleJoinTournament(
       action: 'joined',
       user,
     });
+    if (tournament.players.size == tournament.maxPlayers) {
+      startTournament(tournament);
+      ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
+    }
   }
   console.log('joined tournamentId: ', tournamentId, ' userId: ', userId);
 }
