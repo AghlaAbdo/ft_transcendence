@@ -15,7 +15,7 @@ export interface FriendRequestCardProps {
 export default function FriendRequestCard({ id, username, avatar_url }: FriendRequestCardProps) {
   const handleAccept = async () => {
     try {
-      const response = await fetch(`https://localhost:8080//api/friends/accept/${id}`, {
+      const response = await fetch(`https://localhost:8080/api/friends/accept/${id}`, {
         method: "PUT",
         credentials: "include",
       });
@@ -23,13 +23,17 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
       const data: { status: boolean, message: string} = await response.json();
 
       if (response.ok && data.status) {
+        toast.success(`${data.message}`);
+      } else {
+        toast.error(`${data.message}`);
       }
     } catch (error) {
-      
+      console.error("Error accepting friend request:", error);
+      toast.error("An unexpected error occurred.");
     }
-    // await fetch(`/api/friends/accept/${id}, { method: "PUT" }`);
   };
-
+  
+  // await fetch(`/api/friends/accept/${id}, { method: "PUT" }`);
   const handleReject = async () => {
     await fetch(`/api/friends/reject/${id}, { method: "DELETE" }`);
   };

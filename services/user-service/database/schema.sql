@@ -80,7 +80,8 @@ CREATE TABLE IF NOT EXISTS notifications (
   )),
   read INTEGER DEFAULT 0,
   created_at TEXT DEFAULT (datetime('now')),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 

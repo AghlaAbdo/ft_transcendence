@@ -53,15 +53,19 @@ import { useAuth } from '@/hooks/useAuth';
 import FriendRequestCard from './Rrequest';
 import { markAllNotificationsAsRead_friend, markAllNotificationsAsRead_game } from './markAsRead';
 
-type notification = {
-  id: number;
-  user_id: number;
-  actor_id: string;
-  // avatar_url: string;
-  type: string;
-  read: boolean;
-  created_at: string;
-};
+
+// interface Notification {
+//   id: number;
+//   user_id: number;
+//   user_username: string;
+//   user_avatar: string;
+//   actor_id: number | null;
+//   // actor_username?: string;
+//   // actor_avatar?: string;
+//   type: string;
+//   read: number;
+//   created_at: string;
+// }
 
 interface Notification_props {
   onClose: () => void;
@@ -92,9 +96,24 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
       const res = await fetch(`https://localhost:8080/api/users/notifications/${user.id}`);
       const data = await res.json();
 
-      if (data.status) {
-        console.log('notifs:', data);
-        setNotifications(data.notifications); // auto-sets unreadCount
+      if (res.ok && data.status) {
+        console.log("data: ", data.notifications);
+        
+        // Add this here - fetch user data for each notification
+        const notificationsWithUserData = await Promise.all(
+          data.notifications.map(async (notif: Notification) => {
+            const userRes = await fetch(`https://localhost:8080/api/users/${data.notifications.user_id}`);
+            const userData = await userRes.json();
+            return {
+              ...notif,
+              user_username: userData.username,
+              user_avatar: userData.avatar
+            };
+          })
+        );
+        
+        setNotifications(notificationsWithUserData); // Use the enhanced data
+        
       }
     } catch (err) {
       console.error('API Error:', err);
@@ -227,15 +246,10 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                     <div
                       key={notif.id}
                       className=" transition-all duration-200 hover:bg-slate-750">
-                      {/* <FriendRequestCard
-                        avatar_url='https://ui-avatars.com/api/?name=IM&background=ffa700&color=fff&size=150&bold=true&font-size=0.6'
-                        id={notif.id}
-                        username='imad'
-                      /> */}
                       <FriendRequestCard
-                        avatar_url='https://ui-avatars.com/api/?name=IM&background=ffa700&color=fff&size=150&bold=true&font-size=0.6'
-                        id={notif.user_id}
-                        username='imad'
+                        id = {notif.user_id}
+                        username={notif.user_username}
+                        avatar_url={notif.user_avatar}
                       />
                     </div>
                   ))}

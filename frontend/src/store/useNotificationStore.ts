@@ -10,6 +10,8 @@ interface Notification {
   actor_id: number;
   read: number; // 0 = unread, 1 = read
   created_at: string;
+  user_username: string;
+  user_avatar: string;
 }
 
 interface NotificationState {
