@@ -6,12 +6,6 @@ const fastify = createApp();
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
 
-// declare module "socket.io" {
-//   interface Socket {
-//     userId?: number;
-//   }
-// }
-
 import notoficationModel from "./models/notoficationModel.js";
 
 const onlineUsers = new Map();
@@ -56,8 +50,6 @@ const handleConnection = (fastify, socket) => {
 
 }
 
-
-
 const start = async () => {
     try {
         await fastify.register(cors, { origin: "*" });
@@ -73,7 +65,6 @@ const start = async () => {
             },
         });
 
-        // io.on("connection", handleConnection(fastify, socket));
         io.on("connection", (socket) => handleConnection(fastify, socket));
 
     } catch (err) {

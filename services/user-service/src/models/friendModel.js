@@ -1,14 +1,14 @@
 
 
-const getAllFriends =  (db, id) => {
+const getFriends =  (db, id) => {
     const query = `
-        SELECT u.id, u.username, u.online_status, f.status
+        SELECT u.id, u.username, u.online_status, u.avatar_url, f.status
         FROM FRIENDS f
         JOIN USERS u ON u.id = f.friend_id
         WHERE f.user_id = ?
         AND f.status = 'accepted';
     `;
-    const stmt = db.prapare(query);
+    const stmt = db.prepare(query);
     return stmt.all(id);
 }
 
@@ -60,12 +60,12 @@ const sendFriendRequest = (db, { user_id, friend_id }) => {
 
 const acceptFriendRequest = (db, { user_id, friend_id }) => {
   const checkQuery = `
-    SELECT * FROM friendships
+    SELECT * FROM FRIENDS
     WHERE user_id = ? 
     AND friend_id = ? 
-    AND status = 'pending
+    AND status = 'pending'
   `;
-  const existing = db.prepare(checkQuery).get(user_id, friend_id, friend_id, user_id);
+  const existing = db.prepare(checkQuery).get(user_id, friend_id);
 
   if (!existing) {
     throw new Error("No pending friend request found.");
@@ -88,12 +88,12 @@ const acceptFriendRequest = (db, { user_id, friend_id }) => {
 const rejectFriend = (db, {user_id, friend_id}) => {
     const deleteQuery = `
         DELETE FROM FRIENDS
-        WHERE WHERE user_id = ? 
+        WHERE user_id = ? 
         AND friend_id = ? 
         AND status = 'pending'
     `;
 
-    const res = db.prepare(deleteQuery).run(user_id, friend_id, friend_id, user_id);
+    const res = db.prepare(deleteQuery).run(user_id, friend_id);
 
     if (res.changes === 0) {
         throw new Error("Friend request not found");
@@ -120,7 +120,7 @@ const removeFriendRequest = (db, { user_id, friend_id }) => {
 
 
 export default {
-    getAllFriends,
+    getFriends,
     getPendingRequests,
 
     sendFriendRequest,

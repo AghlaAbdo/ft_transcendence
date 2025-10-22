@@ -33,9 +33,23 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
     }
   };
   
-  // await fetch(`/api/friends/accept/${id}, { method: "PUT" }`);
   const handleReject = async () => {
-    await fetch(`/api/friends/reject/${id}, { method: "DELETE" }`);
+    try {
+      const response = await fetch(`https://localhost:8080/api/friends/reject/${id}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      const data: {status: boolean, message: string} = await response.json();
+      if (response.ok && data.status) {
+        toast.success(`${data.message}`);
+      } else {
+        toast.error(`${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error rejecting friend request:", error);
+      toast.error("An unexpected error occurred.");
+    }
   };
 
   return (

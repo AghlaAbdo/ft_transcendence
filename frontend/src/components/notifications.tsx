@@ -1,48 +1,4 @@
-// <Modal
-//           isOpen={isModalOpen}
-//           onClose={() => setIsModalOpen(false)}
-//         >
-//           {/* Your modal content */}
-//           <input
-//             type='text'
-//             onChange={(e) => {
-//               onsearch_change(e.target.value.trim());
-//             }}
-//             placeholder='Username...'
-//             className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
-//           />
-//           {/* <p className='text-sm text-gray-500 mt-2'>Users list</p> */}
-//           <div className='max-h-[60vh] overflow-y-auto'>
-//           </div>
-//         </Modal>
-// const [users, setusers] = useState<User[]>([]);
-// const [filteredUsers, setfilteredusers] = useState<User[]>([]);
-// const { user } = useAuth();
-// const [isLoading, setIsLoading] = useState<boolean>(false)
-// const [error, seterror] = useState<string | null>(null)
-// useEffect(() => {
-//   // setIsLoading(true)
-//   // seterror("")
-//   // setTimeout(()=>{}, 10000)
-//   fetch(`https://localhost:8080/api/users`)
-//   .then((res) => res.json())
-//   .then((u) => {
-//     if (u.status)
-//       setusers(u.users)
-//   })
-//   .catch((err) => console.log('users fetching failed because of: ', err));
-// }, []);
-// const onsearch_change = async (search_input: string) => {
-//   if (search_input && search_input.trim() && user) {
-//     setfilteredusers(
-//       users.filter((_user) =>
-//         _user.id != user.id &&
-//         _user.username.toLowerCase().includes(search_input.toLowerCase()))
-//     );
-//   } else setfilteredusers([]);
-// };
-// import avatar from '@/../public/avatars/avatar1.png';
-// 
+
 import { useEffect, useState } from 'react';
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { Eye, UserPlus, X } from 'lucide-react';
@@ -54,18 +10,16 @@ import FriendRequestCard from './Rrequest';
 import { markAllNotificationsAsRead_friend, markAllNotificationsAsRead_game } from './markAsRead';
 
 
-// interface Notification {
-//   id: number;
-//   user_id: number;
-//   user_username: string;
-//   user_avatar: string;
-//   actor_id: number | null;
-//   // actor_username?: string;
-//   // actor_avatar?: string;
-//   type: string;
-//   read: number;
-//   created_at: string;
-// }
+interface Notification {
+  id: number;
+  user_id: number;
+  user_username: string;
+  user_avatar: string;
+  actor_id: number | null;
+  type: string;
+  read: number;
+  created_at: string;
+}
 
 interface Notification_props {
   onClose: () => void;
@@ -102,16 +56,15 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
         // Add this here - fetch user data for each notification
         const notificationsWithUserData = await Promise.all(
           data.notifications.map(async (notif: Notification) => {
-            const userRes = await fetch(`https://localhost:8080/api/users/${data.notifications.user_id}`);
+            const userRes = await fetch(`https://localhost:8080/api/users/${notif.user_id}`);
             const userData = await userRes.json();
             return {
               ...notif,
-              user_username: userData.username,
-              user_avatar: userData.avatar
+              user_username: userData.user.username,
+              user_avatar: userData.user.avatar_url
             };
           })
         );
-        
         setNotifications(notificationsWithUserData); // Use the enhanced data
         
       }
