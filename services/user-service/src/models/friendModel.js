@@ -78,10 +78,11 @@ const acceptFriendRequest = (db, { user_id, friend_id }) => {
   `;
   const res = db.prepare(updateQuery).run(existing.id);
 
+  
   if (res.changes === 0) {
     throw new Error("Failed to accept friend request");
   }
-
+  
   return true;
 };
 

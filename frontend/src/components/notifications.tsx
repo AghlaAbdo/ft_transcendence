@@ -43,7 +43,8 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
   const { user } = useAuth();
 
   useEffect(() => {
-  if (!user) return;
+  if (!user) 
+    return;
   // markAllNotificationsAsRead(user.id); // make a function in the component file .
   const fetchNotifications = async () => {
     try {
@@ -51,9 +52,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
       const data = await res.json();
 
       if (res.ok && data.status) {
-        console.log("data: ", data.notifications);
         
-        // Add this here - fetch user data for each notification
         const notificationsWithUserData = await Promise.all(
           data.notifications.map(async (notif: Notification) => {
             const userRes = await fetch(`https://localhost:8080/api/users/${notif.user_id}`);
@@ -76,39 +75,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
   fetchNotifications();
 }, [user]);
 
-// const openNotifications = async () => {
-//   if (user)
-//   {
-//     const userId = user.id;
-//     resetUnread();
-//     await fetch('https://localhost:8080/api/chat/notifications/mark-as-read', {
-//       method: 'PUT',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({ userId }),
-//     });
-//   }
-// };
-  // if (notifications)
-  //   console.log('notifs fetched: ' , notifications);
-  // const getTimeAgo = (timestamp) => {
-  //   const seconds = Math.floor((new Date() - timestamp) / 1000);
-  //   if (seconds < 60) return 'just now';
-  //   const minutes = Math.floor(seconds / 60);
-  //   if (minutes < 60) return `${minutes}m ago`;
-  //   const hours = Math.floor(minutes / 60);
-  //   if (hours < 24) return `${hours}h ago`;
-  //   return `${Math.floor(hours / 24)}d ago`;
-  // };
-
-  const handleAccept = (id: number) => {
-    // setNotifications(notifications.filter(n => n.id !== id));
-  };
-
-  const handleDecline = (id: number) => {
-    // setNotifications(notifications.filter(n => n.id !== id));
-  };
 
   return (
     <div>

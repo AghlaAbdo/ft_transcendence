@@ -8,8 +8,6 @@ const getAllFriends = async (request, reply) => {
         const friends = friendModel.getFriends(db, user_id);
 
 
-        console.log("tetstetstetste\n\n");
-
         if (!friends || friends.length == 0) {
             return reply.send({
                 status: true,
@@ -110,6 +108,13 @@ const acceptFriendRequest = async (request, reply) => {
             friend_id: accepter_id
         });
 
+
+        db.prepare(`
+            DELETE from notifications
+            WHERE user_id = ? 
+            AND actor_id = ?`)
+            .run(requester_id, accepter_id);
+
         reply.code(200).send({
             status: true,
             message: "Friend request accepted successfully"
@@ -150,6 +155,12 @@ const rejectFriendRequest = async (request, reply) => {
             friend_id: accepter_id
         });
 
+        db.prepare(`
+            DELETE from notifications
+            WHERE user_id = ? 
+            AND actor_id = ?`)
+        .run(requester_id, accepter_id);
+        
         return reply.code(200).send({
             status: true,
             message: "Friend request rejected successfully"
