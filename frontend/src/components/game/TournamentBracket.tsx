@@ -13,60 +13,79 @@ const MatchCard: React.FC<{
   match: IMatch;
   currentUserId?: string;
   players: IPlayer[];
-}> = ({ match, currentUserId, players }) => {
+  roundNumber: number;
+}> = ({ match, currentUserId, players, roundNumber }) => {
   const getPlayerDisplay = (playerId: string | null) => {
-    if (!playerId) return 'TBD';
+    if (!playerId) return <span className='text-gray-500 italic'>TBD</span>;
     const isCurrentUser = currentUserId && playerId === currentUserId;
+    const playerName = isCurrentUser
+      ? 'You'
+      : players.find((p) => p.id === playerId)?.username || 'Unknown';
+    const isWinner = match.winnerId === playerId;
+
     return (
       <span
-        className={isCurrentUser ? 'font-bold text-pink-400' : 'text-gray-200'}
+        className={`${
+          isCurrentUser ? 'text-pink font-semibold' : 'text-gray-200'
+        } ${isWinner ? 'text-gold' : ''}`}
       >
-        {isCurrentUser
-          ? 'You'
-          : players.find((p) => p.id === playerId)?.username}
-        {match.winnerId === playerId && ' (W)'}
+        {playerName}
+        {isWinner && ' 🏆'}
       </span>
     );
   };
 
-  const getMatchStatusColor = (status: IMatch['status']) => {
+  const getMatchBorder = (status: IMatch['status']) => {
     switch (status) {
       case 'pending':
-        return 'border-gray-500';
+        return 'border-gray-500/60';
       case 'ready':
-        return 'border-blue-500';
+        return 'border-aqua';
       case 'playing':
-        return 'border-yellow-500';
+        return 'border-purple';
       case 'completed':
-        return 'border-green-500';
+        return 'border-green';
       default:
-        return 'border-gray-600';
+        return 'border-gray-700';
     }
   };
 
   return (
     <div
-      className={`flex flex-col border rounded-md p-2 my-2 w-48 bg-gray-700 ${getMatchStatusColor(match.status)}`}
+      className={`relative flex flex-col bg-gray-800/80 border ${getMatchBorder(
+        match.status
+      )} rounded-xl p-2 w-52 shadow-md hover:shadow-purple/40 transition-all`}
     >
-      <div className='flex justify-between items-center text-sm mb-1'>
-        <span className='text-gray-400'>Match ID:</span>
-        <span className='font-mono text-xs text-gray-400'>
-          {match.id.slice(0, 8)}
-        </span>
+      <div className='flex justify-between text-xs text-gray-400 mb-2'>
+        <span>Round:</span>
+        <span className='font-mono'>{roundNumber}</span>
       </div>
+
       <div
-        className={`flex justify-between p-1 rounded-sm ${match.winnerId === match.player1Id ? 'bg-green-900 bg-opacity-30' : 'bg-gray-800'}`}
+        className={`p-2 rounded-md mb-1 ${
+          match.winnerId === match.player1Id
+            ? 'bg-green/10 border border-green/50'
+            : 'bg-gray-700/60'
+        }`}
       >
         {getPlayerDisplay(match.player1Id)}
       </div>
-      <div className='text-center text-xs text-gray-400'>vs</div>
+
+      <div className='text-center text-gray-500 text-sm'>vs</div>
+
       <div
-        className={`flex justify-between p-1 rounded-sm ${match.winnerId === match.player2Id ? 'bg-green-900 bg-opacity-30' : 'bg-gray-800'}`}
+        className={`p-2 rounded-md mt-1 ${
+          match.winnerId === match.player2Id
+            ? 'bg-green/10 border border-green/50'
+            : 'bg-gray-700/60'
+        }`}
       >
         {getPlayerDisplay(match.player2Id)}
       </div>
-      <div className='text-xs text-gray-400 mt-1 text-right'>
-        Status: {match.status}
+
+      <div className='flex justify-between text-xs text-gray-400 mt-2'>
+        <span>Status:</span>
+        <span className='font-mono'>{match.status}</span>
       </div>
     </div>
   );
@@ -78,24 +97,27 @@ const TournamentBracket: React.FC<TournamentBracketProps> = ({
   players,
 }) => {
   return (
-    <div className='flex justify-center items-start space-x-8 min-w-max'>
-      {bracket.map((round) => (
-        <div key={round.roundNumber} className='flex flex-col items-center'>
-          <h3 className='text-xl font-semibold mb-4 text-purple-300'>
-            Round {round.roundNumber}
-          </h3>
-          <div className='flex flex-col space-y-4'>
-            {round.matches.map((match) => (
-              <MatchCard
-                key={match.id}
-                match={match}
-                currentUserId={currentUserId}
-                players={players}
-              />
-            ))}
+    <div className='flex w-full justify-center'>
+      <div className='flex items-stretch w-fit gap-8'>
+        {bracket.map((round) => (
+          <div
+            key={round.roundNumber}
+            className='flex w-fit flex-col justify-center items-center flex-1'
+          >
+            <div className='flex flex-col justify-center space-y-4'>
+              {round.matches.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  roundNumber={round.roundNumber}
+                  currentUserId={currentUserId}
+                  players={players}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

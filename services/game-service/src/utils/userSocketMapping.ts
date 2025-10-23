@@ -4,6 +4,7 @@ const socketUserMap = new Map<string, string>();
 export function setUserSocket(userId: string, socketId: string) {
   userSocketMap.set(userId, socketId);
   socketUserMap.set(socketId, userId);
+  // console.log("called serUserSocket: ", userSocketMap);
 }
 
 export function setUserSocketNull(socketId: string) {
@@ -19,9 +20,11 @@ export function removeUserSocket(socketId: string) {
     userSocketMap.delete(userId);
   }
   socketUserMap.delete(socketId);
+  // console.log("called removeUserSocket: ", userSocketMap);
 }
 
 export function getUserSocketId(userId: string) {
+  // console.log("userSocketMap in getUserSocketId: ", userSocketMap);
   return userSocketMap.get(userId);
 }
 

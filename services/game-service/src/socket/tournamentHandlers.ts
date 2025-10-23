@@ -4,6 +4,8 @@ import {
   setUserActiveGame,
   removeUserActiveGame,
   setUserActiveTournament,
+  getUserActiveTournament,
+  removeUserActiveTournament,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import {
@@ -28,10 +30,12 @@ export async function handleCreateTournament(
 ): Promise<void> {
   const ioInstance = getIoInstance();
   console.log('called create tournament!!!');
+  console.log('tournament name: ', name);
   const user = await getPlayerInfo(userId);
   if (!user) return;
 
-  if (getUserActiveGame(userId)) {
+  if (getUserActiveTournament(userId)) {
+    console.log('user in another game in handleCreatetournament!');
     socket.emit('inAnotherGame');
     return;
   }
@@ -49,6 +53,7 @@ export async function handleCreateTournament(
     user,
     socket,
   );
+  console.log('playerJoined in createTournament: ', playerJoined);
 
   if (playerJoined) {
     socket.join(newTournament.id);
@@ -129,13 +134,21 @@ export function handleTournPlayerInLoby(
 
   console.log('did increment readyPlayers??');
   tournament.readyPlayers++;
-  if (tournament.readyPlayers === tournament.maxPlayers) {
-    startTournament(tournament);
-    ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
-  }
+  // if (tournament.readyPlayers === tournament.maxPlayers) {
+  //   startTournament(tournament);
+  //   ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
+  // }
 }
 
-export function handleRequestTournaments(socket: Socket) {
+export function handleRequestTournaments(
+  socket: Socket,
+  data: { userId: string },
+) {
+  const tournamentId = getUserActiveTournament(data.userId);
+  if (tournamentId) {
+    socket.emit('inTournament', { tournamentId });
+    return;
+  }
   const tournaments = getAllWaitingTournaments();
   socket.emit('tournamentList', tournaments);
 }
@@ -160,7 +173,7 @@ export function handleRequestTournamentDetails(
 
   socket.emit('tournamentDetails', {
     id: tournament.id,
-    creatorId: tournament.creatorId,
+    winner: tournament.winner,
     status: tournament.status,
     maxPlayers: tournament.maxPlayers,
     players: Array.from(tournament.players.values()),
@@ -205,7 +218,7 @@ export function handleLeaveTournamentLobby(
     userId: data.userId,
     action: 'left',
   });
-  removeUserActiveGame(data.userId, data.tournamentId);
+  removeUserActiveTournament(data.userId, data.tournamentId);
   socket.leave(data.tournamentId);
   if (action === 'tournamentDeleted')
     ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
@@ -216,6 +229,7 @@ export function handleReadyForMatch(
   socket: Socket,
   data: { userId: string; tournamentId: string; gameId: string },
 ) {
+  console.log('data in handleReady for Match: ', data);
   const tournament = getTournament(data.tournamentId);
   const gameState = getGameState(data.gameId);
   if (!gameState || !tournament) {

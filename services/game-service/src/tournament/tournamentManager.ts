@@ -11,6 +11,7 @@ import {
 } from '../remote-game/userActiveGame';
 import { getUserSocketId } from '../utils/userSocketMapping';
 import { convertToTournamentDetails } from '../utils/convertTypes';
+import { getPlayerInfo } from '../utils/getPlayerInfo';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -24,7 +25,7 @@ export function createNewTournament(
   const newTournament: ITournament = {
     id: tournamentId,
     name: name,
-    creatorId: creatorId,
+    winner: null,
     creatorUsername: username,
     status: 'waiting',
     maxPlayers: maxPlayers,
@@ -62,7 +63,7 @@ export function removePlayerFromTournamentLobby(
     console.log('players before delte: ', tournament.players);
     tournament.players.delete(userId);
     console.log('players after delete: ', tournament.players);
-    if (tournament.players.size === 0 && tournament.creatorId === userId) {
+    if (tournament.players.size === 0) {
       deleteTournament(tournamentId);
       return 'tournamentDeleted';
     }
@@ -160,10 +161,6 @@ export function startTournament(tournament: ITournament) {
   //   tournamentId: tournament.id,
   //   bracket: tournament.bracket,
   // });
-  io.to(tournament.id).emit(
-    'tournamentDetails',
-    convertToTournamentDetails(tournament),
-  );
 
   const round1 = tournament.bracket[0];
   if (round1) {
@@ -173,6 +170,11 @@ export function startTournament(tournament: ITournament) {
       }
     });
   }
+
+  io.to(tournament.id).emit(
+    'tournamentDetails',
+    convertToTournamentDetails(tournament),
+  );
 }
 
 function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
@@ -189,14 +191,14 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   const player2Info = tournament.players.get(match.player2Id);
 
   if (!player1Info || !player2Info) {
-    console.error(`Missing player info for match ${match.id}.`);
+    console.log(`Missing player info for match ${match.id}.`);
     return;
   }
 
   const player1SocketId = getUserSocketId(player1Info.id);
   const player2SocketId = getUserSocketId(player2Info.id);
   if (!player1SocketId || !player2SocketId) {
-    console.error("Couldn't get players sockets !!!");
+    console.log("Couldn't get players sockets !!!");
     return;
   }
 
@@ -269,7 +271,7 @@ export function findMatchById(
   return undefined;
 }
 
-export function advancePlayerInTournament(
+export async function advancePlayerInTournament(
   tournamentId: string,
   matchId: string,
   winnerId: string,
@@ -283,12 +285,6 @@ export function advancePlayerInTournament(
   currMatch.status = 'completed';
   currMatch.winnerId = winnerId;
 
-  if (!currMatch.nextMatchId) {
-    // TODO
-    // the final match
-    removeUserActiveTournament(currMatch.winnerId, tournamentId);
-  }
-
   const loserId =
     winnerId === currMatch.player1Id
       ? currMatch.player2Id
@@ -301,8 +297,22 @@ export function advancePlayerInTournament(
     }
   }
 
+  // the final match
+  if (!currMatch.nextMatchId) {
+    const winner = await getPlayerInfo(winnerId);
+    tournament.status = 'completed';
+    tournament.winner = winner;
+    removeUserActiveTournament(currMatch.winnerId, tournamentId);
+    io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
+    io.to(tournamentId).emit('tournamentWinner', { winner });
+    setTimeout(() => deleteTournament(tournamentId), 300 * 1e3);
+    return;
+  }
+
   const nextMatch = findMatchById(tournament, currMatch.nextMatchId);
-  if (!nextMatch) return;
+  if (!nextMatch) {
+    return;
+  }
 
   if (currMatch.nextMatchSlot === 'player1Id') nextMatch.player1Id = winnerId;
   else if (currMatch.nextMatchSlot === 'player2Id')

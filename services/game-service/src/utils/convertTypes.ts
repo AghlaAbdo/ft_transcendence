@@ -5,7 +5,7 @@ export function convertToTournamentDetails(
 ): TournamentDetails {
   return {
     id: tournament.id,
-    creatorId: tournament.creatorId,
+    // creatorId: tournament.creatorId,
     status: tournament.status,
     maxPlayers: tournament.maxPlayers,
     players: Array.from(tournament.players.values()),

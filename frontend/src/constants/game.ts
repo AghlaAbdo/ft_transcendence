@@ -49,7 +49,8 @@ export interface UserInfo {
 
 export interface TournamentDetails {
   id: string;
-  creatorId: string;
+  name: string;
+  winner: IPlayer;
   status: 'waiting' | 'live' | 'completed';
   maxPlayers: number;
   players: IPlayer[];
@@ -69,6 +70,7 @@ export interface ITournament {
 
 export interface TournamentListItem {
   id: string;
+  name: string;
   creatorId: string;
   maxPlayers: number;
   currentPlayers: number;

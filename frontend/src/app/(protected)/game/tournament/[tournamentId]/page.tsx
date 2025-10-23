@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 
+import Avatar from '@/components/Avatar';
 import LoadingPong from '@/components/LoadingPong';
 import TournamentBracket from '@/components/game/TournamentBracket';
 
@@ -18,7 +20,7 @@ export default function SpecificTournamentPage() {
   const router = useRouter();
   const params = useParams<{ tournamentId: string }>();
   const { user } = useUser();
-  const { setHideHeaderSidebar } = useLayout();
+  const { hideHeaderSidebar, setHideHeaderSidebar } = useLayout();
 
   const tournamentId = params.tournamentId;
   const [tournament, setTournament] = useState<TournamentDetails | null>(null);
@@ -27,6 +29,7 @@ export default function SpecificTournamentPage() {
     gameId: string;
   } | null>(null);
   const [notInTournament, setNotInTournament] = useState<boolean>(false);
+  const [winner, setWinner] = useState<IPlayer | null>(null);
 
   const requestDetails = useCallback(() => {
     if (user?.id && tournamentId) {
@@ -41,14 +44,15 @@ export default function SpecificTournamentPage() {
     // if (tournamentId)
     //   socket.emit('tourn:inLoby', { userId: user.id, tournamentId });
     socket.on('tournamentDetails', (data: TournamentDetails) => {
-      console.log('got Tournament details!!');
+      console.log('got Tournament details!!: ', data);
       setTournament(data);
       setError(null);
       if (data.status == 'live') setHideHeaderSidebar(true);
       const match = getCurrentMatch(data, user.id);
-      if (match && match.status == 'ready') {
-        setNextMatchInfo({ gameId: match.gameId! });
+      if (match && match.status == 'ready' && match.gameId) {
+        setNextMatchInfo({ gameId: match.gameId });
       }
+      if (data.winner) setWinner(data.winner);
     });
 
     socket.on('notInTournament', () => {
@@ -74,6 +78,7 @@ export default function SpecificTournamentPage() {
     );
 
     socket.on('bracketUpdate', (bracket: IRound[]) => {
+      console.log('got bracketUpdate!!');
       setTournament((prev) => (prev ? { ...prev, bracket: bracket } : null));
     });
 
@@ -91,35 +96,16 @@ export default function SpecificTournamentPage() {
     );
 
     socket.on('matchReady', (data: { gameId: string }) => {
-      console.log('Your match is ready! You have 60s to join the game');
+      console.log('matchReady, gameId: ', data.gameId);
       setNextMatchInfo({ gameId: data.gameId });
     });
 
-    // socket.on(
-    //   'matchReady',
-    //   (data: { gameId: string; tournamentId: string; opponent: IPlayer }) => {
-    //     console.log('Match Ready! Navigating to game:', data.gameId);
-    //     setTimeout(()=> {
-    //       console.log("set next match info!!");
-    //       setNextMatchInfo({ gameId: data.gameId, opponent: data.opponent })
-    //     }, 5000);
-
-    //     router.push(
-    //       `/game/tournament/${data.tournamentId}/match/${data.gameId}`
-    //     );
-    //   }
-    // );
-
-    socket.on(
-      'tournamentWinner',
-      (data: { winnerId: string; message: string }) => {
-        console.log('Tournament ended! Winner:', data.winnerId);
-        setTournament((prev) =>
-          prev ? { ...prev, status: 'completed' } : null
-        );
-        setNextMatchInfo(null);
-      }
-    );
+    socket.on('tournamentWinner', (data: { winner: IPlayer }) => {
+      console.log('Tournament ended! Winner:', data.winner);
+      setTournament((prev) => (prev ? { ...prev, status: 'completed' } : null));
+      setNextMatchInfo(null);
+      setWinner(data.winner);
+    });
 
     socket.on('leftTournamentLobby', () => {
       router.push('/game/tournament');
@@ -143,7 +129,7 @@ export default function SpecificTournamentPage() {
       socket.off('leftTournamentLobby');
       socket.off('tournamentError');
       socket.off('redirect');
-      // socket.emit('leaveTournamentLobby', user.id, tournamentId);
+      socket.off('startTournament');
     };
   }, [user?.id, tournamentId, router, requestDetails]);
 
@@ -178,10 +164,9 @@ export default function SpecificTournamentPage() {
   }
 
   const currentUserStatus = tournament.players.find((p) => p.id === user.id);
-  console.log('currentUser: ', currentUserStatus);
+  // console.log('currentUser: ', currentUserStatus);
   const isPlayerEliminated = currentUserStatus?.isEliminated;
-  const isCreator = user?.id === tournament.creatorId;
-  const isPlayerRegistered = tournament.players.some((p) => p.id === user?.id);
+  // const isCreator = user?.id === tournament.creatorId;
   const isLobbyFull = tournament.players.length === tournament.maxPlayers;
   const isWaitingStatus = tournament.status === 'waiting';
   const isTournamentRunning = tournament.status === 'live';
@@ -201,121 +186,145 @@ export default function SpecificTournamentPage() {
   // console.log("currentUserMatch: ", currentUserMatch);
 
   return (
-    <div className='flex flex-col items-center p-8 bg-gray-900 text-white min-h-screen'>
-      <h1 className='text-4xl font-bold mb-4 text-pink-500'>
-        Tournament: {tournament.id}
-      </h1>
-      <p className='text-lg mb-2 text-gray-300'>
-        Status: {tournament.status.toUpperCase()}
-      </p>
-      <p className='text-lg mb-4 text-gray-300'>
-        Players: {tournament.players.length} / {tournament.maxPlayers}
-      </p>
+    <div
+      className={`${!hideHeaderSidebar ? 'min-h-[calc(100vh_-_72px)]' : 'min-h-screen'} bg-gradient-to-b from-gray-900  to-dark-blue text-white flex flex-col items-center py-4 px-1 md:py-10 md:px-4`}
+    >
+      <div className='w-full max-w-6xl bg-gray-800/50 backdrop-blur-sm rounded-3xl border border-gray-700 shadow-2xl p-2 sm:p-4 md:p-8 space-y-6'>
+        <h1 className='text-4xl font-extrabold text-center bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent drop-shadow-lg'>
+          {tournament.name || `Tournament #${tournament.id}`}
+        </h1>
 
-      {error && <p className='text-red-500 mb-4'>{error}</p>}
-      {isPlayerEliminated && (
-        <div className='bg-red-700 border-4 border-red-500 p-6 rounded-xl shadow-2xl mb-6 text-center w-full max-w-lg animate-pulse'>
-          <h2 className='text-3xl font-extrabold text-white mb-2'>
-            ELIMINATED! 😥
-          </h2>
-          <p className='text-xl text-red-100'>
-            Your journey ended in Round 'Unknown'.
-          </p>
-          <p className='mt-3 text-lg text-red-100'>
-            Thank you for playing! View the bracket to see the final winner.
-          </p>
-          {/* Optionally, add a button to exit the tournament view completely */}
-          <button
-            onClick={() => router.push('/game/tournament')}
-            className='mt-4 bg-gray-100 text-red-800 font-bold py-2 px-4 rounded-lg'
-          >
-            Go to Main Lobby
-          </button>
+        <div className='flex flex-wrap justify-center gap-4 text-gray-300 text-lg'>
+          <span>
+            🏁 Status:{' '}
+            <span className='font-bold text-aqua'>
+              {tournament.status.toUpperCase()}
+            </span>
+          </span>
+          <span>
+            👥 Players: {tournament.players.length}/{tournament.maxPlayers}
+          </span>
         </div>
-      )}
 
-      {isWaitingStatus && isCreator && !isLobbyFull && (
-        <p className='text-yellow-400 mb-4'>
-          Waiting for {tournament.maxPlayers - tournament.players.length} more
-          players...
-        </p>
-      )}
+        {error && <p className='text-red-500 text-center'>{error}</p>}
 
-      {isWaitingStatus && isCreator && isLobbyFull && (
-        <button
-          onClick={handleStartTournament}
-          className='bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 mb-6'
-        >
-          Start Tournament
-        </button>
-      )}
-
-      {isWaitingStatus && !isCreator && isPlayerRegistered && (
-        <button
-          onClick={handleLeaveLobby}
-          className='bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 mb-6'
-        >
-          Leave Lobby
-        </button>
-      )}
-
-      {isTournamentRunning && currentUserMatch && nextMatchInfo && (
-        <div className='bg-blue-800 p-4 rounded-lg shadow-md mb-6'>
-          <p className='text-xl font-semibold text-blue-200 mb-2'>
-            Your Match is Ready!
-          </p>
-          <button
-            onClick={handleGoToMatch}
-            className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300'
-          >
-            Go to Match
-          </button>
-        </div>
-      )}
-
-      {isTournamentRunning && !currentUserMatch && isPlayerRegistered && (
-        <p className='text-xl text-blue-300 mb-6'>
-          Waiting for your next match to be ready...
-        </p>
-      )}
-
-      {!isPlayerRegistered && tournament.status === 'live' && (
-        <p className='text-xl text-gray-400 mb-6'>
-          Tournament is running. Spectator mode or you've been eliminated.
-        </p>
-      )}
-
-      <h2 className='text-2xl font-semibold mb-4 text-gray-300'>
-        Registered Players ({tournament.players.length}/{tournament.maxPlayers})
-      </h2>
-      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-4xl mb-8'>
-        {tournament.players.map((player) => (
-          <div
-            key={player.id}
-            className='bg-gray-800 p-3 rounded-md flex items-center justify-center text-center'
-          >
-            <p className='font-medium text-lg'>{player.username}</p>
-            {player.id === tournament.creatorId && (
-              <span className='ml-2 text-yellow-500 text-sm'>(Creator)</span>
-            )}
+        {isPlayerEliminated && (
+          <div className='text-center bg-red-800/40 border border-red-500 rounded-2xl p-6 shadow-lg'>
+            <h2 className='text-2xl sm:text-3xl font-bold text-red-400 mb-2 animate-pulse'>
+              You’ve been eliminated 😢
+            </h2>
+            <p className='text-gray-300'>Better luck next time!</p>
+            <button
+              onClick={() => router.push('/game/tournament')}
+              className='mt-2 px-6 py-2 bg-gradient-to-r from-red-600 to-red-400 text-gray-50 font-semibold rounded-xl shadow-md cursor-pointer'
+            >
+              Back to Lobby
+            </button>
           </div>
-        ))}
+        )}
+
+        {isWaitingStatus && (
+          <div className='flex justify-center'>
+            <button
+              onClick={handleLeaveLobby}
+              className='bg-gradient-to-r from-red-600 to-red-800 hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md'
+            >
+              Leave Lobby
+            </button>
+          </div>
+        )}
+
+        {isTournamentRunning && currentUserMatch && nextMatchInfo && (
+          <div className='text-center bg-light-purple/15 border border-purple rounded-2xl p-6 shadow-lg'>
+            <p className='text-xl font-semibold mb-3 text-pink'>
+              Your Match is Ready!
+            </p>
+            <button
+              onClick={handleGoToMatch}
+              className='bg-gradient-to-r from-pink to-purple hover:opacity-90 text-gray-50 font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md hover:shadow-purple/40 cursor-pointer'
+            >
+              Go to Match
+            </button>
+          </div>
+        )}
+
+        <div>
+          <h2 className='text-2xl font-bold mb-4 text-center text-gray-200'>
+            Registered Players
+          </h2>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+            {tournament.players.map((player) => (
+              <div
+                key={player.id}
+                className={`bg-gray-800/70 border border-gray-700 rounded-lg px-8 py-4 flex flex-col items-center justify-center ${
+                  player.isEliminated ? 'opacity-50' : ''
+                }`}
+              >
+                <Avatar width={200} url={player.avatar} frame={player.frame} />
+                <div className='relative'>
+                  <div className='absolute right-0 top-1/2 -translate-y-1/2'>
+                    <div className='relative w-8 md:w-12'>
+                      <Image
+                        width={48}
+                        height={48}
+                        src='/images/star.png'
+                        alt='star'
+                        className='w-full pointer-events-none'
+                      />
+                      <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px] md:text-[16px] text-gray-50 font-bold drop-shadow-[0_0_2px_black]'>
+                        {player.level}
+                      </span>
+                    </div>
+                  </div>
+                  <span className='block min-w-22 sm:min-w-24 md:min-w-32 lg:min-w-40 font-bold text-[12px] sm:text-[16px] lg:text-[20px] text-left px-2 md:px-3 py-[2px] lg:py-1 rounded-[8px] bg-gray-600 mr-3 md:mr-4'>
+                    {player.username}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {winner && (
+          <div className='text-center bg-gradient-to-b from-gray-800 to-gray-700 border border-gold rounded-2xl p-6 shadow-lg mt-10 max-w-md mx-auto'>
+            <div className='flex flex-col items-center'>
+              <div className='text-gold text-5xl mb-3'>🏆</div>
+              <h2 className='text-2xl font-bold text-gold mb-2'>
+                Tournament Champion
+              </h2>
+              <p className='text-gray-200 text-lg mb-4'>
+                {winner.username || 'Unknown Player'}
+              </p>
+
+              <div className='w-full h-px bg-gradient-to-r from-transparent via-gold to-transparent mb-4'></div>
+
+              <button
+                onClick={() => router.push('/game/tournament')}
+                className='px-6 py-2 bg-gradient-to-r from-blue to-aqua text-gray-50 font-semibold rounded-xl shadow-md hover:from-aqua hover:to-blue transition-all duration-300'
+              >
+                Back to Lobby
+              </button>
+            </div>
+          </div>
+        )}
+
+        {tournament.bracket.length > 0 && (
+          <>
+            <h2 className='text-2xl font-semibold mb-4 text-center text-gray-200'>
+              Bracket Progress
+            </h2>
+            <div className='w-full overflow-x-auto bg-gray-900/40 p-4 rounded-xl border border-gray-700 shadow-inner'>
+              <div className='flex w-max space-x-8'>
+                <TournamentBracket
+                  bracket={tournament.bracket}
+                  currentUserId={user?.id}
+                  players={tournament.players}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
-
-      {tournament.bracket.length > 0 && (
-        <>
-          <h2 className='text-2xl font-semibold mb-4 text-gray-300'>
-            Tournament Bracket
-          </h2>
-          <div className='w-full overflow-x-auto p-4 bg-gray-800 rounded-lg shadow-lg'>
-            <TournamentBracket
-              bracket={tournament.bracket}
-              currentUserId={user?.id}
-              players={tournament.players}
-            />
-          </div>
-        </>
-      )}
     </div>
   );
 }
