@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
 
 import LoadingPong from '@/components/LoadingPong';
 import Matching from '@/components/Matching';
@@ -11,6 +10,7 @@ import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
+import InTournamentCard from '@/components/game/InTournamentCard';
 
 import { socket } from '@/app/(protected)/lib/socket';
 import { IPlayer } from '@/constants/game';
@@ -28,6 +28,7 @@ export default function GamePage() {
     playerRole,
     inAnotherGame,
     gameStatus,
+    inTournament,
   } = usePongGameLogic(null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
@@ -51,7 +52,13 @@ export default function GamePage() {
     closeDialRef.current?.showModal();
   }
 
-  if (inAnotherGame) return <AlreadyInGame />;
+  if (inTournament) {
+    console.log('inTournament??');
+    return <InTournamentCard tournamentId={inTournament} />;
+  }
+  if (inAnotherGame) {
+    return <AlreadyInGame />;
+  }
   if (!player || !gameId) {
     return (
       <div className='flex h-[calc(100vh_-_72px)] justify-center items-center'>

@@ -98,8 +98,12 @@ export async function handlePlay(socket: Socket, userId: string) {
 
   if (!user) return;
   if (getUserActiveGame(userId)) {
-    console.log('inAnotherGame handlePlay');
     socket.emit('inAnotherGame');
+    return;
+  }
+  const tournamentId = getUserActiveTournament(userId);
+  if (tournamentId) {
+    socket.emit('inTournament', { tournamentId });
     return;
   }
 

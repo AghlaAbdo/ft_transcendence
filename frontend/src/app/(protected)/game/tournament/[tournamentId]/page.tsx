@@ -215,10 +215,10 @@ export default function SpecificTournamentPage() {
             </h2>
             <p className='text-gray-300'>Better luck next time!</p>
             <button
-              onClick={() => router.push('/game/tournament')}
-              className='mt-2 px-6 py-2 bg-gradient-to-r from-red-600 to-red-400 text-gray-50 font-semibold rounded-xl shadow-md cursor-pointer'
+              onClick={handleLeaveLobby}
+              className='bg-gradient-to-r from-red-600 to-red-800 hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md cursor-pointer'
             >
-              Back to Lobby
+              Leave Lobby
             </button>
           </div>
         )}
@@ -227,7 +227,7 @@ export default function SpecificTournamentPage() {
           <div className='flex justify-center'>
             <button
               onClick={handleLeaveLobby}
-              className='bg-gradient-to-r from-red-600 to-red-800 hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md'
+              className='bg-gradient-to-r from-red-600 to-red-800 hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md cursor-pointer'
             >
               Leave Lobby
             </button>
@@ -245,6 +245,48 @@ export default function SpecificTournamentPage() {
             >
               Go to Match
             </button>
+          </div>
+        )}
+
+        {winner && (
+          <div className='text-center bg-gradient-to-b from-gray-800 to-gray-700 border border-gold rounded-2xl p-6 shadow-lg mt-10 max-w-md mx-auto'>
+            <div className='flex flex-col items-center'>
+              <div className='text-gold text-5xl mb-3'>🏆</div>
+              <h2 className='text-2xl font-bold text-gold mb-2'>
+                Tournament Champion
+              </h2>
+              <div className='mb-4'>
+                <Avatar width={120} url={winner.avatar} frame={winner.frame} />
+                <div className='relative'>
+                  <div className='absolute right-0 top-1/2 -translate-y-1/2'>
+                    <div className='relative w-6 md:w-8 lg:w-12'>
+                      <Image
+                        width={48}
+                        height={48}
+                        src='/images/star.png'
+                        alt='star'
+                        className='w-full pointer-events-none'
+                      />
+                      <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px] md:text-[16px] text-gray-50 font-bold drop-shadow-[0_0_2px_black]'>
+                        {winner.level}
+                      </span>
+                    </div>
+                  </div>
+                  <span className='block min-w-16 sm:min-w-24 md:min-w-32 lg:min-w-40 font-bold text-[12px] sm:text-[16px] lg:text-[20px] text-left px-2 md:px-3 py-[2px] lg:py-1 rounded-[8px] bg-gray-600 mr-3 md:mr-4'>
+                    {winner.username}
+                  </span>
+                </div>
+              </div>
+
+              <div className='w-full h-px bg-gradient-to-r from-transparent via-gold to-transparent mb-4'></div>
+
+              <button
+                onClick={() => router.push('/game/tournament')}
+                className='bg-gradient-to-r from-pink to-purple hover:opacity-90 text-gray-50 font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md hover:shadow-purple/40 cursor-pointer'
+              >
+                Back to Lobby
+              </button>
+            </div>
           </div>
         )}
 
@@ -284,29 +326,6 @@ export default function SpecificTournamentPage() {
             ))}
           </div>
         </div>
-
-        {winner && (
-          <div className='text-center bg-gradient-to-b from-gray-800 to-gray-700 border border-gold rounded-2xl p-6 shadow-lg mt-10 max-w-md mx-auto'>
-            <div className='flex flex-col items-center'>
-              <div className='text-gold text-5xl mb-3'>🏆</div>
-              <h2 className='text-2xl font-bold text-gold mb-2'>
-                Tournament Champion
-              </h2>
-              <p className='text-gray-200 text-lg mb-4'>
-                {winner.username || 'Unknown Player'}
-              </p>
-
-              <div className='w-full h-px bg-gradient-to-r from-transparent via-gold to-transparent mb-4'></div>
-
-              <button
-                onClick={() => router.push('/game/tournament')}
-                className='px-6 py-2 bg-gradient-to-r from-blue to-aqua text-gray-50 font-semibold rounded-xl shadow-md hover:from-aqua hover:to-blue transition-all duration-300'
-              >
-                Back to Lobby
-              </button>
-            </div>
-          </div>
-        )}
 
         {tournament.bracket.length > 0 && (
           <>

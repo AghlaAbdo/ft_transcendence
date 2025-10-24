@@ -27,6 +27,7 @@ interface returnType {
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
   inAnotherGame: boolean;
+  inTournament: string | null;
   gameStatus: 'playing' | 'waiting' | 'notFound' | null;
 }
 
@@ -50,6 +51,7 @@ export const usePongGameLogic = (
   const [gameStatus, setGameStatus] = useState<
     'playing' | 'waiting' | 'notFound' | null
   >(null);
+  const [inTournament, setInTournament] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pixiApp = useRef<PIXI.Application | null>(null);
@@ -343,6 +345,10 @@ export const usePongGameLogic = (
       console.log('Socket ID:', socket.id);
     });
 
+    socket.on('inTournament', (data: { tournamentId: string }) => {
+      setInTournament(data.tournamentId);
+    });
+
     socket.on(
       'playerData',
       (data: {
@@ -529,6 +535,7 @@ export const usePongGameLogic = (
     gameId: gameId.current,
     playerRole: playerRole.current,
     inAnotherGame,
+    inTournament,
     gameStatus,
   };
 };
