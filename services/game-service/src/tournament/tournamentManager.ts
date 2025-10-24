@@ -289,7 +289,6 @@ export async function advancePlayerInTournament(
     winnerId === currMatch.player1Id
       ? currMatch.player2Id
       : currMatch.player1Id;
-  // removeUserActiveGame(loserId, tournament.id);
   if (loserId) {
     const loser = tournament.players.get(loserId);
     if (loser) {

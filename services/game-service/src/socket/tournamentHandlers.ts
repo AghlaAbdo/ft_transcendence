@@ -36,6 +36,12 @@ export async function handleCreateTournament(
 
   if (getUserActiveTournament(userId)) {
     console.log('user in another game in handleCreatetournament!');
+    socket.emit('inTournament', {
+      tournamentId: getUserActiveTournament(userId),
+    });
+    return;
+  }
+  if (getUserActiveGame(userId)) {
     socket.emit('inAnotherGame');
     return;
   }
@@ -85,6 +91,14 @@ export async function handleJoinTournament(
 
   if (getUserActiveGame(userId)) {
     socket.emit('inAnotherGame');
+    return;
+  }
+
+  if (getUserActiveTournament(userId)) {
+    console.log('user in another game in handleCreatetournament!');
+    socket.emit('inTournament', {
+      tournamentId: getUserActiveTournament(userId),
+    });
     return;
   }
 
@@ -147,6 +161,10 @@ export function handleRequestTournaments(
   const tournamentId = getUserActiveTournament(data.userId);
   if (tournamentId) {
     socket.emit('inTournament', { tournamentId });
+    return;
+  }
+  if (getUserActiveGame(data.userId)) {
+    socket.emit('inAnotherGame');
     return;
   }
   const tournaments = getAllWaitingTournaments();

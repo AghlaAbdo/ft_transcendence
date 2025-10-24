@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import AlreadyInGame from '@/components/game/AlreadyInGame';
 import Modal from '@/components/game/Modal';
 
 import { socket } from '@/app/(protected)/lib/socket';
@@ -21,12 +22,17 @@ export default function TournamentLobbyPage() {
   const [tournamentName, setTournamentName] = useState<string>('');
   const [showError, setShowError] = useState(false);
   const { hideHeaderSidebar } = useLayout();
+  const [inAnotherGame, setInAnotherGame] = useState<boolean>(false);
 
   useEffect(() => {
     socket.emit('requestTournaments', { userId: user.id });
 
     socket.on('tournamentList', (data: TournamentListItem[]) => {
       setTournaments(data);
+    });
+
+    socket.on('inAnotherGame', () => {
+      setInAnotherGame(true);
     });
 
     socket.on('inTournament', (data: { tournamentId: string }) => {
@@ -94,6 +100,8 @@ export default function TournamentLobbyPage() {
   const handleSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setNewTournamentSize(Number(e.target.value));
   };
+
+  if (inAnotherGame) return <AlreadyInGame />;
 
   return (
     <div

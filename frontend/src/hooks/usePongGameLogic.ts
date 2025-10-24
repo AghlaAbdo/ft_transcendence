@@ -345,7 +345,7 @@ export const usePongGameLogic = (
       console.log('Socket ID:', socket.id);
     });
 
-    socket.on('inTournament', (data: { tournamentId: string }) => {
+    socket.on('registeredInTournament', (data: { tournamentId: string }) => {
       setInTournament(data.tournamentId);
     });
 

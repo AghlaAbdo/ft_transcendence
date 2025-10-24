@@ -103,7 +103,7 @@ export async function handlePlay(socket: Socket, userId: string) {
   }
   const tournamentId = getUserActiveTournament(userId);
   if (tournamentId) {
-    socket.emit('inTournament', { tournamentId });
+    socket.emit('registeredInTournament', { tournamentId });
     return;
   }
 
@@ -184,6 +184,12 @@ export async function handleRematch(
   console.log('userId in handle rematch: ', userId);
   if (!playerRole) {
     console.log('playerRole is null!!');
+    return;
+  }
+
+  const tournamentId = getUserActiveTournament(userId);
+  if (tournamentId) {
+    socket.emit('registeredInTournament', { tournamentId });
     return;
   }
 
