@@ -98,6 +98,7 @@ export async function handlePlay(socket: Socket, userId: string) {
 
   if (!user) return;
   if (getUserActiveGame(userId)) {
+    console.log('inAnotherGame handlePlay');
     socket.emit('inAnotherGame');
     return;
   }
@@ -187,7 +188,6 @@ export async function handleRematch(
     const gameState = generateGameState(gameId, user, null, null, null);
     gameState.game.status = 'rematching';
     gameState.player1.ready = true;
-    setUserActiveGame(gameState.player1.id, gameId);
     getAllGames().games[gameId] = gameState;
   } else {
     const gameState = getGameState(gameId);
@@ -208,8 +208,9 @@ export async function handleRematch(
     gameState.player2.frame = user.frame;
     gameState.player2.level = user.level;
     gameState.player2.ready = true;
-    setUserActiveGame(gameState.player2.id, gameId);
     if (gameState.player1.ready && gameState.player2.ready) {
+      setUserActiveGame(gameState.player1.id, gameId);
+      setUserActiveGame(gameState.player2.id, gameId);
       gameState.game.status = 'playing';
       setTimeout(() => {
         socket.to(gameId).emit('playAgain');
@@ -256,9 +257,6 @@ export function handleQuit(
     if (!gameState.startDate) gameState.startDate = getCurrDate();
     postGame(gameState);
     if (gameState.isTournamentGame) {
-      removeUserActiveGame(gameState.player1.id, gameState.tournamentId);
-      removeUserActiveGame(gameState.player2.id, gameState.tournamentId);
-    } else {
       removeUserActiveGame(gameState.player1.id, gameState.id);
       removeUserActiveGame(gameState.player2.id, gameState.id);
     }

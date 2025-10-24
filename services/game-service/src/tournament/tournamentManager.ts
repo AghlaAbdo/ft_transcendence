@@ -289,7 +289,7 @@ export async function advancePlayerInTournament(
     winnerId === currMatch.player1Id
       ? currMatch.player2Id
       : currMatch.player1Id;
-  removeUserActiveGame(loserId, tournament.id);
+  // removeUserActiveGame(loserId, tournament.id);
   if (loserId) {
     const loser = tournament.players.get(loserId);
     if (loser) {
@@ -305,7 +305,7 @@ export async function advancePlayerInTournament(
     removeUserActiveTournament(currMatch.winnerId, tournamentId);
     io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
     io.to(tournamentId).emit('tournamentWinner', { winner });
-    setTimeout(() => deleteTournament(tournamentId), 300 * 1e3);
+    setTimeout(() => deleteTournament(tournamentId), 3000 * 1e3);
     return;
   }
 

@@ -200,13 +200,13 @@ export function handleLeaveTournamentLobby(
     socket.emit('tournamentError', 'Tournament not found.');
     return;
   }
-  if (tournament.status !== 'waiting') {
-    socket.emit(
-      'tournamentError',
-      'Cannot leave a tournament that has already started.',
-    );
-    return;
-  }
+  // if (tournament.status !== 'waiting') {
+  //   socket.emit(
+  //     'tournamentError',
+  //     'Cannot leave a tournament that has already started.',
+  //   );
+  //   return;
+  // }
 
   const action = removePlayerFromTournamentLobby(
     data.tournamentId,
@@ -259,7 +259,7 @@ export function handleQuitTournament(data: {
   userId: string;
   tournamentId: string;
 }) {
-  removeUserActiveGame(data.userId, data.tournamentId);
+  removeUserActiveTournament(data.userId, data.tournamentId);
 }
 
 export function handleRequestTournMatchDetails(
