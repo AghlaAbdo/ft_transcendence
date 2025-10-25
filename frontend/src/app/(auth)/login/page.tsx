@@ -24,7 +24,6 @@ const LoginPage = () => {
       setMessage('');
   
       try {
-        // Changed from 'http://localhost:5000/api/auth/signup' to relative path
         const response = await fetch('https://localhost:8080/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

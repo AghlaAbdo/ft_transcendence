@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
 import { jwtVerify } from 'jose';
-import { log } from 'node:console';
  
 
-const publicAuthRoutes = ["/login", "/signup",
-    '/forgot-password',
-    '/reset-password',
+const publicAuthRoutes = [
+    "/login", 
+    "/signup",
+    '/forgotPassword',
+    '/resetPassword',
     '/verifyEmail',
     '/check-email',
 ];
@@ -27,7 +28,6 @@ const SKIP_MIDDLEWARE_ROUTES = [
   "/oauth/",
   "/callback",
   "/success",
-//    "/forgotPassword", "/resetPassword"
 ];
 
 
@@ -37,15 +37,15 @@ export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
 
-    // Skip API routes, static files, etc.
-    if (
-        path.startsWith('/api') ||
-        path.startsWith('/_next') ||
-        path.startsWith('/static') ||
-        path.includes('.')
-    ) {
-        return NextResponse.next();
-    }
+    // // Skip API routes, static files, etc.
+    // if (
+    //     path.startsWith('/api') ||
+    //     path.startsWith('/_next') ||
+    //     path.startsWith('/static') ||
+    //     path.includes('.')
+    // ) {
+    //     return NextResponse.next();
+    // }
 
     // if (matchesRoutes(path, SKIP_MIDDLEWARE_ROUTES)) {
     //     return NextResponse.next();
@@ -62,19 +62,6 @@ export default async function middleware(req: NextRequest) {
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
-            
-            // if (payload.isAccountVerified === false) {
-            //     const response  = NextResponse.redirect(new URL("/login", req.url));
-            //     response.cookies.delete('token');
-            //     return response;
-            // }
-
-            // if (payload.isAccountVerified === false) {
-            //     const response  = NextResponse.redirect(new URL("/verifyEmail", req.url));
-            //     response.cookies.delete('token');
-            //     return response;
-            // }
-            
             isAuthenticated = true;
 
         } catch (error) {
