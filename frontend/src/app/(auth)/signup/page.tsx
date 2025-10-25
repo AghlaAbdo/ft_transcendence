@@ -59,7 +59,7 @@ const SignUpPage = () => {
           if (dataResponse.message === 'VERIFICATION_EMAIL')
             toast.success("Please verify your email address. We've sent you a new verification email");
           else
-            toast.success("Signup successful!, Please verify your email address. We've sent you a new verification email");
+            toast.success("Signup successful, Please verify your email address. We've sent you a new verification email");
 
           router.push(`/verifyEmail?email=${encodeURIComponent(data.email)}`);
           

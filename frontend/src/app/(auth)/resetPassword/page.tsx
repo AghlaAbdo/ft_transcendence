@@ -36,20 +36,13 @@ const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
   const [password, setPassword] = useState<string>("");
   const [confirm, setConfirm] = useState<string>("");
-  const [token, setToken] = useState<string | null>(null);
+  // const [token, setToken] = useState<string | null>(null);
   
   const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
   });
-  const router = useRouter();
   
-  useEffect(() => {
-    const t = searchParams.get("token");
-    if (t) {
-        setToken(t);
-        router.push('/resetPassword');
-    }
-  }, [router]);
+  const token = searchParams.get("token");
 
   const handleResetPassword = async (data: ResetPasswordInput) =>{
     // e.preventDefault();
@@ -59,10 +52,10 @@ const ResetPasswordPage = () => {
     //     return;
     // }
 
-    // if (!token) {
-    //     toast.error("❌ Missing token.");
-    //     return;
-    // }
+    if (!token) {
+        toast.error("❌ Missing token.");
+        return;
+    }
 
     try {
       const response = await fetch("https://localhost:8080/api/auth/reset-password", {
