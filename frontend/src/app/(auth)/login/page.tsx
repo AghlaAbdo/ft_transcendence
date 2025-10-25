@@ -41,7 +41,7 @@ const LoginPage = () => {
         } else {
           const data = await response.json();
           if (data.error === 'EMAIL_NOT_VERIFIED') {
-            router.push('/verifyEmail')
+            router.push(`/verifyEmail?email=${encodeURIComponent(email)}`);
             // console.log(data);
           }  
           toast.error(`❌ ${data.message}`);

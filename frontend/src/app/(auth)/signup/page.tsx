@@ -45,31 +45,24 @@ const SignUpPage = () => {
       setMessage('');
   
       try {
-        // Changed from 'http://localhost:5000/api/auth/signup' to relative path
         const response = await fetch('https://localhost:8080/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
-          credentials: "include"  // allow cookies
+          // credentials: "include"  // allow cookies
         });
   
-        
-        if (response.ok) {
-          const data  : {message?: string, error?: string} = await response.json();
-          if (data.message === 'VERIFICATION_EMAIL_RESENT') {
-            toast.success("Please verify your email address. We've sent you a new verification email");
-            router.push('/verifyEmail');
-            setMessage('verify your Email');
-            return ;
-          }
-          toast.success("✅ Signup successful!");
-          router.push('/verifyEmail');
-          setMessage('Signup successful!');
+        const dataResponse: {status: boolean, message: string} = await response.json();
+
+        if (response.ok && dataResponse.status) {
+          // setMessage('Signup successful!');
+          toast.success("Signup successful!, Please verify your email address. We've sent you a new verification email");
+
+          router.push(`/verifyEmail?email=${encodeURIComponent(data.email)}`);
           
         } else {
-          const data  : {message?: string, error?: string} = await response.json();
-          toast.error(`❌ ${data.message}`);
-          setMessage(data.error || 'Signup failed.');
+          toast.error(`❌ ${dataResponse.message}`);
+          setMessage(dataResponse.message || 'Signup failed.');
         }
       } catch (error) {
         toast.error(`❌ Network error. Please check your connection and try again.`);
