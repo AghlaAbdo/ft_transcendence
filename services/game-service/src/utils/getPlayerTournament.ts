@@ -23,9 +23,10 @@ import { activeTournaments } from '../tournament/tournamentManager';
 // }
 
 export function getCurrentMatch(
-  tournament: ITournament,
+  tournament: ITournament | undefined,
   userId: string,
 ): IMatch | null {
+  if (!tournament) return null;
   for (const round of tournament.bracket) {
     for (const match of round.matches) {
       if (

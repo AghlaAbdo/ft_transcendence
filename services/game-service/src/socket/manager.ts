@@ -22,6 +22,7 @@ import {
   handleReadyForMatch,
   handleQuitTournament,
   handleRequestTournMatchDetails,
+  handleUnreadyForMatch,
 } from './tournamentHandlers';
 
 let ioInstance: Server;
@@ -101,6 +102,9 @@ export function initializeSocketIO(server: http.Server): Server {
       'requestTournMatchDetails',
       (data: { userId: string; tournamentId: string; matchGameId: string }) =>
         handleRequestTournMatchDetails(socket, data),
+    );
+    socket.on('unreadyForMatch', (data: { userId: string }) =>
+      handleUnreadyForMatch(data),
     );
   });
 

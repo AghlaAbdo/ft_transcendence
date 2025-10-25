@@ -304,7 +304,7 @@ export default function SpecificTournamentPage() {
               <div
                 key={player.id}
                 className={`bg-gray-800/70 border border-gray-700 rounded-lg px-8 py-4 flex flex-col items-center justify-center ${
-                  player.isEliminated ? 'opacity-50' : ''
+                  player.isEliminated ? 'opacity-40' : ''
                 }`}
               >
                 <Avatar width={200} url={player.avatar} frame={player.frame} />

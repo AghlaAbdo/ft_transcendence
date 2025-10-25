@@ -56,6 +56,8 @@ export default function GamePage() {
       socket.off('inMatch');
       socket.off('notInMatch');
       socket.off('opponentNotJoined');
+      // if (!player || !opponent || matching)
+      socket.emit('unreadyForMatch', { userId: user.id });
     };
   }, []);
 

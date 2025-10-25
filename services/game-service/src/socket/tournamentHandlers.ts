@@ -21,6 +21,7 @@ import { getIoInstance } from './manager';
 import { getGameState } from '../remote-game/AllGames';
 import { findMatchById } from '../tournament/tournamentManager';
 import { toUSVString } from 'util';
+import { getCurrentMatch } from '../utils/getPlayerTournament';
 
 export async function handleCreateTournament(
   socket: Socket,
@@ -191,6 +192,7 @@ export function handleRequestTournamentDetails(
 
   socket.emit('tournamentDetails', {
     id: tournament.id,
+    name: tournament.name,
     winner: tournament.winner,
     status: tournament.status,
     maxPlayers: tournament.maxPlayers,
@@ -255,10 +257,8 @@ export function handleReadyForMatch(
     socket.emit('notInMatch');
     return;
   }
-  // setUserActiveGame(data.userId, data.gameId);
   socket.emit('inMatch');
   console.log('sent Inmatch??');
-  // gameState.game.status = 'playing';
   if (gameState.game.status === 'playing') {
     console.log("gameStatus is 'playing' in handleReadyForMatch!!");
     return;
@@ -324,4 +324,16 @@ export function handleRequestTournMatchDetails(
     opponent: null,
     playerRole: null,
   });
+}
+
+export function handleUnreadyForMatch(data: { userId: string }) {
+  const userActiveTournament = getUserActiveTournament(data.userId);
+  if (userActiveTournament) {
+    const tournament = getTournament(userActiveTournament);
+    const match = getCurrentMatch(tournament, data.userId);
+    if (match) {
+      if (data.userId == match.player1Id) match.isPlayer1Ready = false;
+      else match.isPlayer2Ready = false;
+    }
+  }
 }

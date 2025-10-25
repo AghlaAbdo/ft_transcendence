@@ -74,6 +74,7 @@ export function handleDisconnect(socket: Socket, reason: string): void {
   const userId = getUserId(socket.id);
   if (userId) {
     const userActiveGameId = getUserActiveGame(userId);
+    const userActiveTournament = getUserActiveTournament(userId);
     if (userActiveGameId) {
       const gameState = getGameState(userActiveGameId);
       if (
@@ -92,6 +93,14 @@ export function handleDisconnect(socket: Socket, reason: string): void {
         gameState.game.status != 'playing'
       ) {
         handleQuit(socket, userActiveGameId, userId);
+      }
+    }
+    if (userActiveTournament) {
+      const tournament = getTournament(userActiveTournament);
+      const match = getCurrentMatch(tournament, userId);
+      if (match) {
+        if (userId == match.player1Id) match.isPlayer1Ready = false;
+        else match.isPlayer2Ready = false;
       }
     }
   }
