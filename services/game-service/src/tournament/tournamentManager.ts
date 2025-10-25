@@ -1,8 +1,8 @@
 import { generateGameState } from '../remote-game/gameState';
 import { getIoInstance } from '../socket/manager';
-import { ITournament, IRound, IMatch } from '../types/types';
+import { ITournament, IRound, IMatch, IGameState } from '../types/types';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
-import { startGame } from '../remote-game/gameLogic';
+import { deleteGame, startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
 import {
   removeUserActiveGame,
@@ -12,6 +12,9 @@ import {
 import { getUserSocketId } from '../utils/userSocketMapping';
 import { convertToTournamentDetails } from '../utils/convertTypes';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
+import { handleQuit } from '../socket/handlers';
+import { postGame } from '../models/game.model';
+import { getCurrDate, getDiffInMin } from '../utils/dates';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -60,9 +63,9 @@ export function removePlayerFromTournamentLobby(
   const tournament = activeTournaments.get(tournamentId);
   if (tournament && tournament.status === 'waiting') {
     tournament.readyPlayers--;
-    console.log('players before delte: ', tournament.players);
+    // console.log('players before delte: ', tournament.players);
     tournament.players.delete(userId);
-    console.log('players after delete: ', tournament.players);
+    // console.log('players after delete: ', tournament.players);
     if (tournament.players.size === 0) {
       deleteTournament(tournamentId);
       return 'tournamentDeleted';
@@ -157,10 +160,6 @@ export function startTournament(tournament: ITournament) {
 
   tournament.status = 'live';
   generateBracket(tournament);
-  // io.to(tournament.id).emit('startTournament', {
-  //   tournamentId: tournament.id,
-  //   bracket: tournament.bracket,
-  // });
 
   const round1 = tournament.bracket[0];
   if (round1) {
@@ -175,6 +174,46 @@ export function startTournament(tournament: ITournament) {
     'tournamentDetails',
     convertToTournamentDetails(tournament),
   );
+}
+
+function notJoinTournamentMatch(
+  tournament: ITournament,
+  match: IMatch,
+  gameState: IGameState,
+  userId: string,
+  opponentId: string,
+) {
+  removeUserActiveTournament(userId, gameState.tournamentId);
+  removeUserActiveGame(gameState.player1.id, gameState.id);
+  removeUserActiveGame(gameState.player2.id, gameState.id);
+  gameState.game.status = 'ended';
+  gameState.winner_id =
+    gameState.player1.id === userId
+      ? gameState.player2.id
+      : gameState.player1.id;
+  gameState.playtime = getDiffInMin(gameState.startAt);
+  if (!gameState.startDate) gameState.startDate = getCurrDate();
+  postGame(gameState);
+  advancePlayerInTournament(
+    gameState.tournamentId!,
+    gameState.tournamentMatchId!,
+    gameState.winner_id!,
+  );
+
+  const ioInstance = getIoInstance();
+  const opponentSocketId = getUserSocketId(opponentId);
+  if (opponentSocketId) {
+    ioInstance.to(opponentSocketId).emit('opponentNotJoined');
+  }
+  ioInstance.to(tournament.id).emit('tournamentDetails', {
+    id: tournament.id,
+    winner: tournament.winner,
+    status: tournament.status,
+    maxPlayers: tournament.maxPlayers,
+    players: Array.from(tournament.players.values()),
+    bracket: tournament.bracket,
+  });
+  deleteGame(gameState);
 }
 
 function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
@@ -216,8 +255,25 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   io.to(player2SocketId).emit('matchReady', { gameId, opponent: player1Info });
   io.in(player1SocketId).socketsJoin(gameId);
   io.in(player2SocketId).socketsJoin(gameId);
-  // player1Socket.join(gameId);
-  // player2Socket.join(gameId);
+  setTimeout(() => {
+    if (!match.isPlayer1Ready) {
+      notJoinTournamentMatch(
+        tournament,
+        match,
+        gameState,
+        match.player1Id!,
+        match.player2Id!,
+      );
+    } else if (!match.isPlayer2Ready) {
+      notJoinTournamentMatch(
+        tournament,
+        match,
+        gameState,
+        match.player2Id!,
+        match.player1Id!,
+      );
+    }
+  }, 60 * 1e3);
 }
 
 export function startTournamentMatch(tournament: ITournament, matchId: string) {
@@ -233,8 +289,8 @@ export function startTournamentMatch(tournament: ITournament, matchId: string) {
     console.error(`Missing player info for match ${match.id}.`);
     return;
   }
-  setUserActiveGame(player1Info.id, gameState.id);
-  setUserActiveGame(player2Info.id, gameState.id);
+  // setUserActiveGame(player1Info.id, gameState.id);
+  // setUserActiveGame(player2Info.id, gameState.id);
   const player1SocketId = getUserSocketId(player1Info.id);
   const player2SocketId = getUserSocketId(player2Info.id);
   if (!player1SocketId || !player2SocketId) {

@@ -29,8 +29,8 @@ export async function handleCreateTournament(
   name: string,
 ): Promise<void> {
   const ioInstance = getIoInstance();
-  console.log('called create tournament!!!');
-  console.log('tournament name: ', name);
+  // console.log('called create tournament!!!');
+  // console.log('tournament name: ', name);
   const user = await getPlayerInfo(userId);
   if (!user) return;
 
@@ -255,8 +255,10 @@ export function handleReadyForMatch(
     socket.emit('notInMatch');
     return;
   }
+  // setUserActiveGame(data.userId, data.gameId);
   socket.emit('inMatch');
   console.log('sent Inmatch??');
+  // gameState.game.status = 'playing';
   if (gameState.game.status === 'playing') {
     console.log("gameStatus is 'playing' in handleReadyForMatch!!");
     return;

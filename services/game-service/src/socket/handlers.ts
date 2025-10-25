@@ -76,13 +76,21 @@ export function handleDisconnect(socket: Socket, reason: string): void {
     const userActiveGameId = getUserActiveGame(userId);
     if (userActiveGameId) {
       const gameState = getGameState(userActiveGameId);
-      if (gameState && gameState.game.status === 'waiting') {
+      if (
+        !getUserActiveTournament(userId) &&
+        gameState &&
+        gameState.game.status === 'waiting'
+      ) {
         if (getUserActiveGame(userId)) {
           removeUserActiveGame(userId, userActiveGameId);
           deleteGame(gameState);
           getAllGames().lobyGame = null;
         }
-      } else if (gameState && gameState.game.status != 'playing') {
+      } else if (
+        !getUserActiveTournament(userId) &&
+        gameState &&
+        gameState.game.status != 'playing'
+      ) {
         handleQuit(socket, userActiveGameId, userId);
       }
     }
@@ -233,7 +241,7 @@ export async function handleRematch(
 }
 
 export function handleQuit(
-  socket: Socket,
+  socket: Socket | null,
   gameId: string,
   userId: string,
 ): void {
@@ -254,9 +262,9 @@ export function handleQuit(
     ioInstance
       .to(opponentSocketId)
       .emit('opponentQuit', gameState ? gameState.game.status : null);
-  if (gameState && gameState.game.status === 'rematching') {
-    removeUserActiveGame(userId, gameId);
-  } else if (gameState && gameState.game.status === 'playing') {
+  if (gameState && gameState.game.status === 'playing') {
+    removeUserActiveGame(gameState.player1.id, gameState.id);
+    removeUserActiveGame(gameState.player2.id, gameState.id);
     console.log('gameStatus in handleQuit: ', gameState.game.status);
     gameState.game.status = 'ended';
     gameState.winner_id =
@@ -266,10 +274,6 @@ export function handleQuit(
     gameState.playtime = getDiffInMin(gameState.startAt);
     if (!gameState.startDate) gameState.startDate = getCurrDate();
     postGame(gameState);
-    if (gameState.isTournamentGame) {
-      removeUserActiveGame(gameState.player1.id, gameState.id);
-      removeUserActiveGame(gameState.player2.id, gameState.id);
-    }
     if (gameState.isTournamentGame) {
       advancePlayerInTournament(
         gameState.tournamentId!,

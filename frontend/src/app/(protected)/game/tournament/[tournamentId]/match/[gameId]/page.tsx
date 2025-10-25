@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import LoadingPong from '@/components/LoadingPong';
 import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
+import OpponentNotJoined from '@/components/game/OpponentNotJoined';
 
 import { socket } from '@/app/(protected)/lib/socket';
 import NotFound from '@/app/not-found';
@@ -30,6 +31,8 @@ export default function GamePage() {
   const [accessToMatch, setAccessToMatch] = useState<
     'pending' | 'access' | '404'
   >('pending');
+  const [opponentNotJoined, setOpponentNotJoined] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     console.log('how many times sent readyForMatch??');
@@ -46,9 +49,13 @@ export default function GamePage() {
       console.log('ever got InMatch???');
       setAccessToMatch('access');
     });
+    socket.on('opponentNotJoined', () => {
+      setOpponentNotJoined(true);
+    });
     return () => {
       socket.off('inMatch');
       socket.off('notInMatch');
+      socket.off('opponentNotJoined');
     };
   }, []);
 
@@ -82,6 +89,11 @@ export default function GamePage() {
   if (inAnotherGame) return <AlreadyInGame />;
   if (accessToMatch === '404') {
     return <NotFound />;
+    // return <OpponentNotJoined tournamentId={tournamentId} />
+  }
+  if (opponentNotJoined) {
+    // setTimeout(()=> router.replace('/game/tournament'), 3000);
+    return <OpponentNotJoined tournamentId={tournamentId} />;
   }
   if (!player || !opponent || matching)
     return (

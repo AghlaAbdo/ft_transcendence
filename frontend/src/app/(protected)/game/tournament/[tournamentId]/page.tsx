@@ -120,6 +120,7 @@ export default function SpecificTournamentPage() {
     });
 
     return () => {
+      setHideHeaderSidebar(false);
       socket.off('tournamentDetails');
       socket.off('tournamentPlayerUpdate');
       socket.off('bracketUpdate');
@@ -236,8 +237,12 @@ export default function SpecificTournamentPage() {
 
         {isTournamentRunning && currentUserMatch && nextMatchInfo && (
           <div className='text-center bg-light-purple/15 border border-purple rounded-2xl p-6 shadow-lg'>
-            <p className='text-xl font-semibold mb-3 text-pink'>
+            <p className='text-xl font-semibold mb-1 text-pink'>
               Your Match is Ready!
+            </p>
+            <p className='text-[18px] mb-3 text-gray-400'>
+              You have <strong>60s</strong> to join the match or you will be{' '}
+              <b>eliminated</b>
             </p>
             <button
               onClick={handleGoToMatch}
