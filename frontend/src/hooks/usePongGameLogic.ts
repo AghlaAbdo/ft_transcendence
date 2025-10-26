@@ -429,7 +429,7 @@ export const usePongGameLogic = (
       dialogRef.current?.showModal();
       if (isTournamentGame.current) {
         setTimeout(() => {
-          router.push(`/game/tournament/${tournamentId}`);
+          router.replace(`/game/tournament/${tournamentId}`);
         }, 2000);
       }
     });
@@ -447,7 +447,7 @@ export const usePongGameLogic = (
             if (isTournamentGame.current) {
               console.log('isTournament: ', isTournamentGame.current);
               setTimeout(() => {
-                router.push(`/game/tournament/${tournamentId}`);
+                router.replace(`/game/tournament/${tournamentId}`);
               }, 2000);
             }
           }, 2000);

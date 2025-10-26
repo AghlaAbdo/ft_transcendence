@@ -32,8 +32,8 @@ export default function CloseGameDialog({
     socket.emit('quit', gameId, user.id);
     setHideHeaderSidebar(false);
     if (isTournamentGame)
-      router.push(`/game/tournament/${params.tournamentId}`);
-    else router.push('/game');
+      router.replace(`/game/tournament/${params.tournamentId}`);
+    else router.replace('/game');
   }
   return (
     <dialog

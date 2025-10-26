@@ -107,9 +107,9 @@ export default function SpecificTournamentPage() {
       setWinner(data.winner);
     });
 
-    socket.on('leftTournamentLobby', () => {
-      router.push('/game/tournament');
-    });
+    // socket.on('leftTournamentLobby', () => {
+    //   router.push('/game/tournament');
+    // });
 
     socket.on('tournamentError', (message: string) => {
       setError(message);
@@ -127,10 +127,11 @@ export default function SpecificTournamentPage() {
       socket.off('tournamentStarted');
       socket.off('matchReady');
       socket.off('tournamentWinner');
-      socket.off('leftTournamentLobby');
+      // socket.off('leftTournamentLobby');
       socket.off('tournamentError');
       socket.off('redirect');
       socket.off('startTournament');
+      socket.off('notInTournament');
     };
   }, [user?.id, tournamentId, router, requestDetails]);
 
@@ -143,12 +144,13 @@ export default function SpecificTournamentPage() {
   const handleLeaveLobby = () => {
     if (user?.id && tournamentId) {
       socket.emit('leaveTournamentLobby', { userId: user.id, tournamentId });
+      router.replace('/game/tournament');
     }
   };
 
   const handleGoToMatch = () => {
     if (tournament && nextMatchInfo) {
-      router.push(
+      router.replace(
         `/game/tournament/${tournament.id}/match/${nextMatchInfo.gameId}`
       );
     }
@@ -286,7 +288,7 @@ export default function SpecificTournamentPage() {
               <div className='w-full h-px bg-gradient-to-r from-transparent via-gold to-transparent mb-4'></div>
 
               <button
-                onClick={() => router.push('/game/tournament')}
+                onClick={() => router.replace('/game/tournament')}
                 className='bg-gradient-to-r from-pink to-purple hover:opacity-90 text-gray-50 font-bold py-2 px-6 rounded-lg transition duration-300 shadow-md hover:shadow-purple/40 cursor-pointer'
               >
                 Back to Lobby

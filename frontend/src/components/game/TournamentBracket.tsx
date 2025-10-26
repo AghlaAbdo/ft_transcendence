@@ -104,7 +104,7 @@ const TournamentBracket: React.FC<TournamentBracketProps> = ({
             key={round.roundNumber}
             className='flex w-fit flex-col justify-center items-center flex-1'
           >
-            <div className='flex flex-col justify-center space-y-4'>
+            <div className='flex flex-col h-full justify-around space-y-4'>
               {round.matches.map((match) => (
                 <MatchCard
                   key={match.id}

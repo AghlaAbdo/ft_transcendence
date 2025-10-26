@@ -94,7 +94,7 @@ export default function GamePage() {
     // return <OpponentNotJoined tournamentId={tournamentId} />
   }
   if (opponentNotJoined) {
-    // setTimeout(()=> router.replace('/game/tournament'), 3000);
+    setTimeout(() => router.replace(`/game/tournament/${tournamentId}`), 3000);
     return <OpponentNotJoined tournamentId={tournamentId} />;
   }
   if (!player || !opponent || matching)

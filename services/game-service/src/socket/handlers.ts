@@ -15,6 +15,7 @@ import {
   removeUserActiveGame,
   getUserActiveTournament,
   quitActiveGame,
+  removeUserActiveTournament,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { getCurrDate, getDiffInMin } from '../utils/dates';
@@ -284,6 +285,7 @@ export function handleQuit(
     if (!gameState.startDate) gameState.startDate = getCurrDate();
     postGame(gameState);
     if (gameState.isTournamentGame) {
+      removeUserActiveTournament(userId, gameState.tournamentId);
       advancePlayerInTournament(
         gameState.tournamentId!,
         gameState.tournamentMatchId!,

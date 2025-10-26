@@ -9,6 +9,8 @@ import { ArrowLeft, Trophy } from 'lucide-react';
 
 // components/game/WinByDefaultCard.tsx
 
+// components/game/WinByDefaultCard.tsx
+
 type Props = {
   opponentName?: string | null;
   tournamentId?: string | null;
@@ -44,8 +46,8 @@ export default function WinByDefaultCard({
           <button
             onClick={() =>
               tournamentId
-                ? router.push(`/game/tournament/${tournamentId}`)
-                : router.push('/game/tournament')
+                ? router.replace(`/game/tournament/${tournamentId}`)
+                : router.replace('/game/tournament')
             }
             className='inline-flex items-center gap-2 bg-gradient-to-r from-purple to-light-purple text-gray-50 font-semibold py-2.5 px-5 rounded-lg shadow-md hover:scale-[1.03] transition transform'
           >

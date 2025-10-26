@@ -242,7 +242,7 @@ export function handleLeaveTournamentLobby(
   socket.leave(data.tournamentId);
   if (action === 'tournamentDeleted')
     ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
-  socket.emit('leftTournamentLobby', { tournamentId: data.tournamentId });
+  // socket.emit('leftTournamentLobby', { tournamentId: data.tournamentId });
 }
 
 export function handleReadyForMatch(
