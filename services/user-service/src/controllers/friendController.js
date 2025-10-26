@@ -1,6 +1,35 @@
 import friendModel from "../models/friendModel.js";
 
 const getAllFriends = async (request, reply) => {
+    try {
+        const user_id = request.user.id;
+        const db = request.server.db;
+
+        const friends = friendModel.getFriends(db, user_id);
+
+
+        if (!friends || friends.length == 0) {
+            return reply.send({
+                status: true,
+                friends: [],
+                message: 'No friends found'
+            }); 
+        }
+
+
+        reply.code(200).send({
+            status: true,
+            friends: friends,
+            count: friends.length
+        });
+
+    } catch (error) {
+        console.error('Error in getAllFriends:', error); 
+        return reply.code(500).send({
+            status: false,
+            message: error.message
+        });       
+    }
 }
 
 // Get friend requests RECEIVED by me
@@ -79,6 +108,13 @@ const acceptFriendRequest = async (request, reply) => {
             friend_id: accepter_id
         });
 
+
+        db.prepare(`
+            DELETE from notifications
+            WHERE user_id = ? 
+            AND actor_id = ?`)
+            .run(requester_id, accepter_id);
+
         reply.code(200).send({
             status: true,
             message: "Friend request accepted successfully"
@@ -114,11 +150,17 @@ const rejectFriendRequest = async (request, reply) => {
 
         const db = request.server.db;
 
-        friendModel.rejectFriendRequest(db, {
+        friendModel.rejectFriend(db, {
             user_id : requester_id,
             friend_id: accepter_id
         });
 
+        db.prepare(`
+            DELETE from notifications
+            WHERE user_id = ? 
+            AND actor_id = ?`)
+        .run(requester_id, accepter_id);
+        
         return reply.code(200).send({
             status: true,
             message: "Friend request rejected successfully"

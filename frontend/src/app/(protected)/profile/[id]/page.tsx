@@ -8,7 +8,6 @@ import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { User } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { lookupService } from 'dns';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -16,6 +15,8 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
+>>>>>>> origin/user-service
   useEffect( () => {
     const fetchUserById = async () => {
       try {
@@ -157,8 +158,7 @@ const ProfilePage = () => {
                   </div>
                 </div>
                  <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900 rounded-xl">
-                  {/* <GameHistory1 /> */}
-                  <Friends />
+                  <Friends/>
                 </div>
               </div>
             </div>

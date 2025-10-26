@@ -24,7 +24,6 @@ const LoginPage = () => {
       setMessage('');
   
       try {
-        // Changed from 'http://localhost:5000/api/auth/signup' to relative path
         const response = await fetch('https://localhost:8080/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -41,7 +40,7 @@ const LoginPage = () => {
         } else {
           const data = await response.json();
           if (data.error === 'EMAIL_NOT_VERIFIED') {
-            router.push('/verifyEmail')
+            router.push(`/verifyEmail?email=${encodeURIComponent(email)}`);
             // console.log(data);
           }  
           toast.error(`❌ ${data.message}`);

@@ -18,25 +18,26 @@ const signup = async (request, reply) => {
         if (usernameAlreadyExist && emailAlreadyExist) {
             if (usernameAlreadyExist.isAccountVerified === 0) {
 
-                const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-                const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
+                // const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+                // const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
                 
-                const email = emailAlreadyExist.email;
-                const username = usernameAlreadyExist.username;
+                // const email = emailAlreadyExist.email;
+                // const username = usernameAlreadyExist.username;
                 
-                await sendVerificationEmail(email, verificationToken, username);
+                // await sendVerificationEmail(email, verificationToken, username);
                 
-                db.prepare(`
-                    UPDATE USERS
-                    SET verificationToken = ?,
-                    verificationTokenExpiresAt = ?
-                    WHERE email = ?
-                    `).run(verificationToken, tokenExpiry, emailAlreadyExist.email);
+                // db.prepare(`
+                //     UPDATE USERS
+                //     SET verificationToken = ?,
+                //     verificationTokenExpiresAt = ?
+                //     WHERE email = ?
+                //     `).run(verificationToken, tokenExpiry, emailAlreadyExist.email);
 
-                await sendVerificationEmail(email, verificationToken, username);
-                    return reply.code(200).send({
+                // await sendVerificationEmail(email, verificationToken, username);
+                
+                return reply.code(200).send({
                     status: true,
-                    message: "VERIFICATION_EMAIL_RESENT"
+                    message: "VERIFICATION_EMAIL"
                 });
             }
         }
@@ -51,7 +52,6 @@ const signup = async (request, reply) => {
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
         const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
 
-        // const userId = userModel.createUser(username, email, hashedPassword, verificationToken, tokenExpiry);
 
         const userId = userModel.createUser(db, {
             username,
@@ -62,33 +62,15 @@ const signup = async (request, reply) => {
             tokenExpiry,
             // location
         });
-
-        // generateTokenAndSetCookie(reply, userId, username, email);
-
-        const token = request.server.signToken( {
-            id: userId,
-            username: username,
-            email: email,
-            isAccountVerified: false
-        });
         
-        request.server.setAuthCookie(reply, token);
-
-        
-        //----------------------------------------
         await sendVerificationEmail(email, verificationToken, username);
-        // ----------------------------------------
 
-        reply.code(201) 
-             .send({ status: true, 
-                     message: 'User registered successfully.', 
-                     user: {
-                        id: userId,
-                        username: username,
-                        email: email,
-                   }});    
+        reply.code(201).send({ 
+            status: true, 
+            message: 'User registered successfully.', 
+        });    
     } catch (error) {
-        console.error("Signup error:", error); // Helpful for debugging
+        console.error("Signup error:", error);
         reply.code(400).send({status: false, message: error.message});
     }
 };
@@ -178,17 +160,12 @@ const getMe = async (request, reply) => {
 }
 
 const verifyEmail = async (request, reply) => {
-    const { email, token } = request.body;
     
-    console.log("-----> ", request.body);
-    console.log(email, token);
-    
-    
-
     try {
+        const { email, token } = request.body;
+
         if (!email || !token)
             throw new Error('Email and verification token are required');
-        // Verification token is invalid or expired
 
         const db = request.server.db;
         
@@ -225,15 +202,18 @@ const verifyEmail = async (request, reply) => {
             WHERE id = ?
         `).run(user.id);
 
-        // const newToken = request.server.signToken({
-        //     id: user.id,
-        //     username: user.username,
-        //     email: user.email,
-        //     isAccountVerified: true
-        // });
+        const newToken = request.server.signToken({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+        });
 
-        // request.server.setAuthCookie(reply, newToken);
+        request.server.setAuthCookie(reply, newToken);
 
+        if (!user.online_status) {
+            userModel.updateOnlineStatus(db, user.id, 1);
+            user.isAccountVerified = 1;
+        }
 
         reply.code(200).send({ 
             success: true, 
@@ -289,7 +269,7 @@ const resendVerificationEmail = async (request, reply) => {
         });
         
     } catch (error) {
-        return reply.code(500).send({
+        return reply.code(400).send({
             status: false,
             error: error.message,
             message: "Failed to resend verification email."

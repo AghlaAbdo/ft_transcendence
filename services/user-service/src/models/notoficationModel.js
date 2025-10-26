@@ -1,40 +1,36 @@
 
- function getnotifications(db, userId) {
+function getnotifications(db, userId) {
     try {
         const stmt = db.prepare(`
             SELECT c.id, c.user_id, c.actor_id, c.type, c.read, c.created_at
             FROM notifications c
             WHERE c.actor_id = ?
-            ORDER BY c.created_at DESC
-            `);
-            const result = stmt.all(userId);
-            return {
-      status: true,
-      notifications: result
-    };
-} catch (error) {
+            ORDER BY c.created_at DESC`);
+        const result = stmt.all(userId);
+          return {
+            status: true,
+            notifications: result
+        };
+  } catch (error) {
     console.error("Failed to get notifications:", error);
-    return {
-        status: false,
-        notifications: []
-    };
-}
+      return {
+          status: false,
+          notifications: []
+      };
+  }
 }
 
 
 function insert_notification(db, user_id, actor_id, type)
 {   
-  console.log("-----------------------------------------");
-    const insertStmt = db.prepare(`
-      INSERT INTO notifications (user_id, actor_id, type)
-      VALUES (?, ?, ?)
-    `);
-    const info = insertStmt.run(user_id, actor_id, type);
-    const notif_id = info.lastInsertRowid;
-    const selectStmt = db.prepare('SELECT * FROM notifications WHERE id = ?');
-    const last_notif = selectStmt.get(notif_id);
-    console.log('last: ', last_notif);
-
+  const insertStmt = db.prepare(`
+    INSERT INTO notifications (user_id, actor_id, type)
+    VALUES (?, ?, ?)
+  `);
+  const info = insertStmt.run(user_id, actor_id, type);
+  const notif_id = info.lastInsertRowid;
+  const selectStmt = db.prepare('SELECT * FROM notifications WHERE id = ?');
+  const last_notif = selectStmt.get(notif_id);
   return last_notif;
 }
 
@@ -49,12 +45,11 @@ function insert_notification(db, user_id, actor_id, type)
 
 function mark_friend_request_as_read(db, userId, type) {
   try {
-    console.log('Marking friend request as read...');
     const stmt = db.prepare(`UPDATE notifications SET read = 1 WHERE actor_id = ? AND type = ?`);
     const info = stmt.run(userId, type);
-    console.log('Marking friend request as read...testetsetstetstetstetstet\n');
 
     return { status: info.changes > 0 };
+
   } catch (error) {
     console.error('Error updating notification:', error);
     return { status: false, error: error.message };

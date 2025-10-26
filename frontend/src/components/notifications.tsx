@@ -1,48 +1,4 @@
-// <Modal
-//           isOpen={isModalOpen}
-//           onClose={() => setIsModalOpen(false)}
-//         >
-//           {/* Your modal content */}
-//           <input
-//             type='text'
-//             onChange={(e) => {
-//               onsearch_change(e.target.value.trim());
-//             }}
-//             placeholder='Username...'
-//             className='w-full py-1.5 pl-3 pr-3 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-600'
-//           />
-//           {/* <p className='text-sm text-gray-500 mt-2'>Users list</p> */}
-//           <div className='max-h-[60vh] overflow-y-auto'>
-//           </div>
-//         </Modal>
-// const [users, setusers] = useState<User[]>([]);
-// const [filteredUsers, setfilteredusers] = useState<User[]>([]);
-// const { user } = useAuth();
-// const [isLoading, setIsLoading] = useState<boolean>(false)
-// const [error, seterror] = useState<string | null>(null)
-// useEffect(() => {
-//   // setIsLoading(true)
-//   // seterror("")
-//   // setTimeout(()=>{}, 10000)
-//   fetch(`https://localhost:8080/api/users`)
-//   .then((res) => res.json())
-//   .then((u) => {
-//     if (u.status)
-//       setusers(u.users)
-//   })
-//   .catch((err) => console.log('users fetching failed because of: ', err));
-// }, []);
-// const onsearch_change = async (search_input: string) => {
-//   if (search_input && search_input.trim() && user) {
-//     setfilteredusers(
-//       users.filter((_user) =>
-//         _user.id != user.id &&
-//         _user.username.toLowerCase().includes(search_input.toLowerCase()))
-//     );
-//   } else setfilteredusers([]);
-// };
-// import avatar from '@/../public/avatars/avatar1.png';
-// 
+
 import { useEffect, useState } from 'react';
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { Eye, UserPlus, X } from 'lucide-react';
@@ -53,15 +9,17 @@ import { useAuth } from '@/hooks/useAuth';
 import FriendRequestCard from './Rrequest';
 import { markAllNotificationsAsRead_friend, markAllNotificationsAsRead_game } from './markAsRead';
 
-type notification = {
+
+interface Notification {
   id: number;
   user_id: number;
-  actor_id: string;
-  // avatar_url: string;
+  user_username: string;
+  user_avatar: string;
+  actor_id: number | null;
   type: string;
-  read: boolean;
+  read: number;
   created_at: string;
-};
+}
 
 interface Notification_props {
   onClose: () => void;
@@ -85,16 +43,29 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
   const { user } = useAuth();
 
   useEffect(() => {
-  if (!user) return;
+  if (!user) 
+    return;
   // markAllNotificationsAsRead(user.id); // make a function in the component file .
   const fetchNotifications = async () => {
     try {
       const res = await fetch(`https://localhost:8080/api/users/notifications/${user.id}`);
       const data = await res.json();
 
-      if (data.status) {
-        console.log('notifs:', data);
-        setNotifications(data.notifications); // auto-sets unreadCount
+      if (res.ok && data.status) {
+        
+        const notificationsWithUserData = await Promise.all(
+          data.notifications.map(async (notif: Notification) => {
+            const userRes = await fetch(`https://localhost:8080/api/users/${notif.user_id}`);
+            const userData = await userRes.json();
+            return {
+              ...notif,
+              user_username: userData.user.username,
+              user_avatar: userData.user.avatar_url
+            };
+          })
+        );
+        setNotifications(notificationsWithUserData); // Use the enhanced data
+        
       }
     } catch (err) {
       console.error('API Error:', err);
@@ -104,39 +75,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
   fetchNotifications();
 }, [user]);
 
-// const openNotifications = async () => {
-//   if (user)
-//   {
-//     const userId = user.id;
-//     resetUnread();
-//     await fetch('https://localhost:8080/api/chat/notifications/mark-as-read', {
-//       method: 'PUT',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({ userId }),
-//     });
-//   }
-// };
-  // if (notifications)
-  //   console.log('notifs fetched: ' , notifications);
-  // const getTimeAgo = (timestamp) => {
-  //   const seconds = Math.floor((new Date() - timestamp) / 1000);
-  //   if (seconds < 60) return 'just now';
-  //   const minutes = Math.floor(seconds / 60);
-  //   if (minutes < 60) return `${minutes}m ago`;
-  //   const hours = Math.floor(minutes / 60);
-  //   if (hours < 24) return `${hours}h ago`;
-  //   return `${Math.floor(hours / 24)}d ago`;
-  // };
-
-  const handleAccept = (id: number) => {
-    // setNotifications(notifications.filter(n => n.id !== id));
-  };
-
-  const handleDecline = (id: number) => {
-    // setNotifications(notifications.filter(n => n.id !== id));
-  };
 
   return (
     <div>
@@ -228,9 +166,9 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                       key={notif.id}
                       className=" transition-all duration-200 hover:bg-slate-750">
                       <FriendRequestCard
-                        avatar_url='https://ui-avatars.com/api/?name=IM&background=ffa700&color=fff&size=150&bold=true&font-size=0.6'
-                        id={notif.id}
-                        username='imad'
+                        id = {notif.user_id}
+                        username={notif.user_username}
+                        avatar_url={notif.user_avatar}
                       />
                     </div>
                   ))}

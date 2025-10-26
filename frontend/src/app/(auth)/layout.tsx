@@ -13,12 +13,12 @@ const AuthLayout = ({
   children: React.ReactNode;
 }) => {
   return (
-    <PublicRouteGuard>
+    // <PublicRouteGuard>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white mx-auto px-10">
         {children}
         <Toaster richColors position="top-right" />
       </div>
-    </PublicRouteGuard>
+    // </PublicRouteGuard>
   )
 }
 
