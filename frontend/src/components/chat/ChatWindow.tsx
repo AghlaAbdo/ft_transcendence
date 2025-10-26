@@ -8,8 +8,6 @@ import { User } from '@/hooks/useAuth';
 
 import UserActionsMenu from './UserActionsMenu';
 
-// import { HeaderInfos } from '@/components/chat/HeaderInofs';
-
 interface Message {
   id: number;
   chat_id: number;
@@ -19,14 +17,6 @@ interface Message {
   created_at: string;
 }
 
-// type User = {
-//   id: number;
-//   username: string;
-//   email: string;
-//   createdAt: string;
-//   updatedAt: string;
-//   avatar_url: string;
-// };
 
 interface ChatWindowProps {
   SelectedChatId: number | null;

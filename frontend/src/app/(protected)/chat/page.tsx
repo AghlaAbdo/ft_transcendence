@@ -72,7 +72,7 @@ export default function ChatPage() {
   const [UserId_2, SetUser_2] = useState<number | null>(null); // second user which is the receiver
   useEffect(() => { // put this in the layout ok??
     if (!user) return;
-    const socket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`, {
+    const socket = io(`wss://localhost:8080`, {
       path: '/ws/chat/socket.io/',
       auth: { user_id: user?.id },
     });

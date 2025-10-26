@@ -7,6 +7,7 @@ import { Plus, Search } from 'lucide-react';
 import { User } from '@/hooks/useAuth';
 
 import { Search_Input } from './Search_Input';
+import { NoChats } from './noChats';
 
 interface Message {
   id: number;
@@ -82,54 +83,60 @@ export const Chatlist = ({
             />
           </div>
         </div>
-        <div className='px-4 pb-4 flex-1 overflow-y-auto'>
-          {filteredChats.map((chat) => {
-            const otherUser =
-              chat.sender.id === userId ? chat.receiver : chat.sender;
-            return (
-              <div
-                key={chat.chat_id}
-                onClick={() => {
-                  onSelect(chat.chat_id);
-                  onReceiveChange(otherUser.id);
-                }}
-                className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
+        {!filteredChats.length ? (
+          <div className='flex-1 flex flex-col items-center justify-center p-8'>
+            <NoChats isSearching={searchQuery.length > 0} />
+          </div>
+        ) : (
+          <div className='px-4 pb-4 flex-1 overflow-y-auto'>
+            {filteredChats.map((chat) => {
+              const otherUser =
+                chat.sender.id === userId ? chat.receiver : chat.sender;
+              return (
+                <div
+                  key={chat.chat_id}
+                  onClick={() => {
+                    onSelect(chat.chat_id);
+                    onReceiveChange(otherUser.id);
+                  }}
+                  className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
                   hover:bg-gray-800 ${
                     selectedChatId === chat.chat_id ? 'bg-gray-700' : ''
                   }`}
-              >
-                <div className='relative mr-3'>
-                  <img
-                    src={otherUser.avatar_url}
-                    alt={`${otherUser.username}`}
-                    className='w-12 h-12 rounded-full'
-                  />
-                  {otherUser.online_status === 1 ? (
-                    <div className='border-2 border-black absolute top-9 right-0 bg-green-500 rounded-full w-3 h-3'></div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                <div className='flex-1 min-w-0'>
-                  <div className='flex items-center justify-between min-w-0'>
-                    <h3 className='font-semibold text-white flex-shrink-0 mr-2 truncate min-w-0 '>
-                      {otherUser.username}
-                    </h3>
-                    <span className='text-xs text-gray-400 truncate min-w-0'>
-                      {formatDistanceToNow(
-                        new Date(chat.last_message_timestamp + 'Z'),
-                      {addSuffix: true}
-                      )}
-                    </span>
+                >
+                  <div className='relative mr-3'>
+                    <img
+                      src={otherUser.avatar_url}
+                      alt={`${otherUser.username}`}
+                      className='w-12 h-12 rounded-full'
+                    />
+                    {otherUser.online_status === 1 ? (
+                      <div className='border-2 border-black absolute top-9 right-0 bg-green-500 rounded-full w-3 h-3'></div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                  <p className='text-sm text-gray-400 truncate min-w-0'>
-                    {chat.last_message_content || 'No messages yet'}
-                  </p>
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex items-center justify-between min-w-0'>
+                      <h3 className='font-semibold text-white flex-shrink-0 mr-2 truncate min-w-0 '>
+                        {otherUser.username}
+                      </h3>
+                      <span className='text-xs text-gray-400 truncate min-w-0'>
+                        {formatDistanceToNow(
+                          new Date(chat.last_message_timestamp + 'Z'),
+                          { addSuffix: true }
+                        )}
+                      </span>
+                    </div>
+                    <p className='text-sm text-gray-400 truncate min-w-0'>
+                      {chat.last_message_content || 'No messages yet'}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );

@@ -15,7 +15,12 @@ export async function getMessagesHandler(req: any, reply: any) {
   if (isNaN(chatId)) return reply.status(400).send({ error: "Invalid chatId" });
 
   try {
-    return getMessages(chatId);
+    const db = req.server.db;
+    if (!db) {
+      console.error("DB not available on request.server.db");
+      return reply.status(500).send({ error: "Database not initialized" });
+    }
+    return getMessages(db, chatId);
   } catch (err) {
     console.error(err);
     return reply.status(500).send({ error: "Failed to fetch messages" });
@@ -27,7 +32,12 @@ export async function getMessageHandler(req: any, reply: any) {
   if (isNaN(messageId)) return reply.status(400).send({ error: "Invalid messageId" });
 
   try {
-    return getMessage(messageId);
+    const db = req.server.db;
+    if (!db) {
+      console.error("DB not available on request.server.db");
+      return reply.status(500).send({ error: "Database not initialized" });
+    }
+    return getMessage(db, messageId);
   } catch (err) {
     console.error(err);
     return reply.status(500).send({ error: "Failed to fetch message" });
@@ -70,7 +80,12 @@ export async function getChatsHandler(req: any, reply: any) {
   if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
 
   try {
-    const result: ChatRow[] = await getChats(userId);
+    const db = (req as any).server?.db;
+    if (!db) {
+      console.error("DB not available on request.server.db");
+      return reply.status(500).send({ error: "Database not initialized" });
+    }
+    const result: ChatRow[] = getChats(db, userId);
     const userIds = Array.from(
       new Set(result.flatMap((c) => [c.sender, c.receiver]).filter(Boolean))
     );
