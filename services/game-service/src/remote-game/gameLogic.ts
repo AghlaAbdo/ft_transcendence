@@ -54,7 +54,7 @@ export function startGame(gameState: IGameState) {
           }
           ioInstance.to(gameState.id).emit('startGame');
           gameState.startDate = getCurrDate();
-          gameState.game.status = 'playing';
+          // gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),
             GAME_INTERVAL_MS,

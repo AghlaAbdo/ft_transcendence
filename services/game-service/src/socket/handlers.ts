@@ -83,17 +83,17 @@ export function handleDisconnect(socket: Socket, reason: string): void {
         gameState &&
         gameState.game.status === 'waiting'
       ) {
-        if (getUserActiveGame(userId)) {
-          removeUserActiveGame(userId, userActiveGameId);
-          deleteGame(gameState);
-          getAllGames().lobyGame = null;
-        }
+        console.log("gameStatus is 'waiting' in hadleDisconnect!");
+        removeUserActiveGame(userId, userActiveGameId);
+        getAllGames().lobyGame = null;
+        deleteGame(gameState);
       } else if (
         !getUserActiveTournament(userId) &&
         gameState &&
         gameState.game.status != 'playing'
       ) {
-        handleQuit(socket, userActiveGameId, userId);
+        console.log('gameStatus in handleDisconnect: ', gameState.game.status);
+        handleQuit({ gameId: userActiveGameId, userId });
       }
     }
     if (userActiveTournament) {
@@ -250,21 +250,17 @@ export async function handleRematch(
   socket.to(gameId).emit('rematch');
 }
 
-export function handleQuit(
-  socket: Socket | null,
-  gameId: string,
-  userId: string,
-): void {
-  console.log('revived quit event!!');
-  if (!gameId) {
+export function handleQuit(data: { userId: string; gameId: string }): void {
+  console.log('revived quit event!!, data: ', data);
+  if (!data.gameId) {
     console.log('gameId is Null');
     return;
   }
-  console.log('gameId in handleQuit: ', gameId);
-  const gameState = getGameState(gameId);
+  // console.log('gameId in handleQuit: ', data.gameId);
+  const gameState = getGameState(data.gameId);
   if (!gameState) return;
   const opponentId =
-    userId === gameState.player1.id
+    data.userId === gameState.player1.id
       ? gameState.player2.id
       : gameState.player1.id;
   const opponentSocketId = getUserSocketId(opponentId!);
@@ -278,14 +274,14 @@ export function handleQuit(
     console.log('gameStatus in handleQuit: ', gameState.game.status);
     gameState.game.status = 'ended';
     gameState.winner_id =
-      gameState.player1.id === userId
+      gameState.player1.id === data.userId
         ? gameState.player2.id
         : gameState.player1.id;
     gameState.playtime = getDiffInMin(gameState.startAt);
     if (!gameState.startDate) gameState.startDate = getCurrDate();
     postGame(gameState);
     if (gameState.isTournamentGame) {
-      removeUserActiveTournament(userId, gameState.tournamentId);
+      removeUserActiveTournament(data.userId, gameState.tournamentId);
       advancePlayerInTournament(
         gameState.tournamentId!,
         gameState.tournamentMatchId!,
@@ -297,8 +293,14 @@ export function handleQuit(
   console.log('player quit');
 }
 
-export function handleCancelMatching(gameId: string) {
-  const gameState = getGameState(gameId);
+export function handleCancelMatching(data: { userId: string; gameId: string }) {
+  const gameState = getGameState(data.gameId);
+  console.log('gameStatus in handleCancelMatching: ', gameState?.game.status);
+  if (
+    gameState?.player1.id != data.userId ||
+    gameState?.game.status == 'playing'
+  )
+    return;
   getAllGames().lobyGame = null;
   if (gameState) {
     console.log('did remove userActiveGAme in cancelMatching?');
@@ -346,4 +348,18 @@ export function handleRequestGameState(socket: Socket, userId: string) {
     opponent: null,
     playerRole: null,
   });
+}
+
+export function hancleQuitRemoteGamePage(data: {
+  userId: string;
+  gameId: string;
+}) {
+  const gameState = getGameState(data.gameId);
+  if (gameState) {
+    if (gameState.game.status === 'waiting') {
+      handleCancelMatching(data);
+    } else if (gameState.game.status === 'playing') {
+      handleQuit(data);
+    }
+  }
 }

@@ -11,6 +11,8 @@ import { ArrowLeft, Trophy } from 'lucide-react';
 
 // components/game/WinByDefaultCard.tsx
 
+// components/game/WinByDefaultCard.tsx
+
 type Props = {
   opponentName?: string | null;
   tournamentId?: string | null;

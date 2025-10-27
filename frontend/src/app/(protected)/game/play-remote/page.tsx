@@ -32,12 +32,17 @@ export default function GamePage() {
   } = usePongGameLogic(null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
+  const sentQuit = useRef<boolean>(false);
 
   useEffect(() => {
     return () => {
-      if (matching) socket.emit('cancelMatching', gameId);
+      if (gameId && !sentQuit.current) {
+        console.log('sent quitRemoteGamePage!!');
+        socket.emit('quitRemoteGamePage', { userId: user.id, gameId });
+        sentQuit.current = true;
+      }
     };
-  }, []);
+  }, [gameId, sentQuit]);
 
   const player: IPlayer = {
     id: user.id,

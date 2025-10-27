@@ -11,6 +11,7 @@ import {
   handleQuit,
   handleCancelMatching,
   handleRequestGameState,
+  hancleQuitRemoteGamePage,
 } from './handlers';
 import {
   handleJoinTournament,
@@ -55,10 +56,19 @@ export function initializeSocketIO(server: http.Server): Server {
     socket.on('rematch', (gameId, playerRole, userId) =>
       handleRematch(socket, gameId, playerRole, userId),
     );
-    socket.on('quit', (gameId, userId) => handleQuit(socket, gameId, userId));
-    socket.on('cancelMatching', (gameId) => handleCancelMatching(gameId));
+    socket.on('quit', (data: { userId: string; gameId: string }) =>
+      handleQuit(data),
+    );
+    socket.on('cancelMatching', (data: { userId: string; gameId: string }) =>
+      handleCancelMatching(data),
+    );
     socket.on('requestMatchDetails', (userId: string) =>
       handleRequestGameState(socket, userId),
+    );
+    socket.on(
+      'quitRemoteGamePage',
+      (data: { userId: string; gameId: string }) =>
+        hancleQuitRemoteGamePage(data),
     );
 
     // -------- Tournament --------

@@ -29,7 +29,7 @@ export default function CloseGameDialog({
     dialogRef.current?.close();
   }
   function handleQuit() {
-    socket.emit('quit', gameId, user.id);
+    socket.emit('quit', { userId: user.id, gameId });
     setHideHeaderSidebar(false);
     if (isTournamentGame)
       router.replace(`/game/tournament/${params.tournamentId}`);

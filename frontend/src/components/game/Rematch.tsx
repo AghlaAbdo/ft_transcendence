@@ -53,8 +53,8 @@ export default function Rematch({
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
     console.log('gameId in handleReturn: ', gameId);
-    socket.emit('quit', gameId, user.id);
-    setTimeout(() => router.push('/game'), 1000);
+    socket.emit('quit', { userId: user.id, gameId });
+    setTimeout(() => router.replace('/game'), 1000);
   };
 
   if (rematch.includes('quit')) return <div></div>;

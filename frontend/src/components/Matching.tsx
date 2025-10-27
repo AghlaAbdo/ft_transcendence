@@ -27,7 +27,7 @@ export default function Matching({
 
   function handleCancel() {
     if (!opponent) {
-      socket.emit('cancelMatching', gameId);
+      socket.emit('cancelMatching', {userId: player.id, gameId});
       router.push('/game');
     }
   }

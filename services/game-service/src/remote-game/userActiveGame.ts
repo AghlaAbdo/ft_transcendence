@@ -55,9 +55,11 @@ export function quitActiveGame(socket: Socket) {
     if (getUserSocketId(userId)) return;
     const activeGameId = getUserActiveGame(userId);
     const gameState = getGameState(activeGameId);
-    if (gameState) {
+    if (gameState && activeGameId) {
+      removeUserActiveGame(userId, activeGameId);
+      console.log('---- did remove userActiveGame in Disconnect!!');
       // console.log("called quit from quitActiveGame");
-      handleQuit(socket, gameState.id, userId);
+      handleQuit({ gameId: gameState.id, userId });
     }
   }
 }

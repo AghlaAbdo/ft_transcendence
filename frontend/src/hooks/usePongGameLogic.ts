@@ -363,6 +363,7 @@ export const usePongGameLogic = (
         playerRole.current = data.playerRole;
         setPlayer(data.player);
         gameId.current = data.gameId;
+        setGameStatus('waiting');
       }
     );
 
@@ -385,6 +386,7 @@ export const usePongGameLogic = (
       console.log('Match Found: ', opponent.username);
       setHideHeaderSidebar(true);
       setOpponent(opponent);
+      setGameStatus('playing');
     });
 
     socket.on('gameStateUpdate', (gameState: IGameState) => {
@@ -438,6 +440,7 @@ export const usePongGameLogic = (
       'opponentQuit',
       (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
         isPlaying.current = false;
+        if (matching) setMatching(false);
         if (gameStatus === 'playing' || gameStatus === 'waiting') {
           console.log('opponent has quit!!');
           if (endTextRef.current) endTextRef.current.text = 'Opponent Quit';
@@ -492,7 +495,7 @@ export const usePongGameLogic = (
       window.removeEventListener('resize', resize);
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (isPlaying.current) {
-        socket.emit('quit', gameId.current, user.id);
+        socket.emit('quit', { userId: user.id, gameId });
       }
       // if (!isTournamentGame.current) {
       //   socket.off();
