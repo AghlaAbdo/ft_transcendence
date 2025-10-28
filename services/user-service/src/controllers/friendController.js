@@ -2,7 +2,8 @@ import friendModel from "../models/friendModel.js";
 
 const getAllFriends = async (request, reply) => {
     try {
-        const user_id = request.user.id;
+        // const user_id = request.user.id;
+        const user_id = parseInt(request.params.id);
         const db = request.server.db;
 
         const friends = friendModel.getFriends(db, user_id);

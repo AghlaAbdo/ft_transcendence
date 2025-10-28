@@ -56,7 +56,7 @@ const statusStyles: Record<Friend["online_status"], { text: string; classes: str
     },
   };
 
-export default function Friends () {
+export default function Friends ({ id } : FriendsProps) {
 
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ export default function Friends () {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const response = await fetch('https://localhost:8080/api/friends/', {
+        const response = await fetch(`https://localhost:8080/api/friends/${id}`, {
           method: 'GET',
           credentials: 'include',
         });

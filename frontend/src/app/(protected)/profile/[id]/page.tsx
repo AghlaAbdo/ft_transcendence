@@ -160,7 +160,9 @@ const ProfilePage = () => {
                   </div>
                 </div>
                  <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900 rounded-xl">
-                  <Friends/>
+                  <Friends 
+                    id={user.id}
+                  />
                 </div>
               </div>
             </div>
