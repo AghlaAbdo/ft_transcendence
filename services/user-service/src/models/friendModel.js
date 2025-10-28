@@ -1,15 +1,17 @@
 
 
-const getFriends =  (db, id) => {
+const getFriends = (db, id) => {
     const query = `
         SELECT u.id, u.username, u.online_status, u.avatar_url, f.status
         FROM FRIENDS f
-        JOIN USERS u ON u.id = f.friend_id
-        WHERE f.user_id = ?
+        JOIN USERS u 
+            ON (u.id = f.friend_id AND f.user_id = ?)
+            OR (u.id = f.user_id AND f.friend_id = ?)
+        WHERE (f.user_id = ? OR f.friend_id = ?)
         AND f.status = 'accepted';
     `;
     const stmt = db.prepare(query);
-    return stmt.all(id);
+    return stmt.all(id, id, id, id);
 }
 
 
