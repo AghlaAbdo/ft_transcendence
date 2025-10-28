@@ -145,7 +145,7 @@ export const FriendList = ({ onClose }: FriendListProps) => {
             ))}
           </div>
         )}
-``
+        
         {!isLoading && !error && searchTerm && (
           <div className='mt-3 space-y-1 max-h-64 '>
             {filteredUsers.map((user) => (

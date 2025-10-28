@@ -1,11 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
 import { MoreVertical } from 'lucide-react';
-
 import { User } from '@/hooks/useAuth';
-
 import UserActionsMenu from './UserActionsMenu';
 
 interface Message {
@@ -32,7 +29,7 @@ export const ChatWindow = ({
   conv,
   other_User,
   onBackClick,
-  showBackButton = false,
+  showBackButton = false
 }: ChatWindowProps) => {
   const [chat_options, setoptions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);

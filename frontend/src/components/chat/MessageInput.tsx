@@ -19,7 +19,7 @@ export const MessageInput = ({ onSendMessage }: SendMessageProps) => {
     
     const input = inputRef.current;
     if (!input) return;
-    
+
     const start = input.selectionStart || 0;
     const end = input.selectionEnd || 0;
     const emoji = emojiData.emoji;
