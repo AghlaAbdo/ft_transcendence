@@ -17,7 +17,6 @@ interface Message {
   created_at: string;
 }
 
-
 interface ChatWindowProps {
   SelectedChatId: number | null;
   userId: number | null;

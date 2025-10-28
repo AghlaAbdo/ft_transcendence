@@ -16,7 +16,6 @@ const ProfilePage = () => {
   const [error, setError] = useState<string | null>(null);
 
 
->>>>>>> origin/user-service
   useEffect( () => {
     const fetchUserById = async () => {
       try {

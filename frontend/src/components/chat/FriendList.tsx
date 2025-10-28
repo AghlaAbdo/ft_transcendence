@@ -1,51 +1,55 @@
-
 import { useEffect, useState } from 'react';
-import { Eye, Loader2, Search, UserPlus, X } from 'lucide-react';
+import {Loader2, Search, UserPlus, X } from 'lucide-react';
 import { User, useAuth } from '@/hooks/useAuth';
-import UserCard from './User_card';
+import FriendCard from './FriendCard';
 
-interface GlobalSearchProps {
+interface FriendListProps {
   onClose: () => void;
 }
 
-export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
+interface Friend {
+  id: number;
+  username: string;
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
+}
+
+export const FriendList = ({ onClose }: FriendListProps) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [latestfriends, setlatestFriends] = useState<Friend[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      setError(null);
+    const fetchFriends = async () => {
       try {
-        const response = await fetch(`https://localhost:8080/api/users`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch('https://localhost:8080/api/friends/', {
+          method: 'GET',
+          credentials: 'include',
+        });
         const data = await response.json();
-        if (data.status) {
-          setUsers(data.users);
-        } else {
-          setError('Failed to load users');
+        if (response.ok && data.status) {
+          setFriends(data.friends);
+          setlatestFriends(data.friends);
         }
       } catch (err) {
-        setError('Network error. Please try again.');
-        console.error('API Error:', err);
+        console.error('Error fetching friends:', err);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    fetchUsers();
+    fetchFriends();
   }, []);
 
-  // Filter users based on search term
   useEffect(() => {
-    if (searchTerm && searchTerm.trim() && user) {
+    if (searchTerm && searchTerm.trim() && user && friends) {
       setFilteredUsers(
-        users.filter(
+        friends.filter(
           (_user) =>
             _user.id !== user.id &&
             _user.username.toLowerCase().includes(searchTerm.toLowerCase())
@@ -58,7 +62,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
 
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
-      {/* Search Header */}
+      {/* search Header */}
       <div className='flex items-center justify-between px-5 py-1'>
         <h2 className='text-xl font-medium text-white'>Search Users</h2>
         <button
@@ -128,30 +132,35 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         )}
 
         {!isLoading && !error && !searchTerm && (
-          <div className='flex items-center justify-center py-12'>
-            <div className='text-center'>
-              <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center'>
-                <Search className='w-8 h-8 text-gray-500' />
-              </div>
-              <p className='text-gray-400 text-sm'>
-                Start typing to search for users
-              </p>
-            </div>
-          </div>
-        )}
-
-        {!isLoading && !error && filteredUsers.length > 0 && (
           <div className='mt-3 space-y-1 max-h-64 '>
-            {filteredUsers.map((user) => (
+            {latestfriends.map((user) => (
               <div
                 key={user.id}
-                className='animate-in fade-in slide-in-from-bottom-2 duration-200'
+                className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
               >
-                <UserCard _user={user} onClose={onClose} />
+                <button className='w-full cursor-pointer'>
+                  <FriendCard _user={user} onClose={onClose} />
+                </button>
               </div>
             ))}
           </div>
         )}
+``
+        {!isLoading && !error && searchTerm && (
+          <div className='mt-3 space-y-1 max-h-64 '>
+            {filteredUsers.map((user) => (
+              <div
+                key={user.id}
+                className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
+              >
+                <button className='w-full cursor-pointer'>
+                  <FriendCard _user={user} onClose={onClose} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
     </div>
   );

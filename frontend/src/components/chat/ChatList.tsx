@@ -8,6 +8,7 @@ import { User } from '@/hooks/useAuth';
 
 import { Search_Input } from './Search_Input';
 import { NoChats } from './noChats';
+import { FriendList } from './FriendList';
 
 interface Message {
   id: number;
@@ -22,9 +23,16 @@ interface Chat {
   chat_id: number;
   sender: User;
   receiver: User;
-  last_message_content: string;
-  last_message_timestamp: string;
+  last_message_content?: string;
+  last_message_timestamp?: string;
   last_message_id?: number;
+}
+
+interface Friend {
+  id: number,
+  username: string,
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
 }
 
 interface ChatlistProps {
@@ -43,6 +51,20 @@ export const Chatlist = ({
   conv,
 }: ChatlistProps) => {
   const [tick, setTick] = useState(0);
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+
+  useEffect(() =>{
+    if (!showFriendsModal)
+        return;
+    const handleEsckey = (e: KeyboardEvent) =>{
+      if (e.key == 'Escape')
+        setShowFriendsModal(false)
+    }
+    document.addEventListener('keydown', handleEsckey);
+    return () => document.removeEventListener('keydown', handleEsckey);
+  }, [showFriendsModal])
 
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 60000);
@@ -57,23 +79,33 @@ export const Chatlist = ({
     const userIdString = otherUser.username.toString();
     return userIdString.includes(searchQuery);
   });
+
+  
   useEffect(() => {
     if (userId) {
+      setLoading(true); // do not forgot to use this later
       fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`) //fetch chats from backend
-        .then((res) => res.json())
-        .then((data: Chat[]) => {
-          setChats(data);
-        })
-        .catch((err) => console.error('Failed to fetch chats:', err));
+      .then((res) => res.json())
+      .then((data: Chat[]) => {
+        setChats(data);
+      })
+      .catch((err) => console.error('Failed to fetch chats:', err));
       console.log('chat fetched: ', chats);
     }
   }, [userId, conv]);
-
+  
   return (
     <>
       <div className='lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]'>
         <div className='flex items-center justify-between p-4 border-b border-gray-600'>
           <h2 className='text-lg font-semibold text-white'>Messages</h2>
+          <button 
+            onClick={() => setShowFriendsModal(true)}
+            className='p-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition '
+            title='Start new conversation'
+          >
+            <Plus size={17} className='text-white' />
+          </button>
         </div>
         <div className='p-4'>
           <div className='relative'>
@@ -101,7 +133,7 @@ export const Chatlist = ({
                   }}
                   className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
                   hover:bg-gray-800 ${
-                    selectedChatId === chat.chat_id ? 'bg-gray-700' : ''
+                    selectedChatId === chat.chat_id ? "bg-gray-700" : ""
                   }`}
                 >
                   <div className='relative mr-3'>
@@ -138,6 +170,21 @@ export const Chatlist = ({
           </div>
         )}
       </div>
+
+      {/* Friends Modal */}
+     {showFriendsModal && (
+       <div
+         className="fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center "
+         onClick={() => setShowFriendsModal(false)}
+       >
+         <div
+           className="bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg"
+           onClick={(e) => e.stopPropagation()}
+         >
+           <FriendList onClose={() => {setShowFriendsModal(false)}} />
+         </div>
+       </div>
+     )}
     </>
   );
 };
