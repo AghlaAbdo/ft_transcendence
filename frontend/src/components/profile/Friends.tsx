@@ -1,6 +1,6 @@
 
-import { Gamepad2 } from "lucide-react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import router from "next/router";
 import { useEffect, useState } from "react";
 
 // interface Friend {
@@ -60,6 +60,7 @@ export default function Friends ({ id } : FriendsProps) {
 
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -84,6 +85,10 @@ export default function Friends ({ id } : FriendsProps) {
     fetchFriends();
   
   }, []);
+
+  const handleViewProfile = (id: number) => {
+    router.push(`/profile/${id}`);
+  }
 
   if (loading) {
     return <div>Loading...</div>;
@@ -120,7 +125,11 @@ export default function Friends ({ id } : FriendsProps) {
                   className={`absolute bottom-0 right-0 block w-3 h-3 rounded-full border-2 border-[#0f172a] ${statusColors[friend.online_status]}`}
                 />
               </div>
-              <span className="font-semibold text-xl">{friend.username}</span>
+              <button onClick={() => handleViewProfile(friend.id)}>
+                <span className="font-semibold text-xl hover:text-violet-600 transition-colors duration-200">
+                  {friend.username}
+                </span>
+              </button>
             </div>
 
               <div
