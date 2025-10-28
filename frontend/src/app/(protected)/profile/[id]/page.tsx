@@ -144,6 +144,7 @@ const ProfilePage = () => {
                   </div>
                 </div>
                  <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900 rounded-xl">
+                  {/* <GameHistory1 id={user.id} /> */}
                   <GameHistory1 />
                 </div>
               </div>
