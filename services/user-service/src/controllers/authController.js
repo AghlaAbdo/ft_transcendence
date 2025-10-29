@@ -88,6 +88,13 @@ const login = async (request, reply) => {
         if (!user)
             throw new Error("No account found with this email.");
 
+        if (user.is_google_auth) {
+            return reply.code(400).send({
+                status: false,
+                message: "This account uses Google Sign-In. Please use the 'Continue with Google' button to log in."
+            });
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid)
             throw new Error("Incorrect password.");

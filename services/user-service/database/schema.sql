@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS USERS (
     wins INTEGER NOT NULL DEFAULT 0,
     losses INTEGER NOT NULL DEFAULT 0,
     rank INTEGER NOT NULL DEFAULT 0,
+
+    --OAuth 
+    is_google_auth INTEGER DEFAULT 0,
     
     -- Profile info
     location VARCHAR(100),

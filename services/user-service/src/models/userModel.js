@@ -15,7 +15,7 @@ const getUserByID =  (db, id) => {
 const getUserByEmail =  (db, email) => {
     const query = 'SELECT * FROM USERS WHERE email = ?';
     const userEmail = db.prepare(query);
-    return userEmail.get(email);
+    return userEmail.get(email.trim().toLowerCase());
 }
 
 const getUserByUsername =  (db, username) => {
@@ -60,7 +60,7 @@ const createUser = (db, userData) => {
 
     const user = db.prepare(query).run(
         username,
-        email,
+        email.trim().toLowerCase(),
         password,
         avatar_url,
         verificationToken,
