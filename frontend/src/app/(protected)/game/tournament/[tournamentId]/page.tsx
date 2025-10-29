@@ -44,7 +44,7 @@ export default function SpecificTournamentPage() {
     // if (tournamentId)
     //   socket.emit('tourn:inLoby', { userId: user.id, tournamentId });
     socket.on('tournamentDetails', (data: TournamentDetails) => {
-      console.log('got Tournament details!!: ', data);
+      // console.log('got Tournament details!!: ', data);
       setTournament(data);
       setError(null);
       if (data.status == 'live') setHideHeaderSidebar(true);
@@ -78,15 +78,15 @@ export default function SpecificTournamentPage() {
     );
 
     socket.on('bracketUpdate', (bracket: IRound[]) => {
-      console.log('got bracketUpdate!!');
+      // console.log('got bracketUpdate!!');
       setTournament((prev) => (prev ? { ...prev, bracket: bracket } : null));
     });
 
     socket.on(
       'startTournament',
       (data: { tournamentId: string; bracket: IRound[] }) => {
-        console.log('Tournament started:', data.tournamentId);
-        console.log('tournament.bracket: ', data.bracket);
+        // console.log('Tournament started:', data.tournamentId);
+        // console.log('tournament.bracket: ', data.bracket);
         setHideHeaderSidebar(true);
         setTournament((prev) =>
           prev ? { ...prev, status: 'live', bracket: data.bracket } : null
@@ -96,12 +96,12 @@ export default function SpecificTournamentPage() {
     );
 
     socket.on('matchReady', (data: { gameId: string }) => {
-      console.log('matchReady, gameId: ', data.gameId);
+      // console.log('matchReady, gameId: ', data.gameId);
       setNextMatchInfo({ gameId: data.gameId });
     });
 
     socket.on('tournamentWinner', (data: { winner: IPlayer }) => {
-      console.log('Tournament ended! Winner:', data.winner);
+      // console.log('Tournament ended! Winner:', data.winner);
       setTournament((prev) => (prev ? { ...prev, status: 'completed' } : null));
       setNextMatchInfo(null);
       setWinner(data.winner);

@@ -272,7 +272,7 @@ export const usePongGameLogic = (
   }, []);
 
   useEffect(() => {
-    console.log('sent requestGameStatus??');
+    // console.log('sent requestGameStatus??');
     if (isTournamentGame.current) {
       socket.emit('requestTournMatchDetails', {
         userId: user.id,
@@ -288,7 +288,7 @@ export const usePongGameLogic = (
           opponent: IPlayer | null;
           playerRole: 'player1' | 'player2' | null;
         }) => {
-          console.log('match DAta received: ', data);
+          // console.log('match DAta received: ', data);
           setGameStatus(data.gameStatus);
           if (data.gameStatus === 'playing') {
             console.log("is gameStatus 'playing' ??");
@@ -315,13 +315,13 @@ export const usePongGameLogic = (
           opponent: IPlayer | null;
           playerRole: 'player1' | 'player2' | null;
         }) => {
-          console.log('gameStatus recived: ', data);
+          // console.log('gameStatus recived: ', data);
           setGameStatus(data.gameStatus);
           if (!isTournamentGame.current && data.gameStatus === 'notFound') {
-            console.log('sent Play Now');
+            // console.log('sent Play Now');
             socket.emit('play', user.id);
           } else if (data.gameStatus === 'playing') {
-            console.log("is gameStatus 'playing' ??");
+            // console.log("is gameStatus 'playing' ??");
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
             setPlayer(data.player);
@@ -332,7 +332,7 @@ export const usePongGameLogic = (
             setHideHeaderSidebar(true);
             if (data.opponent) setOpponent(data.opponent);
           } else if (data.gameStatus === 'waiting') {
-            console.log('did set player: ', data.player);
+            // console.log('did set player: ', data.player);
             setPlayer(data.player);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
@@ -340,10 +340,6 @@ export const usePongGameLogic = (
         }
       );
     }
-    socket.on('connect', () => {
-      console.log('Connected to Socket.IO server!');
-      console.log('Socket ID:', socket.id);
-    });
 
     socket.on('registeredInTournament', (data: { tournamentId: string }) => {
       setInTournament(data.tournamentId);
@@ -356,7 +352,7 @@ export const usePongGameLogic = (
         gameId: string;
         player: IPlayer;
       }) => {
-        console.log('palyer Data: ', data);
+        // console.log('palyer Data: ', data);
         if (data.playerRole === 'player1' && endTextRef.current) {
           endTextRef.current.text = 'matching';
         }
@@ -371,7 +367,7 @@ export const usePongGameLogic = (
       setMatching(false);
     });
     socket.on('starting', (count) => {
-      console.log('starting: ', count);
+      // console.log('starting: ', count);
       showCountDown(count);
     });
 
@@ -379,7 +375,7 @@ export const usePongGameLogic = (
       isPlaying.current = true;
       if (!animationFrameId.current)
         animationFrameId.current = requestAnimationFrame(gameLoop);
-      console.log('Stared the game !!!!!');
+      // console.log('Stared the game !!!!!');
     });
 
     socket.on('matchFound', (opponent: IPlayer) => {
@@ -448,7 +444,7 @@ export const usePongGameLogic = (
           setTimeout(() => {
             dialogRef.current?.showModal();
             if (isTournamentGame.current) {
-              console.log('isTournament: ', isTournamentGame.current);
+              // console.log('isTournament: ', isTournamentGame.current);
               setTimeout(() => {
                 router.replace(`/game/tournament/${tournamentId}`);
               }, 2000);
@@ -482,7 +478,7 @@ export const usePongGameLogic = (
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       // e.preventDefault();
       e.returnValue = '';
-      console.log('sent quit event');
+      // console.log('sent quit event');
       // if (isPlaying.current) socket.emit('quit', gameId.current, user.id);
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);

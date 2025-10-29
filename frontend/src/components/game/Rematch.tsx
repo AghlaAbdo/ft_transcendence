@@ -26,13 +26,13 @@ export default function Rematch({
   const router = useRouter();
 
   useEffect(() => {
-    console.log('REached Rematch componentn!!');
+    // console.log('REached Rematch componentn!!');
     socket.on('rematch', () => {
-      console.log('Opponent wants to play again');
+      // console.log('Opponent wants to play again');
       setRematch((prev) => [...prev, 'recived']);
     });
     socket.on('opponentQuit', () => {
-      console.log('Opponent quit!');
+      // console.log('Opponent quit!');
       setRematch((prev) => [...prev, 'rejected']);
     });
     socket.on('playAgain', () => {
@@ -45,14 +45,14 @@ export default function Rematch({
   }, [dialogRef, setHideHeaderSidebar, setRematch]);
 
   const handleRematch = () => {
-    console.log('rematch!!');
+    // console.log('rematch!!');
     setRematch((prev) => [...prev, 'sent']);
     socket.emit('rematch', gameId, playerRole, user.id);
   };
 
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
-    console.log('gameId in handleReturn: ', gameId);
+    // console.log('gameId in handleReturn: ', gameId);
     socket.emit('quit', { userId: user.id, gameId });
     setTimeout(() => router.replace('/game'), 1000);
   };

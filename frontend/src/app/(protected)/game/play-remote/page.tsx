@@ -37,7 +37,7 @@ export default function GamePage() {
   useEffect(() => {
     return () => {
       if (gameId && !sentQuit.current) {
-        console.log('sent quitRemoteGamePage!!');
+        // console.log('sent quitRemoteGamePage!!');
         socket.emit('quitRemoteGamePage', { userId: user.id, gameId });
         sentQuit.current = true;
       }
@@ -58,7 +58,7 @@ export default function GamePage() {
   }
 
   if (inTournament) {
-    console.log('inTournament??');
+    // console.log('inTournament??');
     return <InTournamentCard tournamentId={inTournament} />;
   }
   if (inAnotherGame) {

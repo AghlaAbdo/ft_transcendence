@@ -53,14 +53,14 @@ export async function handleCreateTournament(
     maxPlayers,
     name,
   );
-  console.log('Tournament Created: ', newTournament);
+  // console.log('Tournament Created: ', newTournament);
   const playerJoined = joinPlayerToTournament(
     newTournament,
     userId,
     user,
     socket,
   );
-  console.log('playerJoined in createTournament: ', playerJoined);
+  // console.log('playerJoined in createTournament: ', playerJoined);
 
   if (playerJoined) {
     socket.join(newTournament.id);
@@ -147,7 +147,7 @@ export function handleTournPlayerInLoby(
     return;
   }
 
-  console.log('did increment readyPlayers??');
+  // console.log('did increment readyPlayers??');
   tournament.readyPlayers++;
   // if (tournament.readyPlayers === tournament.maxPlayers) {
   //   startTournament(tournament);
@@ -178,7 +178,7 @@ export function handleRequestTournamentDetails(
   tournamentId: string,
 ): void {
   const tournament = getTournament(tournamentId);
-  console.log('sent tournament details');
+  // console.log('sent tournament details');
   if (!tournament) {
     socket.emit('notInTournament');
     return;
@@ -209,12 +209,12 @@ export function handleLeaveTournamentLobby(
   },
 ): void {
   const ioInstance = getIoInstance();
-  console.log(
-    'called LeavLobby, userId: ',
-    data.userId,
-    ' tournamentId: ',
-    data.tournamentId,
-  );
+  // console.log(
+  //   'called LeavLobby, userId: ',
+  //   data.userId,
+  //   ' tournamentId: ',
+  //   data.tournamentId,
+  // );
   const tournament = getTournament(data.tournamentId);
   if (!tournament) {
     socket.emit('tournamentError', 'Tournament not found.');
@@ -223,7 +223,7 @@ export function handleLeaveTournamentLobby(
 
   removePlayerFromTournamentLobby(data.tournamentId, data.userId);
 
-  console.log('did sent tournment playerUpdate after player remove??');
+  // console.log('did sent tournment playerUpdate after player remove??');
   ioInstance.to(data.tournamentId).emit('tournamentPlayerUpdate', {
     userId: data.userId,
     action: 'left',
@@ -237,7 +237,7 @@ export function handleReadyForMatch(
   socket: Socket,
   data: { userId: string; tournamentId: string; gameId: string },
 ) {
-  console.log('data in handleReady for Match: ', data);
+  // console.log('data in handleReady for Match: ', data);
   const tournament = getTournament(data.tournamentId);
   const gameState = getGameState(data.gameId);
   if (!gameState || !tournament) {
@@ -246,12 +246,12 @@ export function handleReadyForMatch(
     return;
   }
   socket.emit('inMatch');
-  console.log('sent Inmatch??');
+  // console.log('sent Inmatch??');
   if (gameState.game.status === 'playing') {
     console.log("gameStatus is 'playing' in handleReadyForMatch!!");
     return;
   }
-  console.log('got readyForMatch, userId: ', data.userId);
+  // console.log('got readyForMatch, userId: ', data.userId);
   const match = findMatchById(tournament, gameState.tournamentMatchId);
 
   if (!match) return;

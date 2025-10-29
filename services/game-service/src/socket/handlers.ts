@@ -83,7 +83,7 @@ export function handleDisconnect(socket: Socket, reason: string): void {
         gameState &&
         gameState.game.status === 'waiting'
       ) {
-        console.log("gameStatus is 'waiting' in hadleDisconnect!");
+        // console.log("gameStatus is 'waiting' in hadleDisconnect!");
         removeUserActiveGame(userId, userActiveGameId);
         getAllGames().lobyGame = null;
         deleteGame(gameState);
@@ -92,7 +92,7 @@ export function handleDisconnect(socket: Socket, reason: string): void {
         gameState &&
         gameState.game.status != 'playing'
       ) {
-        console.log('gameStatus in handleDisconnect: ', gameState.game.status);
+        // console.log('gameStatus in handleDisconnect: ', gameState.game.status);
         handleQuit({ gameId: userActiveGameId, userId });
       }
     }
@@ -126,14 +126,15 @@ export async function handlePlay(socket: Socket, userId: string) {
   }
 
   const allGames = getAllGames();
-  console.log('allGamges length: ', Object.keys(allGames.games).length);
+  // console.log('allGamges length: ', Object.keys(allGames.games).length);
 
-  console.log('lobyGAme in handlePlay: ', allGames.lobyGame);
+  // console.log('lobyGAme in handlePlay: ', allGames.lobyGame);
   if (!allGames.lobyGame) {
+    console.log("--------- First Player Create a game");
     const gameId = crypto.randomUUID();
     setUserActiveGame(userId, gameId);
     allGames.games[gameId] = generateGameState(gameId, user, null, null, null);
-    console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
+    // console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
     socket.emit('playerData', {
       playerRole: 'player1',
       gameId,
@@ -198,8 +199,8 @@ export async function handleRematch(
   playerRole: 'player1' | 'player2' | null,
   userId: string,
 ) {
-  console.log('Recived rematch!!, gameId: ', gameId);
-  console.log('userId in handle rematch: ', userId);
+  // console.log('Recived rematch!!, gameId: ', gameId);
+  // console.log('userId in handle rematch: ', userId);
   if (!playerRole) {
     console.log('playerRole is null!!');
     return;
@@ -251,7 +252,7 @@ export async function handleRematch(
 }
 
 export function handleQuit(data: { userId: string; gameId: string }): void {
-  console.log('revived quit event!!, data: ', data);
+  // console.log('revived quit event!!, data: ', data);
   if (!data.gameId) {
     console.log('gameId is Null');
     return;
@@ -271,7 +272,7 @@ export function handleQuit(data: { userId: string; gameId: string }): void {
   if (gameState && gameState.game.status === 'playing') {
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
-    console.log('gameStatus in handleQuit: ', gameState.game.status);
+    // console.log('gameStatus in handleQuit: ', gameState.game.status);
     gameState.game.status = 'ended';
     gameState.winner_id =
       gameState.player1.id === data.userId
@@ -295,7 +296,7 @@ export function handleQuit(data: { userId: string; gameId: string }): void {
 
 export function handleCancelMatching(data: { userId: string; gameId: string }) {
   const gameState = getGameState(data.gameId);
-  console.log('gameStatus in handleCancelMatching: ', gameState?.game.status);
+  // console.log('gameStatus in handleCancelMatching: ', gameState?.game.status);
   if (
     gameState?.player1.id != data.userId ||
     gameState?.game.status == 'playing'
@@ -303,7 +304,7 @@ export function handleCancelMatching(data: { userId: string; gameId: string }) {
     return;
   getAllGames().lobyGame = null;
   if (gameState) {
-    console.log('did remove userActiveGAme in cancelMatching?');
+    // console.log('did remove userActiveGAme in cancelMatching?');
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
   }
@@ -313,7 +314,7 @@ export function handleCancelMatching(data: { userId: string; gameId: string }) {
 
 export function handleRequestGameState(socket: Socket, userId: string) {
   const gameId = getUserActiveGame(userId);
-  console.log('gameId in handleRequestGameState: ', gameId);
+  // console.log('gameId in handleRequestGameState: ', gameId);
 
   if (gameId) {
     const gameState = getGameState(gameId);

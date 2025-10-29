@@ -35,18 +35,18 @@ export default function GamePage() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('how many times sent readyForMatch??');
+    // console.log('how many times sent readyForMatch??');
     socket.emit('tourn:readyForMatch', {
       userId: user.id,
       tournamentId,
       gameId: matchGameId,
     });
     socket.on('notInMatch', () => {
-      console.log('ever got notInMatch???');
+      // console.log('ever got notInMatch???');
       setAccessToMatch('404');
     });
     socket.on('inMatch', () => {
-      console.log('ever got InMatch???');
+      // console.log('ever got InMatch???');
       setAccessToMatch('access');
     });
     socket.on('opponentNotJoined', () => {
