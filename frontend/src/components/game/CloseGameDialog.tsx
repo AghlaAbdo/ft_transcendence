@@ -1,22 +1,39 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { socket } from '@/app/(protected)/lib/socket';
+import { useLayout } from '@/context/LayoutContext';
+import { useUser } from '@/context/UserContext';
+
+interface MatchPageParams extends Record<string, string> {
+  tournamentId: string;
+  gameId: string;
+}
 
 export default function CloseGameDialog({
   dialogRef,
   gameId,
+  isTournamentGame,
 }: {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   gameId: string | null;
+  isTournamentGame: boolean;
 }) {
+  const { user } = useUser();
+  const router = useRouter();
+  const { setHideHeaderSidebar } = useLayout();
+  const params = useParams<MatchPageParams>();
+
   function handleCancel() {
     dialogRef.current?.close();
   }
   function handleQuit() {
-    socket.emit('quit', gameId);
-    redirect('/game');
+    socket.emit('quit', { userId: user.id, gameId });
+    setHideHeaderSidebar(false);
+    if (isTournamentGame)
+      router.replace(`/game/tournament/${params.tournamentId}`);
+    else router.replace('/game');
   }
   return (
     <dialog

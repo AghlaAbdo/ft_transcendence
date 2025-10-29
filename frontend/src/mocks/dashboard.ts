@@ -4,7 +4,7 @@ export const games: game[] = [
     {datetime: new Date(), opponent: "flaan", type: 'local', score1: 7, score2: 5},
     {datetime: new Date(), opponent: "flaan", type: 'local', score1: 7, score2: 5},
     {datetime: new Date(), opponent: "flaan", type: 'remote', score1: 2, score2: 4},
-    {datetime: new Date(), opponent: "flaan", type: 'local', score1: 7, score2: 5},
+    {datetime: new Date(), opponent: "flaan", type: 'tournament', score1: 7, score2: 5},
     {datetime: new Date(), opponent: "flaan", type: 'local', score1: 7, score2: 5},
     {datetime: new Date(), opponent: "flaan", type: 'local', score1: 7, score2: 5},
     {datetime: new Date(), opponent: "flaan", type: 'local', score1: 7, score2: 5},

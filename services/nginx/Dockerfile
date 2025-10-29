@@ -6,5 +6,6 @@ COPY openssl.cnf .
 COPY script.sh .
 COPY Server-Health-Dashboard.json .
 COPY Docker-Monitoring.json .
+COPY Nginx-Dashboard.json .
 RUN chmod +x script.sh
 CMD ./script.sh

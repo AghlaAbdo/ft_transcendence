@@ -19,3 +19,24 @@ groups:
           annotations:
             summary: "High memory usage"
             description: "Memory usage > 90% for 1 minute"
+
+  - name: nginx-monitoring
+    interval: 30s
+    rules:
+        - alert: NginxExporterDown
+          expr: up{job="nginx"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Nginx exporter is down"
+            description: "Nginx exporter has been down for more than 1 minute"
+
+        - alert: NginxHighConnections
+          expr: nginx_connections_active > 100
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High number of active connections"
+            description: "Nginx has {{ $value }} active connections for more than 2 minutes"

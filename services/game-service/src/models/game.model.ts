@@ -1,5 +1,5 @@
 import { getDb } from '../database/db';
-import { IGameState } from '../types/game';
+import { IGameState } from '../types/types';
 
 function postGame(gameState: IGameState): void {
   const db = getDb();

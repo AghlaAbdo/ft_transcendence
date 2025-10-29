@@ -1,14 +1,20 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import Image from 'next/image';
 
+import LoadingPong from '@/components/LoadingPong';
 import Matching from '@/components/Matching';
+import AlreadyInGame from '@/components/game/AlreadyInGame';
 import CloseGameDialog from '@/components/game/CloseGameDialog';
 import GamePlayers from '@/components/game/GamePlayers';
 import GameResultCard from '@/components/game/GameResultCard';
+import InTournamentCard from '@/components/game/InTournamentCard';
 
+import { socket } from '@/app/(protected)/lib/socket';
+import { IPlayer } from '@/constants/game';
+import { useUser } from '@/context/UserContext';
 import { usePongGameLogic } from '@/hooks/usePongGameLogic';
 
 export default function GamePage() {
@@ -16,22 +22,69 @@ export default function GamePage() {
     containerRef,
     dialogRef,
     matching,
-    player,
     opponent,
     winner,
     gameId,
     playerRole,
-  } = usePongGameLogic();
+    inAnotherGame,
+    gameStatus,
+    inTournament,
+  } = usePongGameLogic(null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
+  const { user } = useUser();
+  const sentQuit = useRef<boolean>(false);
+
+  useEffect(() => {
+    return () => {
+      if (gameId && !sentQuit.current) {
+        // console.log('sent quitRemoteGamePage!!');
+        socket.emit('quitRemoteGamePage', { userId: user.id, gameId });
+        sentQuit.current = true;
+      }
+    };
+  }, [gameId, sentQuit]);
+
+  const player: IPlayer = {
+    id: user.id,
+    username: user.username,
+    avatar: user.avatar_url!,
+    frame: 'silver2',
+    level: '34',
+    isEliminated: false,
+  };
 
   function handleClose() {
     closeDialRef.current?.showModal();
   }
+
+  if (inTournament) {
+    // console.log('inTournament??');
+    return <InTournamentCard tournamentId={inTournament} />;
+  }
+  if (inAnotherGame) {
+    return <AlreadyInGame />;
+  }
+  if (!player || !gameId) {
+    return (
+      <div className='flex h-[calc(100vh_-_72px)] justify-center items-center'>
+        <LoadingPong />
+        !player || !gameId
+      </div>
+    );
+  } else if (matching) {
+    return <Matching player={player} opponent={opponent} gameId={gameId} />;
+  } else if (!opponent) {
+    return (
+      <div className='flex h-[100vh] justify-center items-center'>
+        <LoadingPong />
+        !opponent
+      </div>
+    );
+  }
   return (
     <>
-      {!player && <div></div>}
-      {player && matching && (
-        <Matching player={player} opponent={opponent} gameId={gameId!} />
+      {matching && (
+        <Matching player={player} opponent={opponent} gameId={gameId} />
       )}
       {!matching && (
         <>
@@ -48,21 +101,26 @@ export default function GamePage() {
             />
           </button>
           {/* Close dialog */}
-          <CloseGameDialog dialogRef={closeDialRef} gameId={gameId} />
+          <CloseGameDialog
+            dialogRef={closeDialRef}
+            gameId={gameId}
+            isTournamentGame={false}
+          />
 
           <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
-            <GamePlayers leftUser={player!} rightUser={opponent!} />
+            <GamePlayers leftUser={player} rightUser={opponent} />
             <div
               ref={containerRef}
               className='mx-auto rounded-[8px] overflow-hidden border-2 border-pink aspect-[3/2] w-[min(100%,1600px,calc((100vh-140px)*(3/2)))] shadow-[0_0_14px_4px_rgba(236,72,135,1)]'
             ></div>
             <GameResultCard
               ref={dialogRef}
-              leftUser={player!}
-              rightUser={opponent!}
+              leftUser={player}
+              rightUser={opponent}
               winner={winner}
               gameId={gameId}
               playerRole={playerRole}
+              isTournamentGame={false}
             />
           </div>
         </>

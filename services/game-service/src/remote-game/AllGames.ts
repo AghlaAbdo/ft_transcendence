@@ -1,4 +1,4 @@
-import { IGameState, IGmaes } from '../types/game';
+import { IGameState, IGmaes } from '../types/types';
 
 const allGames: IGmaes = {
   lobyGame: null,
@@ -9,6 +9,9 @@ export function getAllGames(): IGmaes {
   return allGames;
 }
 
-export function getGameState(gameId: string): IGameState {
-  return allGames.games[gameId];
+export function getGameState(
+  gameId: string | undefined,
+): IGameState | undefined {
+  if (gameId) return allGames.games[gameId];
+  return undefined;
 }

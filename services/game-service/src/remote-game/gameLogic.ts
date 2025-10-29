@@ -10,10 +10,15 @@ import {
   BALL_SPEED,
   GAME_INTERVAL_MS,
 } from '../config/game';
-import { IGameState } from '../types/game';
+import { IGameState } from '../types/types';
 import { Server } from 'socket.io';
 import { getAllGames } from './AllGames';
 import { getCurrDate } from '../utils/dates';
+import {
+  removeUserActiveGame,
+  removeUserActiveTournament,
+} from './userActiveGame';
+import { advancePlayerInTournament } from '../tournament/tournamentManager';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -31,7 +36,7 @@ export function setIoInstance(io: Server): void {
 }
 
 export function startGame(gameState: IGameState) {
-  if (gameIntervals[gameState.id]) return;
+  if (!gameState || gameIntervals[gameState.id]) return;
 
   ioInstance.to(gameState.id).emit('prepare');
   for (let i = 1; i <= 3; i++) {
@@ -43,10 +48,13 @@ export function startGame(gameState: IGameState) {
 
       if (j === 1) {
         setTimeout(() => {
+          if (gameState.game.status === 'ended') {
+            deleteGame(gameState);
+            return;
+          }
           ioInstance.to(gameState.id).emit('startGame');
-          ioInstance.emit('startGame');
           gameState.startDate = getCurrDate();
-          gameState.game.status = 'playing';
+          // gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),
             GAME_INTERVAL_MS,
@@ -58,7 +66,7 @@ export function startGame(gameState: IGameState) {
 }
 
 function gameLoop(gameState: IGameState): void {
-  if (gameState.game.status !== 'playing') return;
+  if (!gameState || gameState.game.status !== 'playing') return;
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
   gameState.game.ball.y += gameState.game.ball.dy;
@@ -118,27 +126,40 @@ function gameLoop(gameState: IGameState): void {
 }
 
 function gameOver(gameState: IGameState): void {
+  removeUserActiveGame(gameState.player1.id, gameState.id);
+  removeUserActiveGame(gameState.player2.id, gameState.id);
+  let loserId: string;
   if (gameState.game.leftPaddle.score > gameState.game.rightPaddle.score) {
     gameState.winner_id = gameState.player1.id;
     gameState.game.winner = 'player1';
+    loserId = gameState.player2.id!;
   } else {
     gameState.winner_id = gameState.player2.id;
     gameState.game.winner = 'player2';
+    loserId = gameState.player1.id!;
   }
   gameState.game.status = 'ended';
   gameState.player1.ready = false;
   gameState.player2.ready = false;
-  ioInstance.emit('gameOver');
+  ioInstance.to(gameState.id).emit('gameOver');
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
   gameState.playtime = getDiffInMin(gameState.startAt);
   postGame(gameState);
+  if (gameState.isTournamentGame) {
+    removeUserActiveTournament(loserId, gameState.tournamentId);
+    advancePlayerInTournament(
+      gameState.tournamentId!,
+      gameState.tournamentMatchId!,
+      gameState.winner_id!,
+    );
+  }
+  deleteGame(gameState);
 }
 
-export function deleteGame(gameState: IGameState): void {
-  if (!gameState)
-    return;
+export function deleteGame(gameState: IGameState | undefined): void {
+  if (!gameState) return;
   if (gameState.game.status === 'playing') {
     gameState.game.status = 'ended';
   }

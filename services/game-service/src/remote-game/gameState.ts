@@ -1,4 +1,4 @@
-import { IGameState } from '../types/game';
+import { IGameState, IPlayer } from '../types/types';
 import {
   GAME_WIDTH,
   GAME_HEIGHT,
@@ -9,12 +9,21 @@ import {
   BALL_SPEED,
 } from '../config/game';
 
-export function generateGameState(gameId: string): IGameState {
+export function generateGameState(
+  gameId: string,
+  player1: IPlayer,
+  player2: IPlayer | null,
+  tournamentId: string | null,
+  tournamentMatchId: string | null,
+): IGameState {
   const direction = Math.random() < 0.5 ? 1 : -1;
   const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
   return {
     id: gameId,
     db_id: 0,
+    isTournamentGame: tournamentId ? true : false,
+    tournamentId: tournamentId,
+    tournamentMatchId: tournamentMatchId,
     game: {
       status: 'waiting',
       ball: {
@@ -41,11 +50,19 @@ export function generateGameState(gameId: string): IGameState {
       scoreUpdate: false,
     },
     player1: {
-      id: 45,
+      id: player1.id,
+      username: player1.username,
+      avatar: player1.avatar,
+      frame: player1.frame,
+      level: player1.level,
       ready: false,
     },
     player2: {
-      id: 23,
+      id: player2 ? player2.id : null,
+      username: player2 ? player2.username : null,
+      avatar: player2 ? player2.avatar : null,
+      frame: player2 ? player2.frame : null,
+      level: player2 ? player2.level : null,
       ready: false,
     },
     playersNb: 1,

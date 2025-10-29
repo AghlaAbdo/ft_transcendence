@@ -18,6 +18,7 @@ export default function GameResultCard({
   winner,
   gameId,
   playerRole,
+  isTournamentGame,
 }: {
   ref: React.RefObject<HTMLDialogElement | null>;
   leftUser: IPlayer;
@@ -25,8 +26,11 @@ export default function GameResultCard({
   winner: string;
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
+  isTournamentGame: boolean;
 }) {
   const [rematch, setRematch] = useState<string[]>([]);
+
+  // console.log('reached game reslut card!!!');
 
   return (
     <dialog
@@ -34,7 +38,7 @@ export default function GameResultCard({
       className='bg-dark-blue border-[1px] border-gray-700 rounded-[8px] mx-auto my-auto px-2 pt-1 pb-8 500:pb-10 md:px-8 md:pt-6 md:pb-11'
     >
       <div className='500:w-100 md:w-142 h-full flex gap-1 500:gap-2 md:gap-4 items-end'>
-        <div className='relative flex-1 flex flex-col gap-2 items-center'>
+        <div className='relative flex-1 flex flex-col gap-4 items-center'>
           <div>
             <span
               className={`${winner !== playerRole ? 'invisible' : ''} text-gold px-[2px] text-3xl 500:text-4xl md:text-5xl font-bold`}
@@ -68,13 +72,15 @@ export default function GameResultCard({
         </div>
 
         <div className='relative md:flex-1 flex flex-col gap-4 items-center self-end pb-8'>
-          <Rematch
-            rematch={rematch}
-            setRematch={setRematch}
-            gameId={gameId}
-            playerRole={playerRole}
-            dialogRef={ref}
-          />
+          {!isTournamentGame && (
+            <Rematch
+              rematch={rematch}
+              setRematch={setRematch}
+              gameId={gameId}
+              playerRole={playerRole}
+              dialogRef={ref}
+            />
+          )}
         </div>
 
         <div className='w-fit relative flex-1 flex flex-col gap-2 items-center'>

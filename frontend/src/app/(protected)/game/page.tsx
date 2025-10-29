@@ -2,17 +2,28 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import localGamePng from '@/../public/images/Local-Game.jpg';
 import multiPlayerPng from '@/../public/images/Multiplayer-Game.jpg';
 import onlineGamePng from '@/../public/images/Online-Game.jpg';
 import tournamentPng from '@/../public/images/Tournament.jpg';
+import { useUser } from '@/context/UserContext';
 
-import Styles from './game.module.css';
+import { socket } from '../lib/socket';
 
 export default function GamePage() {
+  const router = useRouter();
+  const { user } = useUser();
+
+  // function handlePlayOnline() {
+  //   socket.emit('play', user.id);
+  //   // setTimeout(()=> {
+  //     router.push('/game/play-remote');
+  //   // }, 2000);
+  // }
   return (
-    <div id={Styles.container} className='flex justify-center'>
+    <div className='flex justify-center'>
       <div className='w-full max-w-[1000px] m-3 md:m-6'>
         <h1 className='text-center text-2xl md:text-4xl font-bold text-gray-50 mb-8'>
           Game Modes
@@ -58,7 +69,8 @@ export default function GamePage() {
                 </p>
               </div>
               <Link
-                href='/game/play-remote'
+                // onClick={handlePlayOnline}
+                href={'/game/play-remote'}
                 className='bg-purple w-fit py-2 px-4 rounded-[8px] self-end font-bold'
               >
                 Play Now
@@ -107,7 +119,7 @@ export default function GamePage() {
                 </p>
               </div>
               <Link
-                href='#'
+                href='/game/tournament'
                 className='bg-purple w-fit py-2 px-4 rounded-[8px] self-end font-bold'
               >
                 Play Now

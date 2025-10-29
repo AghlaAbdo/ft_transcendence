@@ -16,7 +16,7 @@ export default function Avatar({
         height={width}
         src={url}
         alt='Avatar'
-        className='w-full p-[12%]'
+        className='w-full rounded-full p-[12%]'
       />
       <Image
         width={width}

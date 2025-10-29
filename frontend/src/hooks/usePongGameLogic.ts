@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import * as PIXI from 'pixi.js';
 
 import { socket } from '@/app/(protected)/lib/socket';
@@ -13,6 +15,7 @@ import {
   PADDLE_WIDTH,
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
+import { useUser } from '@/context/UserContext';
 
 interface returnType {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -23,19 +26,32 @@ interface returnType {
   winner: string;
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
+  inAnotherGame: boolean;
+  inTournament: string | null;
+  gameStatus: 'playing' | 'waiting' | 'notFound' | null;
 }
 
-export const usePongGameLogic = (): returnType => {
+export const usePongGameLogic = (
+  tournamentId: string | null,
+  matchGameId: string | null
+): returnType => {
+  const router = useRouter();
   const [matching, setMatching] = useState(true);
   const [opponent, setOpponent] = useState<IPlayer | null>(null);
   const [player, setPlayer] = useState<IPlayer | null>(null);
   const [winner, setWinner] = useState<string>('');
+  const [inAnotherGame, setInAnotherGame] = useState<boolean>(false);
   const pressedKeys = useRef<Set<string>>(new Set());
   const animationFrameId = useRef<number | null>(null);
   const gameId = useRef<string>(null);
   const isPlaying = useRef<boolean>(false);
   const playerRole = useRef<'player1' | 'player2'>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const isTournamentGame = useRef<boolean>(false);
+  const [gameStatus, setGameStatus] = useState<
+    'playing' | 'waiting' | 'notFound' | null
+  >(null);
+  const [inTournament, setInTournament] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pixiApp = useRef<PIXI.Application | null>(null);
@@ -48,6 +64,7 @@ export const usePongGameLogic = (): returnType => {
   const coundDownRef = useRef<PIXI.Text | null>(null);
   const gameContainerRef = useRef<PIXI.Container | null>(null);
 
+  const { user } = useUser();
   const { setHideHeaderSidebar } = useLayout();
 
   const showCountDown = useCallback((num: number) => {
@@ -75,7 +92,14 @@ export const usePongGameLogic = (): returnType => {
   }, []);
 
   useEffect(() => {
-    if (matching) return;
+    if (tournamentId) {
+      isTournamentGame.current = true;
+      gameId.current = matchGameId;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!gameStatus || matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
       try {
@@ -171,9 +195,12 @@ export const usePongGameLogic = (): returnType => {
           text: '',
           style: {
             fontSize: 48,
-            fill: 0xf9fafb,
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            fill: 0xeab308,
             align: 'center',
           },
+          resolution: 2,
         });
         endText.anchor.set(0.5);
         endText.x = GAME_WIDTH / 2;
@@ -223,7 +250,7 @@ export const usePongGameLogic = (): returnType => {
         pixiApp.current = null;
       }
     };
-  }, [matching]);
+  }, [matching, gameStatus]);
 
   const transformX = useCallback(
     (x: number, playerRole: 'player1' | 'player2'): number => {
@@ -245,15 +272,78 @@ export const usePongGameLogic = (): returnType => {
   }, []);
 
   useEffect(() => {
-    socket.connect();
-    socket.on('connect', () => {
-      console.log('Connected to Socket.IO server!');
-      console.log('Socket ID:', socket.id);
-    });
+    // console.log('sent requestGameStatus??');
+    if (isTournamentGame.current) {
+      socket.emit('requestTournMatchDetails', {
+        userId: user.id,
+        tournamentId: tournamentId,
+        matchGameId,
+      });
+      socket.on(
+        'tournMatchDetails',
+        (data: {
+          gameId: string | null;
+          gameStatus: 'playing' | 'waiting' | 'notFound';
+          player: IPlayer | null;
+          opponent: IPlayer | null;
+          playerRole: 'player1' | 'player2' | null;
+        }) => {
+          // console.log('match DAta received: ', data);
+          setGameStatus(data.gameStatus);
+          if (data.gameStatus === 'playing') {
+            console.log("is gameStatus 'playing' ??");
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+            setPlayer(data.player);
+            setMatching(false);
+            isPlaying.current = true;
+            if (!animationFrameId.current)
+              animationFrameId.current = requestAnimationFrame(gameLoop);
+            setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          }
+        }
+      );
+    } else {
+      socket.emit('requestMatchDetails', user.id);
+      socket.on(
+        'matchDetails',
+        (data: {
+          gameId: string | null;
+          gameStatus: 'playing' | 'waiting' | 'notFound';
+          player: IPlayer | null;
+          opponent: IPlayer | null;
+          playerRole: 'player1' | 'player2' | null;
+        }) => {
+          // console.log('gameStatus recived: ', data);
+          setGameStatus(data.gameStatus);
+          if (!isTournamentGame.current && data.gameStatus === 'notFound') {
+            // console.log('sent Play Now');
+            socket.emit('play', user.id);
+          } else if (data.gameStatus === 'playing') {
+            // console.log("is gameStatus 'playing' ??");
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+            setPlayer(data.player);
+            setMatching(false);
+            isPlaying.current = true;
+            if (!animationFrameId.current)
+              animationFrameId.current = requestAnimationFrame(gameLoop);
+            setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          } else if (data.gameStatus === 'waiting') {
+            // console.log('did set player: ', data.player);
+            setPlayer(data.player);
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+          }
+        }
+      );
+    }
 
-    console.log('Play Now');
-    socket.emit('play');
-    // isPlaying.current = true;
+    socket.on('registeredInTournament', (data: { tournamentId: string }) => {
+      setInTournament(data.tournamentId);
+    });
 
     socket.on(
       'playerData',
@@ -262,13 +352,14 @@ export const usePongGameLogic = (): returnType => {
         gameId: string;
         player: IPlayer;
       }) => {
-        console.log('player role: ', data.playerRole);
+        // console.log('palyer Data: ', data);
         if (data.playerRole === 'player1' && endTextRef.current) {
           endTextRef.current.text = 'matching';
         }
         playerRole.current = data.playerRole;
         setPlayer(data.player);
         gameId.current = data.gameId;
+        setGameStatus('waiting');
       }
     );
 
@@ -276,7 +367,7 @@ export const usePongGameLogic = (): returnType => {
       setMatching(false);
     });
     socket.on('starting', (count) => {
-      console.log('starting: ', count);
+      // console.log('starting: ', count);
       showCountDown(count);
     });
 
@@ -284,13 +375,14 @@ export const usePongGameLogic = (): returnType => {
       isPlaying.current = true;
       if (!animationFrameId.current)
         animationFrameId.current = requestAnimationFrame(gameLoop);
-      console.log('Stared the game !!!!!');
+      // console.log('Stared the game !!!!!');
     });
 
     socket.on('matchFound', (opponent: IPlayer) => {
       console.log('Match Found: ', opponent.username);
       setHideHeaderSidebar(true);
       setOpponent(opponent);
+      setGameStatus('playing');
     });
 
     socket.on('gameStateUpdate', (gameState: IGameState) => {
@@ -333,19 +425,38 @@ export const usePongGameLogic = (): returnType => {
     socket.on('gameOver', () => {
       isPlaying.current = false;
       dialogRef.current?.showModal();
+      if (isTournamentGame.current) {
+        setTimeout(() => {
+          router.replace(`/game/tournament/${tournamentId}`);
+        }, 2000);
+      }
     });
 
     socket.on(
       'opponentQuit',
       (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
         isPlaying.current = false;
-        if (gameStatus === 'playing') {
-          endTextRef.current!.text = 'You Won';
+        if (matching) setMatching(false);
+        if (gameStatus === 'playing' || gameStatus === 'waiting') {
+          console.log('opponent has quit!!');
+          if (endTextRef.current) endTextRef.current.text = 'Opponent Quit';
           setWinner(playerRole.current!);
-          setTimeout(() => dialogRef.current?.showModal(), 2000);
+          setTimeout(() => {
+            dialogRef.current?.showModal();
+            if (isTournamentGame.current) {
+              // console.log('isTournament: ', isTournamentGame.current);
+              setTimeout(() => {
+                router.replace(`/game/tournament/${tournamentId}`);
+              }, 2000);
+            }
+          }, 2000);
         }
       }
     );
+
+    socket.on('inAnotherGame', () => {
+      setInAnotherGame(true);
+    });
 
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
@@ -367,8 +478,8 @@ export const usePongGameLogic = (): returnType => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       // e.preventDefault();
       e.returnValue = '';
-      console.log('sent quit event');
-      if (isPlaying.current) socket.emit('quit', gameId.current);
+      // console.log('sent quit event');
+      // if (isPlaying.current) socket.emit('quit', gameId.current, user.id);
       window.removeEventListener('keydown', keydownEvent);
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);
@@ -384,10 +495,24 @@ export const usePongGameLogic = (): returnType => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (isPlaying.current) {
-        socket.emit('quit', gameId.current);
+        socket.emit('quit', { userId: user.id, gameId });
       }
-      socket.off();
-      socket.disconnect();
+      // if (!isTournamentGame.current) {
+      //   socket.off();
+      //   socket.disconnect();
+      // } else {
+      socket.off('inAnotherGame');
+      socket.off('playerData');
+      socket.off('prepare');
+      socket.off('starting');
+      socket.off('startGame');
+      socket.off('matchFound');
+      socket.off('gameStateUpdate');
+      socket.off('gameOver');
+      socket.off('opponentQuit');
+      socket.off('tournMatchDetails');
+      socket.off('matchDetails');
+      // }
     };
   }, []);
 
@@ -412,5 +537,8 @@ export const usePongGameLogic = (): returnType => {
     winner,
     gameId: gameId.current,
     playerRole: playerRole.current,
+    inAnotherGame,
+    inTournament,
+    gameStatus,
   };
 };

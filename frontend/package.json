@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "^5.2.2",
     "chart.js": "^4.5.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
+    "geist": "^1.5.1",
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.542.0",
