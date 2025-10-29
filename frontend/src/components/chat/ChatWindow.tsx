@@ -72,9 +72,7 @@ export const ChatWindow = ({
                 />
                 {other_User.online_status === 1 ? (
                   <div className='border-2 border-black absolute top-9 right-0 bg-green-500 rounded-full w-3 h-3'></div>
-                ) : (
-                  <></>
-                )}
+                ) : null}
               </div>
               <div className='flex-1'>
                 <div className='flex justify-between items-center'>

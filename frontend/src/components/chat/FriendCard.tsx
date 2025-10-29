@@ -11,10 +11,9 @@ type User = {
 };
 type UserCardProps = {
   _user: User;
-  onClose: () => void;
 };
 
-export default function FriendCard({ _user, onClose }: UserCardProps) {
+export default function FriendCard({ _user }: UserCardProps) {
   return (
     <div className="flex items-center justify-between w-full p-3 bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg overflow-visible">
       <div className="flex items-center flex-1 min-w-0 space-x-3">

@@ -1,4 +1,8 @@
-import { getMessages, insert_message, getMessage } from "../database/conversations.js";
+import {
+  getMessages,
+  insert_message,
+  getMessage,
+} from "../database/conversations.js";
 import { getChats } from "../database/chats.js";
 
 type ChatRow = {
@@ -29,7 +33,8 @@ export async function getMessagesHandler(req: any, reply: any) {
 
 export async function getMessageHandler(req: any, reply: any) {
   const messageId = parseInt((req.params as any).messageId);
-  if (isNaN(messageId)) return reply.status(400).send({ error: "Invalid messageId" });
+  if (isNaN(messageId))
+    return reply.status(400).send({ error: "Invalid messageId" });
 
   try {
     const db = req.server.db;
@@ -44,7 +49,6 @@ export async function getMessageHandler(req: any, reply: any) {
   }
 }
 
-
 // export async function getUserHandler(req: any, reply: any) {
 //   const userId = parseInt((req.params as any).userId);
 //   if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
@@ -54,7 +58,7 @@ export async function getMessageHandler(req: any, reply: any) {
 //   } catch (err) {
 //     console.error(err);
 //     return reply.status(500).send({ error: "Failed to fetch user" });
-//   }
+//   }`
 // }
 
 async function fetchUserFromService(ids: number[]) {
@@ -102,5 +106,31 @@ export async function getChatsHandler(req: any, reply: any) {
   } catch (err) {
     console.error("Chats error:", err);
     return reply.status(500).send({ error: "Failed to fetch chats" });
+  }
+}
+
+export async function checkChatExistsHandler(req: any, rep: any) {
+  const userId = parseInt((req.params).userId);
+  const friendId = parseInt((req.params).friendId);
+  try {
+    const db = req.server.db;
+    if (!db) {
+      return rep.status(500).send({ error: "Database not initialized" });
+    }
+    const stmt = db.prepare(`
+      SELECT chat_id
+      FROM chats
+      WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)
+      LIMIT 1
+      `);
+      const result = stmt.get(userId, friendId, friendId, userId);
+      if (result) {
+        return {exists: true,chat_id: result.chat_id}
+      }
+      else {
+        return { exists: false, chat_id: -1 };
+      }
+  } catch (err) {
+    return rep.status(500).send({ error: "Failed to check chat" });
   }
 }

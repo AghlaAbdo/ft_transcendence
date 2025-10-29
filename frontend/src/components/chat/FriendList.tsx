@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import {Loader2, Search, UserPlus, X } from 'lucide-react';
+
+import { Loader2, Search, UserPlus, X } from 'lucide-react';
+
 import { User, useAuth } from '@/hooks/useAuth';
+
 import FriendCard from './FriendCard';
 
 interface FriendListProps {
   onClose: () => void;
+  onchatselected: (friendid: number) => void;
 }
 
 interface Friend {
@@ -14,7 +18,7 @@ interface Friend {
   avatar_url: string;
 }
 
-export const FriendList = ({ onClose }: FriendListProps) => {
+export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,6 +49,26 @@ export const FriendList = ({ onClose }: FriendListProps) => {
     };
     fetchFriends();
   }, []);
+
+  const handleFriendSelect = async (friendId: number) => {
+    if (!user) return;
+    try {
+      const fetchChatExistense = await fetch(
+        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${friendId}`
+      );
+      const data = await fetchChatExistense.json();
+      if (data.exists) {
+        console.log('user is there');
+        onchatselected(data.chat_id);
+      } else {
+        console.log('user its not there');
+        onchatselected(-1);
+      }
+      onClose();
+    } catch {
+      console.error('Failed to check chat:', error);
+    }
+  };
 
   useEffect(() => {
     if (searchTerm && searchTerm.trim() && user && friends) {
@@ -84,7 +108,7 @@ export const FriendList = ({ onClose }: FriendListProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder='Search username...'
             className='w-full py-2 pl-11 pr-4 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 z-[1]'
-            autoFocus
+            autoFocus // remember to put this in the global search also in the
           />
           {searchTerm && (
             <button
@@ -138,14 +162,20 @@ export const FriendList = ({ onClose }: FriendListProps) => {
                 key={user.id}
                 className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
               >
-                <button className='w-full cursor-pointer'>
-                  <FriendCard _user={user} onClose={onClose} />
+                <button
+                  onClick={() => {
+                    onClose();
+                    handleFriendSelect(user.id);
+                  }}
+                  className='w-full cursor-pointer'
+                >
+                  <FriendCard _user={user} />
                 </button>
               </div>
             ))}
           </div>
         )}
-        
+
         {!isLoading && !error && searchTerm && (
           <div className='mt-3 space-y-1 max-h-64 '>
             {filteredUsers.map((user) => (
@@ -153,14 +183,19 @@ export const FriendList = ({ onClose }: FriendListProps) => {
                 key={user.id}
                 className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
               >
-                <button className='w-full cursor-pointer'>
-                  <FriendCard _user={user} onClose={onClose} />
+                <button
+                  onClick={() => {
+                    onClose();
+                    handleFriendSelect(user.id);
+                  }}
+                  className='w-full cursor-pointer'
+                >
+                  <FriendCard _user={user} />
                 </button>
               </div>
             ))}
           </div>
         )}
-
       </div>
     </div>
   );

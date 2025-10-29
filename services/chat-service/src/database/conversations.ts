@@ -6,7 +6,16 @@ export function getMessages(db: Database.Database, chatId: number) {
     FROM messages c
     WHERE c.chat_id = ?
   `);
-  return stmt.all(chatId);
+  const result = stmt.all(chatId);
+  if (result && result.length > 0)
+      return {
+          status: true,
+          messages: result
+      }
+  else 
+    return {
+      status: false
+    } 
 }
 
 export function getMessage(db: Database.Database, MessageId: number) {
@@ -28,7 +37,6 @@ export function insert_message(db: Database.Database, chat_id: number, sender: n
   `);
 
   const selectStmt = db.prepare('SELECT * FROM messages WHERE id = ?');
-
   const info = insertStmt.run(chat_id, sender, receiver, content);
   const newMessageId = info.lastInsertRowid as number;
   updateChatStmt.run(content, chat_id);

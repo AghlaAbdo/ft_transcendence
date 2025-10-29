@@ -161,7 +161,7 @@ export const Chatlist = ({
                       </span>
                     </div>
                     <p className='text-sm text-gray-400 truncate min-w-0'>
-                      {chat.last_message_content || 'No messages yet'}
+                      {chat.last_message_content || ''}
                     </p>
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export const Chatlist = ({
            className="bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg"
            onClick={(e) => e.stopPropagation()}
          >
-           <FriendList onClose={() => {setShowFriendsModal(false)}} />
+           <FriendList onchatselected={onSelect} onClose={() => {setShowFriendsModal(false)}} />
          </div>
        </div>
      )}
