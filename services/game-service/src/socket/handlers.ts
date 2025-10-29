@@ -68,7 +68,7 @@ export function handleDisconnect(socket: Socket, reason: string): void {
 
   setUserSocketNull(socket.id);
   setTimeout(() => {
-    quitActiveGame(socket);
+    quitActiveGame(socket.id);
     removeUserSocket(socket.id);
   }, 5000);
 
@@ -317,6 +317,10 @@ export function handleRequestGameState(socket: Socket, userId: string) {
 
   if (gameId) {
     const gameState = getGameState(gameId);
+    // if (gameState && gameState.game.status === 'playing' && socket.id != getUserSocketId(userId)) {
+    //   socket.emit('inAnotherGame');
+    //   return;
+    // }
     // console.log('gameState is: ', gameState);
     if (gameState) {
       let player;

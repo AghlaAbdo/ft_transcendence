@@ -9,7 +9,7 @@ export function setUserSocket(userId: string, socketId: string) {
 
 export function setUserSocketNull(socketId: string) {
   const userId = socketUserMap.get(socketId);
-  if (userId) {
+  if (userId && socketId === userSocketMap.get(userId)) {
     userSocketMap.set(userId, null);
   }
 }

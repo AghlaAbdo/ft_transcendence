@@ -71,7 +71,6 @@ export interface ITournament {
 export interface TournamentListItem {
   id: string;
   name: string;
-  creatorId: string;
   maxPlayers: number;
   currentPlayers: number;
   status: string;

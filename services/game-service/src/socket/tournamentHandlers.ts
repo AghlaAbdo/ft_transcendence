@@ -107,6 +107,7 @@ export async function handleJoinTournament(
 
   if (playerJoined) {
     socket.emit('tournamentJoined', { tournamentId: tournamentId });
+    ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
     ioInstance.to(tournamentId).emit('tournamentPlayerUpdate', {
       userId: userId,
       action: 'joined',
@@ -114,7 +115,6 @@ export async function handleJoinTournament(
     });
     if (tournament.players.size == tournament.maxPlayers) {
       startTournament(tournament);
-      ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
     }
   }
   console.log('joined tournamentId: ', tournamentId, ' userId: ', userId);
@@ -220,18 +220,8 @@ export function handleLeaveTournamentLobby(
     socket.emit('tournamentError', 'Tournament not found.');
     return;
   }
-  // if (tournament.status !== 'waiting') {
-  //   socket.emit(
-  //     'tournamentError',
-  //     'Cannot leave a tournament that has already started.',
-  //   );
-  //   return;
-  // }
 
-  const action = removePlayerFromTournamentLobby(
-    data.tournamentId,
-    data.userId,
-  );
+  removePlayerFromTournamentLobby(data.tournamentId, data.userId);
 
   console.log('did sent tournment playerUpdate after player remove??');
   ioInstance.to(data.tournamentId).emit('tournamentPlayerUpdate', {
@@ -240,9 +230,7 @@ export function handleLeaveTournamentLobby(
   });
   removeUserActiveTournament(data.userId, data.tournamentId);
   socket.leave(data.tournamentId);
-  if (action === 'tournamentDeleted')
-    ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
-  // socket.emit('leftTournamentLobby', { tournamentId: data.tournamentId });
+  ioInstance.emit('tournamentListUpdate', getAllWaitingTournaments());
 }
 
 export function handleReadyForMatch(

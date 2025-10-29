@@ -147,11 +147,7 @@ export default function TournamentLobbyPage() {
                   </h3>
                   <p className='text-gray-300 mb-1'>👤 {t.creatorUsername}</p>
                   <p className='text-gray-400 mb-1'>
-                    Players:{' '}
-                    <span className='font-semibold text-white'>
-                      {t.currentPlayers}
-                    </span>{' '}
-                    / {t.maxPlayers}
+                    Players: {t.currentPlayers} / {t.maxPlayers}
                   </p>
                   <p
                     className={`text-sm font-medium ${

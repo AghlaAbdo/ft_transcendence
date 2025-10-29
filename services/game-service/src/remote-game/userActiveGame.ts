@@ -48,8 +48,8 @@ export function removeUserActiveTournament(
     userActiveTournament.delete(userId);
 }
 
-export function quitActiveGame(socket: Socket) {
-  const userId = getUserId(socket.id);
+export function quitActiveGame(socketId: string) {
+  const userId = getUserId(socketId);
   // console.log("called quitActiveGame!!");
   if (userId) {
     if (getUserSocketId(userId)) return;

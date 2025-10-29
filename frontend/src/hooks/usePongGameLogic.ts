@@ -458,6 +458,10 @@ export const usePongGameLogic = (
       }
     );
 
+    socket.on('inAnotherGame', () => {
+      setInAnotherGame(true);
+    });
+
     window.addEventListener('keydown', keydownEvent);
     window.addEventListener('keyup', keyupEvent);
 

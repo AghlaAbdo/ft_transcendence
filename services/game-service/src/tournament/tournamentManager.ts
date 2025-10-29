@@ -1,6 +1,11 @@
 import { generateGameState } from '../remote-game/gameState';
 import { getIoInstance } from '../socket/manager';
-import { ITournament, IRound, IMatch, IGameState } from '../types/types';
+import {
+  ITournament,
+  TournamentListItem,
+  IMatch,
+  IGameState,
+} from '../types/types';
 import { getAllGames, getGameState } from '../remote-game/AllGames';
 import { deleteGame, startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
@@ -44,10 +49,17 @@ export function getTournament(tournamentId: string): ITournament | undefined {
   return activeTournaments.get(tournamentId);
 }
 
-export function getAllWaitingTournaments(): ITournament[] {
-  return Array.from(activeTournaments.values()).filter(
-    (t) => t.status === 'waiting',
-  );
+export function getAllWaitingTournaments(): TournamentListItem[] {
+  return Array.from(activeTournaments.values())
+    .filter((t) => t.status === 'waiting')
+    .map((t) => ({
+      id: t.id,
+      name: t.name,
+      maxPlayers: t.maxPlayers,
+      currentPlayers: t.players.size,
+      status: t.status,
+      creatorUsername: t.creatorUsername,
+    }));
 }
 
 export function deleteTournament(tournamentId: string): void {
@@ -59,7 +71,7 @@ export function setTournament(tournament: ITournament) {}
 export function removePlayerFromTournamentLobby(
   tournamentId: string,
   userId: string,
-): 'tournamentDeleted' | null {
+): void {
   const tournament = activeTournaments.get(tournamentId);
   if (tournament && tournament.status === 'waiting') {
     tournament.readyPlayers--;
@@ -68,10 +80,8 @@ export function removePlayerFromTournamentLobby(
     // console.log('players after delete: ', tournament.players);
     if (tournament.players.size === 0) {
       deleteTournament(tournamentId);
-      return 'tournamentDeleted';
     }
   }
-  return null;
 }
 
 function generateBracket(tournament: ITournament): void {

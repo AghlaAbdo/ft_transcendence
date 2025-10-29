@@ -110,3 +110,12 @@ export interface TournamentDetails {
   players: IPlayer[];
   bracket: IRound[];
 }
+
+export interface TournamentListItem {
+  id: string;
+  name: string;
+  maxPlayers: number;
+  currentPlayers: number;
+  status: string;
+  creatorUsername?: string;
+}
