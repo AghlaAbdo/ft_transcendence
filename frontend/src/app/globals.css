@@ -15,6 +15,7 @@
   --gray-200: #cdd3e0;
   --gray-50: #f9fafb;
   --purple: #9333ea;
+  --light-purple: #a459eb;
   --pink: #ec4899;
   --green: #15a426;
   --red: #b02c2c;
@@ -34,6 +35,7 @@
   --color-gray-200: var(--gray-200);
   --color-gray-50: var(--gray-50);
   --color-purple: var(--purple);
+  --color-light-purple: var(--light-purple);
   --color-pink: var(--pink);
   --color-green: var(--green);
   --color-red: var(--red);
@@ -81,4 +83,64 @@ body {
 
 .custom-scrollbar-gray::-webkit-scrollbar-thumb:hover {
   background: #6B7280;
+}
+
+@tailwind utilities;
+
+@layer utilities {
+  /* Ball X movement */
+  @keyframes ball-x {
+    0%, 100% {
+      transform: translate(40px, 80px);
+    }
+    50% {
+      transform: translate(88px, 80px);
+    }
+  }
+
+  /* Ball Y movement */
+  @keyframes ball-y {
+    0%, 50%, 100% {
+      transform: translate(0, 0);
+    }
+    25%, 75% {
+      transform: translate(0, -68px);
+    }
+  }
+
+  /* Paddle X movement */
+  @keyframes paddle-x {
+    0%, 100% {
+      transform: translate(36px, 92px) rotate(6deg);
+    }
+    50% {
+      transform: translate(92px, 92px) rotate(-6deg);
+    }
+  }
+
+  /* Paddle Y movement */
+  @keyframes paddle-y {
+    0%, 50%, 100% {
+      transform: translate(0, 0);
+    }
+    25%, 75% {
+      transform: translate(0, 28px);
+    }
+  }
+
+  .animate-ball-x {
+    animation: ball-x 1.5s linear infinite;
+  }
+
+  .animate-ball-y {
+    animation: ball-y 1.5s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+  }
+
+  .animate-paddle-x {
+    animation: paddle-x 1.5s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+  }
+
+  .animate-paddle-y {
+    animation: paddle-y 1.5s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+  }
 }

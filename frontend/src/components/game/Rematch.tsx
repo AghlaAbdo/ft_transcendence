@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 
 import { socket } from '@/app/(protected)/lib/socket';
 import { useLayout } from '@/context/LayoutContext';
+import { useUser } from '@/context/UserContext';
 
 export default function Rematch({
   rematch,
@@ -21,14 +22,17 @@ export default function Rematch({
   dialogRef: React.RefObject<HTMLDialogElement | null>;
 }) {
   const { setHideHeaderSidebar } = useLayout();
+  const { user } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
+    // console.log('REached Rematch componentn!!');
     socket.on('rematch', () => {
-      console.log('Opponent wants to play again');
+      // console.log('Opponent wants to play again');
       setRematch((prev) => [...prev, 'recived']);
     });
     socket.on('opponentQuit', () => {
-      console.log('Opponent quit!');
+      // console.log('Opponent quit!');
       setRematch((prev) => [...prev, 'rejected']);
     });
     socket.on('playAgain', () => {
@@ -41,15 +45,16 @@ export default function Rematch({
   }, [dialogRef, setHideHeaderSidebar, setRematch]);
 
   const handleRematch = () => {
-    console.log('rematch!!');
+    // console.log('rematch!!');
     setRematch((prev) => [...prev, 'sent']);
-    socket.emit('rematch', gameId, playerRole);
+    socket.emit('rematch', gameId, playerRole, user.id);
   };
 
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
-    socket.emit('quit', gameId);
-    setTimeout(() => redirect('/game'), 1000);
+    // console.log('gameId in handleReturn: ', gameId);
+    socket.emit('quit', { userId: user.id, gameId });
+    setTimeout(() => router.replace('/game'), 1000);
   };
 
   if (rematch.includes('quit')) return <div></div>;

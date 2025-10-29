@@ -31,8 +31,65 @@ export interface IGameState {
 }
 
 export interface IPlayer {
+  id: string;
   username: string;
   avatar: string;
   frame: string;
   level: string;
+  isEliminated: boolean;
+}
+
+export interface UserInfo {
+  id: string;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  isAccountVerified: boolean;
+}
+
+export interface TournamentDetails {
+  id: string;
+  name: string;
+  winner: IPlayer;
+  status: 'waiting' | 'live' | 'completed';
+  maxPlayers: number;
+  players: IPlayer[];
+  bracket: IRound[];
+}
+
+export interface ITournament {
+  id: string;
+  name: string;
+  creatorId: string;
+  creatorUsername: string;
+  status: 'waiting' | 'live' | 'completed';
+  maxPlayers: number;
+  players: Map<string, IPlayer>;
+  bracket: IRound[];
+}
+
+export interface TournamentListItem {
+  id: string;
+  name: string;
+  maxPlayers: number;
+  currentPlayers: number;
+  status: string;
+  creatorUsername?: string;
+}
+
+export interface IMatch {
+  id: string;
+  round: number;
+  player1Id: string | null;
+  player2Id: string | null;
+  gameId: string | null;
+  winnerId: string | null;
+  nextMatchId: string | null;
+  nextMatchSlot: 'player1Id' | 'player2Id' | null;
+  status: 'pending' | 'ready' | 'playing' | 'completed';
+}
+
+export interface IRound {
+  roundNumber: number;
+  matches: IMatch[];
 }

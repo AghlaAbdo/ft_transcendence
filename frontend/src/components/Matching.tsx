@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 
@@ -23,10 +23,12 @@ export default function Matching({
   opponent: null | IPlayer;
   gameId: string;
 }) {
+  const router = useRouter();
+
   function handleCancel() {
     if (!opponent) {
-      socket.emit('cancelMatching', gameId);
-      redirect('/game');
+      socket.emit('cancelMatching', {userId: player.id, gameId});
+      router.push('/game');
     }
   }
   return (
@@ -78,6 +80,7 @@ export default function Matching({
                 duration: 1,
                 scale: { type: 'spring', bounce: 0.5, duration: 1 },
               }}
+              className='w-full'
             >
               <Avatar
                 width={192}
