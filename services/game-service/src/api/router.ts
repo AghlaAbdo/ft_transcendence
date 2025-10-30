@@ -6,8 +6,6 @@ export interface WeekStats {
   games_played: number;
 }
 
-
-
 export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   fastify.get('/matches', async (req, reply) => {
     const db: DatabaseType = (fastify as any).db;
@@ -36,12 +34,16 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
         return reply.status(400).send({ error: 'Invalid user ID format' });
       }
 
-      const games = db.prepare(`
+      const games = db
+        .prepare(
+          `
         SELECT played_at, player1_id, player2_id, 'local' as type, player1_score, player2_score, winner_id 
         FROM game 
         WHERE player1_id = ? OR player2_id = ?
         ORDER BY played_at DESC
-      `).all(userIdNumber, userIdNumber);
+      `,
+        )
+        .all(userIdNumber, userIdNumber);
 
       return { games };
     } catch (error) {
@@ -64,10 +66,14 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
         return reply.status(400).send({ error: 'Invalid user ID format' });
       }
 
-      const stats = db.prepare(`
+      const stats = db
+        .prepare(
+          `
           select sum(play_time) as total_play_time, avg(play_time) as avg_play_time, max(play_time) as longest_play_time
           from game where player1_id = ? or player2_id = ?
-      `).get(userIdNumber, userIdNumber);
+      `,
+        )
+        .get(userIdNumber, userIdNumber);
 
       return { stats };
     } catch (error) {
@@ -100,10 +106,18 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       const quarterSize = Math.ceil(daysInMonth / 4);
       const weeks = [
         { week: 1, start: 1, end: Math.min(quarterSize, daysInMonth) },
-        { week: 2, start: quarterSize + 1, end: Math.min(quarterSize * 2, daysInMonth) },
-        { week: 3, start: quarterSize * 2 + 1, end: Math.min(quarterSize * 3, daysInMonth) },
-        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth }
-      ].filter(w => w.start <= daysInMonth);
+        {
+          week: 2,
+          start: quarterSize + 1,
+          end: Math.min(quarterSize * 2, daysInMonth),
+        },
+        {
+          week: 3,
+          start: quarterSize * 2 + 1,
+          end: Math.min(quarterSize * 3, daysInMonth),
+        },
+        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth },
+      ].filter((w) => w.start <= daysInMonth);
 
       const stmt = db.prepare(`
         SELECT
@@ -123,20 +137,28 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       `);
 
       const dbResults = stmt.all(
-        weeks[0].start, weeks[0].end,
-        weeks[1]?.start || 32, weeks[1]?.end || 32,
-        weeks[2]?.start || 32, weeks[2]?.end || 32,
-        weeks[3]?.start || 32, weeks[3]?.end || 32,
-        userIdNumber, userIdNumber, `${year}-${String(month + 1).padStart(2, '0')}`
+        weeks[0].start,
+        weeks[0].end,
+        weeks[1]?.start || 32,
+        weeks[1]?.end || 32,
+        weeks[2]?.start || 32,
+        weeks[2]?.end || 32,
+        weeks[3]?.start || 32,
+        weeks[3]?.end || 32,
+        userIdNumber,
+        userIdNumber,
+        `${year}-${String(month + 1).padStart(2, '0')}`,
       ) as WeekStats[];
 
-      const stats = [1, 2, 3, 4].map(weekNum => {
-        const found = dbResults.find(r => r.week_number === weekNum);
-        const weekInfo = weeks.find(w => w.week === weekNum);
+      const stats = [1, 2, 3, 4].map((weekNum) => {
+        const found = dbResults.find((r) => r.week_number === weekNum);
+        const weekInfo = weeks.find((w) => w.week === weekNum);
         return {
           week: weekNum,
           games_played: found ? found.games_played : 0,
-          range: weekInfo ? `${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.start).padStart(2, '0')} to ${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.end).padStart(2, '0')}` : null
+          range: weekInfo
+            ? `${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.start).padStart(2, '0')} to ${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.end).padStart(2, '0')}`
+            : null,
         };
       });
 

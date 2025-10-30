@@ -130,7 +130,7 @@ export async function handlePlay(socket: Socket, userId: string) {
 
   // console.log('lobyGAme in handlePlay: ', allGames.lobyGame);
   if (!allGames.lobyGame) {
-    console.log("--------- First Player Create a game");
+    console.log('--------- First Player Create a game');
     const gameId = crypto.randomUUID();
     setUserActiveGame(userId, gameId);
     allGames.games[gameId] = generateGameState(gameId, user, null, null, null);
@@ -251,7 +251,11 @@ export async function handleRematch(
   socket.to(gameId).emit('rematch');
 }
 
-export function handleQuit(data: { userId: string; gameId: string }): void {
+export function handleQuit(data: {
+  userId: string;
+  gameId: string;
+  opponentId?: string;
+}): void {
   // console.log('revived quit event!!, data: ', data);
   if (!data.gameId) {
     console.log('gameId is Null');
@@ -259,16 +263,21 @@ export function handleQuit(data: { userId: string; gameId: string }): void {
   }
   // console.log('gameId in handleQuit: ', data.gameId);
   const gameState = getGameState(data.gameId);
-  if (!gameState) return;
-  const opponentId =
-    data.userId === gameState.player1.id
-      ? gameState.player2.id
-      : gameState.player1.id;
-  const opponentSocketId = getUserSocketId(opponentId!);
+  let opponentId: string | null = null;
+  if (gameState) {
+    opponentId =
+      data.userId === gameState.player1.id
+        ? gameState.player2.id
+        : gameState.player1.id;
+  } else if (data.opponentId) opponentId = data.opponentId;
+  const opponentSocketId = getUserSocketId(opponentId || '');
   if (opponentSocketId)
     ioInstance
       .to(opponentSocketId)
       .emit('opponentQuit', gameState ? gameState.game.status : null);
+  if (!gameState) {
+    return;
+  }
   if (gameState && gameState.game.status === 'playing') {
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
