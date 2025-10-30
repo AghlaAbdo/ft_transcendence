@@ -1,32 +1,22 @@
 import { useEffect, useState } from 'react';
-
 import { Loader2, Search, UserPlus, X } from 'lucide-react';
-
 import { User, useAuth } from '@/hooks/useAuth';
-
 import FriendCard from './FriendCard';
 
 interface FriendListProps {
   onClose: () => void;
-  onchatselected: (friendid: number) => void;
-}
-
-interface Friend {
-  id: number;
-  username: string;
-  online_status: 0 | 1 | 2;
-  avatar_url: string;
+  onchatselected: (friendid: number, selectedFriend?:User) => void;
 }
 
 export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [latestfriends, setlatestFriends] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<User[]>([]);
+  const [latestfriends, setlatestFriends] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +28,7 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
         });
         const data = await response.json();
         if (response.ok && data.status) {
+          
           setFriends(data.friends);
           setlatestFriends(data.friends);
         }
@@ -50,11 +41,11 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
     fetchFriends();
   }, []);
 
-  const handleFriendSelect = async (friendId: number) => {
+  const handleFriendSelect = async (selectedFriend: User) => {
     if (!user) return;
     try {
       const fetchChatExistense = await fetch(
-        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${friendId}`
+        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${selectedFriend.id}`
       );
       const data = await fetchChatExistense.json();
       if (data.exists) {
@@ -62,7 +53,7 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
         onchatselected(data.chat_id);
       } else {
         console.log('user its not there');
-        onchatselected(-1);
+        onchatselected(-1, selectedFriend);
       }
       onClose();
     } catch {
@@ -165,7 +156,7 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
                 <button
                   onClick={() => {
                     onClose();
-                    handleFriendSelect(user.id);
+                    handleFriendSelect(user);
                   }}
                   className='w-full cursor-pointer'
                 >
@@ -186,7 +177,7 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
                 <button
                   onClick={() => {
                     onClose();
-                    handleFriendSelect(user.id);
+                    handleFriendSelect(user);
                   }}
                   className='w-full cursor-pointer'
                 >

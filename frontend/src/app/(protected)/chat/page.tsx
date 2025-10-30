@@ -43,21 +43,20 @@ export default function ChatPage() {
 
   useEffect(() => {
     const fetchingmessages = async () => {
-      if (user && selectedChatId) {
+      if (user && selectedChatId && selectedChatId != -1) {
         try {
-          console.log('chat id: ', selectedChatId);
+          // console.log('chat id: ', selectedChatId);
           const fetchmessage = await fetch(
             `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`
           );
           const data = await fetchmessage.json();
           if (data.status) {
             set_conv(data.messages);
-            console.log('messages are there: ', data.messages);
+            // console.log('messages are there: ', data.messages);
             const otherId =
               data.messages[0].sender === user.id
                 ? data.messages[0].receiver
                 : data.messages[0].sender;
-
             if (otherId) {
               const userResponse = await fetch(
                 `https://localhost:8080/api/users/${otherId}`
@@ -65,8 +64,6 @@ export default function ChatPage() {
               const userData = await userResponse.json();
               setOtherUser(userData.user);
             }
-          } else {
-            console.log('no messages');
           }
         } catch (error) {
           console.error('failed because of: ', error);
@@ -77,16 +74,17 @@ export default function ChatPage() {
   }, [selectedChatId]);
   const socketRef = useRef<Socket | null>(null);
   const handleSendMessage = (messageContent: string) => {
-    if (socketRef.current && selectedChatId && messageContent.trim() && user) {
+    if (socketRef.current && selectedChatId && messageContent.trim() && user && otherUser) {
+      // console.log('allllllo');
       socketRef.current.emit('ChatMessage', {
         chatId: selectedChatId,
         message: messageContent,
         sender: user.id,
-        receiver: UserId_2,
+        receiver: otherUser.id,
       });
     }
   };
-  const [UserId_2, SetUser_2] = useState<number | null>(null); // second user which is the receiver
+  const [UserId_2, SetUser_2] = useState<number | null>(null); //second user which is the receiver
   useEffect(() => {
     if (!user) return;
     const socket = io(`wss://localhost:8080`, {
@@ -95,7 +93,11 @@ export default function ChatPage() {
     });
     socketRef.current = socket;
     socket.on('ChatMessage', (data) => {
-      console.log('a message has arrives');
+      // console.log('a message has arrives to:,  ', selectedChatId); 
+      if ((selectedChatId === -1  || !selectedChatId) && data.chat_id) {
+        // console.log('chat id is -1');
+        setSelectedChatId(data.chat_id);
+      }
       set_conv((prevMessages) => [...prevMessages, data]);
     });
     return () => {
@@ -104,7 +106,11 @@ export default function ChatPage() {
   }, [user]);
 
   // Navigation handlers
-  const handleChatSelect = (chatId: number) => {
+  const handleChatSelect = (chatId: number, selectedFriend?: User) => {
+    if (selectedFriend) {
+      // console.log('haaa user comes from there');
+      setOtherUser(selectedFriend)
+    }
     setSelectedChatId(chatId);
     if (isMobile) {
       setShowChatList(false);

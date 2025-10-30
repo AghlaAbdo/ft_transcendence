@@ -36,7 +36,7 @@ interface Friend {
 }
 
 interface ChatlistProps {
-  onSelect: (chatId: number) => void;
+  onSelect: (chatId: number, selectedFriend?:User) => void;
   onReceiveChange: (userId_2: number) => void;
   selectedChatId: number | null;
   userId: number | null;

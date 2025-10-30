@@ -11,10 +11,9 @@ declare module "socket.io" {
 }
 
 const fastify = Fastify();
-
+// adding plugins 
 await fastify.register(cors, { origin: "*" });
 await fastify.register(dbPlugin as any);
-
 await fastify.register(chatsRoutes as any);
 
 fastify.setErrorHandler((error, request, reply) => {
@@ -24,7 +23,6 @@ fastify.setErrorHandler((error, request, reply) => {
     message: error.message,
   });
 });
-
 
 const start = async () => {
   try {

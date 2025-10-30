@@ -4,9 +4,7 @@ CREATE TABLE IF NOT EXISTS chats (
     sender INTEGER NOT NULL,
     receiver INTEGER NOT NULL,
     last_message_content TEXT NOT NULL,
-    last_message_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_message_id INTEGER,
-    FOREIGN KEY (last_message_id) REFERENCES messages(id) ON DELETE SET NULL
+    last_message_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create messages table

@@ -23,6 +23,19 @@ export function getMessage(db: Database.Database, MessageId: number) {
   return stmt.get(MessageId);
 }
 
+export function create_new_chat(
+  db: Database.Database,
+  sender: number,
+  receiver: number,
+  message: string,
+): number {
+  const stmt = db.prepare(
+    `INSERT INTO chats (sender, receiver, last_message_content) VALUES (?, ?, ?)`
+  );
+  const result = stmt.run(sender, receiver, message);
+  return result.lastInsertRowid as number;
+}
+
 export function insert_message(db: Database.Database, chat_id: number, sender: number, receiver: number, content: string) {
   const updateChatStmt = db.prepare(`
     UPDATE chats

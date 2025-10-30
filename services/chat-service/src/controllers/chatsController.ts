@@ -2,6 +2,7 @@ import {
   getMessages,
   insert_message,
   getMessage,
+  create_new_chat,
 } from "../database/conversations.js";
 import { getChats } from "../database/chats.js";
 
@@ -30,6 +31,21 @@ export async function getMessagesHandler(req: any, reply: any) {
     return reply.status(500).send({ error: "Failed to fetch messages" });
   }
 }
+
+// export async function first_message(req: ) {
+
+//   try {
+//     const db = req.server.db;
+//     if (!db)
+//     {
+//       console.error("db plugin not available");
+//       return rep.status(500).send({error: "database not initialized"})
+//     }
+//     return create_new_chat(db,)
+//   } catch {
+
+//   }
+// }
 
 export async function getMessageHandler(req: any, reply: any) {
   const messageId = parseInt((req.params as any).messageId);
