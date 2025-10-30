@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Plus, Search } from 'lucide-react';
 
-import { User } from '@/hooks/useAuth';
+import { User, useAuth } from '@/hooks/useAuth';
 
 import { Search_Input } from './Search_Input';
 import { NoChats } from './noChats';
@@ -36,7 +36,7 @@ interface Friend {
 }
 
 interface ChatlistProps {
-  onSelect: (chatId: number, selectedFriend?:User) => void;
+  onSelect: (chatId: number, selectedFriend?:Friend) => void;
   onReceiveChange: (userId_2: number) => void;
   selectedChatId: number | null;
   userId: number | null;
@@ -55,6 +55,7 @@ export const Chatlist = ({
   const [loading, setLoading] = useState(true);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
 
+  const {user} = useAuth();
   useEffect(() =>{
     if (!showFriendsModal)
         return;
@@ -181,7 +182,7 @@ export const Chatlist = ({
            className="bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg"
            onClick={(e) => e.stopPropagation()}
          >
-           <FriendList onchatselected={onSelect} onClose={() => {setShowFriendsModal(false)}} />
+           <FriendList user={user} onchatselected={onSelect} onClose={() => {setShowFriendsModal(false)}} />
          </div>
        </div>
      )}

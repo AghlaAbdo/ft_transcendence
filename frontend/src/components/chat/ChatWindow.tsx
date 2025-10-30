@@ -14,11 +14,18 @@ interface Message {
   created_at: string;
 }
 
+interface Friend {
+  id: number,
+  username: string,
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
+}
+
 interface ChatWindowProps {
   SelectedChatId: number | null;
   userId: number | null;
   conv: Message[];
-  other_User: User | null;
+  other_User: Friend | null;
   onBackClick?: () => void;
   showBackButton?: boolean;
 }

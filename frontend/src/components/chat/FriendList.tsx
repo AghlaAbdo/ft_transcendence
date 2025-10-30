@@ -1,34 +1,47 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Search, UserPlus, X } from 'lucide-react';
-import { User, useAuth } from '@/hooks/useAuth';
+import { User } from '@/hooks/useAuth';
 import FriendCard from './FriendCard';
 
 interface FriendListProps {
+  user: User | null;
   onClose: () => void;
-  onchatselected: (friendid: number, selectedFriend?:User) => void;
+  onchatselected: (friendid: number, selectedFriend?:Friend) => void;
 }
 
-export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
+interface Friend {
+  id: number,
+  username: string,
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
+}
+
+export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
-  const [friends, setFriends] = useState<User[]>([]);
-  const [latestfriends, setlatestFriends] = useState<User[]>([]);
+  // const { user } = useAuth();
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [latestfriends, setlatestFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
+    if (!user)
+        return ; 
+    console.log('allllo');
     const fetchFriends = async () => {
+      console.log('allllo second');
       try {
-        const response = await fetch('https://localhost:8080/api/friends/', {
+        const response = await fetch(`https://localhost:8080/api/friends/${user.id}`, {
           method: 'GET',
           credentials: 'include',
         });
         const data = await response.json();
-        if (response.ok && data.status) {
-          
+        
+        console.log('friends: ', data);
+        if (data.status) {
           setFriends(data.friends);
           setlatestFriends(data.friends);
         }
@@ -41,8 +54,9 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
     fetchFriends();
   }, []);
 
-  const handleFriendSelect = async (selectedFriend: User) => {
-    if (!user) return;
+  const handleFriendSelect = async (selectedFriend: Friend
+  ) => {
+    if (!user || !selectedFriend) return;
     try {
       const fetchChatExistense = await fetch(
         `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${selectedFriend.id}`
@@ -67,14 +81,16 @@ export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
         friends.filter(
           (_user) =>
             _user.id !== user.id &&
-            _user.username.toLowerCase().includes(searchTerm.toLowerCase())
+          _user.username.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     } else {
       setFilteredUsers([]);
     }
   }, [searchTerm, users, user]);
-
+  if (!user) 
+      return <div>Loading</div>;
+  
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
       {/* search Header */}

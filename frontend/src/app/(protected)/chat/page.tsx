@@ -22,13 +22,20 @@ interface conversation {
   created_at: string;
 }
 
+interface Friend {
+  id: number,
+  username: string,
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
+}
+
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [showChatList, setShowChatList] = useState(true);
-  const [otherUser, setOtherUser] = useState<User | null>(null);
+  const [otherUser, setOtherUser] = useState<Friend | null>(null);
 
   // Mobile detection
   useEffect(() => {
@@ -106,7 +113,7 @@ export default function ChatPage() {
   }, [user]);
 
   // Navigation handlers
-  const handleChatSelect = (chatId: number, selectedFriend?: User) => {
+  const handleChatSelect = (chatId: number, selectedFriend?: Friend) => {
     if (selectedFriend) {
       // console.log('haaa user comes from there');
       setOtherUser(selectedFriend)

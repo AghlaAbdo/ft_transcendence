@@ -10,8 +10,17 @@ import { useSocketStore } from '@/store/useNotificationSocket';
 //   avatar_url: string;
 // };
 type UserCardProps = {
-  _user: User;
+  _user: Friend;
 };
+
+
+interface Friend {
+  id: number,
+  username: string,
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
+}
+
 
 export default function FriendCard({ _user }: UserCardProps) {
   return (

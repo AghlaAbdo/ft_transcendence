@@ -4,7 +4,15 @@ import {toast}  from "sonner"
 import { User } from '@/hooks/useAuth';
 type chat_options_props = {
   onClose: () => void;
-  _other_user: User;
+  _other_user: Friend;
+}
+
+
+interface Friend {
+  id: number,
+  username: string,
+  online_status: 0 | 1 | 2;
+  avatar_url: string;
 }
 
 const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
