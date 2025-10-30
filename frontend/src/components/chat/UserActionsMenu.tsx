@@ -1,16 +1,17 @@
 import { Eye, Gamepad2, Ban, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {toast}  from "sonner"
+import { User } from '@/hooks/useAuth';
 type chat_options_props = {
   onClose: () => void;
+  _other_user: User;
 }
 
-const UserActionsMenu = ({ onClose }: chat_options_props) => {
-  
-  const handleViewProfile = () => {
-    console.log('View profile clicked');
-    onClose();
-    // Add your profile viewing logic here
-  };
+const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
+  const router = useRouter();
+  const handleViewProfile = (id: number) => {
+    router.push(`/profile/${id}`);
+  }
 
   const handleInviteToGame = () => {
     console.log('Invite to game clicked');
@@ -32,8 +33,12 @@ const UserActionsMenu = ({ onClose }: chat_options_props) => {
       <div>
         {/* View Profile */}
         <button
-          onClick={() => toast.success("Data saved successfully!")}
-          className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-800 hover:text-white transition-all duration-200 group"
+          onClick={() => {
+            handleViewProfile(_other_user.id)
+            onClose()
+          }
+          }
+          className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-700 hover:text-white transition-all duration-200 group"
         >
           <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400 group-hover:bg-purple-500/30 transition-colors duration-200">
             <Eye className="w-5 h-5" />
@@ -44,7 +49,7 @@ const UserActionsMenu = ({ onClose }: chat_options_props) => {
         {/* Invite to Game */}
         <button
           onClick={handleInviteToGame}
-          className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-800 hover:text-white transition-all duration-200 group"
+          className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-700 hover:text-white transition-all duration-200 group"
         >
           <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400 group-hover:bg-purple-500/30 transition-colors duration-200">
             <Gamepad2 className="w-5 h-5" />

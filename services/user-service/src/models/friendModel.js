@@ -28,8 +28,6 @@ const getPendingRequests = (db, userID) => {
     return db.prepare(query).all(userID);
 }
 
-
-
 const sendFriendRequest = (db, { user_id, friend_id }) => {
     if (user_id === friend_id) {
         throw new Error("You cannot send a friend request to yourself.");

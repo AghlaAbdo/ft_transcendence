@@ -3,17 +3,10 @@
 import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
-
 import { motion } from 'framer-motion';
-import { User } from 'lucide-react';
-
 import useConnectSocket from '@/lib/useConnectSocket';
-
-import avatar from '@/../public/avatars/avatar1.png';
-// import { useLayout } from '@/context/LayoutContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationStore } from '@/store/useNotificationStore';
-
 import { GlobalSearch } from './global_search';
 import { markAllNotificationsAsRead_friend } from './markAsRead';
 import NotificationCenter from './notifications';
@@ -25,7 +18,6 @@ export default function Header() {
   const [isopen, setopen] = useState<boolean>(false);
   const [not_isopen, set_notopen] = useState<boolean>(false);
   const { unreadCount } = useNotificationStore();
-
 
   useConnectSocket();
   useEffect(() => {

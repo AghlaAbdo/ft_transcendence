@@ -10,7 +10,6 @@ import { User } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 const ProfilePage = () => {
-
   const { id } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,11 +20,10 @@ const ProfilePage = () => {
     const fetchUserById = async () => {
       try {
         if (!id) 
-          return;
+          return; 
         const response = await fetch(`https://localhost:8080/api/users/${id}`, {
           credentials: "include"
         });
-
         const data: {status: string, user: User, message: string} = await response.json();
 
         if (response.ok && data.status) {
@@ -39,7 +37,6 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
-
     fetchUserById();
   }, [id]);
 

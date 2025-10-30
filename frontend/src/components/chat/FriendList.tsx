@@ -1,51 +1,70 @@
-
 import { useEffect, useState } from 'react';
-import { Eye, Loader2, Search, UserPlus, X } from 'lucide-react';
+import { Loader2, Search, UserPlus, X } from 'lucide-react';
 import { User, useAuth } from '@/hooks/useAuth';
-import UserCard from './User_card';
+import FriendCard from './FriendCard';
 
-interface GlobalSearchProps {
+interface FriendListProps {
   onClose: () => void;
+  onchatselected: (friendid: number, selectedFriend?:User) => void;
 }
 
-export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
+export const FriendList = ({ onClose, onchatselected }: FriendListProps) => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const [friends, setFriends] = useState<User[]>([]);
+  const [latestfriends, setlatestFriends] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      setError(null);
+    const fetchFriends = async () => {
       try {
-        const response = await fetch(`https://localhost:8080/api/users`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch('https://localhost:8080/api/friends/', {
+          method: 'GET',
+          credentials: 'include',
+        });
         const data = await response.json();
-        if (data.status) {
-          setUsers(data.users);
-        } else {
-          setError('Failed to load users');
+        if (response.ok && data.status) {
+          
+          setFriends(data.friends);
+          setlatestFriends(data.friends);
         }
       } catch (err) {
-        setError('Network error. Please try again.');
-        console.error('API Error:', err);
+        console.error('Error fetching friends:', err);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    fetchUsers();
+    fetchFriends();
   }, []);
 
-  // Filter users based on search term
+  const handleFriendSelect = async (selectedFriend: User) => {
+    if (!user) return;
+    try {
+      const fetchChatExistense = await fetch(
+        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${selectedFriend.id}`
+      );
+      const data = await fetchChatExistense.json();
+      if (data.exists) {
+        console.log('user is there');
+        onchatselected(data.chat_id);
+      } else {
+        console.log('user its not there');
+        onchatselected(-1, selectedFriend);
+      }
+      onClose();
+    } catch {
+      console.error('Failed to check chat:', error);
+    }
+  };
+
   useEffect(() => {
-    if (searchTerm && searchTerm.trim() && user) {
+    if (searchTerm && searchTerm.trim() && user && friends) {
       setFilteredUsers(
-        users.filter(
+        friends.filter(
           (_user) =>
             _user.id !== user.id &&
             _user.username.toLowerCase().includes(searchTerm.toLowerCase())
@@ -58,7 +77,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
 
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
-      {/* Search Header */}
+      {/* search Header */}
       <div className='flex items-center justify-between px-5 py-1'>
         <h2 className='text-xl font-medium text-white'>Search Users</h2>
         <button
@@ -80,7 +99,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder='Search username...'
             className='w-full py-2 pl-11 pr-4 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 z-[1]'
-            autoFocus
+            autoFocus // remember to put this in the global search also in the
           />
           {searchTerm && (
             <button
@@ -128,26 +147,42 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         )}
 
         {!isLoading && !error && !searchTerm && (
-          <div className='flex items-center justify-center py-12'>
-            <div className='text-center'>
-              <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center'>
-                <Search className='w-8 h-8 text-gray-500' />
+          <div className='mt-3 space-y-1 max-h-64 '>
+            {latestfriends.map((user) => (
+              <div
+                key={user.id}
+                className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
+              >
+                <button
+                  onClick={() => {
+                    onClose();
+                    handleFriendSelect(user);
+                  }}
+                  className='w-full cursor-pointer'
+                >
+                  <FriendCard _user={user} />
+                </button>
               </div>
-              <p className='text-gray-400 text-sm'>
-                Start typing to search for users
-              </p>
-            </div>
+            ))}
           </div>
         )}
 
-        {!isLoading && !error && filteredUsers.length > 0 && (
+        {!isLoading && !error && searchTerm && (
           <div className='mt-3 space-y-1 max-h-64 '>
             {filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className='animate-in fade-in slide-in-from-bottom-2 duration-200'
+                className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
               >
-                <UserCard _user={user} onClose={onClose} />
+                <button
+                  onClick={() => {
+                    onClose();
+                    handleFriendSelect(user);
+                  }}
+                  className='w-full cursor-pointer'
+                >
+                  <FriendCard _user={user} />
+                </button>
               </div>
             ))}
           </div>
