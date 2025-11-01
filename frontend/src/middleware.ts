@@ -4,7 +4,14 @@ import { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
  
 
-const publicAuthRoutes = ["/login", "/signup"];
+const publicAuthRoutes = [
+    "/login", 
+    "/signup",
+    '/forgotPassword',
+    '/resetPassword',
+    '/verifyEmail',
+    '/check-email',
+];
 const protectedRoutes = ["/home", "/profile", "/game", "/chat", "/settings"];
 
 const secret = new TextEncoder().encode('pingpongsupersecretkey');
@@ -21,7 +28,6 @@ const SKIP_MIDDLEWARE_ROUTES = [
   "/oauth/",
   "/callback",
   "/success",
-//    "/forgotPassword", "/resetPassword"
 ];
 
 
@@ -31,26 +37,32 @@ export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
 
-    if (matchesRoutes(path, SKIP_MIDDLEWARE_ROUTES)) {
-        return NextResponse.next();
-    }
+    // // Skip API routes, static files, etc.
+    // if (
+    //     path.startsWith('/api') ||
+    //     path.startsWith('/_next') ||
+    //     path.startsWith('/static') ||
+    //     path.includes('.')
+    // ) {
+    //     return NextResponse.next();
+    // }
+
+    // if (matchesRoutes(path, SKIP_MIDDLEWARE_ROUTES)) {
+    //     return NextResponse.next();
+    // }
 
     const tokenCookie = req.cookies.get('token');
     const token = tokenCookie?.value;
     
-    let isValid = false;
+    let isAuthenticated = false;
     
+    if (matchesRoutes(path, publicAuthRoutes) ) {
+        return NextResponse.next();
+    }
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
-            
-            if (payload.isAccountVerified === false) {
-                const response  = NextResponse.redirect(new URL("/login", req.url));
-                response.cookies.delete('token');
-                return response;
-            }
-            
-            isValid = true;
+            isAuthenticated = true;
 
         } catch (error) {
             console.log("Invalid token: ", error);
@@ -61,15 +73,19 @@ export default async function middleware(req: NextRequest) {
     }
     
     // If user has token and tries to access login page
-    // if (isValid && path === '/login') {
+    // if (isAuthenticated && path === '/login') {
     //     return NextResponse.redirect(new URL('/home', req.url));
     // }
         
-    if (!isValid && matchesRoutes(path, protectedRoutes)) {
+    if (!isAuthenticated && matchesRoutes(path, protectedRoutes)) {
         return NextResponse.redirect(new URL('/login', req.url))
     }
 
-    if (isValid && matchesRoutes(path, publicAuthRoutes)) {
+    // if (isAuthenticated && matchesRoutes(path, publicAuthRoutes)) {
+    //     return NextResponse.redirect(new URL('/home', req.url));
+    // }
+
+    if (isAuthenticated && (path === '/login' || path === '/signup')) {
         return NextResponse.redirect(new URL('/home', req.url));
     }
 

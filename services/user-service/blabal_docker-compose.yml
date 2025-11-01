@@ -7,7 +7,8 @@ services:
     image: user-service:v2.0.0
     ports:
       - "5000:3000"
-    # volumes:
+    volumes:
+      - ./uploads:/app/src/uploads
     #   - .:/app
     #   - ./database/user-service.db:/app/database/user-service.db
     env_file:

@@ -98,7 +98,8 @@ const handleGoogleCallback = async (request, reply) => {
                 db.prepare(`
                 UPDATE USERS
                 SET isAccountVerified = 1,
-                    online_status = 1
+                    online_status = 1,
+                    is_google_auth = 1
                 WHERE id = ?
                 `).run(userID);
             }

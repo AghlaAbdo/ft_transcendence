@@ -7,8 +7,11 @@ import authPlugin from './plugins/auth.js';
 import authRoutes from './routes/auth.js';
 import oauthPlugin from './plugins/oauth.js';
 import userRoutes from './routes/users.js';
+import friendRoutes from './routes/friends.js'
 import dotenv from 'dotenv';
-
+import multipart from "@fastify/multipart";
+import fastifyStatic from '@fastify/static';
+import path from "path";
 
 const createApp = () => {
     const fastify = Fastify({
@@ -16,23 +19,17 @@ const createApp = () => {
     });
     
     dotenv.config();
+
+    fastify.register(multipart);
+
     
-    // fastify.register(fastifyCookie);
-    // Session management
-    // fastify.register(fastifyCORS, {
-    //     origin: ['http://localhost:3000'],  // your frontend
-    //     credentials: true
-    // });
+    fastify.register(fastifyStatic, {
+        root: path.join(process.cwd(), 'uploads'),
+        prefix: '/uploads/', // URL prefix
+    });
 
     fastify.register(fastifyCookie);
-    // fastify.register(fastifySession, {
-    //     secret: process.env.SESSION_SECRET,
-    //     cookie: {
-    //     secure: process.env.NODE_ENV === 'production', // HTTPS in production
-    //     httpOnly: true,
-    //     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    //     }
-    // });
+
 
     fastify.register(oauthPlugin, {
         clientId: process.env.GOOGLE_CLIENT_ID,
@@ -45,11 +42,7 @@ const createApp = () => {
 
     fastify.register(authRoutes, { prefix: '/api/auth' });
     fastify.register(userRoutes, { prefix: '/api/users' });
-
-    // Health check
-    fastify.get('/health', async (request, reply) => {
-        reply.send({ status: 'OK', service: 'user-service', timestamp: new Date().toISOString() });
-    });
+    fastify.register(friendRoutes, { prefix: '/api/friends' });
 
     return fastify;
 }

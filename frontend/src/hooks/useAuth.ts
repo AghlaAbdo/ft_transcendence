@@ -3,23 +3,32 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface User {
+export enum OnlineStatus {
+  Offline = 0,
+  Online = 1,
+  InGame = 2
+}
+
+export interface User {
   id: number;
   username: string;
   email: string;
-  avatar_url: string | null;
-  isAccountVerified: boolean;
+  avatar_url: string;
+  isAccountVerified: number;
+  points: number;
+  wins: number;
+  losses: number;
+  rank: number;
+  online_status: number;
 }
 
 
-// Define the API response type
+
 interface AuthResponse {
     status: boolean,
     user: User
 }
 
-
-// Define the return type of the hook
 interface UseAuthReturn {
     user: User | null,
     isLoading: boolean

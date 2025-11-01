@@ -23,17 +23,23 @@ CREATE TABLE IF NOT EXISTS USERS (
     wins INTEGER NOT NULL DEFAULT 0,
     losses INTEGER NOT NULL DEFAULT 0,
     rank INTEGER NOT NULL DEFAULT 0,
+
+    --OAuth 
+    is_google_auth INTEGER DEFAULT 0,
     
     -- Profile info
     location VARCHAR(100),
-    online_status BOOLEAN NOT NULL DEFAULT FALSE,
+    -- online_status BOOLEAN NOT NULL DEFAULT FALSE,
+    online_status INTEGER NOT NULL DEFAULT 0,
+
+    is_2fa_enabled BOOLEAN DEFAULT 0,
+    totp_secret VARCHAR(255),
     
     -- Timestamps
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. FRIENDSHIPS TABLE - Friend system
 
 CREATE TABLE IF NOT EXISTS FRIENDS (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,23 +52,21 @@ CREATE TABLE IF NOT EXISTS FRIENDS (
   UNIQUE(user_id, friend_id)
 );
 
--- db.exec(`
--- CREATE TABLE IF NOT EXISTS user (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     username TEXT UNIQUE,
---     email TEXT UNIQUE,
---     password_hash TEXT,
---     display_name TEXT UNIQUE,
---     avatar_url TEXT DEFAULT 'default_avatar.png',
---     is_oauth BOOLEAN DEFAULT 0,
---     oauth_provider TEXT,
---     oauth_id TEXT,
---     two_factor_secret TEXT,
---     is_2fa_enabled BOOLEAN DEFAULT 0,
---     wins INTEGER DEFAULT 0,
---     losses INTEGER DEFAULT 0,
---     online_status BOOLEAN DEFAULT 0,
---     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
---     UNIQUE(oauth_provider, oauth_id) -- For OAuth users
--- )
--- `);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  actor_id INTEGER,
+  type TEXT NOT NULL CHECK (type IN (
+    'friend_request',
+    'friend_accept',
+    'game_invite',
+    'message',
+    'tournament_invite'
+  )),
+  read INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
