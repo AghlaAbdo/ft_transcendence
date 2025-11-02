@@ -18,7 +18,7 @@ const startMatch = () => {
 function readlineHandler(input: string) {
   if (!rl) return;
   const trimmed = input.trim().toLowerCase();
-//   console.log('trimmed: [',trimmed,']');
+  //   console.log('trimmed: [',trimmed,']');
 
   if (trimmed === 'play' && !playerData.inGame) {
     startMatch();

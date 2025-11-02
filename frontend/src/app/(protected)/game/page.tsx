@@ -45,7 +45,7 @@ export default function GamePage() {
                 </p>
               </div>
               <Link
-                href='#'
+                href='/game/local'
                 className='bg-purple w-fit py-2 px-4 rounded-[8px] self-end font-bold'
               >
                 Play Now

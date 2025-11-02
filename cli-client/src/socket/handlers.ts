@@ -9,7 +9,7 @@ import { renderGame } from '../game/render.js';
 
 export function handleConnect(socket: Socket) {
   if (playerData.user?.id) socket.emit('hello', playerData.user.id);
-  console.log(chalk.yellowBright('Type "play" to start or "exit" to quit.'))
+  console.log(chalk.yellowBright('Type "play" to start or "exit" to quit.'));
 }
 
 export function handlePlayerData(data: {

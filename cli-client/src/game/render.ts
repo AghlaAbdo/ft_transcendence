@@ -1,9 +1,4 @@
-import {
-  GAME_HEIGHT,
-  GAME_WIDTH,
-  TERM_HEIGHT,
-  TERM_WIDTH,
-} from '../config.js';
+import { GAME_HEIGHT, GAME_WIDTH, TERM_HEIGHT, TERM_WIDTH } from '../config.js';
 import { IGameState } from '../interfaces.js';
 import { playerData } from '../main.js';
 
