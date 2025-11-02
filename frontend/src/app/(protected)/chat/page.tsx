@@ -37,7 +37,7 @@ export default function ChatPage() {
   const [showChatList, setShowChatList] = useState(true);
   const [otherUser, setOtherUser] = useState<Friend | null>(null);
 
-  // Mobile detection
+  
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -52,14 +52,12 @@ export default function ChatPage() {
     const fetchingmessages = async () => {
       if (user && selectedChatId && selectedChatId != -1) {
         try {
-          // console.log('chat id: ', selectedChatId);
           const fetchmessage = await fetch(
             `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`
           );
           const data = await fetchmessage.json();
           if (data.status) {
             set_conv(data.messages);
-            // console.log('messages are there: ', data.messages);
             const otherId =
               data.messages[0].sender === user.id
                 ? data.messages[0].receiver
@@ -82,7 +80,6 @@ export default function ChatPage() {
   const socketRef = useRef<Socket | null>(null);
   const handleSendMessage = (messageContent: string) => {
     if (socketRef.current && selectedChatId && messageContent.trim() && user && otherUser) {
-      // console.log('allllllo');
       socketRef.current.emit('ChatMessage', {
         chatId: selectedChatId,
         message: messageContent,
@@ -91,7 +88,7 @@ export default function ChatPage() {
       });
     }
   };
-  const [UserId_2, SetUser_2] = useState<number | null>(null); //second user which is the receiver
+  const [UserId_2, SetUser_2] = useState<number | null>(null);
   useEffect(() => {
     if (!user) return;
     const socket = io(`wss://localhost:8080`, {
@@ -100,9 +97,7 @@ export default function ChatPage() {
     });
     socketRef.current = socket;
     socket.on('ChatMessage', (data) => {
-      // console.log('a message has arrives to:,  ', selectedChatId); 
       if ((selectedChatId === -1  || !selectedChatId) && data.chat_id) {
-        // console.log('chat id is -1');
         setSelectedChatId(data.chat_id);
       }
       set_conv((prevMessages) => [...prevMessages, data]);
@@ -112,10 +107,8 @@ export default function ChatPage() {
     };
   }, [user]);
 
-  // Navigation handlers
   const handleChatSelect = (chatId: number, selectedFriend?: Friend) => {
     if (selectedFriend) {
-      // console.log('haaa user comes from there');
       setOtherUser(selectedFriend)
     }
     setSelectedChatId(chatId);
@@ -138,7 +131,6 @@ export default function ChatPage() {
 
   return (
     <div className='h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2'>
-      {/*big screens  */}
       {!isMobile ? (
         <>
           <Chatlist
@@ -164,7 +156,6 @@ export default function ChatPage() {
           </div>
         </>
       ) : (
-        /*mobile */
         <>
           {showChatList ? (
             <div className='w-full '>

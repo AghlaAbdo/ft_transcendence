@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Loader2, Search, UserPlus, X } from 'lucide-react';
 import { User } from '@/hooks/useAuth';
 import FriendCard from './FriendCard';
+import { useDebounce } from 'use-debounce';
 
 interface FriendListProps {
   user: User | null;
@@ -20,30 +21,28 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // const { user } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [latestfriends, setlatestFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     if (!user)
-        return ; 
-    console.log('allllo');
+        return ;
     const fetchFriends = async () => {
-      console.log('allllo second');
       try {
         const response = await fetch(`https://localhost:8080/api/friends/${user.id}`, {
           method: 'GET',
           credentials: 'include',
         });
         const data = await response.json();
-        
         console.log('friends: ', data);
         if (data.status) {
+          console.log('friends: ', data.friends);
           setFriends(data.friends);
-          setlatestFriends(data.friends);
+          // setlatestFriends(data.friends);
         }
       } catch (err) {
         console.error('Error fetching friends:', err);
@@ -52,7 +51,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
       }
     };
     fetchFriends();
-  }, []);
+  }, [debouncedSearchTerm, friends, user]);
 
   const handleFriendSelect = async (selectedFriend: Friend
   ) => {
@@ -66,7 +65,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
         console.log('user is there');
         onchatselected(data.chat_id);
       } else {
-        console.log('user its not there');
+        console.log('user its not there');​
         onchatselected(-1, selectedFriend);
       }
       onClose();
@@ -76,6 +75,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
   };
 
   useEffect(() => {
+    console.log('filter trigerd');
     if (searchTerm && searchTerm.trim() && user && friends) {
       setFilteredUsers(
         friends.filter(
@@ -89,13 +89,12 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     }
   }, [searchTerm, users, user]);
   if (!user) 
-      return <div>Loading</div>;
-  
+      return <div className='flex justify-center items-center text-white h-screens'>Loading</div>;
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
       {/* search Header */}
       <div className='flex items-center justify-between px-5 py-1'>
-        <h2 className='text-xl font-medium text-white'>Search Users</h2>
+        <h2 className='text-xl font-medium text-white'>Search Friends</h2>
         <button
           onClick={onClose}
           className='text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200'
@@ -113,7 +112,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
             type='text'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder='Search username...'
+            placeholder='username...'
             className='w-full py-2 pl-11 pr-4 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 z-[1]'
             autoFocus // remember to put this in the global search also in the
           />

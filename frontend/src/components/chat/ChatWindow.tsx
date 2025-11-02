@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useLayoutEffect} from 'react';
 import { MoreVertical } from 'lucide-react';
-import { User } from '@/hooks/useAuth';
 import UserActionsMenu from './UserActionsMenu';
 
 interface Message {
@@ -38,13 +37,17 @@ export const ChatWindow = ({
   onBackClick,
   showBackButton = false
 }: ChatWindowProps) => {
-  const [chat_options, setoptions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView();
-  }, [conv, SelectedChatId]);
+ useEffect(() => {
+    const time = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+    },50);
+    return () => clearTimeout(time);
+}, [conv, SelectedChatId]);
+const [open, setopen] = useState(false);
 
-  const [open, setopen] = useState(false);
+  if (SelectedChatId && conv.length === 0)
+    return <div className='flex justify-center items-center text-white h-screens'>Loading Messages ...</div>
   return (
     <>
       <div className='flex-1 flex flex-col min-h-0'>
@@ -54,7 +57,7 @@ export const ChatWindow = ({
               {showBackButton && (
                 <button
                   onClick={onBackClick}
-                  className='mr-3 text-white hover:text-gray-300 transition-colors duration-200'
+                  className='mr-3 text-white hover:text-gray-300'
                 >
                   <svg
                     width='20'
@@ -97,7 +100,6 @@ export const ChatWindow = ({
                     <button
                       className='cursor-pointer'
                       onClick={() => {
-                        setoptions(true);
                       }}
                     >
                       <MoreVertical onClick={() => setopen(true)} />
@@ -106,13 +108,13 @@ export const ChatWindow = ({
                 </div>
               </div>
             </div>
-            <div className='flex-1 p-3 overflow-y-auto scroll-smooth scrollbar-none [&::-webkit-scrollbar]:hidden'>
+            <div className='flex-1 p-3 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden'>
               {conv
                 .filter((msg) => msg.chat_id === SelectedChatId)
                 .map((msg) => {
                   const isOwn = msg.sender === userId;
                   return (
-                    <div key={msg.id}>
+                    <div  key={msg.id}>
                       <div
                         className={`flex flex-col ${
                           isOwn ? 'items-end' : 'items-start'
@@ -140,7 +142,7 @@ export const ChatWindow = ({
                     </div>
                   );
                 })}
-              <div ref={messagesEndRef} />
+                { <div  ref={messagesEndRef}/>}
             </div>
           </>
         ) : (

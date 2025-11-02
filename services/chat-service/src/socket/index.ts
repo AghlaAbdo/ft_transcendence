@@ -7,11 +7,10 @@ declare module "socket.io" {
   }
 }
 
-const onlineUsers: Map<number, Socket> = new Map();
-// const onlineUsers: Map<number, Set<Socket>> = new Map();
+const onlineUsers: Map<number, Set<Socket>> = new Map();
 export function initSocket(server: any, db: Database.Database) {
   const handleConnection = (socket: Socket) => {
-    ;
+
     const user__id = parseInt(
       (socket.handshake).auth?.user_id ||
       (socket.handshake.query.user_id as string) ||
@@ -22,21 +21,21 @@ export function initSocket(server: any, db: Database.Database) {
       console.log("Invalid user ID — disconnecting socket");
       return socket.disconnect();
     }
-
     socket.userId = user__id;
-    onlineUsers.set(user__id, socket);
-    console.log("user connected:", user__id);
-
-    /* ----------------------- chat Message Event ----------------------- */
+    if (!onlineUsers.has(user__id)) {
+      onlineUsers.set(user__id, new Set());
+    }
+    onlineUsers.get(user__id)!.add(socket);
+    /* ----------------------- chat message event ----------------------- */
     socket.on("ChatMessage", async (data: any) => {
       try {
         const { chatId, sender, receiver, message } = data;
         if (!sender || !receiver || !message) return;
         console.log('data: ', data);
-        
+
         let actualChatId = chatId;
         console.log('in socket handler: ', message);
-        
+
         // If chatId is -1, create new chat (no need to check if exists)
         if (chatId === -1) {
           console.log(`Creating new chat between ${sender} and ${receiver}`);
@@ -49,9 +48,18 @@ export function initSocket(server: any, db: Database.Database) {
           return socket.emit("error", { message: "Failed to insert message" });
         }
 
-        socket.emit("ChatMessage", newMessage);
-        const receiverSocket = onlineUsers.get(receiver);
-        if (receiverSocket) receiverSocket.emit("ChatMessage", newMessage);
+        const sendersockets = onlineUsers.get(sender);
+        if (sendersockets) {
+          sendersockets.forEach((s)=>{
+            s.emit("ChatMessage", newMessage);
+          })
+        }
+        const receiverSockets = onlineUsers.get(receiver);
+        if (receiverSockets) {
+          receiverSockets.forEach((receiversocket) =>{
+            receiversocket.emit("ChatMessage", newMessage);
+          })
+        }
       } catch (err) {
         console.error("ChatMessage error:", err);
         socket.emit("error", { message: "Failed to send message" });
@@ -62,8 +70,14 @@ export function initSocket(server: any, db: Database.Database) {
 
     socket.on("disconnect", () => {
       if (socket.userId) {
-        onlineUsers.delete(socket.userId);
-        console.log(`User ${socket.userId} disconnected`);
+        const disconnect_socket = onlineUsers.get(socket.userId);
+        if (disconnect_socket) {
+          disconnect_socket.delete(socket);
+        }
+        if (disconnect_socket) {
+          if (disconnect_socket.size === 0)
+              onlineUsers.delete(socket.userId);
+        }
       }
     });
   };
