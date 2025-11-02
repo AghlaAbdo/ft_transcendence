@@ -45,9 +45,8 @@ export const ChatWindow = ({
     return () => clearTimeout(time);
 }, [conv, SelectedChatId]);
 const [open, setopen] = useState(false);
-
-  if (SelectedChatId && conv.length === 0)
-    return <div className='flex justify-center items-center text-white h-screens'>Loading Messages ...</div>
+  // if (SelectedChatId && conv.length === 0)
+  //   return <div className='flex justify-center items-center text-white h-screens'>Loading Messages ...</div>
   return (
     <>
       <div className='flex-1 flex flex-col min-h-0'>

@@ -65,7 +65,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
         console.log('user is there');
         onchatselected(data.chat_id);
       } else {
-        console.log('user its not there');​
+        console.log('user its not there');
         onchatselected(-1, selectedFriend);
       }
       onClose();
