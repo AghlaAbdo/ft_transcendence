@@ -12,7 +12,17 @@ import {
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
 
-export const useLocalPongLogic = () => {
+interface returnType {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  scores: React.RefObject<{
+    left: number;
+    right: number;
+  }>;
+  dialogRef: React.RefObject<HTMLDialogElement | null>;
+  winner: React.RefObject<'Player 1' | 'Player 2' | null>;
+}
+
+export const useLocalPongLogic = (): returnType => {
   const gameContainerRef = useRef<PIXI.Container | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pixiApp = useRef<PIXI.Application | null>(null);
@@ -23,7 +33,13 @@ export const useLocalPongLogic = () => {
   const leftPaddleRef = useRef<PIXI.Graphics | null>(null);
   const rightPaddleRef = useRef<PIXI.Graphics | null>(null);
   const scoreTextRef = useRef<PIXI.Text | null>(null);
-  const [scores, setScores] = useState({ left: 0, right: 0 });
+  const scores = useRef({ left: 0, right: 0 });
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const winner = useRef<'Player 1' | 'Player 2' | null>(null);
+  const [gameStatus, setGameStatus] = useState<'waiting' | 'playing' | 'ended'>(
+    'waiting'
+  );
+  const isPlaying = useRef<boolean>(false);
 
   const pressedKeys = useRef<Set<string>>(new Set());
   const animationFrame = useRef<number | null>(null);
@@ -37,6 +53,22 @@ export const useLocalPongLogic = () => {
   const leftPaddleY = useRef(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);
   const rightPaddleY = useRef(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);
   const { setHideHeaderSidebar } = useLayout();
+
+  useEffect(() => {
+    let count = 3;
+    setTimeout(() => {
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          showCountDown(count);
+          count--;
+          if (count === 0)
+            setTimeout(() => {
+              setGameStatus('playing');
+            }, 1000);
+        }, i * 1000);
+      }
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     setHideHeaderSidebar(true);
@@ -182,15 +214,6 @@ export const useLocalPongLogic = () => {
       }
     };
 
-    const loop = () => {
-      movePaddles();
-      moveBall();
-      renderGame();
-      animationFrame.current = requestAnimationFrame(loop);
-    };
-
-    animationFrame.current = requestAnimationFrame(loop);
-
     function resize() {
       if (!pixiApp.current || !gameContainerRef.current) return;
       const scaleX = pixiApp.current.renderer.width / GAME_WIDTH;
@@ -205,6 +228,30 @@ export const useLocalPongLogic = () => {
 
     window.addEventListener('resize', resize);
 
+    initPixiApp();
+    return () => {
+      setHideHeaderSidebar(false);
+      window.removeEventListener('resize', resize);
+      if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
+      if (isInitialized && pixiApp.current) {
+        pixiApp.current.destroy();
+        pixiApp.current = null;
+      }
+    };
+  }, []);
+
+  const gameLoop = useCallback(() => {
+    movePaddles();
+    moveBall();
+    renderGame();
+    if (isPlaying.current)
+      animationFrame.current = requestAnimationFrame(gameLoop);
+    else animationFrame.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (gameStatus !== 'playing') return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const keys = ['ArrowUp', 'ArrowDown', 'w', 'W', 's', 'S'];
       if (keys.includes(e.key)) pressedKeys.current.add(e.key);
@@ -214,22 +261,37 @@ export const useLocalPongLogic = () => {
       if (keys.includes(e.key)) pressedKeys.current.delete(e.key);
     };
 
-    initPixiApp();
-
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
+    isPlaying.current = true;
+    animationFrame.current = requestAnimationFrame(gameLoop);
     return () => {
-      setHideHeaderSidebar(false);
-      window.removeEventListener('resize', resize);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
-      if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
-      if (isInitialized && pixiApp.current) {
-        pixiApp.current.destroy();
-        pixiApp.current = null;
+    };
+  }, [gameStatus]);
+
+  const showCountDown = useCallback((num: number) => {
+    if (!coundDownRef.current) return;
+    coundDownRef.current.text = num.toString();
+    coundDownRef.current.alpha = 1;
+    coundDownRef.current.scale.set(1);
+
+    let elapsed = 0;
+
+    const animate = (ticker: PIXI.Ticker) => {
+      if (!coundDownRef.current) return;
+      const delta = ticker.deltaTime / 60;
+      elapsed += delta;
+      coundDownRef.current.scale.set(1 + elapsed * 0.5);
+      coundDownRef.current.alpha = Math.max(1 - elapsed, 0);
+      if (elapsed >= 1) {
+        pixiApp.current?.ticker.remove(animate);
       }
     };
+
+    pixiApp.current?.ticker.add(animate);
   }, []);
 
   const movePaddles = () => {
@@ -290,11 +352,23 @@ export const useLocalPongLogic = () => {
     }
     // check for loss
     else if (ball.current.x - 10 <= 0) {
-      setScores((s) => ({ ...s, right: s.right + 1 }));
-      resetBall();
+      scores.current.right += 1;
+      console.log('increasing right??');
+      if (scores.current.right === 5) {
+        winner.current = 'Player 2';
+        setGameStatus('ended');
+        isPlaying.current = false;
+        dialogRef.current?.show();
+      } else resetBall();
     } else if (ball.current.x + 10 >= GAME_WIDTH) {
-      setScores((s) => ({ ...s, left: s.left + 1 }));
-      resetBall();
+      scores.current.left += 1;
+      console.log('increasing left ??');
+      if (scores.current.left === 5) {
+        winner.current = 'Player 1';
+        setGameStatus('ended');
+        isPlaying.current = false;
+        dialogRef.current?.show();
+      } else resetBall();
     }
   };
 
@@ -316,8 +390,8 @@ export const useLocalPongLogic = () => {
     if (leftPaddleRef.current) leftPaddleRef.current.y = leftPaddleY.current;
     if (rightPaddleRef.current) rightPaddleRef.current.y = rightPaddleY.current;
     if (scoreTextRef.current)
-      scoreTextRef.current.text = `${scores.left}    ${scores.right}`;
+      scoreTextRef.current.text = `${scores.current.left}    ${scores.current.right}`;
   };
 
-  return { containerRef, scores };
+  return { containerRef, scores, dialogRef, winner };
 };
