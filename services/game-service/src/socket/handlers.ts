@@ -213,6 +213,7 @@ export async function handleRematch(
   }
 
   const user = await getPlayerInfo(userId);
+  if (!user) return ;
   if (!getGameState(gameId)) {
     const gameState = generateGameState(gameId, user, null, null, null);
     gameState.game.status = 'rematching';

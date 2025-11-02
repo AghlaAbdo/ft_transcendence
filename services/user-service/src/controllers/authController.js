@@ -124,7 +124,7 @@ const login = async (request, reply) => {
 
         request.server.setAuthCookie(reply, token);
 
-        reply.send({status: true, message: 'User Logged in successfully'});
+        reply.send({status: true, user: {id: user.id, username: user.username, level: user.rank}});
 
     } catch(error) {
         console.error("login error:", error);
