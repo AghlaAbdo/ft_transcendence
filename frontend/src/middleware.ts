@@ -37,7 +37,6 @@ export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
 
-    // // Skip API routes, static files, etc.
     // if (
     //     path.startsWith('/api') ||
     //     path.startsWith('/_next') ||

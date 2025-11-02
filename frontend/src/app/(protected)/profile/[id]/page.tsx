@@ -2,7 +2,7 @@
 
 import FriendRequestCard from '@/components/profile/FriendRequestCard';
 import Friends from '@/components/profile/Friends';
-import { GameHistory1 } from '@/components/profile/GameHistory';
+import { GameHistory } from '@/components/profile/GameHistory';
 import UserCard from '@/components/profile/UserCard';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -142,7 +142,9 @@ const ProfilePage = () => {
                 </div>
                  <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900 rounded-xl">
                   {/* <GameHistory1 id={user.id} /> */}
-                  <GameHistory1 />
+                  <GameHistory 
+                    id = {user.id}
+                  />
                 </div>
               </div>
             </div>
