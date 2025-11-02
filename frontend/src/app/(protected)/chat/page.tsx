@@ -150,6 +150,7 @@ export default function ChatPage() {
               />
             }
             {selectedChatId && (
+              // <BlockedUserInput />
               // <BlockingUserInput />
               <MessageInput onSendMessage={handleSendMessage} />
             )}

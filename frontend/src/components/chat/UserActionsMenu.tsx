@@ -48,7 +48,7 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
           }
           className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-700 hover:text-white transition-all duration-200 group"
         >
-          <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400 group-hover:bg-purple-500/30 transition-colors duration-200">
+          <div className="p-1">
             <Eye className="w-5 h-5" />
           </div>
           <span className="ml-3 font-medium">View Profile</span>
@@ -59,7 +59,7 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
           onClick={handleInviteToGame}
           className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-700 hover:text-white transition-all duration-200 group"
         >
-          <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400 group-hover:bg-purple-500/30 transition-colors duration-200">
+          <div className="p-1">
             <Gamepad2 className="w-5 h-5" />
           </div>
           <span className="ml-3 font-medium">Invite to Game</span>
@@ -70,10 +70,10 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
           onClick={handleBlock}
           className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-red-900/30 hover:text-red-400 transition-all duration-200 group"
         >
-          <div className="p-2 rounded-lg bg-red-500/20 text-red-400 group-hover:bg-red-500/30 transition-colors duration-200">
+          <div className="p-1 text-red">
             <Ban className="w-5 h-5" />
           </div>
-          <span className="ml-3 font-medium">Block User</span>
+          <span className="ml-3 text-red font-medium">Block User</span>
         </button>
       </div>
     </div>

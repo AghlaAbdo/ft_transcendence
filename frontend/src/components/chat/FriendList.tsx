@@ -18,15 +18,11 @@ interface Friend {
 }
 
 export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 200);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [latestfriends, setlatestFriends] = useState<Friend[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user)
@@ -38,20 +34,23 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           credentials: 'include',
         });
         const data = await response.json();
-        console.log('friends: ', data);
+        console.log('func called');
         if (data.status) {
-          console.log('friends: ', data.friends);
-          setFriends(data.friends);
-          // setlatestFriends(data.friends);
+          setFriends(data.friends.filter(
+          (_user: any) =>
+            _user.id !== user.id &&
+          _user.username.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
         }
       } catch (err) {
         console.error('Error fetching friends:', err);
+        setError("Can't fetch users right now, try again later !");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchFriends();
-  }, [debouncedSearchTerm, friends, user]);
+  }, [debouncedSearchTerm, user]);
 
   const handleFriendSelect = async (selectedFriend: Friend
   ) => {
@@ -74,20 +73,21 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     }
   };
 
-  useEffect(() => {
-    console.log('filter trigerd');
-    if (searchTerm && searchTerm.trim() && user && friends) {
-      setFilteredUsers(
-        friends.filter(
-          (_user) =>
-            _user.id !== user.id &&
-          _user.username.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredUsers([]);
-    }
-  }, [searchTerm, users, user]);
+  // useEffect(() => {
+  //   console.log('latest 10 friends');
+  //   if (searchTerm && searchTerm.trim() && user && friends) {
+  //     setlatestFriends(
+  //       friends.filter(
+  //         (_user) =>
+  //           _user.id !== user.id &&
+  //         _user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  //       )
+  //     );
+  //   } else {
+  //     setlatestFriends([]);
+  //   }
+  // }, []);
+
   if (!user) 
       return <div className='flex justify-center items-center text-white h-screens'>Loading</div>;
   return (
@@ -147,7 +147,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           </div>
         )}
 
-        {!isLoading && !error && searchTerm && filteredUsers.length === 0 && (
+        {!isLoading && !error && searchTerm && friends.length === 0 && (
           <div className='flex items-center justify-center py-2'>
             <div className='text-center'>
               <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center'>
@@ -161,7 +161,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           </div>
         )}
 
-        {!isLoading && !error && !searchTerm && (
+        {/* {!isLoading && !error && !searchTerm && (
           <div className='mt-3 space-y-1 max-h-64 '>
             {latestfriends.map((user) => (
               <div
@@ -179,12 +179,25 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
                 </button>
               </div>
             ))}
+          </div> */}
+        {/* )} */}
+
+        {!isLoading && !error && !searchTerm && (
+          <div className='flex items-center justify-center py-12'>
+            <div className='text-center'>
+              <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center'>
+                <Search className='w-8 h-8 text-gray-500' />
+              </div>
+              <p className='text-gray-400 text-sm'>
+                Start typing to search for users
+              </p>
+            </div>
           </div>
         )}
 
         {!isLoading && !error && searchTerm && (
           <div className='mt-3 space-y-1 max-h-64 '>
-            {filteredUsers.map((user) => (
+            {friends.map((user) => (
               <div
                 key={user.id}
                 className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'

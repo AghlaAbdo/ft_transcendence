@@ -1,11 +1,7 @@
-// "use client";
 import { useEffect, useRef, useState } from 'react';
-
 import { formatDistanceToNow } from 'date-fns';
 import { Plus, Search } from 'lucide-react';
-
 import { User, useAuth } from '@/hooks/useAuth';
-
 import { Search_Input } from './Search_Input';
 import { NoChats } from './noChats';
 import { FriendList } from './FriendList';
@@ -51,7 +47,6 @@ export const Chatlist = ({
   conv,
 }: ChatlistProps) => {
   const [tick, setTick] = useState(0);
-  const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
 
@@ -80,21 +75,19 @@ export const Chatlist = ({
     const userIdString = otherUser.username.toString();
     return userIdString.includes(searchQuery);
   });
-
   
   useEffect(() => {
     if (userId) {
       setLoading(true); // do not forgot to use this later
-      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`) //fetch chats from backend
+      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`) // fetch chats from backend
       .then((res) => res.json())
       .then((data: Chat[]) => {
         setChats(data);
       })
       .catch((err) => console.error('Failed to fetch chats:', err));
-      console.log('chat fetched: ', chats);
     }
   }, [userId, conv]);
-  
+
   return (
     <>
       <div className='lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]'>
@@ -150,8 +143,8 @@ export const Chatlist = ({
                     )}
                   </div>
                   <div className='flex-1 min-w-0'>
-                    <div className='flex items-center justify-between min-w-0'>
-                      <h3 className='font-semibold text-white flex-shrink-0 mr-2 truncate min-w-0 '>
+                    <div className='flex items-center justify-between'>
+                      <h3 className='font-semibold text-white flex-shrink-0 mr-2 truncate'>
                         {otherUser.username}
                       </h3>
                       <span className='text-xs text-gray-400 truncate min-w-0'>
@@ -172,7 +165,6 @@ export const Chatlist = ({
         )}
       </div>
 
-      {/* Friends Modal */}
      {showFriendsModal && (
        <div
          className="fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center "
