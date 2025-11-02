@@ -152,53 +152,73 @@ export function GameHistory( { id } :  FriendsProps) {
     <div className="bg-[#0d1323] rounded-2xl p-4 shadow-lg text-white max-w-3xl mx-auto">
 
       <div className="space-y-3">
-        {matches.map((match, index) => (
-          <div
-            key={index}
-            className="flex justify-between items-center bg-[#1F2937] rounded-xl px-4 py-3 hover:bg-[#1b2235] transition"
-          >
-            <div className="flex items-center gap-3">
+        {matches.map((match, index) => {
+
+          const isPlayer1 = id === match.player1_id;
+          const currentPlayer = isPlayer1 ? match.player1 : match.player2;
+          const opponent = isPlayer1 ? match.player2 : match.player1;
+
+          const currentScore = isPlayer1 ? match.player1_score : match.player2_score;
+          const opponentScore = isPlayer1 ? match.player2_score : match.player1_score;
+
+
+          return (
+            <div
+              key={index}
+              className="flex justify-between items-center bg-[#1F2937] rounded-xl px-4 py-3 hover:bg-[#1b2235] transition"
+            >
+            <div className="flex flex-1 items-center gap-3">
               <img
-                src={match.player1?.avatar_url || "./avatars/avatar1.png"}
-                alt={match.player1?.username || "player 1"}
+                src={currentPlayer?.avatar_url || "./avatars/avatar1.png"}
+                alt={currentPlayer?.username || "player 1"}
                 width={40}
                 height={40}
                 className="rounded-full"
               />
 
 
-              <span className="font-bold">{match.player1?.username}</span>
+              <span className="font-medium">{currentPlayer?.username}</span>
             </div>
 
-            <div className="text-center mt-5">
+            {/* <div className="text-center mt-5">
               <span className="px-3 py-1 border-2 border-purple-500 rounded-full font-bold text-sm md:text-base">
                   {match.player1_score} : {match.player2_score}
               </span>
 
               <div className="text-purple-400 font-medium mt-1">
-                {new Date(match.played_at).toLocaleTimeString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                })}
+                {match.played_at}
               </div>
+            </div> */}
+            <div className="flex flex-1 flex-col items-center">
+              <span
+                className={`px-3 py-1 border-2 rounded-full font-bold text-sm md:text-base ${
+                  currentScore > opponentScore
+                    ? "border-green-500 text-green-400"
+                    : currentScore < opponentScore
+                    ? "border-red-500 text-red-400"
+                    : "border-purple-500 text-purple-400"
+                }`}
+              >
+                {currentScore} : {opponentScore}
+              </span>
+
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="font-bold">{match.player2?.username}</span>
+            <div className="flex flex-1 items-center gap-3 ml-auto justify-end">
+              <span className="font-medium">{opponent?.username}</span>
               <img
-                src={match.player2?.avatar_url || "./avatars/avatar1.png"}
-                alt={match.player2?.username || "Player 2"}
+                src={opponent?.avatar_url || "./avatars/avatar1.png"}
+                alt={opponent?.username || "Player 2"}
                 width={40}
                 height={40}
                 className="rounded-full"
               />
             </div>
           </div>
-        ))}
+          )
+        })}
+          
+        {/* ))} */}
       </div>
     </div>
   );
