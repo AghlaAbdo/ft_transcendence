@@ -70,9 +70,14 @@ function gameLoop(gameState: IGameState): void {
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
   gameState.game.ball.y += gameState.game.ball.dy;
+  if (gameState.game.ball.y < 20)
+    gameState.game.ball.y = 20;
+  else if (gameState.game.ball.y > GAME_HEIGHT - 20)
+    gameState.game.ball.y = GAME_HEIGHT - 20;
+
   if (
-    gameState.game.ball.y - BALL_RADIUS / 2 < 0 ||
-    gameState.game.ball.y + BALL_RADIUS >= GAME_HEIGHT
+    gameState.game.ball.y <= 20 ||
+    gameState.game.ball.y >= GAME_HEIGHT - 20
   ) {
     gameState.game.ball.dy *= -1;
   }

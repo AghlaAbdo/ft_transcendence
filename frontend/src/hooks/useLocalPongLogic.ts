@@ -319,9 +319,13 @@ export const useLocalPongLogic = (): returnType => {
   const moveBall = () => {
     ball.current.x += ball.current.dx;
     ball.current.y += ball.current.dy;
+    if (ball.current.y < 20)
+      ball.current.y = 20;
+    else if (ball.current.y > GAME_HEIGHT - 20)
+      ball.current.y = GAME_HEIGHT - 20;
     if (
-      ball.current.y - BALL_RADIUS / 2 < 0 ||
-      ball.current.y + BALL_RADIUS >= GAME_HEIGHT
+      ball.current.y <= 20 ||
+      ball.current.y >= GAME_HEIGHT - 20
     ) {
       ball.current.dy *= -1;
     }
