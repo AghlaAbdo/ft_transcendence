@@ -105,6 +105,7 @@ export default function GamePage() {
             dialogRef={closeDialRef}
             gameId={gameId}
             isTournamentGame={false}
+            isLocal={false}
           />
 
           <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>

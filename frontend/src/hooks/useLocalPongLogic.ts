@@ -270,7 +270,6 @@ export const useLocalPongLogic = (): returnType => {
   }
 
   function startGameLoop() {
-    console.log('called startGameLpp again!');
     isPlaying.current = true;
     animationFrame.current = requestAnimationFrame(gameLoop);
   }
@@ -356,8 +355,7 @@ export const useLocalPongLogic = (): returnType => {
     // check for loss
     else if (ball.current.x - 10 <= 0) {
       scores.current.right += 1;
-      console.log('increasing right??');
-      if (scores.current.right === 2) {
+      if (scores.current.right === 1) {
         setWinner('Player 2');
         isPlaying.current = false;
         dialogRef.current?.show();
@@ -365,7 +363,7 @@ export const useLocalPongLogic = (): returnType => {
     } else if (ball.current.x + 10 >= GAME_WIDTH) {
       scores.current.left += 1;
       console.log('increasing left ??');
-      if (scores.current.left === 2) {
+      if (scores.current.left === 1) {
         setWinner('Player 1');
         isPlaying.current = false;
         dialogRef.current?.show();
