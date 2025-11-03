@@ -46,9 +46,12 @@ CREATE TABLE IF NOT EXISTS FRIENDS (
   user_id INTEGER NOT NULL,
   friend_id INTEGER NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'blocked')),
+  blocked_by INTEGER, -- null unless statis is blocked
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (blocked_by) REFERENCES users(id) ON DELETE CASCADE,
+
   UNIQUE(user_id, friend_id)
 );
 

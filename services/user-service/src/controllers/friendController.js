@@ -245,6 +245,55 @@ const searchQuery = async (request, reply) => {
     }
 }
 
+const blockFriend = async (request, reply) => {
+    try {
+        const currentUserId = request.user.id;
+        const targetUserId = parseInt(request.params.id);
+
+        if (!targetUserId || isNaN(targetUserId)) {
+            return reply.code(400).send({
+                status: false,
+                message: "Invalid user ID"
+            }); 
+        }
+
+        if (currentUserId === targetUserId) {
+            return reply.code(400).send({
+                status: false,
+                message: "Cannot block yourself"
+            });
+        }
+        const db = request.server.db;
+
+        const targetUser = db.prepare(`
+            SELECT id FROM USERS
+            WHERE id = ?
+        `).get(targetUserId);
+
+        if (!targetUser) {
+            return reply.code(404).send({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+        friendModel.blockFriend(db, {currentUserId, targetUserId} );
+
+        friendModel.blockFriend(db, { currentUserId, targetUserId });
+
+        return reply.code(200).send({
+            status: true,
+            message: "User blocked successfully"
+        });
+        
+    } catch (error) {
+        return reply.code(500).send({
+            status: false,
+            message: error.message || 'Failed to block user'
+        }); 
+    }
+}
+
 export default {
     getAllFriends,
     sendFriendRequest,
@@ -252,5 +301,6 @@ export default {
     rejectFriendRequest,
     removeFriend,
     getPendingRequests,
-    searchQuery
+    searchQuery,
+    blockFriend
 };

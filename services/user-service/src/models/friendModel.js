@@ -136,6 +136,34 @@ const removeFriendRequest = (db, { user_id, friend_id }) => {
   return true;
 };
 
+const blockFriend = (db, { currentUserId, targetUserId }) => {
+    const checkExisting = db.prepare(`
+            SELECT id, status, blocked_by 
+            FROM FRIENDS 
+            WHERE (user_id = ? AND friend_id = ?) 
+               OR (user_id = ? AND friend_id = ?)
+    `).get(currentUserId, targetUserId, targetUserId, currentUserId);  
+
+    if (!checkExisting) {
+        throw new Error('Friendship not found');
+    }
+
+
+    const blockQuery = `
+        UPDATE FRIENDS
+        SET status = 'blocked', 
+            blocked_by = ?
+        WHERE id = ?
+    `;
+
+    const res = db.prepare(blockQuery).run(currentUserId, checkExisting.id);
+    if (res.changes === 0) {
+        throw new Error("Failed to update block status");
+    }
+
+    return true;
+}
+
 
 export default {
     getFriends,
@@ -145,4 +173,5 @@ export default {
     acceptFriendRequest,
     rejectFriend,
     removeFriendRequest,
+    blockFriend
 }
