@@ -36,6 +36,11 @@ const friendRoutes = (fastify, options) => {
     }, friendController.removeFriend);
 
 
+    fastify.get("/:id/search", {
+        onRequest: [fastify.authenticate] 
+    }, friendController.searchQuery);
+
+
 
     // fastify.post("/friends/send", { onRequest: [fastify.authenticate] }, friendController.sendFriendRequest);
     // fastify.post("/friends/accept", { onRequest: [fastify.authenticate] }, friendController.acceptFriendRequest);

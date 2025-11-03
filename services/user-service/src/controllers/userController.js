@@ -259,6 +259,39 @@ const updateInfo = async (request, reply) => {
     }
 }
 
+const searchQuery = async (request, reply) => {
+    try {
+        const { query } = request.query;
+        const trimQuery = query?.trim();
+
+        if (!trimQuery || trimQuery.length < 2) {
+            return reply.code(400).send({
+                status: false,
+                message: "Query must be at least 2 characters"
+            });
+        }
+        const db = request.server.db;
+
+        const users = db.prepare(`
+            SELECT id, username, avatar_url, online_status
+            FROM USERS
+            WHERE username LIKE ?
+        `).all(`%${trimQuery}%`);
+
+        reply.send( {
+            status: true,
+            count: users.length,
+            users: users
+        });
+
+    } catch (error) {
+        reply.code(500).send({
+            status: false,
+            message: error.message || 'Failed to search users'
+        });
+    }
+}
+ 
 const  getProfile = async (request, reply) => {
 }
 
@@ -337,5 +370,6 @@ export default {
     uploadAvatar, 
     changePassword,
     updateInfo,
-    twoFactorAuth
+    twoFactorAuth,
+    searchQuery
 };

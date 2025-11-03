@@ -213,11 +213,44 @@ const removeFriend = async (request, reply) => {
     }
 }
 
+const searchQuery = async (request, reply) => {
+    try {
+        const user_id =  parseInt(request.params.id);
+        const { query } = request.query;
+
+        const trimQuery = query?.trim();
+
+        if (!trimQuery || trimQuery.length < 2) {
+            return reply.code(400).send({
+                status: false,
+                message: "Query must be at least 2 characters"
+            });
+        }
+
+        const db = request.server.db;
+        const friends = friendModel.sreachQueryFriends(db, user_id, trimQuery);
+
+        reply.code(200).send({
+            status: true,
+            friends: friends,
+            count: friends.length
+        });
+
+    } catch (error) {
+        console.error('Error in searchQuery:', error); 
+        return reply.code(500).send({
+            status: false,
+            message: error.message || "failed to search friends"
+        }); 
+    }
+}
+
 export default {
     getAllFriends,
     sendFriendRequest,
     acceptFriendRequest,
     rejectFriendRequest,
     removeFriend,
-    getPendingRequests
+    getPendingRequests,
+    searchQuery
 };

@@ -8,10 +8,27 @@ const getFriends = (db, id) => {
             ON (u.id = f.friend_id AND f.user_id = ?)
             OR (u.id = f.user_id AND f.friend_id = ?)
         WHERE (f.user_id = ? OR f.friend_id = ?)
-        AND f.status = 'accepted';
+        AND f.status = 'accepted'
+        ORDER BY f.created_at DESC;
     `;
     const stmt = db.prepare(query);
     return stmt.all(id, id, id, id);
+}
+
+const sreachQueryFriends = (db, id, query) => {
+    const querySQL = `
+        SELECT u.id, u.username, u.online_status, u.avatar_url, f.status
+        FROM FRIENDS f
+        JOIN USERS u 
+            ON (u.id = f.friend_id AND f.user_id = ?)
+            OR (u.id = f.user_id AND f.friend_id = ?)
+        WHERE (f.user_id = ? OR f.friend_id = ?)
+        AND f.status = 'accepted'
+        AND u.username LIKE ?
+        ORDER BY f.created_at DESC;
+    `;
+    const stmt = db.prepare(querySQL);
+    return stmt.all(id, id, id, id, `%${query}%`);
 }
 
 
@@ -123,7 +140,7 @@ const removeFriendRequest = (db, { user_id, friend_id }) => {
 export default {
     getFriends,
     getPendingRequests,
-
+    sreachQueryFriends,
     sendFriendRequest,
     acceptFriendRequest,
     rejectFriend,
