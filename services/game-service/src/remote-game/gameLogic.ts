@@ -65,13 +65,14 @@ export function startGame(gameState: IGameState) {
   }
 }
 
+let ballSpeed = BALL_SPEED;
+
 function gameLoop(gameState: IGameState): void {
   if (!gameState || gameState.game.status !== 'playing') return;
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
   gameState.game.ball.y += gameState.game.ball.dy;
-  if (gameState.game.ball.y < 20)
-    gameState.game.ball.y = 20;
+  if (gameState.game.ball.y < 20) gameState.game.ball.y = 20;
   else if (gameState.game.ball.y > GAME_HEIGHT - 20)
     gameState.game.ball.y = GAME_HEIGHT - 20;
 
@@ -92,8 +93,9 @@ function gameLoop(gameState: IGameState): void {
       gameState.game.leftPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.game.ball.dx = BALL_SPEED * Math.cos(bounceAngle);
-    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    ballSpeed *= 1.06;
+    gameState.game.ball.dx = ballSpeed * Math.cos(bounceAngle);
+    gameState.game.ball.dy = ballSpeed * -Math.sin(bounceAngle);
   }
   // check collision with right paddle
   else if (
@@ -105,13 +107,15 @@ function gameLoop(gameState: IGameState): void {
       gameState.game.rightPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.game.ball.dx = -BALL_SPEED * Math.cos(bounceAngle);
-    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    ballSpeed *= 1.06;
+    gameState.game.ball.dx = -ballSpeed * Math.cos(bounceAngle);
+    gameState.game.ball.dy = ballSpeed * -Math.sin(bounceAngle);
   }
   // check for loss
   else if (gameState.game.ball.x - 10 <= 0) {
     gameState.game.rightPaddle.score++;
     gameState.game.scoreUpdate = true;
+    ballSpeed = BALL_SPEED;
     if (gameState.game.rightPaddle.score === 5) {
       gameOver(gameState);
     } else {
@@ -120,6 +124,7 @@ function gameLoop(gameState: IGameState): void {
   } else if (gameState.game.ball.x + 10 >= GAME_WIDTH) {
     gameState.game.leftPaddle.score++;
     gameState.game.scoreUpdate = true;
+    ballSpeed = BALL_SPEED;
     if (gameState.game.leftPaddle.score === 5) {
       gameOver(gameState);
     } else {

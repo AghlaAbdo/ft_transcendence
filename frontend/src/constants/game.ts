@@ -3,7 +3,8 @@ export const GAME_HEIGHT = 600;
 export const PADDLE_HEIGHT = 150;
 export const PADDLE_WIDTH = 30;
 export const BALL_RADIUS = 20;
-export const BALL_SPEED = 6;
+export const BALL_SPEED = 9;
+export const PADDLE_SPEED = 14;
 
 export interface IBall {
   x: number;
