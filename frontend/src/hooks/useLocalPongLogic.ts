@@ -19,7 +19,8 @@ interface returnType {
     right: number;
   }>;
   dialogRef: React.RefObject<HTMLDialogElement | null>;
-  winner: React.RefObject<'Player 1' | 'Player 2' | null>;
+  winner: 'Player 1' | 'Player 2' | null;
+  handleRematch: () => void;
 }
 
 export const useLocalPongLogic = (): returnType => {
@@ -35,10 +36,7 @@ export const useLocalPongLogic = (): returnType => {
   const scoreTextRef = useRef<PIXI.Text | null>(null);
   const scores = useRef({ left: 0, right: 0 });
   const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const winner = useRef<'Player 1' | 'Player 2' | null>(null);
-  const [gameStatus, setGameStatus] = useState<'waiting' | 'playing' | 'ended'>(
-    'waiting'
-  );
+  const [winner, setWinner] = useState<'Player 1' | 'Player 2' | null>(null);
   const isPlaying = useRef<boolean>(false);
 
   const pressedKeys = useRef<Set<string>>(new Set());
@@ -55,18 +53,8 @@ export const useLocalPongLogic = (): returnType => {
   const { setHideHeaderSidebar } = useLayout();
 
   useEffect(() => {
-    let count = 3;
     setTimeout(() => {
-      for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-          showCountDown(count);
-          count--;
-          if (count === 0)
-            setTimeout(() => {
-              setGameStatus('playing');
-            }, 1000);
-        }, i * 1000);
-      }
+      prepareGame();
     }, 1000);
   }, []);
 
@@ -250,8 +238,6 @@ export const useLocalPongLogic = (): returnType => {
   }, []);
 
   useEffect(() => {
-    if (gameStatus !== 'playing') return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       const keys = ['ArrowUp', 'ArrowDown', 'w', 'W', 's', 'S'];
       if (keys.includes(e.key)) pressedKeys.current.add(e.key);
@@ -263,14 +249,31 @@ export const useLocalPongLogic = (): returnType => {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-
-    isPlaying.current = true;
-    animationFrame.current = requestAnimationFrame(gameLoop);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [gameStatus]);
+  }, []);
+
+  function prepareGame() {
+    let count = 3;
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        showCountDown(count);
+        count--;
+        if (count === 0)
+          setTimeout(() => {
+            startGameLoop();
+          }, 1000);
+      }, i * 1000);
+    }
+  }
+
+  function startGameLoop() {
+    console.log('called startGameLpp again!');
+    isPlaying.current = true;
+    animationFrame.current = requestAnimationFrame(gameLoop);
+  }
 
   const showCountDown = useCallback((num: number) => {
     if (!coundDownRef.current) return;
@@ -354,18 +357,16 @@ export const useLocalPongLogic = (): returnType => {
     else if (ball.current.x - 10 <= 0) {
       scores.current.right += 1;
       console.log('increasing right??');
-      if (scores.current.right === 5) {
-        winner.current = 'Player 2';
-        setGameStatus('ended');
+      if (scores.current.right === 2) {
+        setWinner('Player 2');
         isPlaying.current = false;
         dialogRef.current?.show();
       } else resetBall();
     } else if (ball.current.x + 10 >= GAME_WIDTH) {
       scores.current.left += 1;
       console.log('increasing left ??');
-      if (scores.current.left === 5) {
-        winner.current = 'Player 1';
-        setGameStatus('ended');
+      if (scores.current.left === 2) {
+        setWinner('Player 1');
         isPlaying.current = false;
         dialogRef.current?.show();
       } else resetBall();
@@ -382,6 +383,25 @@ export const useLocalPongLogic = (): returnType => {
     ball.current.dy = BALL_SPEED * Math.sin(angle);
   };
 
+  const resetPaddles = () => {
+    if (!rightPaddleRef.current || !leftPaddleRef.current) return;
+    leftPaddleY.current = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
+    rightPaddleY.current = GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2;
+  };
+
+  const handleRematch = () => {
+    resetPaddles();
+    resetBall();
+    scores.current.left = 0;
+    scores.current.right = 0;
+    renderGame();
+    setWinner(null);
+    setTimeout(() => {
+      prepareGame();
+    }, 400);
+    dialogRef.current?.close();
+  };
+
   const renderGame = () => {
     if (ballRef.current) {
       ballRef.current.x = ball.current.x;
@@ -393,5 +413,5 @@ export const useLocalPongLogic = (): returnType => {
       scoreTextRef.current.text = `${scores.current.left}    ${scores.current.right}`;
   };
 
-  return { containerRef, scores, dialogRef, winner };
+  return { containerRef, scores, dialogRef, winner, handleRematch };
 };

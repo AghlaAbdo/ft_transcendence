@@ -7,14 +7,12 @@ import LocalGamePlayers from '@/components/game/LocalGamePlayers';
 import { useLocalPongLogic } from '@/hooks/useLocalPongLogic';
 
 export default function LocalGamePage() {
-  const { containerRef, scores, dialogRef, winner } = useLocalPongLogic();
+  const { containerRef, scores, dialogRef, winner, handleRematch } =
+    useLocalPongLogic();
   const router = useRouter();
 
   function handleReturn() {
     router.replace('/game');
-  }
-  function handleRematch() {
-    window.location.reload();
   }
 
   return (
@@ -34,7 +32,7 @@ export default function LocalGamePage() {
               Winner
             </span>
             <span className='bg-gray-700 px-1 py-[2px] md:px-3 md:py-1 rounded-[8px] border-1 border-gray-500 text-sm md:text-[16px] text-gray-50 font-bold'>
-              {winner.current}
+              {winner}
             </span>
           </div>
           <div className='flex w-full justify-between'>
