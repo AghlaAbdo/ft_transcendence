@@ -35,12 +35,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.on('connect', () => {
       console.log('Connected to socket');
     });
-
     socket.on('Notification', (data) => {
       const { addNotification, incrementUnread } = useNotificationStore.getState();
       addNotification(data);
       incrementUnread();
     });
+
 
     socket.on('disconnect', () => {
       console.log('Disconnected from Socket');

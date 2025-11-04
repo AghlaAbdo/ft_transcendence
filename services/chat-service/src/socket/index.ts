@@ -66,7 +66,7 @@ export function initSocket(server: any, db: Database.Database) {
       }
     });
 
-    /* -------------------------- Disconnect ---------------------------- */
+    /* -------------------------- disconnect ---------------------------- */
 
     socket.on("disconnect", () => {
       if (socket.userId) {

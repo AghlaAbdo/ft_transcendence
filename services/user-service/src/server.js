@@ -18,7 +18,7 @@ const handleConnection = (fastify, socket) => {
     }
 
     socket.userId = user__id;
-    onlineUsers.set(user__id, socket);
+    onlineUsers.set(user__id, socket); // add set to multiple tabs
 
     socket.on("Notification", async (data) => {
         try {

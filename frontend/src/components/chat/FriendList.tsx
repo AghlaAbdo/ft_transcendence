@@ -34,7 +34,6 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           credentials: 'include',
         });
         const data = await response.json();
-        console.log('func called');
         if (data.status) {
           setFriends(data.friends.filter(
           (_user: any) =>
@@ -42,6 +41,8 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           _user.username.toLowerCase().includes(searchTerm.toLowerCase())
         ));
         }
+        else
+          setFriends([]);
       } catch (err) {
         console.error('Error fetching friends:', err);
         setError("Can't fetch users right now, try again later !");
@@ -73,23 +74,9 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     }
   };
 
-  // useEffect(() => {
-  //   console.log('latest 10 friends');
-  //   if (searchTerm && searchTerm.trim() && user && friends) {
-  //     setlatestFriends(
-  //       friends.filter(
-  //         (_user) =>
-  //           _user.id !== user.id &&
-  //         _user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  //       )
-  //     );
-  //   } else {
-  //     setlatestFriends([]);
-  //   }
-  // }, []);
-
   if (!user) 
       return <div className='flex justify-center items-center text-white h-screens'>Loading</div>;
+
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
       {/* search Header */}
@@ -161,27 +148,6 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           </div>
         )}
 
-        {/* {!isLoading && !error && !searchTerm && (
-          <div className='mt-3 space-y-1 max-h-64 '>
-            {latestfriends.map((user) => (
-              <div
-                key={user.id}
-                className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
-              >
-                <button
-                  onClick={() => {
-                    onClose();
-                    handleFriendSelect(user);
-                  }}
-                  className='w-full cursor-pointer'
-                >
-                  <FriendCard _user={user} />
-                </button>
-              </div>
-            ))}
-          </div> */}
-        {/* )} */}
-
         {!isLoading && !error && !searchTerm && (
           <div className='flex items-center justify-center py-12'>
             <div className='text-center'>
@@ -195,12 +161,12 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
           </div>
         )}
 
-        {!isLoading && !error && searchTerm && (
+        {!isLoading && !error && searchTerm && friends.length > 0 && (
           <div className='mt-3 space-y-1 max-h-64 '>
             {friends.map((user) => (
               <div
                 key={user.id}
-                className='animate-in fade-in slide-in-from-bottom-2 duration-200 w-full'
+                // className='w-full'
               >
                 <button
                   onClick={() => {

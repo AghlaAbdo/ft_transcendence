@@ -42,7 +42,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
 
   const { user } = useAuth();
 
-  useEffect(() => {
+ useEffect(() => {
   if (!user) 
     return;
   // markAllNotificationsAsRead(user.id); // make a function in the component file .
