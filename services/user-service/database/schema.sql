@@ -27,8 +27,6 @@ CREATE TABLE IF NOT EXISTS USERS (
     --OAuth 
     is_google_auth INTEGER DEFAULT 0,
     
-    -- Profile info
-    location VARCHAR(100),
     -- online_status BOOLEAN NOT NULL DEFAULT FALSE,
     online_status INTEGER NOT NULL DEFAULT 0,
 

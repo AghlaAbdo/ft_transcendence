@@ -374,23 +374,23 @@ const updateStats = async (request, reply) => {
             });
         }
 
-        
+        db.prepare(`
+            UPDATE USERS
+            SET wins = wins + 1,
+                points = points + 3,
+                updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(winnerId);
 
-        // db.prepare(`
-        //     UPDATE USERS
-        //     SET wins = wins + 1,
-        //         points = points + 3,
-        //         updatedAt = CURRENT_TIMESTAMP
-        //     WHERE id = ?;
-        // `).run(winnerId);
+        db.prepare(`
+            UPDATE USERS
+            SET losses = losses + 1,
+                points = points + 1,
+                updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(loserId);
 
-        // db.prepare(`
-        //     UPDATE USERS
-        //     SET losses = losses + 1,
-        //         points = points + 1,
-        //         updatedAt = CURRENT_TIMESTAMP
-        //     WHERE id = ?;
-        // `).run(loserId);
+        userModel.recalculateRanks(db);
 
         return reply.status(200).send({ 
             status: true,

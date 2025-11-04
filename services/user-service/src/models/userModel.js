@@ -1,7 +1,10 @@
 import { generatePingPongAvatar } from '../utils/generatePingPongAvatar.js'
 
 const getAllUsers =  (db) => {
-    const query = 'SELECT * FROM USERS';
+    const query = `SELECT id, username, email,avatar_url,
+        isAccountVerified, points, wins, losses, rank, is_google_auth, 
+        online_status, is_2fa_enabled, createdAt, updatedAt
+    FROM USERS`;
     const users = db.prepare(query);
     return users.all();
 }
@@ -75,6 +78,25 @@ const updateOnlineStatus = (db, id, status) => {
     return stmt.run(status, id);
 }
 
-const userModel = { getUserByID, getUserByEmail, getUserByUsername, getAllUsers, createUser, updateOnlineStatus}
+const recalculateRanks = (db) => {
+    const users = db.prepare(`
+            SELECT id FROM USERS
+            ORDER BY points DESC, wins DESC, losses ASC
+    `).all();
+
+    const query = db.prepare(`
+        UPDATE USERS
+        SET rank = ?
+        WHERE id = ? 
+    `);
+
+    db.transaction(() => {
+        users.forEach((user, index) => {
+            query.run(index + 1, user.id);
+        });
+    })(); 
+}
+
+const userModel = { getUserByID, getUserByEmail, getUserByUsername, getAllUsers, createUser, updateOnlineStatus, recalculateRanks}
 
 export default userModel;
