@@ -46,7 +46,7 @@ export interface UserInfo {
   username: string;
   email: string;
   avatar_url: string | null;
-  isAccountVerified: boolean;
+  isAccountVerified: number;
 }
 
 export interface TournamentDetails {

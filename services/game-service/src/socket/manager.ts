@@ -12,6 +12,7 @@ import {
   handleCancelMatching,
   handleRequestGameState,
   hancleQuitRemoteGamePage,
+  handleGetGameInviteMatch,
 } from './handlers';
 import {
   handleJoinTournament,
@@ -117,6 +118,13 @@ export function initializeSocketIO(server: http.Server): Server {
     );
     socket.on('unreadyForMatch', (data: { userId: string }) =>
       handleUnreadyForMatch(data),
+    );
+
+    // ------------ GAme INvite ------------
+    socket.on(
+      'getGameInviteMatch',
+      (data: { gameId: string; userId: string }) =>
+        handleGetGameInviteMatch(socket, data),
     );
   });
 

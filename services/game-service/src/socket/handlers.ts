@@ -378,3 +378,46 @@ export function hancleQuitRemoteGamePage(data: {
     }
   }
 }
+
+export function handleGetGameInviteMatch(
+  socket: Socket,
+  data: { gameId: string; userId: string },
+) {
+  const gameState = getGameState(data.gameId);
+  if (
+    gameState &&
+    (gameState.player1.id === data.userId ||
+      gameState.player2.id === data.userId)
+  ) {
+    let player;
+    let playerRole;
+    let opponent;
+    console.log('Indeed found gameInvite match!!');
+    if (gameState.player1.id === data.userId) {
+      gameState.player1.ready = true;
+      player = gameState.player1;
+      opponent = gameState.player2.id ? gameState.player2 : null;
+      playerRole = 'player1';
+    } else {
+      gameState.player2.ready = true;
+      player = gameState.player2;
+      opponent = gameState.player1;
+      playerRole = 'player2';
+    }
+    // socket.emit('gameInviteFound');
+    socket.emit('matchDetails', {
+      gameId: gameState.id,
+      gameStatus: gameState.game.status,
+      player,
+      opponent,
+      playerRole,
+    });
+    if (gameState.player1.ready && gameState.player2.ready) {
+      console.log('Indeed started gameInvite match!!');
+      setUserActiveGame(gameState.player1.id, gameState.id);
+      setUserActiveGame(gameState.player2.id, gameState.id);
+      gameState.game.status = 'playing';
+      startGame(gameState);
+    }
+  } else socket.emit('matchNotFound');
+}

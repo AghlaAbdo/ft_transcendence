@@ -33,7 +33,8 @@ interface returnType {
 
 export const usePongGameLogic = (
   tournamentId: string | null,
-  matchGameId: string | null
+  matchGameId: string | null,
+  gameInviteId: string | null,
 ): returnType => {
   const router = useRouter();
   const [matching, setMatching] = useState(true);
@@ -99,6 +100,8 @@ export const usePongGameLogic = (
   }, []);
 
   useEffect(() => {
+    console.log("gameStatus:", gameStatus);
+    console.log("matching: ", matching);
     if (!gameStatus || matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
@@ -233,6 +236,8 @@ export const usePongGameLogic = (
           (pixiApp.current!.renderer.width - GAME_WIDTH * scale) / 2;
         gameContainerRef.current!.y =
           (pixiApp.current!.renderer.height - GAME_HEIGHT * scale) / 2;
+
+        console.log("Ever set PixiJS ???");
       } catch (error) {
         console.error('Failed to initialize PixiJS app:', error);
         if (pixiApp.current) {
@@ -304,6 +309,41 @@ export const usePongGameLogic = (
           }
         }
       );
+    } else if (gameInviteId) {
+
+        socket.emit('getGameInviteMatch', {gameId: gameInviteId, userId: user.id});
+        socket.on('matchDetails', (data: {
+          gameId: string | null;
+          gameStatus: 'playing' | 'waiting' | 'notFound';
+          player: IPlayer | null;
+          opponent: IPlayer | null;
+          playerRole: 'player1' | 'player2' | null;
+        }) => {
+            console.log("Game Invite Found");
+            setGameStatus(data.gameStatus);
+            if (data.gameStatus === 'playing') {
+            // console.log("is gameStatus 'playing' ??");
+            console.log("match found, data:", data);
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+            setPlayer(data.player);
+            setMatching(false);
+            isPlaying.current = true;
+            if (!animationFrameId.current)
+              animationFrameId.current = requestAnimationFrame(gameLoop);
+            setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          } else if (data.gameStatus === 'waiting') {
+            // console.log('did set player: ', data.player);
+            console.log("match found waiting, data:", data);
+            setPlayer(data.player);
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+          }
+        });
+        socket.on('matchNotFound', ()=> {
+          console.log("GAmeInvite match not found!!");
+        });
     } else {
       socket.emit('requestMatchDetails', user.id);
       socket.on(
@@ -322,6 +362,7 @@ export const usePongGameLogic = (
             socket.emit('play', user.id);
           } else if (data.gameStatus === 'playing') {
             // console.log("is gameStatus 'playing' ??");
+            console.log("match found, data:", data);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
             setPlayer(data.player);
@@ -333,6 +374,7 @@ export const usePongGameLogic = (
             if (data.opponent) setOpponent(data.opponent);
           } else if (data.gameStatus === 'waiting') {
             // console.log('did set player: ', data.player);
+            console.log("match found waiting, data:", data);
             setPlayer(data.player);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;

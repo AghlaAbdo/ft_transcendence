@@ -119,3 +119,13 @@ export interface TournamentListItem {
   status: string;
   creatorUsername?: string;
 }
+
+// ----------- Game Invite -----------
+
+export interface IGameInvite {
+  challengerId: string;
+  opponentId: string;
+  challengerJoined: boolean;
+  opponentJoined: boolean;
+  game: IGameState;
+}

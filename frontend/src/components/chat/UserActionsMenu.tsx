@@ -21,10 +21,16 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
     router.push(`/profile/${id}`);
   }
 
-  const handleInviteToGame = () => {
+  const handleInviteToGame = async () => {
     console.log('Invite to game clicked');
     onClose();
-    // Add your game invitation logic here
+    const response = await fetch(`/api/game/game-invite?challengerId=5&opponentId=8`, {
+      method: 'POST'
+    });
+    const data = await response.json();
+    console.log("recived data in gameInvite: ", data);
+    if (data && data.gameId)
+      router.push(`/game/game-invite/${data.gameId}`);
   };
 
   const handleBlock = () => {

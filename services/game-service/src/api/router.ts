@@ -1,5 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { Database as DatabaseType } from 'better-sqlite3';
+import { getPlayerInfo } from '../utils/getPlayerInfo';
+import { handleGameInvite } from '../remote-game/gameInvite';
 
 export interface WeekStats {
   week_number: number;
@@ -167,5 +169,30 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       console.error('Error retrieving weekly stats:', error);
       reply.status(500).send({ error: 'Failed to retrieve weekly stats' });
     }
+  });
+
+  fastify.post('/game-invite', async (req, rep) => {
+    console.log('req.body: ', req.body);
+    console.log('req.query: ', req.query);
+    const { challengerId, opponentId } = req.query as {
+      challengerId?: string;
+      opponentId?: string;
+    };
+    if (!challengerId || !opponentId || challengerId === opponentId) {
+      rep
+        .status(500)
+        .send({ error: 'challengerId and opponentId are required!' });
+      return;
+    }
+    const challenger = await getPlayerInfo(challengerId);
+    const opponent = await getPlayerInfo(opponentId);
+    // console.log("challenger: ", challenger);
+    // console.log("opponent: ", opponent);
+    if (!challenger || !opponent) {
+      rep.status(500).send({ error: 'Players not found!' });
+      return;
+    }
+    const gameId = handleGameInvite(challenger, opponent);
+    return { message: 'Created game!', gameId };
   });
 }

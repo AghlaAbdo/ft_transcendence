@@ -29,7 +29,7 @@ export default function GamePage() {
     inAnotherGame,
     gameStatus,
     inTournament,
-  } = usePongGameLogic(null, null);
+  } = usePongGameLogic(null, null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
   const sentQuit = useRef<boolean>(false);
