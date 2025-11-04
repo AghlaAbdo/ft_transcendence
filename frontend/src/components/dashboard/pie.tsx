@@ -8,7 +8,7 @@ import {
     ChartOptions,
     ChartData
 } from 'chart.js';
-import { Player, PlayerWithRank } from '@/constants/leaderboard';
+import { PlayerWithRank } from '@/constants/leaderboard';
 
 ChartJS.register(
     ArcElement,

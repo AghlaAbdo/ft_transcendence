@@ -47,7 +47,7 @@ export default function Table({players, numOfPages, page}: TableProps) {
                 }
                 {
                     numOfPages > 1 && (
-                        <div className="mx-auto flex justify-between w-fit zmt-5 items-center">
+                        <div className="mx-auto flex justify-between w-fit mt-5 items-center">
                             <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                 flex items-center justify-center font-bold
                                 rounded-[4px] hover:bg-gray-400

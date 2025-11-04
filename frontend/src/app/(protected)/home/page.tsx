@@ -25,9 +25,11 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(1)
     const loadRef = useRef<HTMLDivElement>(null)
     const currentOffset = useRef(0)
-    const limit = 15
+    const limit = 9
+    const [observerStart, setObserverStart] = useState(false)
 
-    const loadMore = useCallback(() => {
+    const loadMore = () => {
+        // console.log("here")
         if (currentOffset.current >= allGames.length) {
             return
         }
@@ -38,7 +40,7 @@ export default function Dashboard() {
             currentOffset.current = nextOffset;
             setLoading(0)
         }, 1000)
-    }, [allGames, limit]);
+    }
     useEffect(() => {
         async function getData() {
             if (!authUser || authLoading) return;
@@ -56,11 +58,12 @@ export default function Dashboard() {
             setVisibleGames(games.slice(0, limit))
             currentOffset.current = limit
             setLoading(0)
+            setObserverStart(true)
         }
         getData()
     }, [authUser, authLoading])
     useEffect(() => {
-        console.log("observer start")
+        // console.log("observer") 
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
@@ -73,9 +76,9 @@ export default function Dashboard() {
         if (loadRef.current) observer.observe(loadRef.current);
 
         return () => {
-            observer.disconnect();
-        };
-    }, [loadMore, loading]);
+            observer.disconnect()
+        }
+    }, [observerStart]); 
     return (
         (loading === 1 || authLoading) ? (
             <div className="flex justify-center items-center h-[100vh]">
@@ -107,12 +110,12 @@ export default function Dashboard() {
                     {/* up right  */}
                     <div className="h-[50vh] rounded-[10px] m-2 mr-5 w-[70%] bg-gray-800 overflow-y-auto custom-scrollbar-gray 2xl:h-[40vh]">
                         <h2 className="p-4 font-bold 2xl:text-[1.2rem]">OVERVIEW</h2>
-                        <div className="flex items-center justify-baseline pl-10 2xl:mb-10">
+                        <div className="flex items-center pl-10 2xl:mb-10">
                             <PieChart user={user} />
                             <Statistic label="WINS" value={user.wins} color="bg-green" />
                             <Statistic label="LOSE" value={user.losses} color="bg-red" />
                         </div>
-                        <div className="flex flex-wrap mt-4 justify-around">
+                        <div className="flex flex-wrap mt-4 justify-around">    
                             <Statistics label="Total games" value={user.games} />
                             <Statistics label="Rank" value={user.rank} />
                             <Statistics label="Points" value={user.score} />
@@ -130,14 +133,14 @@ export default function Dashboard() {
                     </div>
                     {/* down right  */}
                     <div className="h-[50vh] rounded-[10px] m-2 mr-5 mb-5 w-[70%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">
-                        <div className="grid grid-cols-5 py-3 pr-5 justify-items-center border-b-1 border-gray-700 flex-shrink-0">
+                        <div className="grid grid-cols-5 py-3 pr-5 justify-items-center border-b-1 border-gray-700">
                             <span className="2xl:text-[1.2rem]">Date & Time</span>
                             <span className="2xl:text-[1.2rem]">Opponent</span>
                             <span className="2xl:text-[1.2rem]">Type</span>
                             <span className="2xl:text-[1.2rem]">Score</span>
                             <span className="2xl:text-[1.2rem]">Result</span>
                         </div>
-                        <div className="overflow-y-auto flex-1 custom-scrollbar-gray">
+                        <div className="overflow-y-auto custom-scrollbar-gray">
                             {
                                 visibleGames.length > 0 ? (
                                     visibleGames.map((game, index) => (
@@ -166,14 +169,16 @@ export default function Dashboard() {
                                     </div>
                                 )
                             }
-                            {loading === 2 && currentOffset.current < allGames.length && (
-                                <div ref={loadRef} className="text-center py-4">
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
-                                </div>
-                            )}
-                            {loading !== 2 && currentOffset.current < allGames.length && (
-                                <div ref={loadRef} className="h-4"></div>
-                            )}
+                            <div className="h-4" ref={loadRef}>
+                                {loading === 2 && currentOffset.current < allGames.length && (
+                                    <div className="text-center py-4">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                                    </div>
+                                )}
+                                {/* {loading !== 2 && currentOffset.current < allGames.length && (
+                                    <div className="h-4"></div>
+                                )} */}
+                            </div>
                         </div>
                     </div>
                 </div>

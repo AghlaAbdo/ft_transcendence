@@ -12,7 +12,7 @@ interface BadgeProps {
 export default function Badge({imgSrc, rank, username, score, showCrown, color}: BadgeProps) {
   const position: string = rank !== 1 ? "transfrom translate-y-5" : "";
     return (
-    <div className={`flex flex-col items-center w-fit mx-auto ${position}`}>
+    <div className={`flex flex-col items-center w-fit ${position}`}>
       {
         showCrown && (
           <div className="w-fit">

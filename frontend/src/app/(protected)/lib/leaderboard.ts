@@ -1,20 +1,20 @@
 import { Player } from "@/constants/leaderboard";
-import { Players } from "@/mocks/leaderboard";
+// import { Players } from "@/mocks/leaderboard";
 
 interface PlayerWithRank extends Player {
     rank: number;
 }
 
-const is_mock = false
+// const is_mock = false
 
 export async function get_all_leaderboard(): Promise<PlayerWithRank[]> {
-    if (is_mock) {
-        const sorted = Players.sort((a, b) => b.score - a.score)
-        return sorted.map((player, index) => ({
-            ...player,
-            rank: index + 1
-        }))
-    }
+    // if (is_mock) {
+    //     const sorted = Players.sort((a, b) => b.score - a.score)
+    //     return sorted.map((player, index) => ({
+    //         ...player,
+    //         rank: index + 1
+    //     }))
+    // }
 
     try {
         const response = await fetch('/api/users');
@@ -47,7 +47,7 @@ export async function get_all_leaderboard(): Promise<PlayerWithRank[]> {
         }))
     } catch (error) {
         console.error('Error fetching leaderboard:', error)
-        throw new Error('Failed to fetch leaderboard data')
+        return []
     }
 }
 
