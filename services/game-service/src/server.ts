@@ -3,6 +3,9 @@ import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { initializeSocketIO } from './socket/manager';
 import { initializeDb, getDb } from './database/db';
 import apiRouter from './api/router';
+import fs from 'fs';
+
+const logStream = fs.createWriteStream('./logs/game.log', { flags: 'a' });
 
 const PORT = 4000;
 
@@ -16,8 +19,27 @@ const serverFactory = (
 };
 
 const fastify: FastifyInstance = Fastify({
-  serverFactory: serverFactory,
+  serverFactory,
+  logger: {
+    level: process.env.LOG_LEVEL || 'info',
+    stream: logStream,
+    base: null,
+    timestamp: () => `,"time":"${new Date().toISOString()}"`
+  }
 });
+
+export function logEvent(level: 'info' | 'warn' | 'error' | 'debug', service: string, event: string, data: Record<string, any> = {}) {
+  const logger = fastify.log as any;
+  if (logger[level] && typeof logger[level] === 'function') {
+    logger[level]({
+      service,
+      event,
+      ...data,
+    });
+  } else {
+    console.warn(`Invalid log level: ${level}`);
+  }
+}
 
 initializeSocketIO(httpServer);
 

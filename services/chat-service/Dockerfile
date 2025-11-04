@@ -1,5 +1,6 @@
 FROM node:22-bullseye AS base
 WORKDIR /app
+RUN mkdir logs
 
 FROM base AS development
 COPY run_dev.sh /usr/local/bin/run_dev.sh
