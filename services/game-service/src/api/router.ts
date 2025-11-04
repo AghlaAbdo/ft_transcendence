@@ -99,25 +99,16 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       const now = new Date();
       const year = now.getFullYear();
       const month = now.getMonth();
-      const monthStart = new Date(year, month, 1);
+      // const monthStart = new Date(year, month, 1);
       const monthEnd = new Date(year, month + 1, 0);
       const daysInMonth = monthEnd.getDate();
-
       const quarterSize = Math.ceil(daysInMonth / 4);
       const weeks = [
-        { week: 1, start: 1, end: Math.min(quarterSize, daysInMonth) },
-        {
-          week: 2,
-          start: quarterSize + 1,
-          end: Math.min(quarterSize * 2, daysInMonth),
-        },
-        {
-          week: 3,
-          start: quarterSize * 2 + 1,
-          end: Math.min(quarterSize * 3, daysInMonth),
-        },
-        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth },
-      ].filter((w) => w.start <= daysInMonth);
+        { week: 1, start: 1, end: quarterSize },
+        { week: 2, start: quarterSize + 1, end: quarterSize * 2 },
+        { week: 3, start: quarterSize * 2 + 1, end: quarterSize * 3 },
+        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth }
+      ];
 
       const stmt = db.prepare(`
         SELECT
@@ -137,28 +128,20 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       `);
 
       const dbResults = stmt.all(
-        weeks[0].start,
-        weeks[0].end,
-        weeks[1]?.start || 32,
-        weeks[1]?.end || 32,
-        weeks[2]?.start || 32,
-        weeks[2]?.end || 32,
-        weeks[3]?.start || 32,
-        weeks[3]?.end || 32,
-        userIdNumber,
-        userIdNumber,
-        `${year}-${String(month + 1).padStart(2, '0')}`,
+        weeks[0].start, weeks[0].end,
+        weeks[1].start, weeks[1].end,
+        weeks[2].start, weeks[2].end,
+        weeks[3].start, weeks[3].end,
+        userIdNumber, userIdNumber, `${year}-${String(month + 1).padStart(2, '0')}`
       ) as WeekStats[];
-
-      const stats = [1, 2, 3, 4].map((weekNum) => {
-        const found = dbResults.find((r) => r.week_number === weekNum);
-        const weekInfo = weeks.find((w) => w.week === weekNum);
+      
+      const stats = [1, 2, 3, 4].map(weekNum => {
+        const found = dbResults.find(r => r.week_number === weekNum);
+        // const weekInfo = weeks.find(w => w.week === weekNum);
         return {
           week: weekNum,
           games_played: found ? found.games_played : 0,
-          range: weekInfo
-            ? `${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.start).padStart(2, '0')} to ${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.end).padStart(2, '0')}`
-            : null,
+          // range: weekInfo ? `${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.start).padStart(2, '0')} to ${year}-${String(month + 1).padStart(2, '0')}-${String(weekInfo.end).padStart(2, '0')}` : null
         };
       });
 

@@ -2,7 +2,8 @@ global:
   resolve_timeout: 5m
 
 route:
-  receiver: discord_webhook 
+  receiver: discord_webhook
+  # todo_hamza
   repeat_interval: 1m
   group_by: ['alertname']
   group_wait: 10s

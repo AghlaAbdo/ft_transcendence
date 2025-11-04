@@ -64,6 +64,7 @@ services:
   #     - '--storage.tsdb.path=/prometheus'
   #     - '--storage.tsdb.retention.size=50GB'
   #     - '--storage.tsdb.retention.time=6m'
+  #     # todo_hamza
   #     - '--storage.tsdb.min-block-duration=2m'
   #     - '--storage.tsdb.max-block-duration=2m'
   #   networks:
@@ -125,9 +126,10 @@ services:
   #   depends_on:
   #     - prometheus
   #   environment:
+  #     # todo_hamza
   #     - GF_SERVER_ROOT_URL=https://localhost:3000/grafana
   #     - GF_SERVER_SERVE_FROM_SUB_PATH=false
-  #     - GF_SECURITY_COOKIE_SAMESITE=lax
+  #     # - GF_SECURITY_COOKIE_SAMESITE=lax
   #     - GF_SECURITY_COOKIE_SECURE=true
   #     - GF_SERVER_PROTOCOL=http
   #     - GF_SERVER_HTTP_PORT=3000
