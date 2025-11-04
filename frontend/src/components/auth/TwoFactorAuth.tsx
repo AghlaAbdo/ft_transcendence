@@ -67,29 +67,27 @@ export default function TwoFactorAuth() {
         </button>
       </div>
 
-      <div
-        className={`fixed inset-0 bg-black/50 z-50 pt-5 transition-opacity duration-200 ease-out ${showModal
-            ? 'opacity-100 pointer-events-auto'
-            : 'opacity-0 pointer-events-none'
-          }`}
-        onClick={() => setshowModal(false)}
-      >
-        <div
-          className={`absolute bg-slate-800 rounded-xl transform transition-all duration-300 ease-out mx-2 w-[calc(100%-16px)] md:right-3 md:mx-0 md:w-full md:max-w-lg ${showModal ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
-            }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          { showqr && <div className="bg-white p-4 rounded-lg">
-            <img
-              src={showqr.qrCode}
-              alt="QR Code"
-              className="mx-auto"
-              style={{ width: 256, height: 256 }}
-            />
-          </div>}
-          {/* <GlobalSearch onClose={() => setopen(false)} /> */}
-        </div>
-      </div>
+      {showModal && (
+             <div
+               className="fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center "
+               onClick={() => setshowModal(false)}
+             >
+               <div
+                 className="bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg"
+                 onClick={(e) => e.stopPropagation()}
+               >
+                 {/* <FriendList user={user} onchatselected={onSelect} onClose={() => {setshowModal(false)}} /> */}
+               { showqr && <div className="bg-white p-4 rounded-lg">
+                 <img
+                   src={showqr.qrCode}
+                   alt="QR Code"
+                   className="mx-auto"
+                   style={{ width: 256, height: 256 }}
+                 />
+               </div>}
+               </div>
+             </div>
+           )}
 
     </>
   );
