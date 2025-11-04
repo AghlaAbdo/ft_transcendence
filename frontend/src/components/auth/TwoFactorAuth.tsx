@@ -1,5 +1,7 @@
+import { QrCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import QrModal from "./QrModal"
 
 interface qrCode {
   manualEntryKey: string;
@@ -15,10 +17,10 @@ export default function TwoFactorAuth() {
 
 
   const toggle2FA = async () => {
-    // setEnabled(true);
     setshowModal(true);
-    console.log('dackchiiii');
-    setLoading(true);
+    if (showqr)
+        return ;
+    // setLoading(true);
     try {
       const response = await fetch('https://localhost:8080/api/auth/2fa/setup', {
         method: 'GET',
@@ -67,7 +69,7 @@ export default function TwoFactorAuth() {
         </button>
       </div>
 
-      {showModal && (
+      {showModal && showqr && (
              <div
                className="fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center "
                onClick={() => setshowModal(false)}
@@ -76,19 +78,12 @@ export default function TwoFactorAuth() {
                  className="bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg"
                  onClick={(e) => e.stopPropagation()}
                >
+                <QrModal onclose={()=>setshowModal(false)} qr={showqr}/>
                  {/* <FriendList user={user} onchatselected={onSelect} onClose={() => {setshowModal(false)}} /> */}
-               { showqr && <div className="bg-white p-4 rounded-lg">
-                 <img
-                   src={showqr.qrCode}
-                   alt="QR Code"
-                   className="mx-auto"
-                   style={{ width: 256, height: 256 }}
-                 />
-               </div>}
+               {/* { showqr } */}
                </div>
              </div>
            )}
-
     </>
   );
 }
