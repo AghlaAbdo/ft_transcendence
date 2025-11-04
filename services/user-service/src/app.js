@@ -25,7 +25,7 @@ const createApp = () => {
     
     fastify.register(fastifyStatic, {
         root: path.join(process.cwd(), 'uploads'),
-        prefix: '/uploads/', // URL prefix
+        prefix: '/uploads/',
     });
 
     fastify.register(fastifyCookie);
