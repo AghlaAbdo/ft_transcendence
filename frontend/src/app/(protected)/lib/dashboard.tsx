@@ -1,12 +1,11 @@
-import { games } from "@/mocks/dashboard"
+// import { games } from "@/mocks/dashboard"
 import { game, stat, StatWithTimeDict, TimeDict, WeekStats } from "@/constants/dashboard"
-import { statSync } from "fs"
 
 export async function GetGames(userId: number): Promise<game[]> {
-    const empty = false
-    if (empty) {
-        userId = 1000
-    }
+    // const empty = false
+    // if (empty) {
+    //     userId = 1000
+    // }
     const response = await fetch(`/api/game/games?userId=${userId}`)
     if (!response.ok) throw new Error("Error fetching games!")
     const rawData = await response.json()

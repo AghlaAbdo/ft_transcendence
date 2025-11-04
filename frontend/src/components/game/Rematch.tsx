@@ -14,12 +14,14 @@ export default function Rematch({
   gameId,
   playerRole,
   dialogRef,
+  opponentId,
 }: {
   rematch: string[];
   setRematch: React.Dispatch<React.SetStateAction<string[]>>;
   gameId: string | null;
   playerRole: 'player1' | 'player2' | null;
   dialogRef: React.RefObject<HTMLDialogElement | null>;
+  opponentId: string;
 }) {
   const { setHideHeaderSidebar } = useLayout();
   const { user } = useUser();
@@ -53,7 +55,7 @@ export default function Rematch({
   const handleReturn = () => {
     setRematch((prev) => [...prev, 'quit']);
     // console.log('gameId in handleReturn: ', gameId);
-    socket.emit('quit', { userId: user.id, gameId });
+    socket.emit('quit', { userId: user.id, gameId, opponentId });
     setTimeout(() => router.replace('/game'), 1000);
   };
 

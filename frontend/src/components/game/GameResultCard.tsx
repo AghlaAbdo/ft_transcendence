@@ -79,6 +79,7 @@ export default function GameResultCard({
               gameId={gameId}
               playerRole={playerRole}
               dialogRef={ref}
+              opponentId={rightUser.id}
             />
           )}
         </div>

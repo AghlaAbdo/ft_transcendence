@@ -4,11 +4,8 @@ import Badge from "@/components/leaderboard/Badge";
 import { get_all_leaderboard, get_top_players, get_paginated_players } from "../lib/leaderboard";
 import Table from "@/components/leaderboard/Table";
 import { useEffect, useState, useMemo, use } from "react";
-import { Player } from "@/constants/leaderboard";
+import { Player, PlayerWithRank } from "@/constants/leaderboard";
 
-interface PlayerWithRank extends Player {
-    rank: number;
-}
 
 export default function Leaderboard({
     searchParams,
@@ -27,6 +24,7 @@ export default function Leaderboard({
 
     const numOfPlayers = allPlayers.length
     const numOfPages = Math.ceil(numOfPlayers / limit)
+    console.log(numOfPlayers)
 
     const topPlayers = useMemo(() => get_top_players(allPlayers), [allPlayers])
     const players = useMemo(() => get_paginated_players(allPlayers, page, limit), [allPlayers, page, limit])
@@ -48,7 +46,7 @@ export default function Leaderboard({
 
             <div className="w-[90%] m-auto">
                 <h1 className="text-center text-[2rem] mb-5">Leaderboard</h1>
-                <div className={`flex items-end w-[${widthMap.get(topPlayers.length)}%] mx-auto`}>
+                <div className={`flex items-end w-[${widthMap.get(topPlayers.length)}%] mx-auto justify-between`}>
 
                     {
                         numOfPlayers > 1 ? (

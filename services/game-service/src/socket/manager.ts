@@ -56,8 +56,10 @@ export function initializeSocketIO(server: http.Server): Server {
     socket.on('rematch', (gameId, playerRole, userId) =>
       handleRematch(socket, gameId, playerRole, userId),
     );
-    socket.on('quit', (data: { userId: string; gameId: string }) =>
-      handleQuit(data),
+    socket.on(
+      'quit',
+      (data: { userId: string; gameId: string; opponentId?: string }) =>
+        handleQuit(data),
     );
     socket.on('cancelMatching', (data: { userId: string; gameId: string }) =>
       handleCancelMatching(data),
