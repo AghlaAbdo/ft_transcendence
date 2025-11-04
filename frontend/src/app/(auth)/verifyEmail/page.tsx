@@ -33,7 +33,7 @@ const VerifyEmailPage = () => {
         const response = await fetch('https://localhost:8080/api/auth/verify-email', {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, token: code }),
+            body: JSON.stringify({ email: email.trim().toLocaleLowerCase(), token: code }),
             credentials: 'include',
         });
 

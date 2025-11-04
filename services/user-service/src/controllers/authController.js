@@ -170,7 +170,8 @@ const verifyEmail = async (request, reply) => {
     
     try {
         const { email, token } = request.body;
-
+        console.log(email);
+        
         if (!email || !token)
             throw new Error('Email and verification token are required');
 
