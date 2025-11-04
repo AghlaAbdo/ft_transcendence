@@ -361,6 +361,50 @@ const twoFactorAuth = async (request, reply) => {
     }
 }
 
+const updateStats = async (request, reply) => {
+    const { winnerId, loserId } = request.body;
+    
+    try {
+        const db = request.server.db;
+
+        if (!winnerId || !loserId) {
+            return reply.status(400).send({ 
+                status : false,
+                message: "Missing required fields" 
+            });
+        }
+
+        
+
+        // db.prepare(`
+        //     UPDATE USERS
+        //     SET wins = wins + 1,
+        //         points = points + 3,
+        //         updatedAt = CURRENT_TIMESTAMP
+        //     WHERE id = ?;
+        // `).run(winnerId);
+
+        // db.prepare(`
+        //     UPDATE USERS
+        //     SET losses = losses + 1,
+        //         points = points + 1,
+        //         updatedAt = CURRENT_TIMESTAMP
+        //     WHERE id = ?;
+        // `).run(loserId);
+
+        return reply.status(200).send({ 
+            status: true,
+            message: "Stats updated successfully" 
+        });
+    } catch (err) {
+        console.error("❌ Error updating user stats:", err);
+        return reply.status(500).send({ 
+            status: false,
+            message: "Error updating user stats" 
+        });
+    }
+}
+
 export default { 
     getUserById, 
     getAllUsers, 
@@ -371,5 +415,6 @@ export default {
     changePassword,
     updateInfo,
     twoFactorAuth,
-    searchQuery
+    searchQuery,
+    updateStats
 };

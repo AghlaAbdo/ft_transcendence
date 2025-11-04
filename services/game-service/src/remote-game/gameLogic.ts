@@ -19,6 +19,7 @@ import {
   removeUserActiveTournament,
 } from './userActiveGame';
 import { advancePlayerInTournament } from '../tournament/tournamentManager';
+import postGameStats from '../api/postGameStats';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -155,6 +156,7 @@ function gameOver(gameState: IGameState): void {
       gameState.winner_id!,
     );
   }
+  postGameStats(gameState);
   deleteGame(gameState);
 }
 
