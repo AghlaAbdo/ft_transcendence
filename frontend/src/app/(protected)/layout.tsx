@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar';
 
 import { useLayout } from '@/context/LayoutContext';
 import { Toaster } from 'sonner';
+import Heartbeat from '@/components/Heartbeat';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { hideHeaderSidebar } = useLayout();
@@ -21,6 +22,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <Sidebar />
         <Header />
         <main className={`${!hideHeaderSidebar ? 'md:ml-[72px] mt-[72px]' : ''}`}>
+          <Heartbeat />
           {children}
           <Toaster richColors position="top-right" />
         </main>

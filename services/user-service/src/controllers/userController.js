@@ -405,6 +405,51 @@ const updateStats = async (request, reply) => {
     }
 }
 
+const heartBeat = async (req, res) => {
+    console.log("test----------------------------heartBeat");
+    
+    try {
+        const { userId, online_status } = req.body;
+        
+        if (!userId) {
+            return res.code(400).send({
+                status: false,
+                message: "userId not defined"
+            });
+        }
+
+        const db = req.server.db;
+        
+        const user = userModel.getUserByID(db, userId);
+        if (!user) {
+            return res.code(400).send({
+                status: false,
+                message: "No user found with this id"
+            });
+        }
+
+        const status = online_status !== undefined ? online_status : 1;
+
+        db.prepare(`
+            UPDATE USERS
+            SET online_status = ?
+            WHERE id = ?    
+        `).run(status, user.id);
+
+        return res.code(200).send({
+            status: true,
+            message: "Status updated successfully"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return reply.code(500).send({
+            status: false,
+            message: "Internal server error"
+        });
+    }
+}
+
 export default { 
     getUserById, 
     getAllUsers, 
@@ -416,5 +461,6 @@ export default {
     updateInfo,
     twoFactorAuth,
     searchQuery,
-    updateStats
+    updateStats,
+    heartBeat
 };
