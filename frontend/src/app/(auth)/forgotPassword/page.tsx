@@ -22,9 +22,10 @@ const ForgotPasswordPage = () => {
 
       if (response.ok) {
         toast.success("📩 we’ve sent you a reset link.");
+        setEmail("");
       } else {
-        const data : { mesage?: string} = await response.json();
-        toast.error(data.mesage || "❌ Failed to send reset email.");
+        const data : { message?: string} = await response.json();
+        toast.error(data.message || "❌ Failed to send reset email.");
       }
     } catch (error) {
       toast.error('Network error. Please try again.');

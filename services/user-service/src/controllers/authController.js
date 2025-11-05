@@ -288,7 +288,7 @@ const resendVerificationEmail = async (request, reply) => {
 
 const forgotPassword = async (request, reply) => {
     const { email } = request.body;
-
+    
     try {
         if (!email)
             return reply.code(400).send({
@@ -306,12 +306,18 @@ const forgotPassword = async (request, reply) => {
             });
         }
 
+        if (user.is_google_auth) {
+            return reply.code(400).send({
+                status: false,
+                message: "You don't need a password. Your account is secured through Google"
+            });
+        }
+
         if (!user.isAccountVerified) {
             return reply.code(401).send({
                 status: false,
                 error: "EMAIL_NOT_VERIFIED",
                 message: "Email not verified. Please verify your email address.",
-                // resendVerificationUrl: "/api/auth/resend-verification"
             });
         }
 
