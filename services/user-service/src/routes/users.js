@@ -88,7 +88,7 @@ const userRoutes = async (fastify, options) => {
       return notoficationModel.mark_friend_request_as_read(db, userId, "game_invite");
     });
 
-    fastify.post("/heartbeat", {
+    fastify.post("/close-tab", {
       onRequest: fastify.authenticate
     }, userController.heartBeat);
 }

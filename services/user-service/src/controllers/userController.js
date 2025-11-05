@@ -406,10 +406,10 @@ const updateStats = async (request, reply) => {
 }
 
 const heartBeat = async (req, res) => {
-    console.log("test----------------------------heartBeat");
     
     try {
         const { userId, online_status } = req.body;
+    console.log("test---------------------------- online_status : ", online_status);
         
         if (!userId) {
             return res.code(400).send({

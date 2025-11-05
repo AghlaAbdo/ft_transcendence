@@ -22,7 +22,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <Sidebar />
         <Header />
         <main className={`${!hideHeaderSidebar ? 'md:ml-[72px] mt-[72px]' : ''}`}>
-          <Heartbeat />
+          {/* <Heartbeat /> */}
           {children}
           <Toaster richColors position="top-right" />
         </main>

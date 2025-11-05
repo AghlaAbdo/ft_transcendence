@@ -9,7 +9,7 @@ export default function Heartbeat() {
     if (!user) return;
 
     const setOnline = async () => {
-      await fetch("https://localhost:8080/api/users/heartbeat", {
+      await fetch("https://localhost:8080/api/users/close-tab", {
         method: "POST",
         body: JSON.stringify({ userId: user.id, online_status: 1 }),
         headers: {
@@ -31,7 +31,7 @@ export default function Heartbeat() {
     const handleBeforeUnload = () => {
       // Use sendBeacon instead of fetch - it's guaranteed to send
       navigator.sendBeacon(
-        "https://localhost:8080/api/users/heartbeat",
+        "https://localhost:8080/api/users/close-tab",
         JSON.stringify({ userId: user.id, online_status: 0 })
       );
     };
