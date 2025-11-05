@@ -267,8 +267,10 @@ export const usePongGameLogic = (
 
   const gameLoop = useCallback(() => {
     if (pressedKeys.current.has('ArrowUp')) {
+      console.log("sent MovePaddle up");
       socket.emit('movePaddle', gameId.current, playerRole.current, 'up');
     } else if (pressedKeys.current.has('ArrowDown')) {
+      console.log("sent move Paddle down");
       socket.emit('movePaddle', gameId.current, playerRole.current, 'down');
     }
     if (isPlaying.current)
@@ -339,6 +341,7 @@ export const usePongGameLogic = (
             setPlayer(data.player);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
+            if (data.opponent) setOpponent(data.opponent);
           }
         });
         socket.on('matchNotFound', ()=> {
@@ -406,10 +409,13 @@ export const usePongGameLogic = (
     );
 
     socket.on('prepare', () => {
+      console.log("preparing..");
       setMatching(false);
+      if (gameStatus !== 'playing')
+        setGameStatus('playing');
     });
     socket.on('starting', (count) => {
-      // console.log('starting: ', count);
+      console.log('starting: ', count);
       showCountDown(count);
     });
 

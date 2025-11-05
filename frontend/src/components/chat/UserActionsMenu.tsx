@@ -24,7 +24,7 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
   const handleInviteToGame = async () => {
     console.log('Invite to game clicked');
     onClose();
-    const response = await fetch(`/api/game/game-invite?challengerId=5&opponentId=8`, {
+    const response = await fetch(`/api/game/game-invite?challengerId=5&opponentId=10`, {
       method: 'POST'
     });
     const data = await response.json();

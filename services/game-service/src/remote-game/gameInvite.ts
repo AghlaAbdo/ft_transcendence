@@ -12,8 +12,8 @@ export function handleGameInvite(challenger: IPlayer, opponent: IPlayer) {
     if (!gameState.player1.ready || !gameState.player2.ready) {
       console.log('delete game: ', gameId);
       console.log("Because Players didn't join");
+      delete getAllGames().games[gameId];
     }
-    delete getAllGames().games[gameId];
-  }, 20 * 1000);
+  }, 30 * 1000);
   return gameId;
 }

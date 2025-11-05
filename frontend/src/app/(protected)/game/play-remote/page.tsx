@@ -72,7 +72,11 @@ export default function GamePage() {
       </div>
     );
   } else if (matching) {
-    return <Matching player={player} opponent={opponent} gameId={gameId} />;
+    return (
+      <Matching player={player} opponent={opponent} gameId={gameId}>
+        {' '}
+      </Matching>
+    );
   } else if (!opponent) {
     return (
       <div className='flex h-[100vh] justify-center items-center'>
@@ -84,7 +88,9 @@ export default function GamePage() {
   return (
     <>
       {matching && (
-        <Matching player={player} opponent={opponent} gameId={gameId} />
+        <Matching player={player} opponent={opponent} gameId={gameId}>
+          {' '}
+        </Matching>
       )}
       {!matching && (
         <>

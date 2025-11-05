@@ -393,6 +393,7 @@ export function handleGetGameInviteMatch(
     let playerRole;
     let opponent;
     console.log('Indeed found gameInvite match!!');
+    socket.join(gameState.id);
     if (gameState.player1.id === data.userId) {
       gameState.player1.ready = true;
       player = gameState.player1;
