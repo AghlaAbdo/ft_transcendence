@@ -37,14 +37,14 @@ export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
 
-    // if (
-    //     path.startsWith('/api') ||
-    //     path.startsWith('/_next') ||
-    //     path.startsWith('/static') ||
-    //     path.includes('.')
-    // ) {
-    //     return NextResponse.next();
-    // }
+    if (
+        path.startsWith('/api') ||
+        path.startsWith('/_next') ||
+        path.startsWith('/static') ||
+        path.includes('.')
+    ) {
+        return NextResponse.next();
+    }
 
     // if (matchesRoutes(path, SKIP_MIDDLEWARE_ROUTES)) {
     //     return NextResponse.next();

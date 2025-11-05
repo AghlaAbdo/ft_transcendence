@@ -90,11 +90,11 @@ export default function Dashboard() {
                 <div className="flex">
                     {/* up left */}
                     <div className="relative h-[50vh] overflow-hidden rounded-[10px] m-2 ml-5 w-[30%] group 2xl:h-[40vh]">
-                        <Image
+                        <img
                             src="/images/board.jpg"
                             alt="board"
-                            fill
-                            className="object-cover opacity-30 transition-transform duration-500 group-hover:scale-110"
+                            // fill
+                            className="object-cover opacity-30 transition-transform duration-500 group-hover:scale-110 h-full"
                         />
                         <div className="absolute flex flex-col items-center w-full top-[30%] px-4">
                             <p className="mb-3 font-bold text-white text-lg 2xl:text-[2.3rem]">

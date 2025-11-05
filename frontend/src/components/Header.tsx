@@ -61,13 +61,12 @@ export default function Header() {
       >
         {!isLoading && user && (
         <div className='z-1000 flex justify-between items-center gap-4'>
-          <Image 
+          <img 
               src={user.avatar_url || "/avatars/avatar1.png"} 
               alt="Avatar" 
               width={45}
               height={45}
               className="w-10 h-10 rounded-full object-cover"
-              unoptimized
           />
           <span className='font-bold text-gray-50'>
             Welcome {user.username}

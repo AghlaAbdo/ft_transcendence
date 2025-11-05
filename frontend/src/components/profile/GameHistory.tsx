@@ -1,59 +1,6 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
-// interface Match {
-//   player: string;
-//   playerAvatar: string;
-//   opponent: string;
-//   opponentAvatar: string;
-//   score: string;
-// }
-
-// const matches: Match[] = [
-//   {
-//     player: "username1",
-//     playerAvatar: "/avatars/avatar3.png",
-//     opponent: "username2",
-//     opponentAvatar: "/avatars/avatar2.png",
-//     score: "7 : 3",
-//   },
-//   {
-//     player: "username1",
-//     playerAvatar: "/avatars/avatar3.png",
-//     opponent: "username3",
-//     opponentAvatar: "/avatars/avatar3.png",
-//     score: "2 : 8",
-//   },
-//   {
-//     player: "username1",
-//     playerAvatar: "/avatars/avatar3.png",
-//     opponent: "username4",
-//     opponentAvatar: "/avatars/avatar4.png",
-//     score: "3 : 1",
-//   },
-//   {
-//     player: "username1",
-//     playerAvatar: "/avatars/avatar3.png",
-//     opponent: "username2",
-//     opponentAvatar: "/avatars/avatar2.png",
-//     score: "9 : 8",
-//   },
-//     {
-//     player: "username1",
-//     playerAvatar: "/avatars/avatar3.png",
-//     opponent: "username2",
-//     opponentAvatar: "/avatars/avatar2.png",
-//     score: "9 : 8",
-//   },
-//     {
-//     player: "username1",
-//     playerAvatar: "/avatars/avatar3.png",
-//     opponent: "username2",
-//     opponentAvatar: "/avatars/avatar2.png",
-//     score: "9 : 8",
-//   },
-// ];
 
 interface Match {
   player1_id: number,
@@ -118,9 +65,6 @@ export function GameHistory( { id } :  FriendsProps) {
               playerRes2.json()
             ]);
 
-            console.log(player1.user.avatar_url);
-            console.log(player2.user.avatar_url);
-            
             return { 
               ...match,
               player1: player1.user, 
@@ -184,15 +128,6 @@ export function GameHistory( { id } :  FriendsProps) {
               <span className="font-medium">{currentPlayer?.username}</span>
             </div>
 
-            {/* <div className="text-center mt-5">
-              <span className="px-3 py-1 border-2 border-purple-500 rounded-full font-bold text-sm md:text-base">
-                  {match.player1_score} : {match.player2_score}
-              </span>
-
-              <div className="text-purple-400 font-medium mt-1">
-                {match.played_at}
-              </div>
-            </div> */}
             <div className="flex flex-1 flex-col items-center">
               <span
                 className={`px-3 py-1 border-2 rounded-full font-bold text-sm md:text-base ${
@@ -222,7 +157,6 @@ export function GameHistory( { id } :  FriendsProps) {
           )
         })}
           
-        {/* ))} */}
       </div>
     </div>
   );
@@ -230,7 +164,3 @@ export function GameHistory( { id } :  FriendsProps) {
 
 
 export default { GameHistory };
-
-// /api/users/[searchterm] --> true , object
-// api/friends/[sdfds] --> re
-// 
