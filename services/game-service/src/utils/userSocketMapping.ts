@@ -23,8 +23,10 @@ export function removeUserSocket(socketId: string) {
   // console.log("called removeUserSocket: ", userSocketMap);
 }
 
-export function getUserSocketId(userId: string) {
+export function getUserSocketId(userId: string | null) {
   // console.log("userSocketMap in getUserSocketId: ", userSocketMap);
+  console.log('uerId in getuserSocketId: ', userId);
+  if (!userId) return;
   return userSocketMap.get(userId);
 }
 

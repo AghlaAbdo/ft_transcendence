@@ -19,6 +19,7 @@ import {
   removeUserActiveTournament,
 } from './userActiveGame';
 import { advancePlayerInTournament } from '../tournament/tournamentManager';
+import { deleteGame } from './AllGames';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -49,7 +50,7 @@ export function startGame(gameState: IGameState) {
       if (j === 1) {
         setTimeout(() => {
           if (gameState.game.status === 'ended') {
-            deleteGame(gameState);
+            deleteGame(gameState.id);
             return;
           }
           ioInstance.to(gameState.id).emit('startGame');
@@ -165,13 +166,5 @@ function gameOver(gameState: IGameState): void {
       gameState.winner_id!,
     );
   }
-  deleteGame(gameState);
-}
-
-export function deleteGame(gameState: IGameState | undefined): void {
-  if (!gameState) return;
-  if (gameState.game.status === 'playing') {
-    gameState.game.status = 'ended';
-  }
-  delete getAllGames().games[gameState.id];
+  deleteGame(gameState.id);
 }

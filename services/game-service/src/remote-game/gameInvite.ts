@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { IPlayer } from '../types/types';
 import { generateGameState } from './gameState';
-import { getAllGames } from './AllGames';
+import { getAllGames, addGameState, deleteGame } from './AllGames';
 import { getUserSocketId } from '../utils/userSocketMapping';
 import { getIoInstance } from '../socket/manager';
 import { removeUserActiveGame } from './userActiveGame';
@@ -9,7 +9,7 @@ import { removeUserActiveGame } from './userActiveGame';
 export function handleGameInvite(challenger: IPlayer, opponent: IPlayer) {
   const gameId = crypto.randomUUID();
   const gameState = generateGameState(gameId, challenger, opponent, null, null);
-  getAllGames().games[gameId] = gameState;
+  addGameState(gameState);
   console.log('Created Game: ', gameId);
   setTimeout(() => {
     if (!gameState.player1.ready || !gameState.player2.ready) {
@@ -26,7 +26,7 @@ export function handleGameInvite(challenger: IPlayer, opponent: IPlayer) {
       }
       removeUserActiveGame(gameState.player1.id, gameState.id);
       removeUserActiveGame(gameState.player2.id, gameState.id);
-      delete getAllGames().games[gameId];
+      deleteGame(gameId);
     }
   }, 30 * 1000);
   return gameId;

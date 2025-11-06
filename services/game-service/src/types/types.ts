@@ -53,9 +53,7 @@ export interface IGameState {
 
 export interface IGmaes {
   lobyGame: string | null;
-  games: {
-    [gameId: string]: IGameState;
-  };
+  games: Map<string, IGameState>;
 }
 
 export interface IPlayer {

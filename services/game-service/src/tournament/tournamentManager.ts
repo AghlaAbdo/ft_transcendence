@@ -6,8 +6,13 @@ import {
   IMatch,
   IGameState,
 } from '../types/types';
-import { getAllGames, getGameState } from '../remote-game/AllGames';
-import { deleteGame, startGame } from '../remote-game/gameLogic';
+import {
+  getAllGames,
+  getGameState,
+  deleteGame,
+  addGameState,
+} from '../remote-game/AllGames';
+import { startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
 import {
   removeUserActiveGame,
@@ -223,7 +228,7 @@ function notJoinTournamentMatch(
     players: Array.from(tournament.players.values()),
     bracket: tournament.bracket,
   });
-  deleteGame(gameState);
+  deleteGame(gameState.id);
 }
 
 function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
@@ -258,7 +263,7 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
     tournament.id,
     match.id,
   );
-  getAllGames().games[gameId] = gameState;
+  addGameState(gameState);
   match.gameId = gameId;
 
   io.to(player1SocketId).emit('matchReady', { gameId, opponent: player2Info });
