@@ -138,7 +138,7 @@ const changePassword = async (request, reply) => {
         const db = request.server.db;
 
         const currentUser = db.prepare(`
-            SELECT password
+            SELECT password, is_google_auth
             FROM USERS
             WHERE id = ?
         `).get(user.id);
@@ -149,6 +149,13 @@ const changePassword = async (request, reply) => {
                 message: "User not found"
             });
         }
+        if (currentUser.is_google_auth) {
+            return reply.code(400).send({
+                status: false,
+                message: "Password change is not allowed for Google accounts"
+            });
+        }
+        
 
         const isPasswordValid = await bcrypt.compare(currentPassword, currentUser.password);
         if(!isPasswordValid) {
@@ -405,6 +412,53 @@ const updateStats = async (request, reply) => {
     }
 }
 
+const heartBeat = async (req, res) => {
+    
+    try {
+        const { userId, online_status } = req.body;
+    console.log("test---------------------------- online_status : ", online_status);
+        
+        if (!userId) {
+            return res.code(400).send({
+                status: false,
+                message: "userId not defined"
+            });
+        }
+
+        const db = req.server.db;
+        
+        const user = userModel.getUserByID(db, userId);
+        if (!user) {
+            return res.code(400).send({
+                status: false,
+                message: "No user found with this id"
+            });
+        }
+
+        const status = online_status !== undefined ? online_status : 1;
+        console.log("test---------------------------- status : ", status);
+
+
+        db.prepare(`
+            UPDATE USERS
+            SET online_status = ?
+            WHERE id = ?    
+        `).run(status, user.id);
+
+        return res.code(200).send({
+            status: true,
+            message: "Status updated successfully"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return reply.code(500).send({
+            status: false,
+            message: "Internal server error"
+        });
+    }
+}
+
 export default { 
     getUserById, 
     getAllUsers, 
@@ -416,5 +470,6 @@ export default {
     updateInfo,
     twoFactorAuth,
     searchQuery,
-    updateStats
+    updateStats,
+    heartBeat
 };

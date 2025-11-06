@@ -9,6 +9,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 import notoficationModel from "./models/notoficationModel.js";
 
 const onlineUsers = new Map();
+const disconnectTimers = new Map(); // userId -> timeout
 
 const handleConnection = (fastify, socket) => {
     const user__id = parseInt(socket.handshake.auth.user_id);
@@ -20,6 +21,12 @@ const handleConnection = (fastify, socket) => {
     
     
     socket.userId = user__id;
+
+    if (disconnectTimers.has(user__id)) {
+        clearTimeout(disconnectTimers.get(user__id));
+        disconnectTimers.delete(user__id);
+    }
+
     onlineUsers.set(user__id, socket);
 
     fastify.db.prepare(`UPDATE USERS SET online_status = 1 WHERE id = ?`).run(user__id);
@@ -41,14 +48,19 @@ const handleConnection = (fastify, socket) => {
 
     /* -------------------------- Disconnect ---------------------------- */
 
-    socket.on("disconnect", () => {
-        if (socket.userId) {
-            onlineUsers.delete(socket.userId);
 
-            fastify.db.prepare(`UPDATE USERS SET online_status = 0 WHERE id = ?`).run(user__id);
-            
-            console.log(`User ${socket.userId} disconnected`);
-        }
+    socket.on("disconnect", () => {
+        // Delay marking offline in case user reconnects quickly (page refresh)
+        const timer = setTimeout(() => {
+            if (!onlineUsers.has(user__id)) {
+                fastify.db.prepare(`UPDATE USERS SET online_status = 0 WHERE id = ?`).run(user__id);
+                console.log(`User ${user__id} disconnected`);
+            }
+            disconnectTimers.delete(user__id);
+        }, 2000); // 2 second delay
+
+        disconnectTimers.set(user__id, timer);
+        onlineUsers.delete(user__id);
     });
 
 }

@@ -168,6 +168,8 @@ const SettingsPage = () => {
 
   if (!user) 
     return <p className="text-gray-500">User not found</p>;
+  console.log("user from settings: ", user);
+  
   return (
         <div className="h-[calc(100vh_-_72px)] text-white flex px-2 gap-2 ">
           <div className="flex-1 rounded-[20px] flex flex-col my-2 gap max-w-6xl mx-auto bg-[#021024]">
