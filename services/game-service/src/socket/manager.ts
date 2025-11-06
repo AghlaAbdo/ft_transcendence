@@ -1,6 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import Fastify, { FastifyInstance } from 'fastify';
 import http from 'http';
+import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
 import {
   handleConnection,
   handlePlay,
@@ -27,6 +29,7 @@ import {
   handleRequestTournMatchDetails,
   handleUnreadyForMatch,
 } from './tournamentHandlers';
+import { JWT_SECRET } from '../config/env';
 
 let ioInstance: Server;
 
@@ -44,11 +47,37 @@ export function initializeSocketIO(server: http.Server): Server {
   });
   ioInstance = io;
 
+  io.use((socket, next) => {
+    let token: string | undefined;
+
+    // 1. Browser: token sent in HttpOnly cookie
+    const cookieHeader = socket.handshake.headers.cookie;
+    if (cookieHeader) {
+      const cookies = cookie.parse(cookieHeader);
+      token = cookies.token;
+    }
+
+    // 2. CLI: token sent via auth object
+    if (!token) {
+      token = socket.handshake.auth?.token;
+    }
+
+    if (!token) return next(new Error('NO_TOKEN'));
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as {
+        id: string;
+        username: string;
+      };
+      // console.log("Decoded token: ", decoded);
+      (handleConnection(socket, io, String(decoded.id)), next());
+    } catch (err) {
+      return next(new Error('INVALID_TOKEN'));
+    }
+  });
+
   io.on('connection', (socket: Socket) => {
     console.log('recieved a new connection\n');
-    socket.on('hello', (userId: string) =>
-      handleConnection(socket, io, userId),
-    );
     socket.on('play', (userId) => handlePlay(socket, userId));
     socket.on('movePaddle', (gameId, playerRole, dir) =>
       handleMovePaddle(gameId, playerRole, dir),
