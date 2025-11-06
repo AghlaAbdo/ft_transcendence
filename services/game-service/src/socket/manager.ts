@@ -13,6 +13,7 @@ import {
   handleRequestGameState,
   hancleQuitRemoteGamePage,
   handleGetGameInviteMatch,
+  handleLeaveGameInvite,
 } from './handlers';
 import {
   handleJoinTournament,
@@ -126,6 +127,9 @@ export function initializeSocketIO(server: http.Server): Server {
       (data: { gameId: string; userId: string }) =>
         handleGetGameInviteMatch(socket, data),
     );
+    socket.on('leaveGameInvite', (data: { userId: string; gameId: string }) => {
+      handleLeaveGameInvite(data);
+    });
   });
 
   return io;

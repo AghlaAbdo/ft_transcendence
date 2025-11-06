@@ -422,3 +422,15 @@ export function handleGetGameInviteMatch(
     }
   } else socket.emit('matchNotFound');
 }
+
+export function handleLeaveGameInvite(data: {
+  userId: string;
+  gameId: string;
+}) {
+  const gameState = getGameState(data.gameId);
+  if (!gameState) return;
+  console.log('Set user unready');
+  if (data.userId === gameState.player1.id) gameState.player1.ready = false;
+  else if (data.userId === gameState.player2.id)
+    gameState.player2.ready = false;
+}

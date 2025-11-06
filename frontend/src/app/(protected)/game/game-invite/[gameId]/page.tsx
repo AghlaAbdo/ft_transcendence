@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import LoadingPong from '@/components/LoadingPong';
 import Matching from '@/components/Matching';
@@ -14,6 +14,7 @@ import GameResultCard from '@/components/game/GameResultCard';
 import InTournamentCard from '@/components/game/InTournamentCard';
 
 import { socket } from '@/app/(protected)/lib/socket';
+import NotFound from '@/app/not-found';
 import { IPlayer } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
 import { useUser } from '@/context/UserContext';
@@ -25,32 +26,46 @@ export default function GameInvite() {
   const params = useParams();
   const gameId = params.gameId as string;
   const { setHideHeaderSidebar } = useLayout();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [inviteRejected, setInviteRejected] = useState<boolean>(false);
+  const [notFound, setNotFound] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     setHideHeaderSidebar(true);
+    socket.on('opponentDidNotJoin', () => {
+      setInviteRejected(true);
+      setHideHeaderSidebar(false);
+    });
+    socket.on('matchNotFound', () => {
+      console.log('GAmeInvite match not found!!');
+      setHideHeaderSidebar(false);
+      setLoading(false);
+      setNotFound(true);
+    });
+    socket.on('matchDetails', () => {
+      setLoading(false);
+    });
 
     return () => {
       setHideHeaderSidebar(false);
+      socket.off('opponentDidNotJoin');
+      socket.off('matchNotFound');
+      socket.off('matchDetails');
     };
   }, []);
 
-  const {
-    containerRef,
-    dialogRef,
-    matching,
-    opponent,
-    winner,
-    playerRole,
-    inAnotherGame,
-    gameStatus,
-    inTournament,
-  } = usePongGameLogic(null, null, gameId);
+  const { containerRef, dialogRef, matching, opponent, winner, playerRole } =
+    usePongGameLogic(null, null, gameId);
 
   function handleClose() {
     closeDialRef.current?.showModal();
   }
 
-  function handleReturn() {}
+  function handleReturn() {
+    socket.emit('leaveGameInvite', { userId: user.id, gameId });
+    router.replace('/chat');
+  }
 
   const player: IPlayer = {
     id: user.id,
@@ -60,6 +75,32 @@ export default function GameInvite() {
     level: '34',
     isEliminated: false,
   };
+
+  if (loading)
+    return (
+      <div className='h-[calc(100vh_-_72px)] flex justify-center items-center'>
+        <LoadingPong />
+      </div>
+    );
+
+  if (notFound) return <NotFound />;
+
+  if (inviteRejected)
+    return (
+      <div className='h-[calc(100vh_-_72px)] flex justify-center items-center'>
+        <div className='w-fit min-w-20 flex flex-col justify-center items-center bg-dark-blue gap-4 border-1 border-gray-600 rounded-[8px] p-4'>
+          <span className='text-2xl font-bold'>
+            Opponent did not join the game!
+          </span>
+          <button
+            onClick={() => router.replace('/chat')}
+            className='bg-red py-[2px] 500:py-1 px-1 500:px-4 mt-4 rounded-[8px] text-[14px] 500:text-[18px] text-gray-50 font-bold cursor-pointer'
+          >
+            Return
+          </button>
+        </div>
+      </div>
+    );
 
   return (
     <>
