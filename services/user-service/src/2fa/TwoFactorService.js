@@ -8,7 +8,7 @@ export async function generateSecret(userId, email) {
     length: 32,
   });
 
-  const qrCode = QRCode.toDataURL(secret.otpauth_url);
+  const qrCode = await QRCode.toDataURL(secret.otpauth_url);
 
   return {
     secret: secret.base32,

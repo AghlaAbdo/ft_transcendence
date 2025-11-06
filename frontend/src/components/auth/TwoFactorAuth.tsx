@@ -18,8 +18,8 @@ export default function TwoFactorAuth() {
 
   const toggle2FA = async () => {
     setshowModal(true);
-    if (showqr)
-        return ;
+    // if (showqr)
+    //     return ;
     // setLoading(true);
     try {
       const response = await fetch('https://localhost:8080/api/auth/2fa/setup', {

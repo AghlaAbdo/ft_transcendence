@@ -38,9 +38,9 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
         method: 'POST',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
+    'Content-Type': 'application/json',  // ✅ ADD THIS
+  },
+        body: JSON.stringify({token : code }),
       });
 
       if (response.ok) {

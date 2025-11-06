@@ -392,43 +392,46 @@ try {
     return rep.status(500).send({ error: 'Failed to setup 2FA' });
   }
 }
-
-
- // verfy 2fa token
-
+// verfy 2fa token
 const verify2Fa = async (req, rep) => {
 try {
+    // console.log('verfify backend');
+    
     const userId = req.user?.id;
     const { token } = req.body;
 
+    console.log('user:', userId);
+    console.log('token:', token);
     if (!userId || !token) {
+        // console.log('ists her 1');
       return rep.status(400).send({ error: 'Missing required fields' });
     }
 
     // Get the secret from database
-    const user = await db.prepare(`
-      SELECT two_factor_secret 
-      FROM users 
-      WHERE id = ?
-    `).get(userId);
+    // const user = await db.prepare(`
+    //   SELECT two_factor_secret 
+    //   FROM users 
+    //   WHERE id = ?
+    // `).get(userId);
 
-    if (!user?.two_factor_secret) {
-      return rep.status(400).send({ error: '2FA not set up' });
-    }
+    // if (!user?.two_factor_secret) {
+    //   return rep.status(400).send({ error: '2FA not set up' });
+    // }
 
     // Verify the token
     const isValid = verifyToken(user.two_factor_secret, token);
 
     if (!isValid) {
+        // console.log('ists her');
       return rep.status(400).send({ error: 'Invalid verification code' });
     }
 
     // Enable 2FA
-    await db.prepare(`
-      UPDATE users 
-      SET two_factor_enabled = TRUE 
-      WHERE id = ?
-    `).run(userId);
+    // await db.prepare(`
+    //   UPDATE users 
+    //   SET two_factor_enabled = TRUE 
+    //   WHERE id = ?
+    // `).run(userId);
 
     return {
       status: true,
