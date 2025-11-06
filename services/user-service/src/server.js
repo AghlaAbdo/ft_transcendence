@@ -17,19 +17,19 @@ const handleConnection = (fastify, socket) => {
         return socket.disconnect();
     }
 
+    
+    
     socket.userId = user__id;
     onlineUsers.set(user__id, socket);
+
+    fastify.db.prepare(`UPDATE USERS SET online_status = 1 WHERE id = ?`).run(user__id);
 
     socket.on("Notification", async (data) => {
         try {
             const { user_id, actor_id, type } = data;
-            console.log('db hhhh');
 
             if (!actor_id || !type || !user_id) return;
-            // console.log("user: ",user_id);
-            // console.log("actor: ",actor_id);
-            // console.log("message: ",message);
-            // console.log("type : ",type);
+
             const new_notification = notoficationModel.insert_notification(fastify.db, user_id, actor_id, type);
             const receiverSocket = onlineUsers.get(actor_id);
             if (receiverSocket) receiverSocket.emit("Notification", new_notification);
@@ -44,6 +44,9 @@ const handleConnection = (fastify, socket) => {
     socket.on("disconnect", () => {
         if (socket.userId) {
             onlineUsers.delete(socket.userId);
+
+            fastify.db.prepare(`UPDATE USERS SET online_status = 0 WHERE id = ?`).run(user__id);
+            
             console.log(`User ${socket.userId} disconnected`);
         }
     });
