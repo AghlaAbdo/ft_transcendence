@@ -20,6 +20,7 @@ import {
 } from './userActiveGame';
 import { advancePlayerInTournament } from '../tournament/tournamentManager';
 import postGameStats from '../api/postGameStats';
+import fastify from 'fastify';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
