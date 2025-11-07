@@ -459,17 +459,17 @@ try {
 
     // Get the secret
     const user = await db.prepare(`
-      SELECT two_factor_secret 
+      SELECT totp_secret 
       FROM users 
       WHERE id = ?
     `).get(userId);
 
-    if (!user?.two_factor_secret) {
+    if (!user?.totp_secret) {
       return rep.status(400).send({ error: '2FA not enabled' });
     }
 
     // Verify token before disabling
-    const isValid = TwoFactorService.verifyToken(user.two_factor_secret, token);
+    const isValid = TwoFactorService.verifyToken(user.totp_secret, token);
 
     if (!isValid) {
       return rep.status(400).send({ error: 'Invalid verification code' });
@@ -478,8 +478,8 @@ try {
     // Disable 2FA and clear secret
     await db.prepare(`
       UPDATE users 
-      SET two_factor_enabled = FALSE,
-          two_factor_secret = NULL 
+      SET is_2fa_enabled = FALSE,
+          totp_secret = NULL 
       WHERE id = ?
     `).run(userId);
 

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { setegid, setSourceMapsEnabled } from 'process';
+import { setEnvironmentData } from 'worker_threads';
 
 interface qrCode {
   manualEntryKey: string;
@@ -11,14 +13,18 @@ interface qrCode {
 interface Qrporps {
     qr: qrCode;
     onclose: () => void;
+    enabled: boolean;
+    setenabled: () => void;
+
 }
 
 
-export default function QrMOdal ({qr, onclose}: Qrporps) {
+export default function QrMOdal ({qr, onclose, setenabled}: Qrporps) {
   const [code, setCode] = useState('');
   const [copied, setCopied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
+  
   const handleCopyKey = () => {
     navigator.clipboard.writeText(qr.manualEntryKey);
     setCopied(true);
@@ -45,6 +51,7 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
 
       if (response.ok) {
         toast.success('2FA enabled successfully!');
+        setenabled();
         onclose();
       } else {
         toast.error('Invalid code. Please try again.');
@@ -58,15 +65,12 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
 
   return (
     <div className='bg-slate-800 p-5 rounded-xl relative max-w-2xl'>
-      {/* Close Button */}
       <button
         onClick={onclose}
         className='absolute top-3 right-3 text-gray-400 hover:text-white '
       >
         <X size={20} />
       </button>
-
-      {/* Header */}
       <div className='text-center mb-4'>
         <h2 className='text-xl font-bold text-white mb-1'>
           Enable Two-Factor Authentication
@@ -75,8 +79,6 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
           Scan the QR code with your authenticator app
         </p>
       </div>
-
-      {/* QR Code and Manual Key Side by Side */}
       <div className='flex gap-4 mb-4'>
         {/* QR Code */}
         <div className='bg-white p-3 rounded-lg flex items-center justify-center'>
@@ -87,7 +89,6 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
           />
         </div>
 
-        {/* Manual Entry Key */}
         <div className='flex-1 flex flex-col justify-center'>
           <label className='block text-xs font-medium text-gray-300 mb-2'>
             Manual key:
@@ -112,7 +113,6 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
         </div>
       </div>
 
-      {/* Verification Code Input */}
       <div className='mb-4'>
         <label className='block text-xs font-medium text-gray-300 mb-2'>
           Enter the 6-digit code:
@@ -130,7 +130,6 @@ export default function QrMOdal ({qr, onclose}: Qrporps) {
         />
       </div>
 
-      {/* Action Buttons */}
       <div className='flex gap-2'>
         <button
           onClick={onclose}

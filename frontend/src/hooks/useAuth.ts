@@ -20,6 +20,7 @@ export interface User {
   losses: number;
   rank: number;
   online_status: number;
+  is_2fa_enabled: boolean;
 }
 
 
