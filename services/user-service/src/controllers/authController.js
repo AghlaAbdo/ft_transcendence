@@ -449,11 +449,14 @@ try {
 
 // disable 2fa
 const disable2fa = async(req, rep) => {
+    console.log('allllo');
+    
 try {
+    const db = req.server.db;
     const userId = req.user?.id;
-    const { token } = req.body;
+    // const { token } = req.body;
 
-    if (!userId || !token) {
+    if (!userId) {
       return rep.status(400).send({ error: 'Missing required fields' });
     }
 

@@ -15,52 +15,28 @@ interface qrCode {
 
 export default function TwoFactorAuth() {
   const [enabled, setEnabled] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setshowModal] = useState<boolean>(false);
   const [showqr, setshowqr] = useState<qrCode>();
   const {user} = useAuth();
 
-    useEffect(()=>{
-    if (user)
-        setEnabled(user.is_2fa_enabled);
-  })
-
-  const handlechange = async () => {
-    if (!enabled)
-      toggle2FA();
-    else {
-
-      try {
-        const response = await fetch(
-        'https://localhost:8080/api/auth/2fa/setup',
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      );
-      if (response.ok) {
-        const data: qrCode = await response.json();
-        console.log('data: ', data);
-        setshowqr(data);
-        setshowModal(true);
-        //  setUser(data.user);
-      } else {
-        console.log('error in 2fa setup');
-        //  router.push('/login');
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      //  router.push('/login');
-      } finally {
-        //  setIsLoading(false);
-      }
+  useEffect(() => {
+    if (user) {
+      setEnabled(user.is_2fa_enabled);
     }
-      
+  }, [user])
+
+  const handleToggleChange = async () => {
+    if (!user) return;
+
+    if (!enabled) {
+      await fetchQRCode();
+    }
+    else {
+      await disable2FA();
+    }
   };
-  const toggle2FA = async () => {
-    // if (showqr)
-    //     return ;
-    // setLoading(true);
+
+  const fetchQRCode = async () => {
     try {
       const response = await fetch(
         'https://localhost:8080/api/auth/2fa/setup',
@@ -69,25 +45,51 @@ export default function TwoFactorAuth() {
           credentials: 'include',
         }
       );
+      
       if (response.ok) {
         const data: qrCode = await response.json();
-        console.log('data: ', data);
         setshowqr(data);
         setshowModal(true);
-        //  setUser(data.user);
       } else {
-        console.log('error in 2fa setup');
-        //  router.push('/login');
+        toast.error('Failed to generate QR code');
       }
     } catch (error) {
-      console.error('Auth check error:', error);
-      //  router.push('/login');
-    } finally {
-      //  setIsLoading(false);
+      console.error('2FA setup error:', error);
+      toast.error('Failed to setup 2FA');
     }
   };
+
+  const disable2FA = async () => {
+    try {
+      const response = await fetch(
+        'https://localhost:8080/api/auth/2fa/disable',
+        {
+          method: 'POST',
+          credentials: 'include',
+        }
+      );
+      
+      if (response.ok) {
+        setEnabled(false);
+        toast.success('2FA disabled successfully');
+      } else {
+        toast.error('Failed to disable 2FA');
+      }
+    } catch (error) {
+      console.error('2FA disable error:', error);
+      toast.error('Failed to disable 2FA');
+    }
+  };
+
+  const handleVerificationSuccess = () => {
+    setEnabled(true);
+    setshowModal(false);
+    toast.success('2FA enabled successfully!');
+  };
+
   if (!user)
       return <><div>Loading</div></>
+
   return (
     <>
       <div className='rounded-2xl border border-slate-700 bg-slate-800/50 p-6 shadow-md flex items-center justify-between'>
@@ -104,7 +106,8 @@ export default function TwoFactorAuth() {
           <div className='relative'>
             <input
               type='checkbox'
-              onChange={handlechange}
+              checked={enabled}
+              onChange={handleToggleChange}
               className='sr-only'
             />
             <div
@@ -125,16 +128,18 @@ export default function TwoFactorAuth() {
 
       {showModal && showqr && (
         <div
-          className='fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center '
+          className='fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center'
           onClick={() => setshowModal(false)}
         >
           <div
-            className='bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg'
+            className='bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-2xl'
             onClick={(e) => e.stopPropagation()}
           >
-            <QrModal onclose={() => setshowModal(false)} qr={showqr} enabled={enabled} setenabled={()=>setEnabled(true)} />
-            {/* <FriendList user={user} onchatselected={onSelect} onClose={() => {setshowModal(false)}} /> */}
-            {/* { showqr } */}
+            <QrModal 
+              onclose={() => setshowModal(false)} 
+              qr={showqr}
+              onVerificationSuccess={handleVerificationSuccess}
+            />
           </div>
         </div>
       )}

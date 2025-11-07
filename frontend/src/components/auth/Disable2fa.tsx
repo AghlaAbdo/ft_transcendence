@@ -68,14 +68,6 @@ export default function QrMOdal ({qr, onclose, onVerificationSuccess}: Qrporps) 
       >
         <X size={20} />
       </button>
-      <div className='text-center mb-4'>
-        <h2 className='text-xl font-bold text-white mb-1'>
-          Enable Two-Factor Authentication
-        </h2>
-        <p className='text-gray-400 text-xs'>
-          Scan the QR code with your authenticator app
-        </p>
-      </div>
       <div className='flex gap-4 mb-4'>
         {/* QR Code */}
         <div className='bg-white p-3 rounded-lg flex items-center justify-center'>
