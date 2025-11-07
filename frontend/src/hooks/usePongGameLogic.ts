@@ -33,7 +33,8 @@ interface returnType {
 
 export const usePongGameLogic = (
   tournamentId: string | null,
-  matchGameId: string | null
+  matchGameId: string | null,
+  gameInviteId: string | null
 ): returnType => {
   const router = useRouter();
   const [matching, setMatching] = useState(true);
@@ -99,6 +100,8 @@ export const usePongGameLogic = (
   }, []);
 
   useEffect(() => {
+    console.log('gameStatus:', gameStatus);
+    console.log('matching: ', matching);
     if (!gameStatus || matching) return;
     let isInitialized = false;
     const initPixiApp = async () => {
@@ -291,7 +294,6 @@ export const usePongGameLogic = (
           // console.log('match DAta received: ', data);
           setGameStatus(data.gameStatus);
           if (data.gameStatus === 'playing') {
-            console.log("is gameStatus 'playing' ??");
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
             setPlayer(data.player);
@@ -300,6 +302,45 @@ export const usePongGameLogic = (
             if (!animationFrameId.current)
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          }
+        }
+      );
+    } else if (gameInviteId) {
+      socket.emit('getGameInviteMatch', {
+        gameId: gameInviteId,
+        userId: user.id,
+      });
+      socket.on(
+        'matchDetails',
+        (data: {
+          gameId: string | null;
+          gameStatus: 'playing' | 'waiting' | 'notFound';
+          player: IPlayer | null;
+          opponent: IPlayer | null;
+          playerRole: 'player1' | 'player2' | null;
+        }) => {
+          console.log('Game Invite Found');
+          setGameStatus(data.gameStatus);
+          if (data.gameStatus === 'playing') {
+            // console.log("is gameStatus 'playing' ??");
+            // console.log("match found, data:", data);
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
+            setPlayer(data.player);
+            console.log('setMatching false: 1');
+            setMatching(false);
+            isPlaying.current = true;
+            if (!animationFrameId.current)
+              animationFrameId.current = requestAnimationFrame(gameLoop);
+            setHideHeaderSidebar(true);
+            if (data.opponent) setOpponent(data.opponent);
+          } else if (data.gameStatus === 'waiting') {
+            // console.log('did set player: ', data.player);
+            // console.log("match found waiting, data:", data);
+            setPlayer(data.player);
+            playerRole.current = data.playerRole;
+            gameId.current = data.gameId;
             if (data.opponent) setOpponent(data.opponent);
           }
         }
@@ -322,9 +363,11 @@ export const usePongGameLogic = (
             socket.emit('play', user.id);
           } else if (data.gameStatus === 'playing') {
             // console.log("is gameStatus 'playing' ??");
+            // console.log("match found, data:", data);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
             setPlayer(data.player);
+            console.log('setMatching false: 2');
             setMatching(false);
             isPlaying.current = true;
             if (!animationFrameId.current)
@@ -333,6 +376,7 @@ export const usePongGameLogic = (
             if (data.opponent) setOpponent(data.opponent);
           } else if (data.gameStatus === 'waiting') {
             // console.log('did set player: ', data.player);
+            // console.log("match found waiting, data:", data);
             setPlayer(data.player);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
@@ -364,10 +408,13 @@ export const usePongGameLogic = (
     );
 
     socket.on('prepare', () => {
+      console.log('preparing..');
+      console.log('setMatching false: 3');
       setMatching(false);
+      if (gameStatus !== 'playing') setGameStatus('playing');
     });
     socket.on('starting', (count) => {
-      // console.log('starting: ', count);
+      console.log('starting: ', count);
       showCountDown(count);
     });
 
@@ -436,7 +483,10 @@ export const usePongGameLogic = (
       'opponentQuit',
       (gameStatus: 'waiting' | 'playing' | 'ended' | null) => {
         isPlaying.current = false;
-        if (matching) setMatching(false);
+        if (matching && gameStatus === 'playing') {
+          console.log('setMatching false: 4');
+          setMatching(false);
+        }
         if (gameStatus === 'playing' || gameStatus === 'waiting') {
           console.log('opponent has quit!!');
           if (endTextRef.current) endTextRef.current.text = 'Opponent Quit';

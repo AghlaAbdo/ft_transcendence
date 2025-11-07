@@ -68,8 +68,8 @@ export function generateGameState(
     playersNb: 1,
     winner_id: null,
     startDate: null,
-    startAt: new Date().getTime(),
-    playtime: null,
+    startAt: null,
+    playtime: 0,
   };
 }
 

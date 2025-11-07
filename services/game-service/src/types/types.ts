@@ -23,7 +23,7 @@ export interface IGameState {
   playersNb: number;
   winner_id: string | null;
   startDate: string | null;
-  startAt: number;
+  startAt: number | null;
   playtime: number | null;
   player1: {
     id: string | null;
@@ -53,9 +53,7 @@ export interface IGameState {
 
 export interface IGmaes {
   lobyGame: string | null;
-  games: {
-    [gameId: string]: IGameState;
-  };
+  games: Map<string, IGameState>;
 }
 
 export interface IPlayer {
@@ -118,4 +116,14 @@ export interface TournamentListItem {
   currentPlayers: number;
   status: string;
   creatorUsername?: string;
+}
+
+// ----------- Game Invite -----------
+
+export interface IGameInvite {
+  challengerId: string;
+  opponentId: string;
+  challengerJoined: boolean;
+  opponentJoined: boolean;
+  game: IGameState;
 }

@@ -70,7 +70,7 @@ export default function GamePage() {
     gameId,
     playerRole,
     inAnotherGame,
-  } = usePongGameLogic(tournamentId, matchGameId);
+  } = usePongGameLogic(tournamentId, matchGameId, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
 
   if (accessToMatch === 'pending') return <div></div>;
@@ -125,6 +125,7 @@ export default function GamePage() {
         dialogRef={closeDialRef}
         gameId={gameId}
         isTournamentGame={true}
+        isLocal={false}
       />
 
       <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>
