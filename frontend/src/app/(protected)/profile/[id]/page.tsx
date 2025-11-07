@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { User } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { getFrameByPoints } from '@/utils/getFrameByPoints';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -59,21 +60,33 @@ const ProfilePage = () => {
               </div>
               <div className='flex-1 justify-items-center flex justify-center'>
           
-                  <img 
+                  {/* <img 
                     src={user.avatar_url || "/avatars/avatar1.png"} 
                     alt="avatar"
                     className="absolute top-55 w-44 h-44 rounded-full z-2  " 
-                    />
+                    /> */}
 
-                  <span
-                    className={`absolute -mt-20 ml-29 w-6 h-6 border-5 border-black rounded-full z-10 ${
-                      user.online_status === 0
-                        ? "bg-yellow-500"   // offline
-                        : user.online_status === 1
-                        ? "bg-green-500"  // online
-                        : "bg-orange-500"   // ingame
-                    }`}
-                  ></span>
+                  <div className={`absolute top-55 z-10`}>
+                    <img
+                      src={user.avatar_url  || "/avatars/avatar1.png"}
+                      alt='Avatar'
+                      className='w-45 h-45 rounded-full p-[12%]'
+                    />
+                    <img
+                      src={getFrameByPoints(user.points)}
+                      alt='Frame'
+                      className='absolute w-45 h-45 inset-0 pointer-events-none'
+                    />
+                    <span
+                      className={`absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full ${
+                          user.online_status === 0
+                            ? "bg-yellow-500"   // offline
+                            : user.online_status === 1
+                            ? "bg-green-500"  // online
+                            : "bg-orange-500"   // ingame
+                        }`}
+                      ></span>
+                  </div>
 
               </div>
 

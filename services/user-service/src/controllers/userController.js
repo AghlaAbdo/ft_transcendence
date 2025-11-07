@@ -398,7 +398,7 @@ const updateStats = async (request, reply) => {
             WHERE id = ?;
         `).run(loserId);
 
-        userModel.recalculateRanks(db);
+        // userModel.recalculateRanks(db);
 
         return reply.status(200).send({ 
             status: true,

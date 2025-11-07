@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { getFrameByPoints } from '@/utils/getFrameByPoints';
 
 
 const schema = z.object({
@@ -185,15 +186,27 @@ const SettingsPage = () => {
 
                   <div className="flex flex-row items-center gap-20 -mt-5">
                     <div className="relative">
-                      <div className="rounded-full border-6 border-purple-500 overflow-hidden shadow-2xl">
+                      <div className="rounded-full  overflow-hidden shadow-2xl">
                         
                         {avatar && (
-                            <img
-                              src={avatar || "/avatars/avatar1.png"}
-                              alt="avatar"
-                              className="w-45 h-45 object-cover"
+                            // <img
+                            //   src={avatar || "/avatars/avatar1.png"}
+                            //   alt="avatar"
+                            //   className="w-45 h-45 object-cover"
                               
-                            />
+                            // />
+                            <div className={`w-full relative`}>
+                              <img
+                                src={avatar}
+                                alt='Avatar'
+                                className='w-45 h-45 rounded-full p-[12%]'
+                              />
+                              <img
+                                src={getFrameByPoints(user.points)}
+                                alt='Frame'
+                                className='absolute w-45 h-45 inset-0 pointer-events-none'
+                              />
+                            </div>
                         )}
 
                         <input
