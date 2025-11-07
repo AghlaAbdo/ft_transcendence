@@ -2,9 +2,10 @@ import { generatePingPongAvatar } from '../utils/generatePingPongAvatar.js'
 
 const getAllUsers =  (db) => {
     const query = `SELECT id, username, email,avatar_url,
-        isAccountVerified, points, wins, losses, rank, is_google_auth, 
+        isAccountVerified, points, wins, losses, is_google_auth, 
         online_status, is_2fa_enabled, createdAt, updatedAt
-    FROM USERS`;
+    FROM USERS 
+    ORDER BY points DESC, wins DESC, losses ASC`;
     const users = db.prepare(query);
     return users.all();
 }

@@ -119,7 +119,7 @@ export default function Dashboard() {
                         </div>
                         <div className="flex flex-wrap mt-4 justify-around">
                             <Statistics label="Total games" value={user!.games} />
-                            {/* <Statistics label="Rank" value={user!.rank || 1} /> */}
+                            <Statistics label="Rank" value={user!.rank} />
                             <Statistics label="Points" value={user!.points} />
                             <Statistics label="Total play time" total_stats={stats?.total_play_time} />
                             <Statistics label="Avg games duration" avg_stats={stats?.avg_play_time} />
