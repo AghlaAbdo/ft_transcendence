@@ -8,6 +8,7 @@ import {
   GAME_HEIGHT,
   GAME_WIDTH,
   PADDLE_HEIGHT,
+  PADDLE_SPEED,
   PADDLE_WIDTH,
 } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
@@ -38,15 +39,19 @@ export const useLocalPongLogic = (): returnType => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [winner, setWinner] = useState<'Player 1' | 'Player 2' | null>(null);
   const isPlaying = useRef<boolean>(false);
+  const ballSpeed = useRef(BALL_SPEED);
 
   const pressedKeys = useRef<Set<string>>(new Set());
   const animationFrame = useRef<number | null>(null);
 
+  const direction = Math.random() < 0.5 ? 1 : -1;
+  const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
   const ball = useRef({
     x: GAME_WIDTH / 2,
     y: GAME_HEIGHT / 2,
-    dx: BALL_SPEED,
-    dy: BALL_SPEED,
+    dx: BALL_SPEED * Math.cos(angle) * direction,
+    dy: BALL_SPEED * Math.sin(angle),
+    dir: Math.random() < 0.5 ? 1 : -1,
   });
   const leftPaddleY = useRef(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);
   const rightPaddleY = useRef(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);
@@ -270,7 +275,6 @@ export const useLocalPongLogic = (): returnType => {
   }
 
   function startGameLoop() {
-    console.log('called startGameLpp again!');
     isPlaying.current = true;
     animationFrame.current = requestAnimationFrame(gameLoop);
   }
@@ -299,8 +303,9 @@ export const useLocalPongLogic = (): returnType => {
 
   const movePaddles = () => {
     // Player 1 (left paddle)
-    if (pressedKeys.current.has('ArrowUp')) leftPaddleY.current -= 6;
-    if (pressedKeys.current.has('ArrowDown')) leftPaddleY.current += 6;
+    if (pressedKeys.current.has('ArrowUp')) leftPaddleY.current -= PADDLE_SPEED;
+    if (pressedKeys.current.has('ArrowDown'))
+      leftPaddleY.current += PADDLE_SPEED;
     leftPaddleY.current = Math.max(
       0,
       Math.min(GAME_HEIGHT - PADDLE_HEIGHT, leftPaddleY.current)
@@ -308,9 +313,9 @@ export const useLocalPongLogic = (): returnType => {
 
     // Player 2 (right paddle)
     if (pressedKeys.current.has('w') || pressedKeys.current.has('W'))
-      rightPaddleY.current -= 6;
+      rightPaddleY.current -= PADDLE_SPEED;
     if (pressedKeys.current.has('s') || pressedKeys.current.has('S'))
-      rightPaddleY.current += 6;
+      rightPaddleY.current += PADDLE_SPEED;
     rightPaddleY.current = Math.max(
       0,
       Math.min(GAME_HEIGHT - PADDLE_HEIGHT, rightPaddleY.current)
@@ -320,10 +325,10 @@ export const useLocalPongLogic = (): returnType => {
   const moveBall = () => {
     ball.current.x += ball.current.dx;
     ball.current.y += ball.current.dy;
-    if (
-      ball.current.y - BALL_RADIUS / 2 < 0 ||
-      ball.current.y + BALL_RADIUS >= GAME_HEIGHT
-    ) {
+    if (ball.current.y < 20) ball.current.y = 20;
+    else if (ball.current.y > GAME_HEIGHT - 20)
+      ball.current.y = GAME_HEIGHT - 20;
+    if (ball.current.y <= 20 || ball.current.y >= GAME_HEIGHT - 20) {
       ball.current.dy *= -1;
     }
 
@@ -337,8 +342,9 @@ export const useLocalPongLogic = (): returnType => {
         leftPaddleY.current + PADDLE_HEIGHT / 2 - ball.current.y;
       const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
       const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-      ball.current.dx = BALL_SPEED * Math.cos(bounceAngle);
-      ball.current.dy = BALL_SPEED * -Math.sin(bounceAngle);
+      ballSpeed.current *= 1.06;
+      ball.current.dx = ballSpeed.current * Math.cos(bounceAngle);
+      ball.current.dy = ballSpeed.current * -Math.sin(bounceAngle);
     }
     // check collision with right paddle
     else if (
@@ -350,22 +356,24 @@ export const useLocalPongLogic = (): returnType => {
         rightPaddleY.current + PADDLE_HEIGHT / 2 - ball.current.y;
       const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
       const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-      ball.current.dx = -BALL_SPEED * Math.cos(bounceAngle);
-      ball.current.dy = BALL_SPEED * -Math.sin(bounceAngle);
+      ballSpeed.current *= 1.06;
+      ball.current.dx = -ballSpeed.current * Math.cos(bounceAngle);
+      ball.current.dy = ballSpeed.current * -Math.sin(bounceAngle);
     }
     // check for loss
     else if (ball.current.x - 10 <= 0) {
       scores.current.right += 1;
-      console.log('increasing right??');
-      if (scores.current.right === 2) {
+      ballSpeed.current = BALL_SPEED;
+      if (scores.current.right === 5) {
         setWinner('Player 2');
         isPlaying.current = false;
         dialogRef.current?.show();
       } else resetBall();
     } else if (ball.current.x + 10 >= GAME_WIDTH) {
       scores.current.left += 1;
+      ballSpeed.current = BALL_SPEED;
       console.log('increasing left ??');
-      if (scores.current.left === 2) {
+      if (scores.current.left === 5) {
         setWinner('Player 1');
         isPlaying.current = false;
         dialogRef.current?.show();
@@ -374,13 +382,13 @@ export const useLocalPongLogic = (): returnType => {
   };
 
   const resetBall = () => {
-    const direction = Math.random() < 0.5 ? 1 : -1;
     const angle = Math.random() * (Math.PI / 2) - Math.PI / 4;
 
     ball.current.x = GAME_WIDTH / 2;
     ball.current.y = GAME_HEIGHT / 2;
-    ball.current.dx = BALL_SPEED * Math.cos(angle) * direction;
     ball.current.dy = BALL_SPEED * Math.sin(angle);
+    ball.current.dir = ball.current.dir * -1;
+    ball.current.dx = BALL_SPEED * Math.cos(angle) * ball.current.dir;
   };
 
   const resetPaddles = () => {

@@ -15,7 +15,6 @@ export default function GameLayout({
   useEffect(() => {
     if (auth.user) {
       socket.connect();
-      socket.emit('hello', String(auth.user.id));
       return () => {
         socket.off();
         socket.disconnect();

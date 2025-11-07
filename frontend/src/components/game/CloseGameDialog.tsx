@@ -15,10 +15,12 @@ export default function CloseGameDialog({
   dialogRef,
   gameId,
   isTournamentGame,
+  isLocal,
 }: {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   gameId: string | null;
   isTournamentGame: boolean;
+  isLocal: boolean;
 }) {
   const { user } = useUser();
   const router = useRouter();
@@ -29,6 +31,10 @@ export default function CloseGameDialog({
     dialogRef.current?.close();
   }
   function handleQuit() {
+    if (isLocal) {
+      router.replace('/game');
+      return;
+    }
     socket.emit('quit', { userId: user.id, gameId });
     setHideHeaderSidebar(false);
     if (isTournamentGame)

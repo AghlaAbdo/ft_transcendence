@@ -1,7 +1,11 @@
 'use client';
 
+import { useRef } from 'react';
+
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import CloseGameDialog from '@/components/game/CloseGameDialog';
 import LocalGamePlayers from '@/components/game/LocalGamePlayers';
 
 import { useLocalPongLogic } from '@/hooks/useLocalPongLogic';
@@ -10,13 +14,38 @@ export default function LocalGamePage() {
   const { containerRef, scores, dialogRef, winner, handleRematch } =
     useLocalPongLogic();
   const router = useRouter();
+  const closeDialRef = useRef<HTMLDialogElement | null>(null);
 
   function handleReturn() {
     router.replace('/game');
   }
 
+  function handleClose() {
+    closeDialRef.current?.showModal();
+  }
+
   return (
     <div className='flex flex-col items-center justify-center h-screen bg-gray-900 text-white'>
+      <button
+        onClick={handleClose}
+        className='fixed top-4 left-4 w-10 bg-red rounded-[4px]  cursor-pointer'
+      >
+        <Image
+          width={80}
+          height={80}
+          src='/icons/close.png'
+          alt='close'
+          className='w-full'
+        />
+      </button>
+      {/* Close dialog */}
+      <CloseGameDialog
+        dialogRef={closeDialRef}
+        gameId={null}
+        isTournamentGame={false}
+        isLocal={true}
+      />
+
       <LocalGamePlayers />
       <div
         ref={containerRef}
@@ -24,7 +53,7 @@ export default function LocalGamePage() {
       ></div>
       <dialog
         ref={dialogRef}
-        className='bg-dark-blue min-w-80 border-[1px] border-gray-700 rounded-[8px] mx-auto my-auto pt-6 pb-3 px-5'
+        className='bg-dark-blue min-w-50 500:min-w-80 border-[1px] border-gray-700 rounded-[8px] mx-auto my-auto pt-6 pb-3 px-2 500:px-5'
       >
         <div className='flex flex-col gap-8 items-center'>
           <div className='flex flex-col gap-2 items-center'>

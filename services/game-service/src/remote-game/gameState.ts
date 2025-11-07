@@ -12,6 +12,7 @@ import {
 export function generateGameState(
   gameId: string,
   player1: IPlayer,
+  gameType: 'remote' | 'tournament' | 'invite',
   player2: IPlayer | null,
   tournamentId: string | null,
   tournamentMatchId: string | null,
@@ -21,6 +22,7 @@ export function generateGameState(
   return {
     id: gameId,
     db_id: 0,
+    type: gameType,
     isTournamentGame: tournamentId ? true : false,
     tournamentId: tournamentId,
     tournamentMatchId: tournamentMatchId,
@@ -68,8 +70,8 @@ export function generateGameState(
     playersNb: 1,
     winner_id: null,
     startDate: null,
-    startAt: new Date().getTime(),
-    playtime: null,
+    startAt: null,
+    playtime: 0,
   };
 }
 

@@ -1,5 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { Database as DatabaseType } from 'better-sqlite3';
+import { getPlayerInfo } from '../utils/getPlayerInfo';
+import { handleGameInvite } from '../remote-game/gameInvite';
+import authorization from './auth';
 
 export interface WeekStats {
   week_number: number;
@@ -7,6 +10,8 @@ export interface WeekStats {
 }
 
 export default async function apiRouter(fastify: FastifyInstance, ops: any) {
+  fastify.addHook('preHandler', authorization);
+
   fastify.get('/matches', async (req, reply) => {
     const db: DatabaseType = (fastify as any).db;
     try {
@@ -107,7 +112,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
         { week: 1, start: 1, end: quarterSize },
         { week: 2, start: quarterSize + 1, end: quarterSize * 2 },
         { week: 3, start: quarterSize * 2 + 1, end: quarterSize * 3 },
-        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth }
+        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth },
       ];
 
       const stmt = db.prepare(`
@@ -128,15 +133,21 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       `);
 
       const dbResults = stmt.all(
-        weeks[0].start, weeks[0].end,
-        weeks[1].start, weeks[1].end,
-        weeks[2].start, weeks[2].end,
-        weeks[3].start, weeks[3].end,
-        userIdNumber, userIdNumber, `${year}-${String(month + 1).padStart(2, '0')}`
+        weeks[0].start,
+        weeks[0].end,
+        weeks[1].start,
+        weeks[1].end,
+        weeks[2].start,
+        weeks[2].end,
+        weeks[3].start,
+        weeks[3].end,
+        userIdNumber,
+        userIdNumber,
+        `${year}-${String(month + 1).padStart(2, '0')}`,
       ) as WeekStats[];
-      
-      const stats = [1, 2, 3, 4].map(weekNum => {
-        const found = dbResults.find(r => r.week_number === weekNum);
+
+      const stats = [1, 2, 3, 4].map((weekNum) => {
+        const found = dbResults.find((r) => r.week_number === weekNum);
         // const weekInfo = weeks.find(w => w.week === weekNum);
         return {
           week: weekNum,
@@ -150,5 +161,30 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       console.error('Error retrieving weekly stats:', error);
       reply.status(500).send({ error: 'Failed to retrieve weekly stats' });
     }
+  });
+
+  fastify.post('/game-invite', async (req, rep) => {
+    console.log('req.body: ', req.body);
+    console.log('req.query: ', req.query);
+    const { challengerId, opponentId } = req.query as {
+      challengerId?: string;
+      opponentId?: string;
+    };
+    if (!challengerId || !opponentId || challengerId === opponentId) {
+      rep
+        .status(500)
+        .send({ error: 'challengerId and opponentId are required!' });
+      return;
+    }
+    const challenger = await getPlayerInfo(challengerId);
+    const opponent = await getPlayerInfo(opponentId);
+    // console.log("challenger: ", challenger);
+    // console.log("opponent: ", opponent);
+    if (!challenger || !opponent) {
+      rep.status(500).send({ error: 'Players not found!' });
+      return;
+    }
+    const gameId = handleGameInvite(challenger, opponent);
+    return { message: 'Created game!', gameId };
   });
 }

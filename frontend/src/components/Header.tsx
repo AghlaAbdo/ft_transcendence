@@ -3,14 +3,18 @@
 import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
+
 import { motion } from 'framer-motion';
+
 import useConnectSocket from '@/lib/useConnectSocket';
+
+import { useLayout } from '@/context/LayoutContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationStore } from '@/store/useNotificationStore';
+
 import { GlobalSearch } from './global_search';
 import { markAllNotificationsAsRead_friend } from './markAsRead';
 import NotificationCenter from './notifications';
-import { useLayout } from '@/context/LayoutContext';
 
 export default function Header() {
   const { user, isLoading } = useAuth();
@@ -57,7 +61,7 @@ export default function Header() {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className='fixed h-[72px] w-full md:w-[calc(100%-72px)] top-0 left-0 md:left-[72px]  flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
+        className='fixed h-[72px] w-[calc(100%_-_56px)] bg-bg-color z-10  md:w-[calc(100%-72px)] top-0 left-[56px] md:left-[72px]  flex justify-between items-center px-4 md:pr-16 md:pl-3 border-b border-[#374151]'
       >
         {!isLoading && user && (
         <div className='z-1000 flex justify-between items-center gap-4'>
@@ -151,8 +155,7 @@ export default function Header() {
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         }`}
-        onClick={() => 
-          set_notopen(false)}
+        onClick={() => set_notopen(false)}
       >
         <div
           className={`absolute h-fit transform transition-all duration-300 rounded-lg ease-out mx-2 w-[calc(100%-16px)] md:right-3 md:mx-0 md:w-full md:max-w-lg ${
@@ -160,10 +163,7 @@ export default function Header() {
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          <NotificationCenter
-            onClose={() => 
-              set_notopen(false)}
-          />
+          <NotificationCenter onClose={() => set_notopen(false)} />
         </div>
       </div>
     </>
