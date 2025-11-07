@@ -64,9 +64,8 @@ services:
   #     - '--storage.tsdb.path=/prometheus'
   #     - '--storage.tsdb.retention.size=50GB'
   #     - '--storage.tsdb.retention.time=6m'
-  #     # todo_hamza
-  #     - '--storage.tsdb.min-block-duration=2m'
-  #     - '--storage.tsdb.max-block-duration=2m'
+  #     - '--storage.tsdb.min-block-duration=30m'
+  #     - '--storage.tsdb.max-block-duration=30m'
   #   networks:
   #     - main_net
   #   depends_on:
@@ -126,7 +125,6 @@ services:
   #   depends_on:
   #     - prometheus
   #   environment:
-  #     # todo_hamza
   #     - GF_SERVER_ROOT_URL=https://localhost:3000/grafana
   #     - GF_SERVER_SERVE_FROM_SUB_PATH=false
   #     # - GF_SECURITY_COOKIE_SAMESITE=lax
@@ -166,8 +164,6 @@ services:
   #   container_name: nginx-exporter
   #   command:
   #     - '-nginx.scrape-uri=http://nginx:8081/nginx_status'
-  #   ports:
-  #     - "9113:9113"
   #   networks:
   #     - main_net
   #   depends_on:
@@ -240,7 +236,7 @@ services:
   #     - ./elk-stack/logstash/pipeline:/usr/share/logstash/pipeline
   #     - ca:/usr/share/logstash/config/certs/ca
   #     - logstash_certs:/usr/share/logstash/config/certs/logstash
-  #     - ./elk-stack/logs:/var/log/app-logs
+  #     - ./logs:/var/log/app-logs
   #   environment:
   #     - LOGSTASH_PASSWORD=$LOGSTASH_PASSWORD
   #   networks:
