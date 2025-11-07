@@ -12,7 +12,14 @@ const signup = async (request, reply) => {
         if (!username || !email || !password)
             throw new Error('All fields are required');
 
-        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        if (username.length < 8 || username.length > 20) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username must be between 8 and 20 characters"
+            });
+        }
+        
+        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
             return reply.code(400).send({
                 status: false,
                 message: "Username can only contain letters, numbers, and underscores"

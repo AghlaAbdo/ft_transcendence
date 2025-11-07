@@ -216,7 +216,7 @@ const updateInfo = async (request, reply) => {
             });
         }
 
-        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
             return reply.code(400).send({
                 status: false,
                 message: "Username can only contain letters, numbers, and underscores"
