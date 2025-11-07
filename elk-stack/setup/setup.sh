@@ -42,13 +42,11 @@ response1=$(curl -s -w "%{http_code}" -X POST "https://elasticsearch:9200/_secur
     -d "{\"password\":\"${KIBANA_PASSWORD}\"}")
 
 
-# todo_hamza
 response2=$(curl -s -w "%{http_code}" -X POST "https://elasticsearch:9200/_security/role/logstash_writer" \
   -u "elastic:${ELASTIC_PASSWORD}" \
   --cacert config/certs/ca/ca.crt \
   -H "Content-Type: application/json" \
   -d '{
-    "cluster": ["manage_index_templates", "monitor"],
     "indices": [
       {
         "names": [ "transcendence-logs" ],
@@ -84,7 +82,6 @@ response4=$(curl -s -w "%{http_code}" -X PUT "https://elasticsearch:9200/_snapsh
     }
   }")
 
-# todo_hamza
 response5=$(curl -s -w "%{http_code}" -X PUT "https://elasticsearch:9200/_slm/policy/daily-logs-snapshot" \
   -u "elastic:${ELASTIC_PASSWORD}" \
   --cacert config/certs/ca/ca.crt \

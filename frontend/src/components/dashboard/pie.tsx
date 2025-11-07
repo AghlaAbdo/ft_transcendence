@@ -8,7 +8,7 @@ import {
     ChartOptions,
     ChartData
 } from 'chart.js';
-import { PlayerWithRank } from '@/constants/leaderboard';
+import { Player } from '@/constants/leaderboard';
 
 ChartJS.register(
     ArcElement,
@@ -18,7 +18,7 @@ ChartJS.register(
 );
 
 interface WinrateDoughnutChartProps {
-    user: PlayerWithRank;
+    user: Player;
 }
 
 export default function DoughnutChart({

@@ -9,9 +9,10 @@ import Image from "next/image"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { GetGames, GetStats, GetWeekStats } from "@/app/(protected)/lib/dashboard"
 import { game, stat, StatWithTimeDict, WeekStats } from "@/constants/dashboard"
-import { PlayerWithRank } from "@/constants/leaderboard"
+import { Player } from "@/constants/leaderboard"
 import { get_all_leaderboard, get_user_by_username } from "../lib/leaderboard"
 import { useAuth } from "@/hooks/useAuth"
+import Link from "next/link";
 
 
 
@@ -21,15 +22,14 @@ export default function Dashboard() {
     const [visibleGames, setVisibleGames] = useState<game[]>([])
     const [stats, setStats] = useState<StatWithTimeDict>()
     const [weeklyStats, setWeeklyStats] = useState<WeekStats[]>([])
-    const [user, setUser] = useState<PlayerWithRank>()
     const [loading, setLoading] = useState(1)
     const loadRef = useRef<HTMLDivElement>(null)
     const currentOffset = useRef(0)
     const limit = 9
     const [observerStart, setObserverStart] = useState(false)
+    const [user, setUser] = useState<Player>()
 
     const loadMore = () => {
-        // console.log("here")
         if (currentOffset.current >= allGames.length) {
             return
         }
@@ -44,15 +44,17 @@ export default function Dashboard() {
     useEffect(() => {
         async function getData() {
             if (!authUser || authLoading) return;
-
             const games: game[] = await GetGames(authUser.id)
+            console.log(authUser)
             const stats: StatWithTimeDict = await GetStats(authUser.id)
             setStats(stats)
-            const allPlayersData = await get_all_leaderboard()
             const weeklyStats: WeekStats[] = await GetWeekStats(authUser.id)
             setWeeklyStats(weeklyStats)
-            // console.log(weeklyStats)
-            const current_user = get_user_by_username(allPlayersData, authUser.username)!
+            const current_user: Player = {
+                ...authUser,
+                games: authUser.wins + authUser.losses,
+                winrate: (authUser.wins + authUser.losses) > 0 ? Math.round((authUser.wins / (authUser.wins + authUser.losses)) * 100) : 0
+            }
             setUser(current_user)
             setAllGames(games)
             setVisibleGames(games.slice(0, limit))
@@ -78,7 +80,7 @@ export default function Dashboard() {
         return () => {
             observer.disconnect()
         }
-    }, [observerStart]); 
+    }, [observerStart]);
     return (
         (loading === 1 || authLoading) ? (
             <div className="flex justify-center items-center h-[100vh]">
@@ -111,14 +113,14 @@ export default function Dashboard() {
                     <div className="h-[50vh] rounded-[10px] m-2 mr-5 w-[70%] bg-gray-800 overflow-y-auto custom-scrollbar-gray 2xl:h-[40vh]">
                         <h2 className="p-4 font-bold 2xl:text-[1.2rem]">OVERVIEW</h2>
                         <div className="flex items-center pl-10 2xl:mb-10">
-                            <PieChart user={user} />
-                            <Statistic label="WINS" value={user.wins} color="bg-green" />
-                            <Statistic label="LOSE" value={user.losses} color="bg-red" />
+                            <PieChart user={user!} />
+                            <Statistic label="WINS" value={user!.wins} color="bg-green" />
+                            <Statistic label="LOSE" value={user!.losses} color="bg-red" />
                         </div>
-                        <div className="flex flex-wrap mt-4 justify-around">    
-                            <Statistics label="Total games" value={user.games} />
-                            <Statistics label="Rank" value={user.rank} />
-                            <Statistics label="Points" value={user.score} />
+                        <div className="flex flex-wrap mt-4 justify-around">
+                            <Statistics label="Total games" value={user!.games} />
+                            <Statistics label="Rank" value={user!.rank} />
+                            <Statistics label="Points" value={user!.points} />
                             <Statistics label="Total play time" total_stats={stats?.total_play_time} />
                             <Statistics label="Avg games duration" avg_stats={stats?.avg_play_time} />
                             <Statistics label="Longest game" longest_stats={stats?.longest_play_time} />
@@ -129,7 +131,7 @@ export default function Dashboard() {
                 <div className="flex">
                     {/* down left */}
                     <div className="h-[50vh] rounded-[10px] m-2 ml-5 mb-5 w-[30%] 2xl:h-[40vh]">
-                        <BarChart weeklyStats={weeklyStats}/>
+                        <BarChart weeklyStats={weeklyStats} />
                     </div>
                     {/* down right  */}
                     <div className="h-[50vh] rounded-[10px] m-2 mr-5 mb-5 w-[70%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">
@@ -146,7 +148,7 @@ export default function Dashboard() {
                                     visibleGames.map((game, index) => (
                                         <div key={index} className={`grid grid-cols-5 p-3 justify-items-center items-center border-b border-gray-700 hover:bg-gray-700 transition-colors duration-100 ease-in-out`}>
                                             <span className="text-sm 2xl:text-[1.1rem]">{new Date(game.played_at).toLocaleString()}</span>
-                                            <span className="2xl:text-[1.1rem]">{game.player2_id}</span>
+                                            <Link href={`/profile/${game.player2_id}`}><span className="2xl:text-[1.1rem]">{game.player2_id}</span></Link>
                                             <span className="capitalize border-1 border-[#D97706] text-[#D97706] rounded-[8px] px-2 py-1 text-[.6rem] w-[65px] text-center 2xl:text-[.9rem] 2xl:w-[100px]">{game.type}</span>
                                             <span className="2xl:text-[1.1rem]">{game.player1_score} - {game.player2_score}</span>
                                             <span className={`px-2 py-1 rounded text-white text-[.6rem] w-[50px] text-center h-fit 2xl:text-[.9rem] ${game.winner_id === game.player1_id ? 'bg-green-600 ' : 'bg-red-600'}`}>
