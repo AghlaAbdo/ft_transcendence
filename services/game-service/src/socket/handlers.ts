@@ -138,7 +138,7 @@ export async function handlePlay(socket: Socket, userId: string) {
     const gameId = crypto.randomUUID();
     console.log('--------- First Player Create a game, gameId: ', gameId);
     setUserActiveGame(userId, gameId);
-    addGameState(generateGameState(gameId, user, null, null, null));
+    addGameState(generateGameState(gameId, user, 'remote', null, null, null));
     // console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
     socket.emit('playerData', {
       playerRole: 'player1',
@@ -220,7 +220,14 @@ export async function handleRematch(
   const user = await getPlayerInfo(userId);
   if (!user) return;
   if (!getGameState(gameId)) {
-    const gameState = generateGameState(gameId, user, null, null, null);
+    const gameState = generateGameState(
+      gameId,
+      user,
+      'remote',
+      null,
+      null,
+      null,
+    );
     gameState.game.status = 'rematching';
     gameState.player1.ready = true;
     addGameState(gameState);

@@ -259,6 +259,7 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   const gameState = generateGameState(
     gameId,
     player1Info,
+    'tournament',
     player2Info,
     tournament.id,
     match.id,

@@ -9,6 +9,13 @@ const USER_SERVICE_HOST =
   process.env.USER_SERVICE_HOST || 'http://user-service:5000';
 const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey';
 
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || 'supersecretkey123'
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || 'supersecretkey123';
 
-export { DB_NAME, FASTIFY_PORT, SOCKETIO_PORT, USER_SERVICE_HOST, INTERNAL_API_KEY };
+export {
+  DB_NAME,
+  FASTIFY_PORT,
+  SOCKETIO_PORT,
+  USER_SERVICE_HOST,
+  INTERNAL_API_KEY,
+  JWT_SECRET,
+};

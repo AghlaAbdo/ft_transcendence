@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS Game(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_type TEXT NOT NULL,
     player1_id INTEGER NOT NULL,
     player2_id INTEGER NOT NULL,
     player1_username TEXT NOT NULL,

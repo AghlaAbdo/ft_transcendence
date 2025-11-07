@@ -8,7 +8,14 @@ import { removeUserActiveGame } from './userActiveGame';
 
 export function handleGameInvite(challenger: IPlayer, opponent: IPlayer) {
   const gameId = crypto.randomUUID();
-  const gameState = generateGameState(gameId, challenger, opponent, null, null);
+  const gameState = generateGameState(
+    gameId,
+    challenger,
+    'invite',
+    opponent,
+    null,
+    null,
+  );
   addGameState(gameState);
   console.log('Created Game: ', gameId);
   setTimeout(() => {

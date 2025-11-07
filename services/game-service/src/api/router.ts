@@ -112,7 +112,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
         { week: 1, start: 1, end: quarterSize },
         { week: 2, start: quarterSize + 1, end: quarterSize * 2 },
         { week: 3, start: quarterSize * 2 + 1, end: quarterSize * 3 },
-        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth }
+        { week: 4, start: quarterSize * 3 + 1, end: daysInMonth },
       ];
 
       const stmt = db.prepare(`
@@ -133,15 +133,21 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       `);
 
       const dbResults = stmt.all(
-        weeks[0].start, weeks[0].end,
-        weeks[1].start, weeks[1].end,
-        weeks[2].start, weeks[2].end,
-        weeks[3].start, weeks[3].end,
-        userIdNumber, userIdNumber, `${year}-${String(month + 1).padStart(2, '0')}`
+        weeks[0].start,
+        weeks[0].end,
+        weeks[1].start,
+        weeks[1].end,
+        weeks[2].start,
+        weeks[2].end,
+        weeks[3].start,
+        weeks[3].end,
+        userIdNumber,
+        userIdNumber,
+        `${year}-${String(month + 1).padStart(2, '0')}`,
       ) as WeekStats[];
-      
-      const stats = [1, 2, 3, 4].map(weekNum => {
-        const found = dbResults.find(r => r.week_number === weekNum);
+
+      const stats = [1, 2, 3, 4].map((weekNum) => {
+        const found = dbResults.find((r) => r.week_number === weekNum);
         // const weekInfo = weeks.find(w => w.week === weekNum);
         return {
           week: weekNum,

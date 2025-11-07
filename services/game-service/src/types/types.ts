@@ -17,6 +17,7 @@ export interface IPaddle {
 export interface IGameState {
   id: string;
   db_id: number;
+  type: 'remote' | 'tournament' | 'invite';
   isTournamentGame: boolean;
   tournamentId: string | null;
   tournamentMatchId: string | null;
