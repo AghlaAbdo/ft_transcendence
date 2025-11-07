@@ -61,7 +61,7 @@ export default function Header() {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className='fixed h-[72px] w-full bg-bg-color z-10 md:w-[calc(100%-72px)] top-0 left-0 md:left-[72px]  flex justify-between items-center px-16 pl-3 border-b border-[#374151]'
+        className='fixed h-[72px] w-[calc(100%_-_56px)] bg-bg-color z-10  md:w-[calc(100%-72px)] top-0 left-[56px] md:left-[72px]  flex justify-between items-center px-4 md:pr-16 md:pl-3 border-b border-[#374151]'
       >
         {!isLoading && user && (
           <div className='z-1000 flex justify-between items-center gap-4'>

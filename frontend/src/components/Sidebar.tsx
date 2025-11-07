@@ -41,19 +41,19 @@ export default function Sidebar() {
   const linkBase =
     'p-[14px] hover:[&>svg]:stroke-gray-50 flex items-center justify-center';
   const linkActive = 'bg-purple rounded-lg [&>svg]:stroke-gray-50';
-  const { hideHeaderSidebar } = useLayout();
+  const { hideSidebar } = useLayout();
   return (
     <motion.nav
       initial={false}
       animate={{
-        x: hideHeaderSidebar ? -72 : 0,
-        opacity: hideHeaderSidebar ? 0 : 1,
+        x: hideSidebar ? -72 : 0,
+        opacity: hideSidebar ? 0 : 1,
       }}
       transition={{
         duration: 0.3,
         ease: 'easeInOut',
       }}
-      className={`invisible md:visible bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center`}
+      className={`z-11 bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center`}
     >
       <div className='flex flex-col items-center gap-[70px] z-1000'>
         <Link href='/'>
@@ -295,7 +295,7 @@ export default function Sidebar() {
         <button
           type='button'
           onClick={handleLogout}
-          className={`${linkBase} ${pathName === '/logout' ? linkActive : ''}`}
+          className={`${linkBase} ${pathName === '/logout' ? linkActive : ''} block w-full`}
 
         >
           {/* Logout Icon */}
