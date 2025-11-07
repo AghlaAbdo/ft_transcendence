@@ -23,7 +23,7 @@ export interface IGameState {
   playersNb: number;
   winner_id: string | null;
   startDate: string | null;
-  startAt: number;
+  startAt: number | null;
   playtime: number | null;
   player1: {
     id: string | null;

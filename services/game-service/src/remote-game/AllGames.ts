@@ -19,6 +19,7 @@ export function getGameState(
 export function deleteGame(gameId: string | null): void {
   if (!gameId) return;
 
+  console.log('Did delete gameId: ', gameId);
   allGames.games.delete(gameId);
 }
 

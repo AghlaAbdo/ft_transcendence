@@ -1,6 +1,6 @@
 import { resetBallPos } from './gameState';
 import { postGame } from '../models/game.model';
-import { getDiffInMin } from '../utils/dates';
+import { getDiffInSec } from '../utils/dates';
 import {
   GAME_WIDTH,
   GAME_HEIGHT,
@@ -55,6 +55,7 @@ export function startGame(gameState: IGameState) {
           }
           ioInstance.to(gameState.id).emit('startGame');
           gameState.startDate = getCurrDate();
+          gameState.startAt = new Date().getTime();
           // gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),
@@ -156,7 +157,7 @@ function gameOver(gameState: IGameState): void {
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
-  gameState.playtime = getDiffInMin(gameState.startAt);
+  gameState.playtime = gameState.startAt ? getDiffInSec(gameState.startAt) : 0;
   postGame(gameState);
   if (gameState.isTournamentGame) {
     removeUserActiveTournament(loserId, gameState.tournamentId);

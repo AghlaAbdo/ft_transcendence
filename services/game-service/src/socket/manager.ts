@@ -51,6 +51,7 @@ export function initializeSocketIO(server: http.Server): Server {
     let token: string | undefined;
 
     // 1. Browser: token sent in HttpOnly cookie
+    // console.log("socket.handshake: ", socket.handshake);
     const cookieHeader = socket.handshake.headers.cookie;
     if (cookieHeader) {
       const cookies = cookie.parse(cookieHeader);

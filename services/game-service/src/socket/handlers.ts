@@ -22,7 +22,7 @@ import {
   removeUserActiveTournament,
 } from '../remote-game/userActiveGame';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
-import { getCurrDate, getDiffInMin } from '../utils/dates';
+import { getCurrDate, getDiffInSec } from '../utils/dates';
 import {
   advancePlayerInTournament,
   getTournament,
@@ -135,8 +135,8 @@ export async function handlePlay(socket: Socket, userId: string) {
 
   // console.log('lobyGAme in handlePlay: ', allGames.lobyGame);
   if (!allGames.lobyGame) {
-    console.log('--------- First Player Create a game');
     const gameId = crypto.randomUUID();
+    console.log('--------- First Player Create a game, gameId: ', gameId);
     setUserActiveGame(userId, gameId);
     addGameState(generateGameState(gameId, user, null, null, null));
     // console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
@@ -294,7 +294,9 @@ export function handleQuit(data: {
       gameState.player1.id === data.userId
         ? gameState.player2.id
         : gameState.player1.id;
-    gameState.playtime = getDiffInMin(gameState.startAt);
+    gameState.playtime = gameState.startAt
+      ? getDiffInSec(gameState.startAt)
+      : 0;
     if (!gameState.startDate) gameState.startDate = getCurrDate();
     postGame(gameState);
     if (gameState.isTournamentGame) {

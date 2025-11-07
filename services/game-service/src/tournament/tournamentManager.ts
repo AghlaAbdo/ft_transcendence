@@ -24,7 +24,7 @@ import { convertToTournamentDetails } from '../utils/convertTypes';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { handleQuit } from '../socket/handlers';
 import { postGame } from '../models/game.model';
-import { getCurrDate, getDiffInMin } from '../utils/dates';
+import { getCurrDate, getDiffInSec } from '../utils/dates';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -206,7 +206,7 @@ function notJoinTournamentMatch(
     gameState.player1.id === userId
       ? gameState.player2.id
       : gameState.player1.id;
-  gameState.playtime = getDiffInMin(gameState.startAt);
+  gameState.playtime = gameState.startAt ? getDiffInSec(gameState.startAt) : 0;
   if (!gameState.startDate) gameState.startDate = getCurrDate();
   postGame(gameState);
   advancePlayerInTournament(
