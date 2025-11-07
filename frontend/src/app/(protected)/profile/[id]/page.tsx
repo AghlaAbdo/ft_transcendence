@@ -111,8 +111,8 @@ const ProfilePage = () => {
                             <p className="font-bold">🇲🇦 MAR</p>
                           </div>
                           <div>
-                            <p className="text-gray-400">Rank</p>
-                            <p className="font-bold">{ user.rank }</p>
+                            <p className="text-gray-400">Points</p>
+                            <p className="font-bold">{user.points}</p>
                           </div>
                         </div>
 
