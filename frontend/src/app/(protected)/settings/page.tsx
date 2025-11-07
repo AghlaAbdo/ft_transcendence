@@ -14,7 +14,6 @@ import { useAuth } from '@/hooks/useAuth';
 
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
-  email: z.string().email("Invalid email")
 });
 
 const changePasswordSchema = z
@@ -122,7 +121,6 @@ const SettingsPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify( {
           username: data.username,
-          email: data.email
         }),
         credentials: "include"  // allow cookies
       });
@@ -168,7 +166,6 @@ const SettingsPage = () => {
 
   if (!user) 
     return <p className="text-gray-500">User not found</p>;
-  console.log("user from settings: ", user);
   
   return (
         <div className="h-[calc(100vh_-_72px)] text-white flex px-2 gap-2 ">
@@ -277,15 +274,6 @@ const SettingsPage = () => {
                           />
                           {errorsInfo.username && <p className="text-red-500">{errorsInfo.username.message}</p>}
 
-                        </div>
-                        <div>
-                          <Input 
-                            icon={Mail} 
-                            type="email"
-                            placeholder="Email" 
-                            {...registerInfo("email")}
-                          />
-                          {errorsInfo.email && <p className="text-red-500">{errorsInfo.email.message}</p>}
                         </div>
 
                         <button

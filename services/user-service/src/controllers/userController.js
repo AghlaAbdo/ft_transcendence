@@ -200,60 +200,61 @@ const changePassword = async (request, reply) => {
 const updateInfo = async (request, reply) => {
     try {
         const user = request.user;
-        const { username, email } = request.body;
+        const { username } = request.body;
 
-        if (!username || !email) {
+        if (!username) {
             return reply.code(400).send({
                 status: false,
-                message: "Username and email are required"
+                message: "Username is required"
+            });
+        }
+
+        if (username.length < 8 || username.length > 20) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username must be between 8 and 20 characters"
+            });
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username can only contain letters, numbers, and underscores"
             });
         }
 
         const db = request.server.db;
 
         const currentUser = db.prepare(`
-            SELECT username, email 
+            SELECT username 
             FROM USERS 
             WHERE id = ? 
         `).get(user.id);
 
-        if (currentUser.username === username && currentUser.email === email) {
+        if (currentUser.username === username) {
             return reply.code(400).send({
                 status: false,
                 message: "No changes detected"
             });
         }
 
-        if (username !== currentUser.username) {
-            const usernameAlreadyExist = userModel.getUserByUsername(db, username);
-            if (usernameAlreadyExist) {
-                return reply.code(409).send({
-                    status: false,
-                    message: "Username is already taken"
-                });
-            }
-        }
-
-        if (email !== currentUser.email) {
-            const emailAlreadyExist = userModel.getUserByEmail(db, email);
-            if (emailAlreadyExist) { 
-                return reply.code(409).send({
-                    status: false,
-                    message: "Email is already registered"
-                });
-            }
+        const usernameAlreadyExist = userModel.getUserByUsername(db, username);
+        if (usernameAlreadyExist) {
+            return reply.code(409).send({
+                status: false,
+                message: "Username is already taken"
+            });
         }
 
         db.prepare(`
             UPDATE USERS
-            SET username = ?,
-                email = ?
+            SET username = ?
             WHERE id = ?
-        `).run(username, email, user.id);
+        `).run(username, user.id);
 
         reply.send({
             status: true,
-            message: "Profile updated successfully",
+            message: "Username updated successfully",
         });
 
 
