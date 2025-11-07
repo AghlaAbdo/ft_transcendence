@@ -2,6 +2,7 @@ import { QrCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import QrModal from "./QrModal"
+import Switcher4 from "../toggle_button";
 
 interface qrCode {
   manualEntryKey: string;
@@ -16,6 +17,9 @@ export default function TwoFactorAuth() {
   const [showqr, setshowqr] = useState<qrCode>();
 
 
+  const handlechange = () => {
+
+  }
   const toggle2FA = async () => {
     setshowModal(true);
     // if (showqr)
@@ -54,19 +58,32 @@ export default function TwoFactorAuth() {
           </p>
         </div>
 
-        <button
-          type="button"
-          // onClick={() => setEnabled(!enabled)}
-          onClick={toggle2FA}
-          disabled={loading} // Added a loading state to prevent double clicks.
-          className={`${enabled ? "bg-green-500" : "bg-gray-400"
-            } relative inline-flex h-8 w-16 items-center rounded-full transition`}
-        >
-          <span
-            className={`${enabled ? "translate-x-9" : "translate-x-1"
-              } inline-block h-6 w-6 transform rounded-full bg-white transition`}
+
+    {/* <Switcher4 /> */}
+
+      <label className='flex cursor-pointer select-none items-center'>
+        <div className='relative'>
+          <input
+            type='checkbox'
+            // checked={enabled}
+            // onChange={setEnabled(!enabled)}
+            className='sr-only'
           />
-        </button>
+          <div
+            className={`box block h-8 w-14 rounded-full ${
+              enabled ? 'bg-primary' : 'bg-gray-300'
+            }`}
+          ></div>
+          <div
+            className={`absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-purple-500 transition ${
+              enabled ? 'translate-x-full' : ''
+            }`}
+          ></div>
+        </div>
+      </label>
+    
+      {/* <Switcher4 isChecked={enabled}/> */}
+
       </div>
 
       {showModal && showqr && (

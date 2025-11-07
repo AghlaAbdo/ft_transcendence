@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
 import { generateSecret, verifyToken } from '../2fa/TwoFactorService.js';
+import { error } from "console";
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -358,6 +359,11 @@ const forgotPassword = async (request, reply) => {
     // setup 2fa
 const setup2fa = async (req, rep) => {
 try {
+    const db = req.server.db;
+//    if (!db) {
+//       console.error("DB not available on request.server.db");
+//       return rep.status(500).send({ error: "Database not initialized" });
+//     }
     console.log('allo from 2fa backend');
     const userId = req.user?.id; // Get from session/JWT
     const userEmail = req.user?.email;
@@ -371,16 +377,17 @@ try {
 
     // Generate secret and QR code
     const setup = await generateSecret(userId, userEmail);
-
+    console.log('allo from setup 2fa');
+    
     // Store the secret temporarily (don't enable 2FA yet)
     // You'll confirm it in the next step
 
 
-    // await db.prepare(`
-    //   UPDATE users 
-    //   SET two_factor_secret = ? 
-    //   WHERE id = ?
-    // `).run(setup.secret, userId);
+    await db.prepare(`
+      UPDATE users 
+      SET totp_secret = ? 
+      WHERE id = ?
+    `).run(setup.secret, userId);
 
     return {
       qrCode: setup.qrCode,
@@ -396,7 +403,7 @@ try {
 const verify2Fa = async (req, rep) => {
 try {
     // console.log('verfify backend');
-    
+    const db = req.server.db;
     const userId = req.user?.id;
     const { token } = req.body;
 
@@ -408,30 +415,27 @@ try {
     }
 
     // Get the secret from database
-    // const user = await db.prepare(`
-    //   SELECT two_factor_secret 
-    //   FROM users 
-    //   WHERE id = ?
-    // `).get(userId);
+    const user = await db.prepare(`
+      SELECT totp_secret 
+      FROM users 
+      WHERE id = ?
+    `).get(userId);
 
-    // if (!user?.two_factor_secret) {
-    //   return rep.status(400).send({ error: '2FA not set up' });
-    // }
+    if (!user?.totp_secret) {
+      return rep.status(400).send({ error: '2FA not set up' });
+    }
 
-    // Verify the token
-    const isValid = verifyToken(user.two_factor_secret, token);
+    const isValid = verifyToken(user.totp_secret, token);
 
     if (!isValid) {
-        // console.log('ists her');
       return rep.status(400).send({ error: 'Invalid verification code' });
     }
 
-    // Enable 2FA
-    // await db.prepare(`
-    //   UPDATE users 
-    //   SET two_factor_enabled = TRUE 
-    //   WHERE id = ?
-    // `).run(userId);
+    await db.prepare(`
+      UPDATE users 
+      SET is_2fa_enabled = TRUE 
+      WHERE id = ?
+    `).run(userId);
 
     return {
       status: true,
