@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { Database as DatabaseType } from 'better-sqlite3';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { handleGameInvite } from '../remote-game/gameInvite';
+import authorization from './auth';
 
 export interface WeekStats {
   week_number: number;
@@ -9,6 +10,8 @@ export interface WeekStats {
 }
 
 export default async function apiRouter(fastify: FastifyInstance, ops: any) {
+  fastify.addHook('preHandler', authorization);
+
   fastify.get('/matches', async (req, reply) => {
     const db: DatabaseType = (fastify as any).db;
     try {
