@@ -66,7 +66,7 @@ const ProfilePage = () => {
                     />
 
                   <span
-                    className={`absolute -mt-20 ml-29 w-5 h-5 rounded-full z-10 ${
+                    className={`absolute -mt-20 ml-29 w-5 h-5 rounded-full z-9 ${
                       user.online_status === 0
                         ? "bg-yellow-500"   // offline
                         : user.online_status === 1

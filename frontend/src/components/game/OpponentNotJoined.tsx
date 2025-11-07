@@ -1,4 +1,3 @@
-// components/game/WinByDefaultCard.tsx
 'use client';
 
 import React from 'react';
@@ -6,24 +5,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 
 import { ArrowLeft, Trophy } from 'lucide-react';
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
-
-// components/game/WinByDefaultCard.tsx
 
 type Props = {
   opponentName?: string | null;
@@ -50,8 +31,8 @@ export default function WinByDefaultCard({
 
           <p className='text-gray-300 mb-1'>
             {opponentName
-              ? `${opponentName} didn’t join the match.`
-              : `Your opponent didn’t join the match.`}
+              ? `${opponentName} didn't join the match.`
+              : `Your opponent didn't join the match.`}
           </p>
           <p className='text-gray-400 mb-6'>
             You automatically advance to the next round. Great job!
