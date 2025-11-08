@@ -3,7 +3,7 @@ DOCKER_COMPOSE_DEV=docker-compose.dev.yml
 DOCKER_COMPOSE_PROD=docker-compose.prod.yml
 
 dev:
-	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV) up --build
+	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV) up -d --build
 	
 prod:
 	docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_PROD) up --build

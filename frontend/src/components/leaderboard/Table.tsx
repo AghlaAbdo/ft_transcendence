@@ -32,14 +32,15 @@ export default function Table({players, numOfPages, page}: TableProps) {
                         <li className="pl-2">{player.rank}</li>
                         <div className="flex items-center">
                             <Image
-                            src="/avatars/avatar1.png"
+                            src={player.avatar_url}
                             alt="crown"
                             width={30}
                             height={30}
+                            className="rounded-full"
                             />
-                            <li className="pl-3">{player.username}</li>
+                            <Link href={`/profile/${player.id}`}><li className="pl-3">{player.username}</li></Link>
                         </div>
-                        <li className="w-fit px-2 bg-[#27344b] border-1 border-[#45556C] rounded-[12px]">{player.score} RP</li>
+                        <li className="w-fit px-2 bg-[#27344b] border-1 border-[#45556C] rounded-[12px]">{player.points} P</li>
                         <li>{player.winrate} %</li>
                         <li>{player.games}</li>
                     </ul>
