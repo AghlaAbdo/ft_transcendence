@@ -25,7 +25,7 @@ export default function GameInvite() {
   const { user } = useUser();
   const params = useParams();
   const gameId = params.gameId as string;
-  const { setHideHeaderSidebar } = useLayout();
+  const { setHideHeaderSidebar, setHideSidebar } = useLayout();
   const [loading, setLoading] = useState<boolean>(true);
   const [inviteRejected, setInviteRejected] = useState<boolean>(false);
   const [notFound, setNotFound] = useState<boolean>(false);
@@ -33,13 +33,16 @@ export default function GameInvite() {
 
   useEffect(() => {
     setHideHeaderSidebar(true);
+    setHideSidebar(true);
     socket.on('opponentDidNotJoin', () => {
       setInviteRejected(true);
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
     });
     socket.on('matchNotFound', () => {
       console.log('GAmeInvite match not found!!');
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
       setLoading(false);
       setNotFound(true);
     });
@@ -49,6 +52,7 @@ export default function GameInvite() {
 
     return () => {
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
       socket.off('opponentDidNotJoin');
       socket.off('matchNotFound');
       socket.off('matchDetails');

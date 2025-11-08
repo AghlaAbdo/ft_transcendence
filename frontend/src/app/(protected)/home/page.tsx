@@ -87,15 +87,15 @@ export default function Dashboard() {
                 <div className="animate-spin rounded-full h-15 w-15 border-b-2 border-blue-500 2xl:h-30 2xl:w-30 2xl:border-b-4"></div>
             </div>
         ) : (
-            <div className="flex flex-col">
+            <div className="flex flex-col mt-25 min-w-6xl">
                 {/* up */}
-                <div className="flex">
+                <div className="flex mb-5 justify-around">
                     {/* up left */}
-                    <div className="relative h-[50vh] overflow-hidden rounded-[10px] m-2 ml-5 w-[30%] group 2xl:h-[40vh]">
-                        <img
+                    <div className="relative h-[45vh] overflow-hidden rounded-[10px] w-[30%] group 2xl:h-[40vh]">
+                        <Image
                             src="/images/board.jpg"
                             alt="board"
-                            // fill
+                            fill
                             className="object-cover opacity-30 transition-transform duration-500 group-hover:scale-110 h-full"
                         />
                         <div className="absolute flex flex-col items-center w-full top-[30%] px-4">
@@ -110,7 +110,7 @@ export default function Dashboard() {
 
                     </div>
                     {/* up right  */}
-                    <div className="h-[50vh] rounded-[10px] m-2 mr-5 w-[70%] bg-gray-800 overflow-y-auto custom-scrollbar-gray 2xl:h-[40vh]">
+                    <div className="h-[45vh] rounded-[10px] w-[65%] bg-gray-800 overflow-y-auto custom-scrollbar-gray 2xl:h-[40vh]">
                         <h2 className="p-4 font-bold 2xl:text-[1.2rem]">OVERVIEW</h2>
                         <div className="flex items-center pl-10 2xl:mb-10">
                             <PieChart user={user!} />
@@ -128,36 +128,36 @@ export default function Dashboard() {
                     </div>
                 </div>
                 {/* down */}
-                <div className="flex">
+                <div className="flex mb-10 justify-around">
                     {/* down left */}
-                    <div className="h-[50vh] rounded-[10px] m-2 ml-5 mb-5 w-[30%] 2xl:h-[40vh]">
+                    <div className="h-[45vh] rounded-[10px] w-[30%] 2xl:h-[40vh]">
                         <BarChart weeklyStats={weeklyStats} />
                     </div>
                     {/* down right  */}
-                    <div className="h-[50vh] rounded-[10px] m-2 mr-5 mb-5 w-[70%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">
+                    <div className="h-[45vh] rounded-[10px] w-[65%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">
                         <div className="grid grid-cols-5 py-3 pr-5 justify-items-center border-b-1 border-gray-700">
                             <span className="2xl:text-[1.2rem]">Date & Time</span>
-                            <span className="2xl:text-[1.2rem]">Opponent</span>
                             <span className="2xl:text-[1.2rem]">Type</span>
                             <span className="2xl:text-[1.2rem]">Score</span>
+                            <span className="2xl:text-[1.2rem]">Opponent</span>
                             <span className="2xl:text-[1.2rem]">Result</span>
                         </div>
-                        <div className="overflow-y-auto custom-scrollbar-gray">
+                        <div className="overflow-y-auto custom-scrollbar-gray h-[100%]">
                             {
                                 visibleGames.length > 0 ? (
                                     visibleGames.map((game, index) => (
                                         <div key={index} className={`grid grid-cols-5 p-3 justify-items-center items-center border-b border-gray-700 hover:bg-gray-700 transition-colors duration-100 ease-in-out`}>
                                             <span className="text-sm 2xl:text-[1.1rem]">{new Date(game.played_at).toLocaleString()}</span>
-                                            <Link href={`/profile/${game.player2_id}`}><span className="2xl:text-[1.1rem]">{game.player2_id}</span></Link>
-                                            <span className="capitalize border-1 border-[#D97706] text-[#D97706] rounded-[8px] px-2 py-1 text-[.6rem] w-[65px] text-center 2xl:text-[.9rem] 2xl:w-[100px]">{game.type}</span>
+                                            <span className="capit  alize border-1 border-[#D97706] text-[#D97706] rounded-[8px] px-2 py-1 text-[.6rem] w-[65px] text-center 2xl:text-[.9rem] 2xl:w-[100px]">{game.type}</span>
                                             <span className="2xl:text-[1.1rem]">{game.player1_score} - {game.player2_score}</span>
+                                            <Link href={`/profile/${game.player2_id}`}><span className="2xl:text-[1.1rem]">{game.player2_id}</span></Link>
                                             <span className={`px-2 py-1 rounded text-white text-[.6rem] w-[50px] text-center h-fit 2xl:text-[.9rem] ${game.winner_id === game.player1_id ? 'bg-green-600 ' : 'bg-red-600'}`}>
                                                 {game.winner_id === game.player1_id ? 'WIN' : 'LOSS'}
                                             </span>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-full">
+                                    <div className="flex flex-col items-center justify-center h-[100%]">
                                         <div className="relative w-48 h-32 mb-4 2xl:mb-7 2xl:w-68 2xl:h-52">
                                             <Image
                                                 src={'/images/games-history-placeholder.png'}
