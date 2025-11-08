@@ -38,6 +38,7 @@ export interface IPlayer {
   avatar: string;
   frame: string;
   level: string;
+  points: number;
   isEliminated: boolean;
 }
 
@@ -46,6 +47,7 @@ export interface UserInfo {
   username: string;
   email: string;
   avatar_url: string | null;
+  points: number;
   isAccountVerified: number;
 }
 

@@ -1,5 +1,7 @@
 import Image from 'next/image';
 
+import { getFrameByPoints } from '@/utils/getFrameByPoints';
+
 import Avatar from '../Avatar';
 
 export default function GamePlayers({
@@ -10,12 +12,14 @@ export default function GamePlayers({
     username: string;
     avatar: string;
     frame: string;
+    points: number;
     level: string;
   };
   rightUser: {
     username: string;
     avatar: string;
     frame: string;
+    points: number;
     level: string;
   };
 }) {
@@ -43,7 +47,11 @@ export default function GamePlayers({
             </span>
           </div>
           <div className='w-10 md:w-20'>
-            <Avatar width={80} url={leftUser.avatar} frame={leftUser.frame} />
+            <Avatar
+              width={80}
+              url={leftUser.avatar}
+              frame={getFrameByPoints(leftUser.points)}
+            />
           </div>
         </div>
       </div>
@@ -61,7 +69,11 @@ export default function GamePlayers({
       <div>
         <div className='flex gap-1 md:gap-2 items-center'>
           <div className='w-10 md:w-20'>
-            <Avatar width={80} url={rightUser.avatar} frame={rightUser.frame} />
+            <Avatar
+              width={80}
+              url={rightUser.avatar}
+              frame={getFrameByPoints(rightUser.points)}
+            />
           </div>
           <div className='relative'>
             <div className='absolute right-0 top-1/2 -translate-y-1/2'>

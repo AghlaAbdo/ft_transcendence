@@ -66,7 +66,7 @@ const ProfilePage = () => {
                     className="absolute top-55 w-44 h-44 rounded-full z-2  " 
                     /> */}
 
-                  <div className={`absolute top-55 z-10`}>
+                  <div className={`absolute top-55 z-9`}>
                     <img
                       src={user.avatar_url  || "/avatars/avatar1.png"}
                       alt='Avatar'

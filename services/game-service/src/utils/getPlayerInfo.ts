@@ -5,7 +5,7 @@ export async function getPlayerInfo(userId: string): Promise<IPlayer | null> {
   const response = await fetchUser(userId);
   if (!response) return null;
   const user = response.user;
-  // console.log("user in getPlayerInfo: ", user);
+  console.log('user in getPlayerInfo: ', user);
 
   return {
     id: String(user.id),
@@ -13,6 +13,7 @@ export async function getPlayerInfo(userId: string): Promise<IPlayer | null> {
     avatar: user.avatar_url,
     frame: 'silver2',
     level: '17',
+    points: user.points,
     isEliminated: false,
   };
 }

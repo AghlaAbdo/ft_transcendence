@@ -57,6 +57,7 @@ export function generateGameState(
       avatar: player1.avatar,
       frame: player1.frame,
       level: player1.level,
+      points: player1.points,
       ready: false,
     },
     player2: {
@@ -65,6 +66,7 @@ export function generateGameState(
       avatar: player2 ? player2.avatar : null,
       frame: player2 ? player2.frame : null,
       level: player2 ? player2.level : null,
+      points: player2 ? player2.points : null,
       ready: false,
     },
     playersNb: 1,

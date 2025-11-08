@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 import { IPlayer } from '@/constants/game';
+import { getFrameByPoints } from '@/utils/getFrameByPoints';
 
 import Avatar from '../Avatar';
 import Rematch from './Rematch';
@@ -47,7 +48,11 @@ export default function GameResultCard({
             </span>
           </div>
           <div className='w-16 500:w-24 md:w-32'>
-            <Avatar width={128} url={leftUser.avatar} frame={leftUser.frame} />
+            <Avatar
+              width={128}
+              url={leftUser.avatar}
+              frame={getFrameByPoints(leftUser.points)}
+            />
           </div>
           <span className='bg-gray-700 px-1 py-[2px] md:px-3 md:py-1 rounded-[8px] border-1 border-gray-500 text-sm md:text-[16px] text-gray-50 font-bold'>
             {leftUser.username}
@@ -96,7 +101,7 @@ export default function GameResultCard({
             <Avatar
               width={128}
               url={rightUser.avatar}
-              frame={rightUser.frame}
+              frame={getFrameByPoints(rightUser.points)}
             />
           </div>
           <div className='h-[26px] md:h-[34px] flex items-center pl-3 pr-1 gap-1 bg-gray-700  rounded-[8px] border-1 border-gray-500'>

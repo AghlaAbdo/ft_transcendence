@@ -17,12 +17,11 @@ export default function Avatar({
         src={url}
         alt='Avatar'
         className='w-full rounded-full p-[12%]'
-        unoptimized
       />
       <img
         width={width}
         height={width}
-        src={`/frames/${frame}.png`}
+        src={frame}
         alt='Frame'
         className='absolute inset-0 w-full pointer-events-none'
       />
