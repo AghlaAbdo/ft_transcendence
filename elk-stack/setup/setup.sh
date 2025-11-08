@@ -47,6 +47,7 @@ response2=$(curl -s -w "%{http_code}" -X POST "https://elasticsearch:9200/_secur
   --cacert config/certs/ca/ca.crt \
   -H "Content-Type: application/json" \
   -d '{
+    "cluster": ["manage_index_templates", "monitor"],
     "indices": [
       {
         "names": [ "transcendence-logs" ],

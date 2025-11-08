@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
         hostname: "lh3.googleusercontent.com",
       },
     ],
-    domains: ['localhost'],
+    dangerouslyAllowSVG: true, // allow SVG images
   },
 };
 

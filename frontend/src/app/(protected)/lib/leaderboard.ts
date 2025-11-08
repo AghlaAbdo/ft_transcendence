@@ -1,13 +1,10 @@
 import { Player } from "@/constants/leaderboard";
 // import { Players } from "@/mocks/leaderboard";
 
-interface PlayerWithRank extends Player {
-    rank: number;
-}
 
 // const is_mock = false
 
-export async function get_all_leaderboard(): Promise<PlayerWithRank[]> {
+export async function get_all_leaderboard(): Promise<Player[]> {
     // if (is_mock) {
     //     const sorted = Players.sort((a, b) => b.score - a.score)
     //     return sorted.map((player, index) => ({
@@ -23,48 +20,39 @@ export async function get_all_leaderboard(): Promise<PlayerWithRank[]> {
         const players = rawData.users
 
         const playersData: Player[] = players.map((user: any) => {
-            const wins = user.wins || 0
-            const losses = user.losses || 0
-            const totalGames = wins + losses
-            const winrate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0
+            // const wins = user.wins || 0
+            // const losses = user.losses || 0
+            const games = user.wins + user.losses
+            const winrate = games > 0 ? Math.round((user.wins / games) * 100) : 0
 
             return {
-                username: user.username,
-                score: user.points || 0,
-                winrate: winrate,
-                games: totalGames,
-                avatar_url: user.avatar_url,
-                wins,
-                losses
+                ...user,
+                games,
+                winrate
             }
         })
 
-        const sortedPlayers = playersData.sort((a, b) => b.score - a.score)
-
-        return sortedPlayers.map((player, index) => ({
-            ...player,
-            rank: index + 1
-        }))
+        return playersData
     } catch (error) {
         console.error('Error fetching leaderboard:', error)
         return []
     }
 }
 
-export function get_top_players(players: PlayerWithRank[]): PlayerWithRank[] {
+export function get_top_players(players: Player[]): Player[] {
     return players.slice(0, 3)
 }
 
-export function get_paginated_players(players: PlayerWithRank[], page: number, limit: number): PlayerWithRank[] {
+export function get_paginated_players(players: Player[], page: number, limit: number): Player[] {
     const start = (page - 1) * limit
     const end = start + limit
     return players.slice(start, end)
 }
 
-export function get_user_by_username(players: PlayerWithRank[], username: string): PlayerWithRank {
-    const user = players.find(player => player.username === username)
-    if (!user) {
-        throw new Error(`User '${username}' not found in leaderboard`)
-    }
-    return user
-}
+// export function get_user_by_username(players: PlayerWithRank[], username: string): PlayerWithRank {
+//     const user = players.find(player => player.username === username)
+//     if (!user) {
+//         throw new Error(`User '${username}' not found in leaderboard`)
+//     }
+//     return user
+// }
