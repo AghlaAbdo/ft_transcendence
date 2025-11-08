@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
-import { getFrameByPoints } from '@/utils/getFrameByPoints';
+import { getFrameByLevel } from '@/utils/getFrameByLevel';
 
 
 const schema = z.object({
@@ -212,7 +212,7 @@ const SettingsPage = () => {
                                 className='w-45 h-45 rounded-full p-[12%]'
                               />
                               <img
-                                src={getFrameByPoints(user.points)}
+                                src={getFrameByLevel(user.level)}
                                 alt='Frame'
                                 className='absolute w-45 h-45 inset-0 pointer-events-none'
                               />

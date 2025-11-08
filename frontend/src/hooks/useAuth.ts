@@ -18,7 +18,7 @@ export interface User {
   points: number;
   wins: number;
   losses: number;
-  rank: number;
+  level: number;
   online_status: number;
   is_google_auth: number;
 }

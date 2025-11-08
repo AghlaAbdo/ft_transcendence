@@ -400,6 +400,29 @@ const updateStats = async (request, reply) => {
 
         // userModel.recalculateRanks(db);
 
+        const winner = userModel.getUserByID(db, winnerId);
+        const loser = userModel.getUserByID(db, loser);
+
+        if (winner.points >= 0) {
+            db.prepare(`
+                UPDATE USERS
+                    SET level = level + 1,
+                    points = 0,
+                    updatedAt = CURRENT_TIMESTAMP
+                WHERE id = ?;
+            `).run(winner.id);
+        }
+
+        if (loser.points >= 20) {
+            db.prepare(`
+                UPDATE USERS
+                SET level = level + 1,
+                    points = 0,
+                    updatedAt = CURRENT_TIMESTAMP
+                WHERE id = ?;
+            `).run(loser.id);
+        }
+
         return reply.status(200).send({ 
             status: true,
             message: "Stats updated successfully" 

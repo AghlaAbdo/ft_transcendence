@@ -2,7 +2,7 @@ import { generatePingPongAvatar } from '../utils/generatePingPongAvatar.js'
 
 const getAllUsers =  (db) => {
     const query = `SELECT id, username, email,avatar_url,
-        isAccountVerified, points, wins, losses, is_google_auth, 
+        isAccountVerified, points, wins, losses, level, is_google_auth, 
         online_status, is_2fa_enabled, createdAt, updatedAt
     FROM USERS 
     ORDER BY points DESC, wins DESC, losses ASC`;
@@ -11,13 +11,15 @@ const getAllUsers =  (db) => {
 }
 
 const getUserByID =  (db, id) => {
-    const query = 'SELECT * FROM USERS WHERE id = ?';
+    const query = `SELECT id, username, email,avatar_url,
+        isAccountVerified, points, wins, losses, level, is_google_auth, 
+        online_status, is_2fa_enabled, createdAt, updatedAt FROM USERS WHERE id = ?`;
     const userID = db.prepare(query);
     return userID.get(id);
 }
 
 const getUserByEmail =  (db, email) => {
-    const query = 'SELECT * FROM USERS WHERE email = ?';
+    const query = `SELECT * FROM USERS WHERE email = ?`;
     const userEmail = db.prepare(query);
     return userEmail.get(email.trim().toLowerCase());
 }

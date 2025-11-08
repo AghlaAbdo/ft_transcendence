@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { User } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { getFrameByPoints } from '@/utils/getFrameByPoints';
+import { getFrameByLevel } from '@/utils/getFrameByLevel';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -72,7 +72,7 @@ const ProfilePage = () => {
                       className='w-45 h-45 rounded-full p-[12%]'
                     />
                     <img
-                      src={getFrameByPoints(user.points)}
+                      src={getFrameByLevel(user.level)}
                       alt='Frame'
                       className='absolute w-45 h-45 inset-0 pointer-events-none'
                     />

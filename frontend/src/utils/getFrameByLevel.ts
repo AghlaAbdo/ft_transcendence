@@ -1,15 +1,15 @@
 
 
-export const getFrameByPoints = (points: number) : string => {
+export const getFrameByLevel = (level: number) : string => {
 
     const ranks = ["silver", "gold", "sapphire", "amethyst"];
     const framesPerRank = 3;       
-    const pointsPerFrame = 10;      
+    const levelPerFrame = 5;      
 
-    console.log("player Points: ", points);
-    if (points <= 0) points = 1;
+    console.log("player level: ", level);
+    if (level <= 0) level = 1;
 
-    const index = Math.floor((points - 1) / pointsPerFrame);
+    const index = Math.floor((level - 1) / levelPerFrame);
     const rankIndex = Math.floor(index / framesPerRank);
     const frameNumber = (index % framesPerRank) + 1;
 
