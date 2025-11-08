@@ -403,7 +403,7 @@ const updateStats = async (request, reply) => {
         const winner = userModel.getUserByID(db, winnerId);
         const loser = userModel.getUserByID(db, loser);
 
-        if (winner.points >= 0) {
+        if (winner.points >= 20) {
             db.prepare(`
                 UPDATE USERS
                     SET level = level + 1,
