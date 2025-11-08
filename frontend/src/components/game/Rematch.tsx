@@ -23,7 +23,7 @@ export default function Rematch({
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   opponentId: string;
 }) {
-  const { setHideHeaderSidebar } = useLayout();
+  const { setHideHeaderSidebar, setHideSidebar } = useLayout();
   const { user } = useUser();
   const router = useRouter();
 
@@ -43,6 +43,7 @@ export default function Rematch({
     });
     return () => {
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
     };
   }, [dialogRef, setHideHeaderSidebar, setRematch]);
 

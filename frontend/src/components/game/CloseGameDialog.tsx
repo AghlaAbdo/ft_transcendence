@@ -24,7 +24,7 @@ export default function CloseGameDialog({
 }) {
   const { user } = useUser();
   const router = useRouter();
-  const { setHideHeaderSidebar } = useLayout();
+  const { setHideHeaderSidebar, setHideSidebar } = useLayout();
   const params = useParams<MatchPageParams>();
 
   function handleCancel() {
@@ -37,6 +37,7 @@ export default function CloseGameDialog({
     }
     socket.emit('quit', { userId: user.id, gameId });
     setHideHeaderSidebar(false);
+    setHideSidebar(false);
     if (isTournamentGame)
       router.replace(`/game/tournament/${params.tournamentId}`);
     else router.replace('/game');

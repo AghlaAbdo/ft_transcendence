@@ -20,7 +20,8 @@ export default function SpecificTournamentPage() {
   const router = useRouter();
   const params = useParams<{ tournamentId: string }>();
   const { user } = useUser();
-  const { hideHeaderSidebar, setHideHeaderSidebar } = useLayout();
+  const { hideHeaderSidebar, setHideHeaderSidebar, setHideSidebar } =
+    useLayout();
 
   const tournamentId = params.tournamentId;
   const [tournament, setTournament] = useState<TournamentDetails | null>(null);
@@ -47,7 +48,10 @@ export default function SpecificTournamentPage() {
       // console.log('got Tournament details!!: ', data);
       setTournament(data);
       setError(null);
-      if (data.status == 'live') setHideHeaderSidebar(true);
+      if (data.status == 'live') {
+        setHideHeaderSidebar(true);
+        setHideSidebar(true);
+      }
       const match = getCurrentMatch(data, user.id);
       if (match && match.status == 'ready' && match.gameId) {
         setNextMatchInfo({ gameId: match.gameId });
@@ -88,6 +92,7 @@ export default function SpecificTournamentPage() {
         // console.log('Tournament started:', data.tournamentId);
         // console.log('tournament.bracket: ', data.bracket);
         setHideHeaderSidebar(true);
+        setHideSidebar(true);
         setTournament((prev) =>
           prev ? { ...prev, status: 'live', bracket: data.bracket } : null
         );
@@ -121,6 +126,7 @@ export default function SpecificTournamentPage() {
 
     return () => {
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
       socket.off('tournamentDetails');
       socket.off('tournamentPlayerUpdate');
       socket.off('bracketUpdate');
