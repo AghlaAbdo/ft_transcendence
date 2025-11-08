@@ -442,7 +442,7 @@ export const usePongGameLogic = (
     });
 
     socket.on('matchFound', (opponent: IPlayer) => {
-      console.log('Match Found: ', opponent.username);
+      console.log('Match Found: ', opponent);
       setHideHeaderSidebar(true);
       setHideSidebar(true);
       setOpponent(opponent);

@@ -32,6 +32,7 @@ export interface IGameState {
     avatar: string | null;
     frame: string | null;
     level: string | null;
+    points: number | null;
     ready: boolean;
   };
   player2: {
@@ -40,6 +41,7 @@ export interface IGameState {
     avatar: string | null;
     frame: string | null;
     level: string | null;
+    points: number | null;
     ready: boolean;
   };
   game: {
@@ -63,6 +65,7 @@ export interface IPlayer {
   avatar: string;
   frame: string;
   level: string;
+  points: number;
   isEliminated: boolean;
 }
 

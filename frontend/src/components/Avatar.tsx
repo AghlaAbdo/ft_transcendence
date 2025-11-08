@@ -21,7 +21,7 @@ export default function Avatar({
       <img
         width={width}
         height={width}
-        src={`/frames/${frame}.png`}
+        src={frame}
         alt='Frame'
         className='absolute inset-0 w-full pointer-events-none'
       />

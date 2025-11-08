@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 
 import { socket } from '@/app/(protected)/lib/socket';
 import { IPlayer } from '@/constants/game';
+import { getFrameByPoints } from '@/utils/getFrameByPoints';
 
 const avatars = [
   '/avatars/avatar1.png',
@@ -45,7 +46,7 @@ export default function Matching({
             scale: { type: 'spring', bounce: 0.4, duration: 0.6 },
           }}
         >
-          <Avatar width={192} url={player.avatar} frame={player.frame} />
+          <Avatar width={192} url={player.avatar} frame={getFrameByPoints(player.points)} />
           <span className='bg-gray-800 px-1 py-[2px] sm:px-3 sm:py-1 rounded-[8px] border-1 border-gray-500'>
             {player.username}
           </span>
@@ -88,7 +89,7 @@ export default function Matching({
                 <Avatar
                   width={192}
                   url={`${opponent ? opponent.avatar : '/avatars/avatar2.png'}`}
-                  frame={`${opponent ? opponent.frame : 'silver3'}`}
+                  frame={getFrameByPoints(opponent.points)}
                 />
               </motion.div>
 
@@ -111,7 +112,7 @@ export default function Matching({
                     repeat: Infinity,
                   }}
                 >
-                  <Avatar width={192} url={src} frame='silver1' />
+                  <Avatar width={192} url={src} frame='/frames/silver1.png' />
                 </motion.div>
               ))}
             </div>
