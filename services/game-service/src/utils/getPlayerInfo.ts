@@ -12,7 +12,7 @@ export async function getPlayerInfo(userId: string): Promise<IPlayer | null> {
     username: user.username,
     avatar: user.avatar_url,
     frame: 'silver2',
-    level: '17',
+    level: user.level,
     points: user.points,
     isEliminated: false,
   };

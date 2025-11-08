@@ -37,7 +37,7 @@ export interface IPlayer {
   username: string;
   avatar: string;
   frame: string;
-  level: string;
+  level: number;
   points: number;
   isEliminated: boolean;
 }
