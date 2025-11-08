@@ -19,14 +19,14 @@ export async function get_all_leaderboard(): Promise<Player[]> {
         const rawData = await response.json()
         const players = rawData.users
 
-        const playersData: Player[] = players.map((user: any) => {
+        const playersData: Player[] = players.map((user: Player, index: number) => {
             // const wins = user.wins || 0
             // const losses = user.losses || 0
             const games = user.wins + user.losses
             const winrate = games > 0 ? Math.round((user.wins / games) * 100) : 0
-
             return {
                 ...user,
+                rank: index + 1,
                 games,
                 winrate
             }

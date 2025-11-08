@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
@@ -15,7 +16,7 @@ export default function Sidebar() {
   const { user } = useAuth();
 
   const handleLogout = async () => {
-    
+
     try {
       const response = await fetch('https://localhost:8080/api/auth/logout', {
         method: 'POST',
@@ -25,7 +26,7 @@ export default function Sidebar() {
       if (!response.ok) {
         const data = await response.json();
         toast.error(data.message);
-        return ;
+        return;
       }
 
       router.push('/login');
@@ -56,42 +57,14 @@ export default function Sidebar() {
       className={`z-11 bg-gray-800 py-4 pb-10 w-[72px] fixed top-0 left-0 h-full md:flex flex-col justify-between items-center`}
     >
       <div className='flex flex-col items-center gap-[70px] z-1000'>
-        <Link href='/'>
-          {/* Logo Icon*/}
-          <svg
-            width='57'
-            height='57'
-            viewBox='0 0 57 57'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-            xmlnsXlink='http://www.w3.org/1999/xlink'
-          >
-            <rect
-              y='24.7671'
-              width='40'
-              height='40'
-              rx='20'
-              transform='rotate(-38.2559 0 24.7671)'
-              fill='url(#pattern0_511_61)'
-            />
-            <defs>
-              <pattern
-                id='pattern0_511_61'
-                patternContentUnits='objectBoundingBox'
-                width='1'
-                height='1'
-              >
-                <use xlinkHref='#image0_511_61' transform='scale(0.015625)' />
-              </pattern>
-              <image
-                id='image0_511_61'
-                width='64'
-                height='64'
-                preserveAspectRatio='none'
-                xlinkHref='data:image/png;base64,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'
-              />
-            </defs>
-          </svg>
+        <Link href='/home'>
+          <Image
+            src="/logo2.png"
+            alt="Logo"
+            width={57}
+            height={57}
+            className="object-contain"
+          />
         </Link>
 
         <div className='navLinks flex flex-col items-center gap-2'>

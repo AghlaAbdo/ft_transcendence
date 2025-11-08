@@ -42,7 +42,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       const games = db
         .prepare(
           `
-        SELECT played_at, player1_id, player2_id, 'local' as type, player1_score, player2_score, winner_id 
+        SELECT played_at, player1_id, player2_id, game_type as type, player1_score, player2_score, winner_id, play_time
         FROM game 
         WHERE player1_id = ? OR player2_id = ?
         ORDER BY played_at DESC

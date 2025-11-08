@@ -13,11 +13,15 @@ export async function GetGames(userId: number): Promise<game[]> {
     const updatedGames = games.map(game =>
         userId !== game.player1_id ? {
             ...game,
+            play_time_dict: secondsToTimeDict(game.play_time),
             player1_id: game.player2_id,
             player2_id: game.player1_id,
             player1_score: game.player2_score,
             player2_score: game.player1_score,
-        } : game
+        } : {
+            ...game,
+            play_time_dict: secondsToTimeDict(game.play_time)
+        }
     )
     return updatedGames
 }
