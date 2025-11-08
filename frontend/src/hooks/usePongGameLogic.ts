@@ -39,6 +39,7 @@ export const usePongGameLogic = (
   const router = useRouter();
   const [matching, setMatching] = useState(true);
   const [opponent, setOpponent] = useState<IPlayer | null>(null);
+  const opponentId = useRef<string | null>(null);
   const [player, setPlayer] = useState<IPlayer | null>(null);
   const [winner, setWinner] = useState<string>('');
   const [inAnotherGame, setInAnotherGame] = useState<boolean>(false);
@@ -303,7 +304,10 @@ export const usePongGameLogic = (
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
             setHideSidebar(true);
-            if (data.opponent) setOpponent(data.opponent);
+            if (data.opponent) {
+              setOpponent(data.opponent);
+              opponentId.current = data.opponent.id;
+            }
           }
         }
       );
@@ -336,14 +340,20 @@ export const usePongGameLogic = (
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
             setHideSidebar(true);
-            if (data.opponent) setOpponent(data.opponent);
+            if (data.opponent) {
+              setOpponent(data.opponent);
+              opponentId.current = data.opponent.id;
+            }
           } else if (data.gameStatus === 'waiting') {
             // console.log('did set player: ', data.player);
             // console.log("match found waiting, data:", data);
             setPlayer(data.player);
             playerRole.current = data.playerRole;
             gameId.current = data.gameId;
-            if (data.opponent) setOpponent(data.opponent);
+            if (data.opponent) {
+              setOpponent(data.opponent);
+              opponentId.current = data.opponent.id;
+            }
           }
         }
       );
@@ -376,7 +386,10 @@ export const usePongGameLogic = (
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
             setHideSidebar(true);
-            if (data.opponent) setOpponent(data.opponent);
+            if (data.opponent) {
+              setOpponent(data.opponent);
+              opponentId.current = data.opponent.id;
+            }
           } else if (data.gameStatus === 'waiting') {
             // console.log('did set player: ', data.player);
             // console.log("match found waiting, data:", data);
@@ -433,6 +446,7 @@ export const usePongGameLogic = (
       setHideHeaderSidebar(true);
       setHideSidebar(true);
       setOpponent(opponent);
+      opponentId.current = opponent.id;
       setGameStatus('playing');
     });
 
@@ -559,13 +573,12 @@ export const usePongGameLogic = (
       socket.off('opponentQuit');
       socket.off('tournMatchDetails');
       socket.off('matchDetails');
-      if (isPlaying.current) {
-        socket.emit('quit', {
-          userId: user.id,
-          gameId,
-          opponentId: opponent?.id,
-        });
-      }
+      // console.log("on quit, opponent: ", opponentId.current);
+      socket.emit('quit', {
+        userId: user.id,
+        gameId: gameId.current,
+        opponentId: opponentId.current,
+      });
     };
   }, []);
 
