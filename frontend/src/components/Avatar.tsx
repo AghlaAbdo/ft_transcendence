@@ -11,14 +11,14 @@ export default function Avatar({
 }) {
   return (
     <div className={`w-full relative`}>
-      <Image
+      <img
         width={width}
         height={width}
         src={url}
         alt='Avatar'
         className='w-full rounded-full p-[12%]'
       />
-      <Image
+      <img
         width={width}
         height={width}
         src={`/frames/${frame}.png`}
