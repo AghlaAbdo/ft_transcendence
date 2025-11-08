@@ -16,20 +16,19 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { hideHeaderSidebar, hideSidebar, setHideSidebar } = useLayout();
 
   useEffect(() => {
-  function handleResize() {
-    if (window.innerWidth >= 768) {
-      // md breakpoint → sidebar should be visible
-      setHideSidebar(false);
-    } else {
-      // mobile → sidebar should be hidden (your logic)
-      setHideSidebar(true);
+    function handleResize() {
+      if (window.innerWidth >= 768 && !hideHeaderSidebar) {
+        console.log("sethideSidebar: false");
+        setHideSidebar(false);
+      } else  {
+        setHideSidebar(true);
+      }
     }
-  }
 
-  handleResize(); // run once on mount
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [hideHeaderSidebar]);
 
   return (
     // <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white mx-auto px-10">

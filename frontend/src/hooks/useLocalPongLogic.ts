@@ -55,7 +55,7 @@ export const useLocalPongLogic = (): returnType => {
   });
   const leftPaddleY = useRef(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);
   const rightPaddleY = useRef(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);
-  const { setHideHeaderSidebar } = useLayout();
+  const { setHideHeaderSidebar, setHideSidebar } = useLayout();
 
   useEffect(() => {
     setTimeout(() => {
@@ -65,6 +65,7 @@ export const useLocalPongLogic = (): returnType => {
 
   useEffect(() => {
     setHideHeaderSidebar(true);
+    setHideSidebar(true);
     let isInitialized = false;
     const initPixiApp = async () => {
       try {
@@ -224,6 +225,7 @@ export const useLocalPongLogic = (): returnType => {
     initPixiApp();
     return () => {
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
       window.removeEventListener('resize', resize);
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
       if (isInitialized && pixiApp.current) {

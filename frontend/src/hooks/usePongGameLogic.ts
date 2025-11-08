@@ -66,7 +66,7 @@ export const usePongGameLogic = (
   const gameContainerRef = useRef<PIXI.Container | null>(null);
 
   const { user } = useUser();
-  const { setHideHeaderSidebar } = useLayout();
+  const { setHideHeaderSidebar, setHideSidebar } = useLayout();
 
   const showCountDown = useCallback((num: number) => {
     if (!coundDownRef.current) return;
@@ -302,6 +302,7 @@ export const usePongGameLogic = (
             if (!animationFrameId.current)
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
+            setHideSidebar(true);
             if (data.opponent) setOpponent(data.opponent);
           }
         }
@@ -334,6 +335,7 @@ export const usePongGameLogic = (
             if (!animationFrameId.current)
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
+            setHideSidebar(true);
             if (data.opponent) setOpponent(data.opponent);
           } else if (data.gameStatus === 'waiting') {
             // console.log('did set player: ', data.player);
@@ -373,6 +375,7 @@ export const usePongGameLogic = (
             if (!animationFrameId.current)
               animationFrameId.current = requestAnimationFrame(gameLoop);
             setHideHeaderSidebar(true);
+            setHideSidebar(true);
             if (data.opponent) setOpponent(data.opponent);
           } else if (data.gameStatus === 'waiting') {
             // console.log('did set player: ', data.player);
@@ -428,6 +431,7 @@ export const usePongGameLogic = (
     socket.on('matchFound', (opponent: IPlayer) => {
       console.log('Match Found: ', opponent.username);
       setHideHeaderSidebar(true);
+      setHideSidebar(true);
       setOpponent(opponent);
       setGameStatus('playing');
     });
@@ -544,13 +548,6 @@ export const usePongGameLogic = (
       window.removeEventListener('keyup', keyupEvent);
       window.removeEventListener('resize', resize);
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      if (isPlaying.current) {
-        socket.emit('quit', { userId: user.id, gameId });
-      }
-      // if (!isTournamentGame.current) {
-      //   socket.off();
-      //   socket.disconnect();
-      // } else {
       socket.off('inAnotherGame');
       socket.off('playerData');
       socket.off('prepare');
@@ -562,7 +559,13 @@ export const usePongGameLogic = (
       socket.off('opponentQuit');
       socket.off('tournMatchDetails');
       socket.off('matchDetails');
-      // }
+      if (isPlaying.current) {
+        socket.emit('quit', {
+          userId: user.id,
+          gameId,
+          opponentId: opponent?.id,
+        });
+      }
     };
   }, []);
 
