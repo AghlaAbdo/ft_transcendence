@@ -41,7 +41,11 @@ const createApp = () => {
 
     dotenv.config();
 
-    fastify.register(multipart);
+    fastify.register(multipart, {
+        limits: {
+            fileSize: 10 * 1024 * 1024,
+        }
+    });
 
 
     fastify.register(fastifyStatic, {

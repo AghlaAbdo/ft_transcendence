@@ -75,7 +75,7 @@ const SettingsPage = () => {
     if (e.target.files && e.target.files[0]) {
       const file  = e.target.files[0];
       // console.log("file : ", file);
-      // 10MB
+
       if (file.size > 10 * 1024 * 1024) {
         toast.error('File size must be less than 10MB');
         return;
@@ -89,14 +89,23 @@ const SettingsPage = () => {
       try {
         const response = await fetch("https://localhost:8080/api/users/upload-avatar", {
           method: "POST",
-          // headers: {
-          //   Authorization: `Bearer ${token}`
-          // },
           body: formData,
           credentials: "include", // sends the token cookie automatically no Authorization header is required, the browser send token automatically
         });
 
-        const data = await response.json();
+        if (response.status === 413) {
+          toast.error("File too large. Server limit exceeded.");
+          return;
+        }
+        const contenType = response.headers.get("content-type");
+        if (!contenType || !contenType.includes('application/json')) {
+          const text = await response.text();
+          console.error("Non-JSON reponse:", text);
+          toast.error('Server returened an invalid response');
+          return ;
+        }
+
+        const data: {status: boolean, message: string} = await response.json();
 
         if (response.ok && data.status) {
           
@@ -104,6 +113,7 @@ const SettingsPage = () => {
         } else {
           toast.error("Failed to upload avatar");
         }
+        
       } catch (error) {
         console.error("Upload failed:", error);
         toast.error("Failed to upload avatar. Please try again.");
