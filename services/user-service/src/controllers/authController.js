@@ -454,7 +454,7 @@ const disable2fa = async(req, rep) => {
 try {
     const db = req.server.db;
     const userId = req.user?.id;
-    // const { token } = req.body;
+    const { token } = req.body;
 
     if (!userId) {
       return rep.status(400).send({ error: 'Missing required fields' });
@@ -472,7 +472,7 @@ try {
     }
 
     // Verify token before disabling
-    const isValid = TwoFactorService.verifyToken(user.totp_secret, token);
+    const isValid = verifyToken(user.totp_secret, token);
 
     if (!isValid) {
       return rep.status(400).send({ error: 'Invalid verification code' });

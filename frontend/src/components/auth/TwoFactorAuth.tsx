@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
-import Switcher4 from '../toggle_button';
-import QrModal from './QrModal';
 import { useAuth } from '@/hooks/useAuth';
+
+import Switcher4 from '../toggle_button';
+import Disable2fa from './Disable2fa';
+import QrModal from './QrModal';
 
 interface qrCode {
   manualEntryKey: string;
@@ -14,27 +16,33 @@ interface qrCode {
 }
 
 export default function TwoFactorAuth() {
-  const [enabled, setEnabled] = useState<boolean>(false);
+  const { user } = useAuth();
+  const [enabled, setEnabled] = useState<boolean>(
+    user?.is_2fa_enabled || false
+  );
   const [showModal, setshowModal] = useState<boolean>(false);
-  const [showqr, setshowqr] = useState<qrCode>();
-  const {user} = useAuth();
+  const [showqr, setshowqr] = useState<qrCode | null>();
+  const [showdisableModal, setshowdisable] = useState<boolean>(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && enabled !== user.is_2fa_enabled) {
       setEnabled(user.is_2fa_enabled);
     }
-  }, [user])
+  }, [user]);
 
   const handleToggleChange = async () => {
-    if (!user) return;
-
-    if (!enabled) {
+  if (!user) return;
+  
+  if (!enabled) {
+    try {
       await fetchQRCode();
+    } catch (error) {
+      toast.error('Failed to enable 2FA. Please try again.');
     }
-    else {
-      await disable2FA();
-    }
-  };
+  } else {
+    setshowdisable(true);
+  }
+};
 
   const fetchQRCode = async () => {
     try {
@@ -45,7 +53,7 @@ export default function TwoFactorAuth() {
           credentials: 'include',
         }
       );
-      
+
       if (response.ok) {
         const data: qrCode = await response.json();
         setshowqr(data);
@@ -59,36 +67,17 @@ export default function TwoFactorAuth() {
     }
   };
 
-  const disable2FA = async () => {
-    try {
-      const response = await fetch(
-        'https://localhost:8080/api/auth/2fa/disable',
-        {
-          method: 'POST',
-          credentials: 'include',
-        }
-      );
-      
-      if (response.ok) {
-        setEnabled(false);
-        toast.success('2FA disabled successfully');
-      } else {
-        toast.error('Failed to disable 2FA');
-      }
-    } catch (error) {
-      console.error('2FA disable error:', error);
-      toast.error('Failed to disable 2FA');
-    }
-  };
-
+  const handledisable = () =>{
+    setEnabled(false);
+    setshowdisable(false);
+    toast.success('2FA disabled successfully!');
+  }
   const handleVerificationSuccess = () => {
     setEnabled(true);
     setshowModal(false);
+    setshowqr(null);
     toast.success('2FA enabled successfully!');
   };
-
-  if (!user)
-      return <><div>Loading</div></>
 
   return (
     <>
@@ -123,7 +112,6 @@ export default function TwoFactorAuth() {
           </div>
         </label>
 
-        {/* <Switcher4 isChecked={enabled}/> */}
       </div>
 
       {showModal && showqr && (
@@ -135,10 +123,27 @@ export default function TwoFactorAuth() {
             className='bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-2xl'
             onClick={(e) => e.stopPropagation()}
           >
-            <QrModal 
-              onclose={() => setshowModal(false)} 
+            <QrModal
+              onclose={() => setshowModal(false)}
               qr={showqr}
               onVerificationSuccess={handleVerificationSuccess}
+            />
+          </div>
+        </div>
+      )}
+
+      {showdisableModal && (
+        <div
+          className='fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center'
+          onClick={() => setshowdisable(false)}
+        >
+          <div
+            className='bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-2xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Disable2fa
+            onclose={() => setshowdisable(false)}
+            handledisable={handledisable}
             />
           </div>
         </div>

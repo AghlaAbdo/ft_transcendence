@@ -78,7 +78,7 @@ export default function QrMOdal ({qr, onclose, onVerificationSuccess}: Qrporps) 
       </div>
       <div className='flex gap-4 mb-4'>
         {/* QR Code */}
-        <div className='bg-white p-3 rounded-lg flex items-center justify-center'>
+        <div className='bg-white p-1 rounded-lg flex items-center justify-center'>
           <img
             src={qr.qrCode}
             alt='QR Code'
@@ -92,7 +92,7 @@ export default function QrMOdal ({qr, onclose, onVerificationSuccess}: Qrporps) 
           </label>
           <div className='flex items-center gap-2'>
             <div className='flex-1 bg-gray-700 px-3 py-2.5 rounded-lg border border-gray-600'>
-              <code className='text-purple text-xs font-mono break-all'>
+              <code className='text-purple text-xs break-all'>
                 {qr.manualEntryKey}
               </code>
             </div>
@@ -123,7 +123,7 @@ export default function QrMOdal ({qr, onclose, onVerificationSuccess}: Qrporps) 
             setCode(numbersOnly);
           }}
           placeholder='000000'
-          className='w-full px-3 py-2.5 bg-gray-700 text-white text-center text-xl font-mono tracking-widest rounded-lg border border-gray-600 outline-none focus:border-purple focus:ring-2 focus:ring-purple/20 transition-all'
+          className='w-full px-3 py-2.5 bg-gray-700 text-white text-center text-xl tracking-widest rounded-lg border border-gray-600 outline-none focus:border-purple focus:ring-2 focus:ring-purple/20 transition-all'
         />
       </div>
 

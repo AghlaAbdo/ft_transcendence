@@ -11,7 +11,6 @@ interface GlobalSearchProps {
 
 export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
   const [users, setUsers] = useState<User[]>([]);
-  // const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,10 +32,8 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         }
         const data = await response.json();
         if (data.status) {
-          // console.log('users; ', data.users);
           setUsers(data.users.filter(
             (_user: any) => 
-              // console.log('inside');
               _user.id !== user.id &&
               _user.username.toLowerCase().includes(searchTerm.toLowerCase())
         ));
@@ -53,23 +50,8 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
     fetchUsers();
   }, [debouncedSearchTerm]);
 
-  // useEffect(() => {
-  //   if (searchTerm && searchTerm.trim() && user) {
-  //     setFilteredUsers(
-  //       users.filter(
-  //         (_user) =>
-  //           _user.id !== user.id &&
-  //           _user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  //       )
-  //     );
-  //   } else {
-  //     setFilteredUsers([]);
-  //   }
-  // }, [debouncedSearchTerm, user]);
-
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
-      {/* Search Header */}
       <div className='flex items-center justify-between px-5 py-1'>
         <h2 className='text-xl font-medium text-white'>Search Users</h2>
         <button
@@ -81,7 +63,6 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         </button>
       </div>
 
-      {/* Search Input */}
       <div className='px-5 py-1.5'>
         <div className='relative group'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-500 transition-colors' />
@@ -105,7 +86,6 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         </div>
       </div>
 
-      {/* Results Container */}
       <div className='flex-1 overflow-y-auto px-5 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden'>
         {isLoading && (
           <div className='flex flex-col items-center justify-center py-12 text-gray-400'>

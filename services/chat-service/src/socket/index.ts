@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { create_new_chat, insert_message } from "../database/conversations.js";
 import Database from "better-sqlite3";
+
 declare module "socket.io" {
   interface Socket {
     userId?: number;
@@ -26,7 +27,7 @@ export function initSocket(server: any, db: Database.Database) {
       onlineUsers.set(user__id, new Set());
     }
     onlineUsers.get(user__id)!.add(socket);
-    /* ----------------------- chat message event ----------------------- */
+
     socket.on("ChatMessage", async (data: any) => {
       try {
         const { chatId, sender, receiver, message } = data;
@@ -36,7 +37,6 @@ export function initSocket(server: any, db: Database.Database) {
         let actualChatId = chatId;
         console.log('in socket handler: ', message);
 
-        // If chatId is -1, create new chat (no need to check if exists)
         if (chatId === -1) {
           console.log(`Creating new chat between ${sender} and ${receiver}`);
           actualChatId = create_new_chat(db, sender, receiver, message);
@@ -44,7 +44,6 @@ export function initSocket(server: any, db: Database.Database) {
         }
         const newMessage = insert_message(db, actualChatId, sender, receiver, message);
         if (!newMessage) {
-          console.error("Failed to insert message");
           return socket.emit("error", { message: "Failed to insert message" });
         }
 
@@ -61,12 +60,12 @@ export function initSocket(server: any, db: Database.Database) {
           })
         }
       } catch (err) {
-        console.error("ChatMessage error:", err);
+        // console.error("ChatMessage error:", err);
         socket.emit("error", { message: "Failed to send message" });
       }
     });
 
-    /* -------------------------- disconnect ---------------------------- */
+    
 
     socket.on("disconnect", () => {
       if (socket.userId) {

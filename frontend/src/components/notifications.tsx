@@ -26,12 +26,9 @@ interface Notification_props {
 }
 
 const NotificationCenter = ({ onClose }: Notification_props) => {
-  // const [notifications, setNotifications] = useState<notification[]>([]);
   const [isOpen, setIsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('friend_request');
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
-  const { notifications, setNotifications, setError, setIsLoading, isLoading, resetUnread } = useNotificationStore();
+  const { notifications, setNotifications, setError, setIsLoading, isLoading, resetUnread, removeNotification } = useNotificationStore();
   const friendRequests = notifications.filter(
     (n) => n.type === 'friend_request'
   );
@@ -45,7 +42,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
  useEffect(() => {
   if (!user) 
     return;
-  // markAllNotificationsAsRead(user.id); // make a function in the component file .
   const fetchNotifications = async () => {
     try {
       const res = await fetch(`https://localhost:8080/api/users/notifications/${user.id}`);
@@ -64,8 +60,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
             };
           })
         );
-        setNotifications(notificationsWithUserData); // Use the enhanced data
-        
+        setNotifications(notificationsWithUserData);
       }
     } catch (err) {
       console.error('API Error:', err);
@@ -76,13 +71,14 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
 }, [user]);
 
 
+
+
+
   return (
     <div>
       <div className='max-w-2xl mx-auto'>
-        {/* Notification Panel */}
         {isOpen && (
           <div className='bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700'>
-            {/* Header */}
             <div className='bg-slate-800 p-4'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
@@ -100,7 +96,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
               </div>
             </div>
 
-            {/* Tab Navigation */}
             { user &&
 
               <div className='flex border-b border-slate-700 bg-slate-750'>
@@ -123,7 +118,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                 }}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
                   activeTab === 'game_invite'
-                  ? 'text-purple-400 bnotifg-slate-700 border-b-2 border-purple-400'
+                  ? 'text-purple-400 bg-slate-700 border-b-2 border-purple-400'
                   : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/50'
                   }`}
                   >
@@ -133,7 +128,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
             </div>
               }
 
-            {/* Notifications List */}
             <div className='max-h-[600px] overflow-y-auto'>
               {activeNotifications.length === 0 ? (
                 <div className='p-8 text-center'>
@@ -162,15 +156,28 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                 <div
                   className='overflow-y-auto max-h-64 divide-y divide-slate-600 scrollbar-none [&::-webkit-scrollbar]:hidden'>
                   {activeNotifications.map((notif) => (
+                    // notif.type === "friend_request" ? (
                     <div
                       key={notif.id}
-                      className=" transition-all duration-200 hover:bg-slate-750">
+                      className="transition-all duration-200 hover:bg-slate-750">
                       <FriendRequestCard
                         id = {notif.user_id}
                         username={notif.user_username}
                         avatar_url={notif.user_avatar}
                       />
                     </div>
+                    // ) 
+                    // :
+                    //  (
+                    // <div
+                    //   key={notif.id}
+                    //   className="transition-all duration-200 hover:bg-slate-750">
+                    //   <FriendRequestCard
+                    //     id = {notif.user_id}
+                    //     username={notif.user_username}
+                    //     avatar_url={notif.user_avatar}
+                    //   />
+                    // </div>)  
                   ))}
                 </div>
               )}
