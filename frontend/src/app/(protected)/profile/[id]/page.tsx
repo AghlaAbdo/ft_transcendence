@@ -1,6 +1,5 @@
 "use client";
 
-import FriendRequestCard from '@/components/profile/FriendRequestCard';
 import Friends from '@/components/profile/Friends';
 import { GameHistory } from '@/components/profile/GameHistory';
 import UserCard from '@/components/profile/UserCard';

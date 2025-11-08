@@ -3,14 +3,6 @@ import { useRouter } from "next/navigation";
 import router from "next/router";
 import { useEffect, useState } from "react";
 
-// interface Friend {
-//   id: string;
-//   username: string;
-//   avatar: string;
-//   status: 0 | 1 | 2;
-// }
-
-
 interface FriendsProps {
   id: number;
 }
@@ -23,16 +15,6 @@ interface Friend {
   // status: 0 | 1| 2;
 }
 
-// const friends: Friend[] = [
-//     { id: "1", username: "username3", avatar: "/avatars/avatar3.png", status: 1 },
-//     { id: "2", username: "username4", avatar: "/avatars/avatar4.png", status: 0 },
-//     { id: "3", username: "username5", avatar: "/avatars/avatar1.png", status: 2 },
-//     { id: "4", username: "username6", avatar: "/avatars/avatar2.png", status: 1 },
-//     { id: "5", username: "username3", avatar: "/avatars/avatar3.png", status: 1 },
-//     { id: "6", username: "username4", avatar: "/avatars/avatar4.png", status: 0 },
-//     { id: "7", username: "username5", avatar: "/avatars/avatar1.png", status: 2 },
-//     { id: "8", username: "username6", avatar: "/avatars/avatar2.png", status: 1 },
-// ];
 
 
 const statusColors: Record<Friend["online_status"], string> = {

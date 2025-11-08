@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
@@ -33,6 +34,8 @@ interface EnrichedMatch extends Match {
 export function GameHistory( { id } :  FriendsProps) {
   const [matches, setMatches] = useState<EnrichedMatch[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
+  
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -83,6 +86,10 @@ export function GameHistory( { id } :  FriendsProps) {
 
     fetchGames();
   }, [id]);
+
+  const handleViewProfile = (id: number) => {
+    router.push(`/profile/${id}`);
+  }
 
   if (loading) {
     return <div>Loading...</div>;
@@ -143,8 +150,14 @@ export function GameHistory( { id } :  FriendsProps) {
 
             </div>
 
-            <div className="flex flex-1 items-center gap-3 ml-auto justify-end">
-              <span className="font-medium">{opponent?.username}</span>
+            <div className="flex flex-1 items-center gap-3 ml-auto justify-end hover:text-violet-600 transition-colors duration-200">
+              <button onClick={() => {
+                if (opponent?.id !== undefined) {
+                  handleViewProfile(opponent?.id);
+                }
+              }}>
+                <span className="font-medium">{opponent?.username}</span>
+              </button>
               <img
                 src={opponent?.avatar_url || "./avatars/avatar1.png"}
                 alt={opponent?.username || "Player 2"}
