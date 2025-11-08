@@ -37,6 +37,7 @@ import {
   getUserSocketId,
 } from '../utils/userSocketMapping';
 import { deleteGame } from '../remote-game/AllGames';
+import { logEvent } from '../server';
 
 let ioInstance: Server;
 
@@ -130,6 +131,11 @@ export async function handlePlay(socket: Socket, userId: string) {
     return;
   }
 
+  logEvent('info', 'game', 'user_activity', {
+    activity_type: 'join_game',
+    username: user.username,
+  });
+
   const allGames = getAllGames();
   // console.log('allGamges length: ', Object.keys(allGames.games).length);
 
@@ -175,6 +181,7 @@ export async function handlePlay(socket: Socket, userId: string) {
     socket.to(lobyGameId).emit('matchFound', gameState.player2);
     socket.emit('matchFound', gameState.player1);
     setTimeout(() => {
+      logEvent('info', 'game', 'match_play', { mode: 'remote' });
       startGame(gameState);
     }, 3000);
     allGames.lobyGame = null;
@@ -221,6 +228,10 @@ export async function handleRematch(
   const user = await getPlayerInfo(userId);
   if (!user) return;
   if (!getGameState(gameId)) {
+    logEvent('info', 'game', 'user_activity', {
+      activity_type: 'join_game',
+      username: user.username,
+    });
     const gameState = generateGameState(
       gameId,
       user,
@@ -244,6 +255,10 @@ export async function handleRematch(
       return;
     }
 
+    logEvent('info', 'game', 'user_activity', {
+      activity_type: 'join_game',
+      username: user.username,
+    });
     gameState.playersNb++;
     gameState.player2.id = user.id;
     gameState.player2.username = user.username;
@@ -258,6 +273,7 @@ export async function handleRematch(
       setTimeout(() => {
         socket.to(gameId).emit('playAgain');
         socket.emit('playAgain');
+        logEvent('info', 'game', 'match_play', { mode: 'remote' });
         startGame(gameState);
       }, 2000);
     }
@@ -429,11 +445,16 @@ export function handleGetGameInviteMatch(
       opponent,
       playerRole,
     });
+    logEvent('info', 'game', 'user_activity', {
+      activity_type: 'join_game',
+      username: player.username,
+    });
     if (gameState.player1.ready && gameState.player2.ready) {
       console.log('Indeed started gameInvite match!!');
       setUserActiveGame(gameState.player1.id, gameState.id);
       setUserActiveGame(gameState.player2.id, gameState.id);
       gameState.game.status = 'playing';
+      logEvent('info', 'game', 'match_play', { mode: 'invite' });
       startGame(gameState);
     }
   } else socket.emit('matchNotFound');

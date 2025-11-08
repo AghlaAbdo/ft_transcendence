@@ -3,6 +3,7 @@ import { Database as DatabaseType } from 'better-sqlite3';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { handleGameInvite } from '../remote-game/gameInvite';
 import authorization from './auth';
+import { logEvent } from '../server';
 
 export interface WeekStats {
   week_number: number;
@@ -13,6 +14,10 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   fastify.addHook('preHandler', authorization);
 
   fastify.get('/matches', async (req, reply) => {
+    logEvent('info', 'game', 'api_request', {
+      method: 'GET',
+      path: '/matches',
+    });
     const db: DatabaseType = (fastify as any).db;
     try {
       const matches = db
@@ -26,6 +31,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.get('/games', async (req, reply) => {
+    logEvent('info', 'game', 'api_request', { method: 'GET', path: '/games' });
     const db: DatabaseType = (fastify as any).db;
     try {
       const { userId } = req.query as { userId?: string };
@@ -58,6 +64,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.get('/stats', async (req, reply) => {
+    logEvent('info', 'game', 'api_request', { method: 'GET', path: '/stats' });
     const db: DatabaseType = (fastify as any).db;
     try {
       const { userId } = req.query as { userId?: string };
@@ -88,6 +95,10 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.get('/weekly_stats', async (req, reply) => {
+    logEvent('info', 'game', 'api_request', {
+      method: 'GET',
+      path: '/weekly_stats',
+    });
     const db: DatabaseType = (fastify as any).db;
     try {
       const { userId } = req.query as { userId?: string };
@@ -164,6 +175,10 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.post('/game-invite', async (req, rep) => {
+    logEvent('info', 'game', 'api_request', {
+      method: 'POST',
+      path: '/game-invite',
+    });
     console.log('req.body: ', req.body);
     console.log('req.query: ', req.query);
     const { challengerId, opponentId } = req.query as {
