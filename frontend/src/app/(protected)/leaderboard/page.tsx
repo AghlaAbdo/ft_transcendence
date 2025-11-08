@@ -21,7 +21,7 @@ export default function Leaderboard({
     widthMap.set(3, 50)
     const limit = 20
     const page = Number(resolvedSearchParams.page) || 1
-    console.log("all players", allPlayers)
+    // console.log("all players", allPlayers)
 
     const numOfPlayers = allPlayers.length
     const numOfPages = Math.ceil(numOfPlayers / limit)
@@ -29,7 +29,6 @@ export default function Leaderboard({
     const topPlayers = useMemo(() => get_top_players(allPlayers), [allPlayers])
     const players = useMemo(() => get_paginated_players(allPlayers, page, limit), [allPlayers, page, limit])
 
-    console.log(topPlayers[0])
     
     useEffect(() => {
         async function getLeaderboard() {

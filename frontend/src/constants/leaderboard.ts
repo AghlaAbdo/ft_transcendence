@@ -12,6 +12,7 @@ export interface User {
 }
 
 export type Player = User & {
+    rank: number;
     games: number;
     winrate: number;
 }

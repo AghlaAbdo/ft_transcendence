@@ -6,6 +6,8 @@ export interface game {
     player1_score: number,
     player2_score: number,
     winner_id: number;
+    play_time: number;
+    play_time_dict: TimeDict;
 }
 
 export interface TimeDict {
