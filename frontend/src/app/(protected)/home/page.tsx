@@ -45,7 +45,7 @@ export default function Dashboard() {
         async function getData() {
             if (!authUser || authLoading) return;
             const games: game[] = await GetGames(authUser.id)
-            console.log(authUser)
+            console.log(games)
             const stats: StatWithTimeDict = await GetStats(authUser.id)
             setStats(stats)
             const weeklyStats: WeekStats[] = await GetWeekStats(authUser.id)
@@ -139,7 +139,7 @@ export default function Dashboard() {
                             <span className="2xl:text-[1.2rem]">Date & Time</span>
                             <span className="2xl:text-[1.2rem]">Type</span>
                             <span className="2xl:text-[1.2rem]">Score</span>
-                            <span className="2xl:text-[1.2rem]">Opponent</span>
+                            <span className="2xl:text-[1.2rem]">Duration</span>
                             <span className="2xl:text-[1.2rem]">Result</span>
                         </div>
                         <div className="overflow-y-auto custom-scrollbar-gray h-[100%]">
@@ -150,7 +150,10 @@ export default function Dashboard() {
                                             <span className="text-sm 2xl:text-[1.1rem]">{new Date(game.played_at).toLocaleString()}</span>
                                             <span className="capit  alize border-1 border-[#D97706] text-[#D97706] rounded-[8px] px-2 py-1 text-[.6rem] w-[65px] text-center 2xl:text-[.9rem] 2xl:w-[100px]">{game.type}</span>
                                             <span className="2xl:text-[1.1rem]">{game.player1_score} - {game.player2_score}</span>
-                                            <Link href={`/profile/${game.player2_id}`}><span className="2xl:text-[1.1rem]">{game.player2_id}</span></Link>
+                                            <div>
+                                                {game.play_time_dict.minutes > 0 && <span>{game.play_time_dict.minutes}<i className="text-gray-300 text-[.8rem]">m</i></span>}
+                                                <span>{game.play_time_dict.seconds}<i className="text-gray-300 text-[.8rem]">s</i></span>
+                                            </div>
                                             <span className={`px-2 py-1 rounded text-white text-[.6rem] w-[50px] text-center h-fit 2xl:text-[.9rem] ${game.winner_id === game.player1_id ? 'bg-green-600 ' : 'bg-red-600'}`}>
                                                 {game.winner_id === game.player1_id ? 'WIN' : 'LOSS'}
                                             </span>
