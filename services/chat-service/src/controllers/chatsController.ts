@@ -1,3 +1,4 @@
+import { FastifyRequest, FastifyReply } from 'fastify';
 import {
   getMessages,
   getMessage,
@@ -13,15 +14,36 @@ type ChatRow = {
   last_message_id: number;
 };
 
-export async function getMessagesHandler(req: any, reply: any) {
-  const chatId = parseInt((req.params as any).chatId);
+// Request parameter interfaces
+interface GetMessagesParams {
+  chatId: string;
+}
+
+interface GetMessageParams {
+  messageId: string;
+}
+
+interface GetChatsParams {
+  userId: string;
+}
+
+interface CheckChatExistsParams {
+  userId: string;
+  friendId: string;
+}
+
+export async function getMessagesHandler(
+  req: FastifyRequest<{ Params: GetMessagesParams }>,
+  reply: FastifyReply
+) {
+  const chatId = parseInt(req.params.chatId);
   
   if (isNaN(chatId) || chatId <= 0) {
     return reply.status(400).send({ error: "Invalid chatId" });
   }
 
   try {
-    const db = req.server.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
@@ -33,34 +55,37 @@ export async function getMessagesHandler(req: any, reply: any) {
       return reply.status(404).send({ error: "No messages found for this chat" });
     }
 
-    return result;
+    return reply.status(200).send(result);
   } catch (err) {
     console.error("Error fetching messages:", err);
     return reply.status(500).send({ error: "Failed to fetch messages" });
   }
 }
 
-export async function getMessageHandler(req: any, reply: any) {
-  const messageId = parseInt((req.params).messageId);
+export async function getMessageHandler(
+  req: FastifyRequest<{ Params: GetMessageParams }>,
+  reply: FastifyReply
+) {
+  const messageId = parseInt(req.params.messageId);
   
   if (isNaN(messageId) || messageId <= 0) {
     return reply.status(400).send({ error: "Invalid messageId" });
   }
 
   try {
-    const db = req.server.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
     }
     
-    const message = getMessage(db, messageId);
+    const result = getMessage(db, messageId) as any;
     
-    if (!message) {
+    if (!result || !result.status || !result.message) {
       return reply.status(404).send({ error: "Message not found" });
     }
     
-    return message;
+    return reply.status(200).send(result.message);
   } catch (err) {
     console.error("Error fetching message:", err);
     return reply.status(500).send({ error: "Failed to fetch message" });
@@ -99,15 +124,18 @@ async function fetchUserFromService(ids: number[]) {
   return users;
 }
 
-export async function getChatsHandler(req: any, reply: any) {
-  const userId = parseInt((req.params as any).userId);
+export async function getChatsHandler(
+  req: FastifyRequest<{ Params: GetChatsParams }>,
+  reply: FastifyReply
+) {
+  const userId = parseInt(req.params.userId);
   
   if (isNaN(userId) || userId <= 0) {
     return reply.status(400).send({ error: "Invalid userId" });
   }
 
   try {
-    const db = (req as any).server?.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
@@ -124,7 +152,7 @@ export async function getChatsHandler(req: any, reply: any) {
     );
     
     if (userIds.length === 0) {
-      return result; // Return chats without user enrichment if no valid user IDs
+      return reply.status(200).send(result);
     }
     
     const users = await fetchUserFromService(userIds);
@@ -136,34 +164,37 @@ export async function getChatsHandler(req: any, reply: any) {
       receiver: userMap.get(chat.receiver) || null,
     }));
 
-    return enriched;
+    return reply.status(200).send(enriched);
   } catch (err) {
     console.error("Error fetching chats:", err);
     return reply.status(500).send({ error: "Failed to fetch chats" });
   }
 }
 
-export async function checkChatExistsHandler(req: any, rep: any) {
-  const userId = parseInt((req.params).userId);
-  const friendId = parseInt((req.params).friendId);
+export async function checkChatExistsHandler(
+  req: FastifyRequest<{ Params: CheckChatExistsParams }>,
+  reply: FastifyReply
+) {
+  const userId = parseInt(req.params.userId);
+  const friendId = parseInt(req.params.friendId);
   
   if (isNaN(userId) || userId <= 0) {
-    return rep.status(400).send({ error: "Invalid userId" });
+    return reply.status(400).send({ error: "Invalid userId" });
   }
   
   if (isNaN(friendId) || friendId <= 0) {
-    return rep.status(400).send({ error: "Invalid friendId" });
+    return reply.status(400).send({ error: "Invalid friendId" });
   }
   
   if (userId === friendId) {
-    return rep.status(400).send({ error: "Cannot create chat with yourself" });
+    return reply.status(400).send({ error: "Cannot create chat with yourself" });
   }
   
   try {
-    const db = req.server.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
-      return rep.status(500).send({ error: "Database not initialized" });
+      return reply.status(500).send({ error: "Database not initialized" });
     }
     
     const stmt = db.prepare(`
@@ -176,12 +207,12 @@ export async function checkChatExistsHandler(req: any, rep: any) {
     const result = stmt.get(userId, friendId, friendId, userId) as { chat_id: number } | undefined;
     
     if (result) {
-      return { exists: true, chat_id: result.chat_id };
+      return reply.status(200).send({ exists: true, chat_id: result.chat_id });
     } else {
-      return { exists: false, chat_id: -1 };
+      return reply.status(200).send({ exists: false, chat_id: -1 });
     }
   } catch (err) {
     console.error("Error checking chat existence:", err);
-    return rep.status(500).send({ error: "Failed to check chat" });
+    return reply.status(500).send({ error: "Failed to check chat" });
   }
 }
