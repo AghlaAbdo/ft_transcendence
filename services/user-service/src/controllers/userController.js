@@ -401,26 +401,31 @@ const updateStats = async (request, reply) => {
         // userModel.recalculateRanks(db);
 
         const winner = userModel.getUserByID(db, winnerId);
-        const loser = userModel.getUserByID(db, loser);
+        const loser = userModel.getUserByID(db, loserId);
+
+        // console.log("winner: ", winner);
+        // console.log("loser: ", loser);
 
         if (winner.points >= 20) {
+            const newPoints = winner.points % 20;
             db.prepare(`
                 UPDATE USERS
                     SET level = level + 1,
-                    points = 0,
+                    points = ?,
                     updatedAt = CURRENT_TIMESTAMP
                 WHERE id = ?;
-            `).run(winner.id);
+            `).run(newPoints, winner.id);
         }
 
         if (loser.points >= 20) {
+            const newPoints = loser.points % 20;
             db.prepare(`
                 UPDATE USERS
                 SET level = level + 1,
-                    points = 0,
+                    points = ?,
                     updatedAt = CURRENT_TIMESTAMP
                 WHERE id = ?;
-            `).run(loser.id);
+            `).run(newPoints, loser.id);
         }
 
         return reply.status(200).send({ 
