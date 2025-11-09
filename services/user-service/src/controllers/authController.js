@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import crypto from 'crypto';
 import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
+import { logEvent } from "../app.js";
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -139,8 +140,10 @@ const login = async (request, reply) => {
         request.server.setAuthCookie(reply, token);
 
         reply.send({status: true, user: {id: user.id, username: user.username, level: user.rank}});
-
+        logEvent("info", "user", "user_login", {result: "success", provider: "local"})
+        
     } catch(error) {
+        logEvent("info", "user", "user_login", {result: "failure", provider: "local"})
         console.error("login error:", error);
         reply.code(400).send( { status:false, message: error.message } );
     }

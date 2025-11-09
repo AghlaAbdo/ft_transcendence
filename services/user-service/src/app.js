@@ -55,6 +55,13 @@ const createApp = () => {
 
     fastify.register(fastifyCookie);
 
+    fastify.addHook('onRequest', async (request, reply) => {
+            logEvent('info', 'user', 'api_request', {
+                method: request.method,
+                path: request.url,
+            });
+    });
+
 
     fastify.register(oauthPlugin, {
         clientId: process.env.GOOGLE_CLIENT_ID,

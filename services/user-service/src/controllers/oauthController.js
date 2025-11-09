@@ -1,3 +1,4 @@
+import { logEvent } from "../app.js";
 import userModel from "../models/userModel.js";
 
 const initiateGoogleLogin = async (request, reply) => {
@@ -139,16 +140,18 @@ const handleGoogleCallback = async (request, reply) => {
         //     }
         // });
 
+        logEvent("info", "user", "user_login", {result: "success", provider: "google"})
         return reply.redirect('https://localhost:8080/success');
         // return reply.redirect(302, `${process.env.FRONTEND_URL}/success`);
-
+        
     } catch (error) {
         console.error('An error occurred:', error);
         request.log.error(error);
         // return reply.code(500).send({ 
-        //     status: false, 
-        //     message: error.message,
-        //     error: "Internal Server Error" });
+            //     status: false, 
+            //     message: error.message,
+            //     error: "Internal Server Error" });
+            logEvent("info", "user", "user_login", {result: "failure", provider: "google"})
         return reply.redirect('https://localhost:8080/login');
     }
 }
