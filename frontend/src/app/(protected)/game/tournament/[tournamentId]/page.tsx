@@ -15,7 +15,7 @@ import NotFound from '@/app/not-found';
 import { IMatch, IPlayer, IRound, TournamentDetails } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
 import { useUser } from '@/context/UserContext';
-import { getFrameByPoints } from '@/utils/getFrameByPoints';
+import { getFrameByLevel } from '@/utils/getFrameByLevel';
 
 export default function SpecificTournamentPage() {
   const router = useRouter();
@@ -273,7 +273,7 @@ export default function SpecificTournamentPage() {
                 <Avatar
                   width={120}
                   url={winner.avatar}
-                  frame={getFrameByPoints(winner.points)}
+                  frame={getFrameByLevel(winner.level)}
                 />
                 <div className='relative'>
                   <div className='absolute right-0 top-1/2 -translate-y-1/2'>
@@ -323,7 +323,7 @@ export default function SpecificTournamentPage() {
                 <Avatar
                   width={200}
                   url={player.avatar}
-                  frame={getFrameByPoints(player.points)}
+                  frame={getFrameByLevel(player.level)}
                 />
                 <div className='relative'>
                   <div className='absolute right-0 top-1/2 -translate-y-1/2'>

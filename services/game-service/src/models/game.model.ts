@@ -1,7 +1,9 @@
 import { getDb } from '../database/db';
 import { IGameState } from '../types/types';
+import postGameStats from '../api/postGameStats';
 
 function postGame(gameState: IGameState): void {
+  postGameStats(gameState);
   const db = getDb();
   const query = `
     INSERT INTO Game

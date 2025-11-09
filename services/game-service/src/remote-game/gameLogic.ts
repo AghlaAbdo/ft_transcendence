@@ -168,6 +168,5 @@ function gameOver(gameState: IGameState): void {
       gameState.winner_id!,
     );
   }
-  postGameStats(gameState);
   deleteGame(gameState.id);
 }

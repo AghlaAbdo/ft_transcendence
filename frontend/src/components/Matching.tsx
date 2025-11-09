@@ -46,7 +46,7 @@ export default function Matching({
             scale: { type: 'spring', bounce: 0.4, duration: 0.6 },
           }}
         >
-          <Avatar width={192} url={player.avatar} frame={getFrameByLevel(player.points)} />
+          <Avatar width={192} url={player.avatar} frame={getFrameByLevel(player.level)} />
           <span className='bg-gray-800 px-1 py-[2px] sm:px-3 sm:py-1 rounded-[8px] border-1 border-gray-500'>
             {player.username}
           </span>

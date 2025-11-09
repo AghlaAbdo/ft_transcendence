@@ -169,7 +169,7 @@ export async function handlePlay(socket: Socket, userId: string) {
     gameState.player2.id = user.id;
     gameState.player2.username = user.username;
     gameState.player2.avatar = user.avatar;
-    gameState.player2.frame = user.frame;
+    // gameState.player2.frame = user.frame;
     gameState.player2.points = user.points;
     gameState.player2.level = user.level;
     socket.join(lobyGameId);
@@ -263,7 +263,7 @@ export async function handleRematch(
     gameState.player2.id = user.id;
     gameState.player2.username = user.username;
     gameState.player2.avatar = user.avatar;
-    gameState.player2.frame = user.frame;
+    // gameState.player2.frame = user.frame;
     gameState.player2.level = user.level;
     gameState.player2.ready = true;
     if (gameState.player1.ready && gameState.player2.ready) {

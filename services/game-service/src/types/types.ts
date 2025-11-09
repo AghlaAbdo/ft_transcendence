@@ -30,7 +30,6 @@ export interface IGameState {
     id: string | null;
     username: string | null;
     avatar: string | null;
-    frame: string | null;
     level: string | null;
     points: number | null;
     ready: boolean;
@@ -39,7 +38,6 @@ export interface IGameState {
     id: string | null;
     username: string | null;
     avatar: string | null;
-    frame: string | null;
     level: string | null;
     points: number | null;
     ready: boolean;
@@ -63,7 +61,7 @@ export interface IPlayer {
   id: string;
   username: string;
   avatar: string;
-  frame: string;
+  // frame: string;
   level: string;
   points: number;
   isEliminated: boolean;

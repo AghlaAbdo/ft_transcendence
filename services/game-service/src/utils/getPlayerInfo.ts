@@ -11,7 +11,7 @@ export async function getPlayerInfo(userId: string): Promise<IPlayer | null> {
     id: String(user.id),
     username: user.username,
     avatar: user.avatar_url,
-    frame: 'silver2',
+    // frame: 'silver2',
     level: user.level,
     points: user.points,
     isEliminated: false,

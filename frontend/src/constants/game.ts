@@ -48,6 +48,7 @@ export interface UserInfo {
   email: string;
   avatar_url: string | null;
   points: number;
+  level: number;
   isAccountVerified: number;
 }
 
