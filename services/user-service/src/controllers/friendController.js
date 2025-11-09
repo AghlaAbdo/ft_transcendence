@@ -116,6 +116,7 @@ const acceptFriendRequest = async (request, reply) => {
             AND actor_id = ?`)
             .run(requester_id, accepter_id);
 
+        logEvent("info", "user", "friend_request", {action: "accept"})
         reply.code(200).send({
             status: true,
             message: "Friend request accepted successfully"
@@ -162,6 +163,8 @@ const rejectFriendRequest = async (request, reply) => {
             AND actor_id = ?`)
         .run(requester_id, accepter_id);
         
+        
+        logEvent("info", "user", "friend_request", {action: "reject"})
         return reply.code(200).send({
             status: true,
             message: "Friend request rejected successfully"
