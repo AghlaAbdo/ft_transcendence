@@ -50,18 +50,21 @@ export default function ChatPage() {
 
   useEffect(() => {
     const fetchingmessages = async () => {
+      
       if (user && selectedChatId && selectedChatId != -1) {
         try {
           const fetchmessage = await fetch(
             `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`
           );
           const data = await fetchmessage.json();
+          console.log(      'messages: ', data);
           if (data.status) {
+            console.log('allo from messages');
             set_conv(data.messages);
             const otherId =
-              data.messages[0].sender === user.id
-                ? data.messages[0].receiver
-                : data.messages[0].sender;
+            data.messages[0].sender === user.id
+            ? data.messages[0].receiver
+            : data.messages[0].sender;
             if (otherId) {
               const userResponse = await fetch(
                 `https://localhost:8080/api/users/${otherId}`

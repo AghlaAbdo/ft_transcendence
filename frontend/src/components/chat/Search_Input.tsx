@@ -5,7 +5,7 @@ interface search_props {
   onsearchchange_2: (query: string) => void;
   searchquery_2: string;
 }
-export const Search_Input = ({onsearchchange_2, searchquery_2}: search_props) => {
+export const Search_Input = ({onsearchchange_2}: search_props) => {
     return <>
     <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
