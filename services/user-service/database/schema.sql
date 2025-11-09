@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     'tournament_invite'
   )),
   read INTEGER DEFAULT 0,
+  game_link TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL
