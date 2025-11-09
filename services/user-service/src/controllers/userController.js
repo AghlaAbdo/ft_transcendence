@@ -403,30 +403,21 @@ const updateStats = async (request, reply) => {
         const winner = userModel.getUserByID(db, winnerId);
         const loser = userModel.getUserByID(db, loserId);
 
-        // console.log("winner: ", winner);
-        // console.log("loser: ", loser);
+        let newLevel = Math.floor(winner.points / 10);
+        db.prepare(`
+            UPDATE USERS
+            SET level = ?,
+            updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(newLevel, winner.id);
 
-        if (winner.points >= 20) {
-            const newPoints = winner.points % 20;
-            db.prepare(`
-                UPDATE USERS
-                    SET level = level + 1,
-                    points = ?,
-                    updatedAt = CURRENT_TIMESTAMP
-                WHERE id = ?;
-            `).run(newPoints, winner.id);
-        }
-
-        if (loser.points >= 20) {
-            const newPoints = loser.points % 20;
-            db.prepare(`
-                UPDATE USERS
-                SET level = level + 1,
-                    points = ?,
-                    updatedAt = CURRENT_TIMESTAMP
-                WHERE id = ?;
-            `).run(newPoints, loser.id);
-        }
+        newLevel = Math.floor(loser.points / 10);
+        db.prepare(`
+            UPDATE USERS
+            SET level = ?,
+            updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(newLevel, loser.id);
 
         return reply.status(200).send({ 
             status: true,
