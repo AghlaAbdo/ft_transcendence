@@ -10,20 +10,22 @@ export default function Avatar({
   frame: string;
 }) {
   return (
-    <div className={`w-full relative`}>
-      <img
-        width={width}
-        height={width}
-        src={url}
-        alt='Avatar'
-        className='w-full rounded-full p-[12%]'
-      />
+    <div className='relative w-full aspect-square overflow-hidden rounded-full'>
+      <div className='aspect-square overflow-hidden rounded-full m-[12%]'>
+        <img
+          width={width}
+          height={width}
+          src={url}
+          alt='Avatar'
+          className='w-full h-full object-cover'
+        />
+      </div>
       <img
         width={width}
         height={width}
         src={frame}
         alt='Frame'
-        className='absolute inset-0 w-full pointer-events-none'
+        className='absolute inset-0 w-full h-full pointer-events-none object-contain'
       />
     </div>
   );

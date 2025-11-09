@@ -81,6 +81,7 @@ export default function GamePage() {
     avatar: user.avatar_url!,
     frame: 'silver2',
     level: '34',
+    points: user.points,
     isEliminated: false,
   };
 

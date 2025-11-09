@@ -22,6 +22,7 @@ import { getGameState } from '../remote-game/AllGames';
 import { findMatchById } from '../tournament/tournamentManager';
 import { toUSVString } from 'util';
 import { getCurrentMatch } from '../utils/getPlayerTournament';
+import { logEvent } from '../server';
 
 export async function handleCreateTournament(
   socket: Socket,
@@ -259,6 +260,14 @@ export function handleReadyForMatch(
     ? (match.isPlayer1Ready = true)
     : (match.isPlayer2Ready = true);
 
+  const playerUsername =
+    data.userId === gameState.player1.id
+      ? gameState.player1.username
+      : gameState.player2.username;
+  logEvent('info', 'game', 'user_activity', {
+    activity_type: 'join_game',
+    username: playerUsername,
+  });
   if (match.isPlayer1Ready && match.isPlayer2Ready)
     startTournamentMatch(tournament, match.id);
 }

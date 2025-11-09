@@ -25,6 +25,7 @@ import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { handleQuit } from '../socket/handlers';
 import { postGame } from '../models/game.model';
 import { getCurrDate, getDiffInSec } from '../utils/dates';
+import { logEvent } from '../server';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -328,6 +329,7 @@ export function startTournamentMatch(tournament: ITournament, matchId: string) {
   });
   io.to(player1SocketId).emit('matchFound', player2Info);
   io.to(player2SocketId).emit('matchFound', player1Info);
+  logEvent('info', 'game', 'match_play', { mode: 'tournament' });
   startGame(gameState);
 }
 
