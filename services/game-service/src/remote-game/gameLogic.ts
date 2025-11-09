@@ -1,6 +1,6 @@
 import { resetBallPos } from './gameState';
 import { postGame } from '../models/game.model';
-import { getDiffInMin } from '../utils/dates';
+import { getDiffInSec } from '../utils/dates';
 import {
   GAME_WIDTH,
   GAME_HEIGHT,
@@ -19,6 +19,8 @@ import {
   removeUserActiveTournament,
 } from './userActiveGame';
 import { advancePlayerInTournament } from '../tournament/tournamentManager';
+import { deleteGame } from './AllGames';
+import postGameStats from '../api/postGameStats';
 
 let ioInstance: Server;
 const gameIntervals: { [gameId: string]: NodeJS.Timeout | undefined | null } =
@@ -49,11 +51,12 @@ export function startGame(gameState: IGameState) {
       if (j === 1) {
         setTimeout(() => {
           if (gameState.game.status === 'ended') {
-            deleteGame(gameState);
+            deleteGame(gameState.id);
             return;
           }
           ioInstance.to(gameState.id).emit('startGame');
           gameState.startDate = getCurrDate();
+          gameState.startAt = new Date().getTime();
           // gameState.game.status = 'playing';
           gameIntervals[gameState.id] = setInterval(
             () => gameLoop(gameState),
@@ -65,14 +68,20 @@ export function startGame(gameState: IGameState) {
   }
 }
 
+let ballSpeed = BALL_SPEED;
+
 function gameLoop(gameState: IGameState): void {
   if (!gameState || gameState.game.status !== 'playing') return;
   //check for top and bottom collision
   gameState.game.ball.x += gameState.game.ball.dx;
   gameState.game.ball.y += gameState.game.ball.dy;
+  if (gameState.game.ball.y < 20) gameState.game.ball.y = 20;
+  else if (gameState.game.ball.y > GAME_HEIGHT - 20)
+    gameState.game.ball.y = GAME_HEIGHT - 20;
+
   if (
-    gameState.game.ball.y - BALL_RADIUS / 2 < 0 ||
-    gameState.game.ball.y + BALL_RADIUS >= GAME_HEIGHT
+    gameState.game.ball.y <= 20 ||
+    gameState.game.ball.y >= GAME_HEIGHT - 20
   ) {
     gameState.game.ball.dy *= -1;
   }
@@ -87,8 +96,9 @@ function gameLoop(gameState: IGameState): void {
       gameState.game.leftPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.game.ball.dx = BALL_SPEED * Math.cos(bounceAngle);
-    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    ballSpeed *= 1.06;
+    gameState.game.ball.dx = ballSpeed * Math.cos(bounceAngle);
+    gameState.game.ball.dy = ballSpeed * -Math.sin(bounceAngle);
   }
   // check collision with right paddle
   else if (
@@ -100,13 +110,15 @@ function gameLoop(gameState: IGameState): void {
       gameState.game.rightPaddle.y + PADDLE_HEIGHT / 2 - gameState.game.ball.y;
     const normalizedIntersectY = relativeIntersectY / (PADDLE_HEIGHT / 2);
     const bounceAngle = normalizedIntersectY * (Math.PI / 4);
-    gameState.game.ball.dx = -BALL_SPEED * Math.cos(bounceAngle);
-    gameState.game.ball.dy = BALL_SPEED * -Math.sin(bounceAngle);
+    ballSpeed *= 1.06;
+    gameState.game.ball.dx = -ballSpeed * Math.cos(bounceAngle);
+    gameState.game.ball.dy = ballSpeed * -Math.sin(bounceAngle);
   }
   // check for loss
   else if (gameState.game.ball.x - 10 <= 0) {
     gameState.game.rightPaddle.score++;
     gameState.game.scoreUpdate = true;
+    ballSpeed = BALL_SPEED;
     if (gameState.game.rightPaddle.score === 5) {
       gameOver(gameState);
     } else {
@@ -115,6 +127,7 @@ function gameLoop(gameState: IGameState): void {
   } else if (gameState.game.ball.x + 10 >= GAME_WIDTH) {
     gameState.game.leftPaddle.score++;
     gameState.game.scoreUpdate = true;
+    ballSpeed = BALL_SPEED;
     if (gameState.game.leftPaddle.score === 5) {
       gameOver(gameState);
     } else {
@@ -145,7 +158,7 @@ function gameOver(gameState: IGameState): void {
   if (gameIntervals[gameState.id] != null)
     clearInterval(gameIntervals[gameState.id]!);
   gameIntervals[gameState.id] = null;
-  gameState.playtime = getDiffInMin(gameState.startAt);
+  gameState.playtime = gameState.startAt ? getDiffInSec(gameState.startAt) : 0;
   postGame(gameState);
   if (gameState.isTournamentGame) {
     removeUserActiveTournament(loserId, gameState.tournamentId);
@@ -155,13 +168,5 @@ function gameOver(gameState: IGameState): void {
       gameState.winner_id!,
     );
   }
-  deleteGame(gameState);
-}
-
-export function deleteGame(gameState: IGameState | undefined): void {
-  if (!gameState) return;
-  if (gameState.game.status === 'playing') {
-    gameState.game.status = 'ended';
-  }
-  delete getAllGames().games[gameState.id];
+  deleteGame(gameState.id);
 }

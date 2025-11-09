@@ -43,7 +43,16 @@ const userRoutes = async (fastify, options) => {
         onRequest: [fastify.authenticate]
     }, userController.twoFactorAuth);
 
-    fastify.get("/notifications/:userId", async (req, reply) => {
+    fastify.get('/search', {
+      onRequest: [fastify.authenticate]
+    }, userController.searchQuery);
+
+    fastify.post('/update-stats', userController.updateStats);
+
+    fastify.get("/notifications/:userId", {
+        onRequest: [fastify.authenticate]
+      },
+      async (req, reply) => {
       
       const userId = parseInt((req.params).userId);
       if (isNaN(userId)) 
@@ -58,7 +67,9 @@ const userRoutes = async (fastify, options) => {
       }
     });
     
-    fastify.put('/notifications/friend_request/mark-as-read', async (req, res) => {
+    fastify.put('/notifications/friend_request/mark-as-read', {
+        onRequest: [fastify.authenticate]
+      }, async (req, res) => {
       
       const {userId} =  req.body;
       const db = req.server.db;
@@ -68,7 +79,9 @@ const userRoutes = async (fastify, options) => {
     });
     
     
-    fastify.put('/notifications/game/mark-as-read', async (req, res) => {
+    fastify.put('/notifications/game/mark-as-read',{
+        onRequest: [fastify.authenticate]
+      }, async (req, res) => {
       const {userId} =  req.body;
       const db = req.server.db;
 

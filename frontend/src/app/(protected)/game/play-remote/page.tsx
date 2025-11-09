@@ -29,7 +29,7 @@ export default function GamePage() {
     inAnotherGame,
     gameStatus,
     inTournament,
-  } = usePongGameLogic(null, null);
+  } = usePongGameLogic(null, null, null);
   const closeDialRef = useRef<HTMLDialogElement | null>(null);
   const { user } = useUser();
   const sentQuit = useRef<boolean>(false);
@@ -49,7 +49,8 @@ export default function GamePage() {
     username: user.username,
     avatar: user.avatar_url!,
     frame: 'silver2',
-    level: '34',
+    level: user.level,
+    points: user.points,
     isEliminated: false,
   };
 
@@ -72,7 +73,11 @@ export default function GamePage() {
       </div>
     );
   } else if (matching) {
-    return <Matching player={player} opponent={opponent} gameId={gameId} />;
+    return (
+      <Matching player={player} opponent={opponent} gameId={gameId}>
+        {' '}
+      </Matching>
+    );
   } else if (!opponent) {
     return (
       <div className='flex h-[100vh] justify-center items-center'>
@@ -84,7 +89,9 @@ export default function GamePage() {
   return (
     <>
       {matching && (
-        <Matching player={player} opponent={opponent} gameId={gameId} />
+        <Matching player={player} opponent={opponent} gameId={gameId}>
+          {' '}
+        </Matching>
       )}
       {!matching && (
         <>
@@ -105,6 +112,7 @@ export default function GamePage() {
             dialogRef={closeDialRef}
             gameId={gameId}
             isTournamentGame={false}
+            isLocal={false}
           />
 
           <div className='h-screen py-2 px-2 md:py-6 md:px-6 flex flex-col gap-4 justify-center items-center'>

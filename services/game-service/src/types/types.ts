@@ -17,28 +17,29 @@ export interface IPaddle {
 export interface IGameState {
   id: string;
   db_id: number;
+  type: 'remote' | 'tournament' | 'invite';
   isTournamentGame: boolean;
   tournamentId: string | null;
   tournamentMatchId: string | null;
   playersNb: number;
   winner_id: string | null;
   startDate: string | null;
-  startAt: number;
+  startAt: number | null;
   playtime: number | null;
   player1: {
     id: string | null;
     username: string | null;
     avatar: string | null;
-    frame: string | null;
     level: string | null;
+    points: number | null;
     ready: boolean;
   };
   player2: {
     id: string | null;
     username: string | null;
     avatar: string | null;
-    frame: string | null;
     level: string | null;
+    points: number | null;
     ready: boolean;
   };
   game: {
@@ -53,17 +54,16 @@ export interface IGameState {
 
 export interface IGmaes {
   lobyGame: string | null;
-  games: {
-    [gameId: string]: IGameState;
-  };
+  games: Map<string, IGameState>;
 }
 
 export interface IPlayer {
   id: string;
   username: string;
   avatar: string;
-  frame: string;
+  // frame: string;
   level: string;
+  points: number;
   isEliminated: boolean;
 }
 
@@ -118,4 +118,14 @@ export interface TournamentListItem {
   currentPlayers: number;
   status: string;
   creatorUsername?: string;
+}
+
+// ----------- Game Invite -----------
+
+export interface IGameInvite {
+  challengerId: string;
+  opponentId: string;
+  challengerJoined: boolean;
+  opponentJoined: boolean;
+  game: IGameState;
 }

@@ -3,6 +3,8 @@ export const GAME_HEIGHT = 600;
 export const PADDLE_HEIGHT = 150;
 export const PADDLE_WIDTH = 30;
 export const BALL_RADIUS = 20;
+export const BALL_SPEED = 9;
+export const PADDLE_SPEED = 14;
 
 export interface IBall {
   x: number;
@@ -35,7 +37,8 @@ export interface IPlayer {
   username: string;
   avatar: string;
   frame: string;
-  level: string;
+  level: number;
+  points: number;
   isEliminated: boolean;
 }
 
@@ -44,7 +47,9 @@ export interface UserInfo {
   username: string;
   email: string;
   avatar_url: string | null;
-  isAccountVerified: boolean;
+  points: number;
+  level: number;
+  isAccountVerified: number;
 }
 
 export interface TournamentDetails {

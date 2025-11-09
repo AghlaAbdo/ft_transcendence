@@ -11,9 +11,9 @@ function getCurrDate(): string {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-function getDiffInMin(startTime: number): number {
+function getDiffInSec(startTime: number): number {
   const differenceInMs = new Date().getTime() - startTime;
-  return Math.floor(differenceInMs / (1000 * 60));
+  return Math.floor(differenceInMs / 1000);
 }
 
-export { getCurrDate, getDiffInMin };
+export { getCurrDate, getDiffInSec };

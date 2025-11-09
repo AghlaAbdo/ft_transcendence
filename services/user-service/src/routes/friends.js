@@ -25,6 +25,10 @@ const friendRoutes = (fastify, options) => {
         onRequest: [fastify.authenticate] 
     }, friendController.acceptFriendRequest);
 
+    fastify.put("/block/:id", {
+        onRequest: [fastify.authenticate]
+    }, friendController.blockFriend);
+
 
     fastify.delete("/reject/:id", {
         onRequest: [fastify.authenticate] 
@@ -34,6 +38,11 @@ const friendRoutes = (fastify, options) => {
     fastify.delete("/remove/:friend_id", {
         onRequest: [fastify.authenticate] 
     }, friendController.removeFriend);
+
+
+    fastify.get("/:id/search", {
+        onRequest: [fastify.authenticate] 
+    }, friendController.searchQuery);
 
 
 

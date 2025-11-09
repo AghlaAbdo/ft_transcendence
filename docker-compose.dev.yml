@@ -25,6 +25,7 @@ services:
       target: development
     volumes:
       - ./services/game-service:/app
+      - ./logs:/app/logs
     env_file:
       ./services/game-service/.env.dev
   #   ports:
@@ -46,6 +47,7 @@ services:
       ./services/user-service/.env
     volumes:
       - ./services/user-service/:/app
+      - ./logs:/app/logs
 
   chat-service:
     build:
@@ -54,3 +56,4 @@ services:
       ./services/chat-service/.env
     volumes:
       - ./services/chat-service/:/app
+      - ./logs:/app/logs

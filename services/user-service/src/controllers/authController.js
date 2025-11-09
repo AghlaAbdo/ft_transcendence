@@ -14,6 +14,20 @@ const signup = async (request, reply) => {
         if (!username || !email || !password)
             throw new Error('All fields are required');
 
+        if (username.length < 8 || username.length > 20) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username must be between 8 and 20 characters"
+            });
+        }
+        
+        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username can only contain letters, numbers, and underscores"
+            });
+        }
+
         const usernameAlreadyExist = userModel.getUserByUsername(db, username);
         const emailAlreadyExist = userModel.getUserByEmail(db, email);
 
@@ -126,7 +140,7 @@ const login = async (request, reply) => {
 
         request.server.setAuthCookie(reply, token);
 
-        reply.send({status: true, message: 'User Logged in successfully'});
+        reply.send({status: true, user: {id: user.id, username: user.username, level: user.rank}});
 
     } catch(error) {
         console.error("login error:", error);
@@ -172,7 +186,8 @@ const verifyEmail = async (request, reply) => {
     
     try {
         const { email, token } = request.body;
-
+        console.log(email);
+        
         if (!email || !token)
             throw new Error('Email and verification token are required');
 
@@ -289,7 +304,7 @@ const resendVerificationEmail = async (request, reply) => {
 
 const forgotPassword = async (request, reply) => {
     const { email } = request.body;
-
+    
     try {
         if (!email)
             return reply.code(400).send({
@@ -307,12 +322,18 @@ const forgotPassword = async (request, reply) => {
             });
         }
 
+        if (user.is_google_auth) {
+            return reply.code(400).send({
+                status: false,
+                message: "You don't need a password. Your account is secured through Google"
+            });
+        }
+
         if (!user.isAccountVerified) {
             return reply.code(401).send({
                 status: false,
                 error: "EMAIL_NOT_VERIFIED",
                 message: "Email not verified. Please verify your email address.",
-                // resendVerificationUrl: "/api/auth/resend-verification"
             });
         }
 

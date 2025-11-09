@@ -2,11 +2,9 @@ global:
   resolve_timeout: 5m
 
 route:
-  receiver: discord_webhook 
+  receiver: discord_webhook
   repeat_interval: 1m
   group_by: ['alertname']
-  group_wait: 10s
-  group_interval: 5m
 
 receivers:
   - name: discord_webhook

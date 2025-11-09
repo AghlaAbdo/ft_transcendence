@@ -15,12 +15,14 @@ import NotFound from '@/app/not-found';
 import { IMatch, IPlayer, IRound, TournamentDetails } from '@/constants/game';
 import { useLayout } from '@/context/LayoutContext';
 import { useUser } from '@/context/UserContext';
+import { getFrameByLevel } from '@/utils/getFrameByLevel';
 
 export default function SpecificTournamentPage() {
   const router = useRouter();
   const params = useParams<{ tournamentId: string }>();
   const { user } = useUser();
-  const { hideHeaderSidebar, setHideHeaderSidebar } = useLayout();
+  const { hideHeaderSidebar, setHideHeaderSidebar, setHideSidebar } =
+    useLayout();
 
   const tournamentId = params.tournamentId;
   const [tournament, setTournament] = useState<TournamentDetails | null>(null);
@@ -47,7 +49,10 @@ export default function SpecificTournamentPage() {
       // console.log('got Tournament details!!: ', data);
       setTournament(data);
       setError(null);
-      if (data.status == 'live') setHideHeaderSidebar(true);
+      if (data.status == 'live') {
+        setHideHeaderSidebar(true);
+        setHideSidebar(true);
+      }
       const match = getCurrentMatch(data, user.id);
       if (match && match.status == 'ready' && match.gameId) {
         setNextMatchInfo({ gameId: match.gameId });
@@ -88,6 +93,7 @@ export default function SpecificTournamentPage() {
         // console.log('Tournament started:', data.tournamentId);
         // console.log('tournament.bracket: ', data.bracket);
         setHideHeaderSidebar(true);
+        setHideSidebar(true);
         setTournament((prev) =>
           prev ? { ...prev, status: 'live', bracket: data.bracket } : null
         );
@@ -121,6 +127,7 @@ export default function SpecificTournamentPage() {
 
     return () => {
       setHideHeaderSidebar(false);
+      setHideSidebar(false);
       socket.off('tournamentDetails');
       socket.off('tournamentPlayerUpdate');
       socket.off('bracketUpdate');
@@ -263,7 +270,11 @@ export default function SpecificTournamentPage() {
                 Tournament Champion
               </h2>
               <div className='mb-4'>
-                <Avatar width={120} url={winner.avatar} frame={winner.frame} />
+                <Avatar
+                  width={120}
+                  url={winner.avatar}
+                  frame={getFrameByLevel(winner.level)}
+                />
                 <div className='relative'>
                   <div className='absolute right-0 top-1/2 -translate-y-1/2'>
                     <div className='relative w-6 md:w-8 lg:w-12'>
@@ -309,7 +320,11 @@ export default function SpecificTournamentPage() {
                   player.isEliminated ? 'opacity-40' : ''
                 }`}
               >
-                <Avatar width={200} url={player.avatar} frame={player.frame} />
+                <Avatar
+                  width={200}
+                  url={player.avatar}
+                  frame={getFrameByLevel(player.level)}
+                />
                 <div className='relative'>
                   <div className='absolute right-0 top-1/2 -translate-y-1/2'>
                     <div className='relative w-8 md:w-12'>

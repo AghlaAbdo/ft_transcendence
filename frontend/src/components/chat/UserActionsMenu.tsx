@@ -21,14 +21,37 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
     router.push(`/profile/${id}`);
   }
 
-  const handleInviteToGame = () => {
+  const handleInviteToGame = async () => {
     console.log('Invite to game clicked');
     onClose();
-    // Add your game invitation logic here
+    const response = await fetch(`/api/game/game-invite?challengerId=1&opponentId=2`, {
+      method: 'POST'
+    });
+    const data = await response.json();
+    console.log("recived data in gameInvite: ", data);
+    if (data && data.gameId)
+      router.push(`/game/game-invite/${data.gameId}`);
   };
 
-  const handleBlock = () => {
+  const handleBlock = async () => {
     console.log('Block user clicked');
+
+    try {
+      const response = await fetch(`https://localhost:8080/api/friends/block/${_other_user.id}`, {
+        method: 'PUT',
+        credentials: "include"
+      });
+      const data: { status: boolean, message: string} = await response.json();
+
+      if (response.ok && data.status) {
+        toast.success(`${data.message}`);
+      } else {
+        toast.error(`${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error blocking friend", error);
+      toast.error("An unexpected error occurred.");
+    }
     onClose();
     // Add your blocking logic here
   };

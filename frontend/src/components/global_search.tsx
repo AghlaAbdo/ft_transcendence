@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from 'react';
-import { Eye, Loader2, Search, UserPlus, X } from 'lucide-react';
+import {Loader2, Search, X } from 'lucide-react';
 import { User, useAuth } from '@/hooks/useAuth';
 import UserCard from './User_card';
 import { useDebounce } from 'use-debounce';
@@ -21,12 +20,15 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
     if (!user)
         return;
     const fetchUsers = async () => {
+      if (!searchTerm.trim().length)
+      {
+        setUsers([]);
+        return;
+      }
       setIsLoading(true);
       setError(null);
       try {
-        console.log('fucn called');
-        
-        const response = await fetch(`https://localhost:8080/api/users`);
+        const response = await fetch(`https://localhost:8080/api/users/search?query=${searchTerm}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -87,7 +89,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
       </div>
 
       <div className='flex-1 overflow-y-auto px-5 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden'>
-        {isLoading && (
+        {isLoading && searchTerm && (
           <div className='flex flex-col items-center justify-center py-12 text-gray-400'>
             <Loader2 className='w-8 h-8 animate-spin mb-3' />
             <p className='text-sm'>Searching users...</p>

@@ -6,8 +6,13 @@ import {
   IMatch,
   IGameState,
 } from '../types/types';
-import { getAllGames, getGameState } from '../remote-game/AllGames';
-import { deleteGame, startGame } from '../remote-game/gameLogic';
+import {
+  getAllGames,
+  getGameState,
+  deleteGame,
+  addGameState,
+} from '../remote-game/AllGames';
+import { startGame } from '../remote-game/gameLogic';
 import { match } from 'assert';
 import {
   removeUserActiveGame,
@@ -19,7 +24,8 @@ import { convertToTournamentDetails } from '../utils/convertTypes';
 import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { handleQuit } from '../socket/handlers';
 import { postGame } from '../models/game.model';
-import { getCurrDate, getDiffInMin } from '../utils/dates';
+import { getCurrDate, getDiffInSec } from '../utils/dates';
+import { logEvent } from '../server';
 
 export const activeTournaments = new Map<string, ITournament>();
 
@@ -201,7 +207,7 @@ function notJoinTournamentMatch(
     gameState.player1.id === userId
       ? gameState.player2.id
       : gameState.player1.id;
-  gameState.playtime = getDiffInMin(gameState.startAt);
+  gameState.playtime = gameState.startAt ? getDiffInSec(gameState.startAt) : 0;
   if (!gameState.startDate) gameState.startDate = getCurrDate();
   postGame(gameState);
   advancePlayerInTournament(
@@ -223,7 +229,7 @@ function notJoinTournamentMatch(
     players: Array.from(tournament.players.values()),
     bracket: tournament.bracket,
   });
-  deleteGame(gameState);
+  deleteGame(gameState.id);
 }
 
 function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
@@ -254,11 +260,12 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   const gameState = generateGameState(
     gameId,
     player1Info,
+    'tournament',
     player2Info,
     tournament.id,
     match.id,
   );
-  getAllGames().games[gameId] = gameState;
+  addGameState(gameState);
   match.gameId = gameId;
 
   io.to(player1SocketId).emit('matchReady', { gameId, opponent: player2Info });
@@ -322,6 +329,7 @@ export function startTournamentMatch(tournament: ITournament, matchId: string) {
   });
   io.to(player1SocketId).emit('matchFound', player2Info);
   io.to(player2SocketId).emit('matchFound', player1Info);
+  logEvent('info', 'game', 'match_play', { mode: 'tournament' });
   startGame(gameState);
 }
 

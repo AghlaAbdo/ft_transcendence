@@ -138,7 +138,7 @@ const changePassword = async (request, reply) => {
         const db = request.server.db;
 
         const currentUser = db.prepare(`
-            SELECT password
+            SELECT password, is_google_auth
             FROM USERS
             WHERE id = ?
         `).get(user.id);
@@ -149,6 +149,13 @@ const changePassword = async (request, reply) => {
                 message: "User not found"
             });
         }
+        if (currentUser.is_google_auth) {
+            return reply.code(400).send({
+                status: false,
+                message: "Password change is not allowed for Google accounts"
+            });
+        }
+        
 
         const isPasswordValid = await bcrypt.compare(currentPassword, currentUser.password);
         if(!isPasswordValid) {
@@ -193,60 +200,61 @@ const changePassword = async (request, reply) => {
 const updateInfo = async (request, reply) => {
     try {
         const user = request.user;
-        const { username, email } = request.body;
+        const { username } = request.body;
 
-        if (!username || !email) {
+        if (!username) {
             return reply.code(400).send({
                 status: false,
-                message: "Username and email are required"
+                message: "Username is required"
+            });
+        }
+
+        if (username.length < 8 || username.length > 20) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username must be between 8 and 20 characters"
+            });
+        }
+
+        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+            return reply.code(400).send({
+                status: false,
+                message: "Username can only contain letters, numbers, and underscores"
             });
         }
 
         const db = request.server.db;
 
         const currentUser = db.prepare(`
-            SELECT username, email 
+            SELECT username 
             FROM USERS 
             WHERE id = ? 
         `).get(user.id);
 
-        if (currentUser.username === username && currentUser.email === email) {
+        if (currentUser.username === username) {
             return reply.code(400).send({
                 status: false,
                 message: "No changes detected"
             });
         }
 
-        if (username !== currentUser.username) {
-            const usernameAlreadyExist = userModel.getUserByUsername(db, username);
-            if (usernameAlreadyExist) {
-                return reply.code(409).send({
-                    status: false,
-                    message: "Username is already taken"
-                });
-            }
-        }
-
-        if (email !== currentUser.email) {
-            const emailAlreadyExist = userModel.getUserByEmail(db, email);
-            if (emailAlreadyExist) { 
-                return reply.code(409).send({
-                    status: false,
-                    message: "Email is already registered"
-                });
-            }
+        const usernameAlreadyExist = userModel.getUserByUsername(db, username);
+        if (usernameAlreadyExist) {
+            return reply.code(409).send({
+                status: false,
+                message: "Username is already taken"
+            });
         }
 
         db.prepare(`
             UPDATE USERS
-            SET username = ?,
-                email = ?
+            SET username = ?
             WHERE id = ?
-        `).run(username, email, user.id);
+        `).run(username, user.id);
 
         reply.send({
             status: true,
-            message: "Profile updated successfully",
+            message: "Username updated successfully",
         });
 
 
@@ -259,6 +267,41 @@ const updateInfo = async (request, reply) => {
     }
 }
 
+const searchQuery = async (request, reply) => {
+    console.log('allo from backenddd');
+    
+    try {
+        const { query } = request.query;
+        const trimQuery = query?.trim();
+
+        if (!trimQuery) {
+            return reply.code(400).send({
+                status: false,
+                message: "Query must be at least 2 characters"
+            });
+        }
+        const db = request.server.db;
+
+        const users = db.prepare(`
+            SELECT id, username, avatar_url, online_status
+            FROM USERS
+            WHERE username LIKE ?
+        `).all(`%${trimQuery}%`);
+
+        reply.send( {
+            status: true,
+            count: users.length,
+            users: users
+        });
+
+    } catch (error) {
+        reply.code(500).send({
+            status: false,
+            message: error.message || 'Failed to search users'
+        });
+    }
+}
+ 
 const  getProfile = async (request, reply) => {
 }
 
@@ -328,6 +371,70 @@ const twoFactorAuth = async (request, reply) => {
     }
 }
 
+const updateStats = async (request, reply) => {
+    const { winnerId, loserId } = request.body;
+    
+    try {
+        const db = request.server.db;
+
+        if (!winnerId || !loserId) {
+            return reply.status(400).send({ 
+                status : false,
+                message: "Missing required fields" 
+            });
+        }
+
+        db.prepare(`
+            UPDATE USERS
+            SET wins = wins + 1,
+                points = points + 3,
+                updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(winnerId);
+
+        db.prepare(`
+            UPDATE USERS
+            SET losses = losses + 1,
+                points = points + 1,
+                updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(loserId);
+
+        // userModel.recalculateRanks(db);
+
+        const winner = userModel.getUserByID(db, winnerId);
+        const loser = userModel.getUserByID(db, loserId);
+
+        let newLevel = Math.floor(winner.points / 10);
+        db.prepare(`
+            UPDATE USERS
+            SET level = ?,
+            updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(newLevel, winner.id);
+
+        newLevel = Math.floor(loser.points / 10);
+        db.prepare(`
+            UPDATE USERS
+            SET level = ?,
+            updatedAt = CURRENT_TIMESTAMP
+            WHERE id = ?;
+        `).run(newLevel, loser.id);
+
+        return reply.status(200).send({ 
+            status: true,
+            message: "Stats updated successfully" 
+        });
+    } catch (err) {
+        console.error("❌ Error updating user stats:", err);
+        return reply.status(500).send({ 
+            status: false,
+            message: "Error updating user stats" 
+        });
+    }
+}
+
+
 export default { 
     getUserById, 
     getAllUsers, 
@@ -337,5 +444,7 @@ export default {
     uploadAvatar, 
     changePassword,
     updateInfo,
-    twoFactorAuth
+    twoFactorAuth,
+    searchQuery,
+    updateStats,
 };

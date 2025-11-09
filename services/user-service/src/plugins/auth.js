@@ -38,15 +38,12 @@ const authPlugin = async (fastify, options) => {
             if (!token)
                 return reply.code(401).send({ status: false, message: 'Unauthorized - no token provided'});
 
-            // const decoded = request.server.jwt.verify(token);
             const decoded = jwt.verify(token, JWT_SECRET);
             if (!decoded)
                 return reply.code(401).send({ status: false, message: 'Unauthorized - Invalid token'});
 
             console.log('current user for logged up--->; ', decoded);
 
-            // Verify user exists in database
-            // verify user if exists on db --> decoded.id --> 401 user no longer exists
             const user = fastify.db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.id);
             if (!user) {
                 fastify.clearAuthCookie(reply);
@@ -55,7 +52,6 @@ const authPlugin = async (fastify, options) => {
 
             request.user = user;
 
-            // request.user = decoded;
 
         } catch (error) {
             fastify.clearAuthCookie(reply);

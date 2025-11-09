@@ -22,13 +22,11 @@ CREATE TABLE IF NOT EXISTS USERS (
     points INTEGER NOT NULL DEFAULT 0,
     wins INTEGER NOT NULL DEFAULT 0,
     losses INTEGER NOT NULL DEFAULT 0,
-    rank INTEGER NOT NULL DEFAULT 0,
+    level INTEGER NOT NULL DEFAULT 0,
 
     --OAuth 
     is_google_auth INTEGER DEFAULT 0,
     
-    -- Profile info
-    location VARCHAR(100),
     -- online_status BOOLEAN NOT NULL DEFAULT FALSE,
     online_status INTEGER NOT NULL DEFAULT 0,
 
@@ -46,9 +44,12 @@ CREATE TABLE IF NOT EXISTS FRIENDS (
   user_id INTEGER NOT NULL,
   friend_id INTEGER NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'blocked')),
+  blocked_by INTEGER, -- null unless statis is blocked
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (blocked_by) REFERENCES users(id) ON DELETE CASCADE,
+
   UNIQUE(user_id, friend_id)
 );
 

@@ -10,11 +10,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { getFrameByLevel } from '@/utils/getFrameByLevel';
 
 
 const schema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters"),
-  email: z.string().email("Invalid email")
 });
 
 const changePasswordSchema = z
@@ -75,7 +75,7 @@ const SettingsPage = () => {
     if (e.target.files && e.target.files[0]) {
       const file  = e.target.files[0];
       // console.log("file : ", file);
-      // 10MB
+
       if (file.size > 10 * 1024 * 1024) {
         toast.error('File size must be less than 10MB');
         return;
@@ -89,14 +89,23 @@ const SettingsPage = () => {
       try {
         const response = await fetch("https://localhost:8080/api/users/upload-avatar", {
           method: "POST",
-          // headers: {
-          //   Authorization: `Bearer ${token}`
-          // },
           body: formData,
           credentials: "include", // sends the token cookie automatically no Authorization header is required, the browser send token automatically
         });
 
-        const data = await response.json();
+        if (response.status === 413) {
+          toast.error("File too large. Server limit exceeded.");
+          return;
+        }
+        const contenType = response.headers.get("content-type");
+        if (!contenType || !contenType.includes('application/json')) {
+          const text = await response.text();
+          console.error("Non-JSON reponse:", text);
+          toast.error('Server returened an invalid response');
+          return ;
+        }
+
+        const data: {status: boolean, message: string} = await response.json();
 
         if (response.ok && data.status) {
           
@@ -104,6 +113,7 @@ const SettingsPage = () => {
         } else {
           toast.error("Failed to upload avatar");
         }
+        
       } catch (error) {
         console.error("Upload failed:", error);
         toast.error("Failed to upload avatar. Please try again.");
@@ -122,7 +132,6 @@ const SettingsPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify( {
           username: data.username,
-          email: data.email
         }),
         credentials: "include"  // allow cookies
       });
@@ -168,6 +177,7 @@ const SettingsPage = () => {
 
   if (!user) 
     return <p className="text-gray-500">User not found</p>;
+  
   return (
         <div className="h-[calc(100vh_-_72px)] text-white flex px-2 gap-2 ">
           <div className="flex-1 rounded-[20px] flex flex-col my-2 gap max-w-6xl mx-auto bg-[#021024]">
@@ -186,15 +196,27 @@ const SettingsPage = () => {
 
                   <div className="flex flex-row items-center gap-20 -mt-5">
                     <div className="relative">
-                      <div className="rounded-full border-6 border-purple-500 overflow-hidden shadow-2xl">
+                      <div className="rounded-full  overflow-hidden shadow-2xl">
                         
                         {avatar && (
-                            <img
-                              src={avatar || "/avatars/avatar1.png"}
-                              alt="avatar"
-                              className="w-45 h-45 object-cover"
+                            // <img
+                            //   src={avatar || "/avatars/avatar1.png"}
+                            //   alt="avatar"
+                            //   className="w-45 h-45 object-cover"
                               
-                            />
+                            // />
+                            <div className={`w-full relative`}>
+                              <img
+                                src={avatar}
+                                alt='Avatar'
+                                className='w-45 h-45 rounded-full p-[12%]'
+                              />
+                              <img
+                                src={getFrameByLevel(user.level)}
+                                alt='Frame'
+                                className='absolute w-45 h-45 inset-0 pointer-events-none'
+                              />
+                            </div>
                         )}
 
                         <input
@@ -275,15 +297,6 @@ const SettingsPage = () => {
                           />
                           {errorsInfo.username && <p className="text-red-500">{errorsInfo.username.message}</p>}
 
-                        </div>
-                        <div>
-                          <Input 
-                            icon={Mail} 
-                            type="email"
-                            placeholder="Email" 
-                            {...registerInfo("email")}
-                          />
-                          {errorsInfo.email && <p className="text-red-500">{errorsInfo.email.message}</p>}
                         </div>
 
                         <button

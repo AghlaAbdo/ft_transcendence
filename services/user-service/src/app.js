@@ -12,20 +12,45 @@ import dotenv from 'dotenv';
 import multipart from "@fastify/multipart";
 import fastifyStatic from '@fastify/static';
 import path from "path";
+import fs from 'fs';
+
+const logStream = fs.createWriteStream('./logs/user.log', { flags: 'a' });
+
+export function logEvent(level, service, event, data = {}) {
+    const logger = global.userServiceLogger;
+    if (logger && logger[level] && typeof logger[level] === 'function') {
+        logger[level]({
+            service,
+            event,
+            ...data,
+        });
+    } else {
+        console.warn(`Invalid log level: ${level}`);
+    }
+}
 
 const createApp = () => {
     const fastify = Fastify({
-        logger: true
+        logger: {
+            level: process.env.LOG_LEVEL || 'info',
+            stream: logStream,
+            base: null,
+            timestamp: () => `,"time":"${new Date().toISOString()}"`
+        }
     });
-    
+
     dotenv.config();
 
-    fastify.register(multipart);
+    fastify.register(multipart, {
+        limits: {
+            fileSize: 10 * 1024 * 1024,
+        }
+    });
 
-    
+
     fastify.register(fastifyStatic, {
         root: path.join(process.cwd(), 'uploads'),
-        prefix: '/uploads/', // URL prefix
+        prefix: '/uploads/',
     });
 
     fastify.register(fastifyCookie);
@@ -43,6 +68,8 @@ const createApp = () => {
     fastify.register(authRoutes, { prefix: '/api/auth' });
     fastify.register(userRoutes, { prefix: '/api/users' });
     fastify.register(friendRoutes, { prefix: '/api/friends' });
+
+    global.userServiceLogger = fastify.log;
 
     return fastify;
 }

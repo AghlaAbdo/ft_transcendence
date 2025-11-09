@@ -25,21 +25,19 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
   const [friends, setFriends] = useState<Friend[]>([]);
 
   useEffect(() => {
-    if (!user)
+    if (!user || !searchTerm.trim().length)
         return ;
+    setIsLoading(true);
+    setError(null);
     const fetchFriends = async () => {
       try {
-        const response = await fetch(`https://localhost:8080/api/friends/${user.id}`, {
+        const response = await fetch(`https://localhost:8080/api/friends/${user.id}/search?query=${searchTerm}`, {
           method: 'GET',
           credentials: 'include',
         });
         const data = await response.json();
         if (data.status) {
-          setFriends(data.friends.filter(
-          (_user: any) =>
-            _user.id !== user.id &&
-          _user.username.toLowerCase().includes(searchTerm.toLowerCase())
-        ));
+          setFriends(data.friends);
         }
         else
           setFriends([]);
@@ -51,7 +49,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
       }
     };
     fetchFriends();
-  }, [debouncedSearchTerm, user]);
+  }, [debouncedSearchTerm]);
 
   const handleFriendSelect = async (selectedFriend: Friend
   ) => {
@@ -115,9 +113,9 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
         </div>
       </div>
 
-      {/* Results Container */}
+
       <div className='flex-1 overflow-y-auto px-5 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden'>
-        {isLoading && (
+        {isLoading && searchTerm && (
           <div className='flex flex-col items-center justify-center py-12 text-gray-400'>
             <Loader2 className='w-8 h-8 animate-spin mb-3' />
             <p className='text-sm'>Searching users...</p>

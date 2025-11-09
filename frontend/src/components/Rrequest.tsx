@@ -29,6 +29,7 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
       const data: { status: boolean, message: string} = await response.json();
 
       if (response.ok && data.status) {
+        removeNotification(id);
         toast.success(`${data.message}`);
         setTimeout(() => setIsVisible(false), 300);
       } else {
@@ -38,7 +39,8 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
       console.error("Error accepting friend request:", error);
       toast.error("An unexpected error occurred.");
     } finally {
-      removeNotification(id);
+      console.log('remove notifications');
+      
       setIsLoading(null);
     }
   };
@@ -53,6 +55,7 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
 
       const data: {status: boolean, message: string} = await response.json();
       if (response.ok && data.status) {
+        removeNotification(id);
         toast.success(`${data.message}`);
         setTimeout(() => setIsVisible(false), 300);
       } else {
@@ -62,7 +65,6 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
       console.error("Error rejecting friend request:", error);
       toast.error("An unexpected error occurred.");
     } finally {
-      removeNotification(id);
       setIsLoading(null);
     }
   };

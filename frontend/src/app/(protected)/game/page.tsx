@@ -2,26 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import localGamePng from '@/../public/images/Local-Game.jpg';
-import multiPlayerPng from '@/../public/images/Multiplayer-Game.jpg';
 import onlineGamePng from '@/../public/images/Online-Game.jpg';
 import tournamentPng from '@/../public/images/Tournament.jpg';
-import { useUser } from '@/context/UserContext';
-
-import { socket } from '../lib/socket';
 
 export default function GamePage() {
-  const router = useRouter();
-  const { user } = useUser();
-
-  // function handlePlayOnline() {
-  //   socket.emit('play', user.id);
-  //   // setTimeout(()=> {
-  //     router.push('/game/play-remote');
-  //   // }, 2000);
-  // }
   return (
     <div className='flex justify-center'>
       <div className='w-full max-w-[1000px] m-3 md:m-6'>
@@ -45,7 +31,7 @@ export default function GamePage() {
                 </p>
               </div>
               <Link
-                href='#'
+                href='/game/local'
                 className='bg-purple w-fit py-2 px-4 rounded-[8px] self-end font-bold'
               >
                 Play Now
@@ -77,31 +63,9 @@ export default function GamePage() {
               </Link>
             </div>
           </div>
+        </div>
 
-          <div className='flex items-center gap-3 md:gap-6 w-full bg-gray-800 rounded-2xl overflow-hidden max-w-[470px]'>
-            <Image
-              src={multiPlayerPng}
-              alt='Team Game'
-              className=' max-w-[40%] h-[100%]'
-            />
-            <div className='flex flex-col justify-between h-full w-[60%] py-3 pr-3 md:pt-7 md:pr-4 md:pb-4'>
-              <div>
-                <h3 className='text-xl text-gray-50 font-bold pb-2 md:text-2xl md:pb-3'>
-                  Team Game
-                </h3>
-                <p className='text-[15px] text-gray-200 md:text-[18px]'>
-                  Team up with another player and play against two others.
-                </p>
-              </div>
-              <Link
-                href='#'
-                className='bg-purple w-fit py-2 px-4 rounded-[8px] self-end font-bold'
-              >
-                Play Now
-              </Link>
-            </div>
-          </div>
-
+        <div className='flex justify-center mt-4 md:mt-12'>
           <div className='flex items-center gap-3 md:gap-6 w-full bg-gray-800 rounded-2xl overflow-hidden max-w-[470px]'>
             <Image
               src={tournamentPng}

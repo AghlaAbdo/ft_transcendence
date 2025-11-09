@@ -1,13 +1,13 @@
 "use client";
 
-import FriendRequestCard from '@/components/profile/FriendRequestCard';
 import Friends from '@/components/profile/Friends';
-import { GameHistory1 } from '@/components/profile/GameHistory';
+import { GameHistory } from '@/components/profile/GameHistory';
 import UserCard from '@/components/profile/UserCard';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { User } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { getFrameByLevel } from '@/utils/getFrameByLevel';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -59,21 +59,33 @@ const ProfilePage = () => {
               </div>
               <div className='flex-1 justify-items-center flex justify-center'>
           
-                  <img 
+                  {/* <img 
                     src={user.avatar_url || "/avatars/avatar1.png"} 
                     alt="avatar"
                     className="absolute top-55 w-44 h-44 rounded-full z-2  " 
-                    />
+                    /> */}
 
-                  <span
-                    className={`absolute -mt-20 ml-29 w-5 h-5 rounded-full z-10 ${
-                      user.online_status === 0
-                        ? "bg-yellow-500"   // offline
-                        : user.online_status === 1
-                        ? "bg-green-500"  // online
-                        : "bg-orange-500"   // ingame
-                    }`}
-                  ></span>
+                  <div className={`absolute top-55 z-9`}>
+                    <img
+                      src={user.avatar_url  || "/avatars/avatar1.png"}
+                      alt='Avatar'
+                      className='w-45 h-45 rounded-full p-[12%]'
+                    />
+                    <img
+                      src={getFrameByLevel(user.level)}
+                      alt='Frame'
+                      className='absolute w-45 h-45 inset-0 pointer-events-none'
+                    />
+                    <span
+                      className={`absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full ${
+                          user.online_status === 0
+                            ? "bg-yellow-500"   // offline
+                            : user.online_status === 1
+                            ? "bg-green-500"  // online
+                            : "bg-orange-500"   // ingame
+                        }`}
+                      ></span>
+                  </div>
 
               </div>
 
@@ -111,8 +123,8 @@ const ProfilePage = () => {
                             <p className="font-bold">🇲🇦 MAR</p>
                           </div>
                           <div>
-                            <p className="text-gray-400">Rank</p>
-                            <p className="font-bold">{ user.rank }</p>
+                            <p className="text-gray-400">Level</p>
+                            <p className="font-bold">{user.level}</p>
                           </div>
                         </div>
 
@@ -141,8 +153,9 @@ const ProfilePage = () => {
                   </div>
                 </div>
                  <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900 rounded-xl">
-                  {/* <GameHistory1 id={user.id} /> */}
-                  <GameHistory1 />
+                  <GameHistory 
+                    id = {user.id}
+                  />
                 </div>
               </div>
             </div>

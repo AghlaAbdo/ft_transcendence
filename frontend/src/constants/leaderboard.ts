@@ -1,14 +1,18 @@
-export interface Player {
-    username: string;
-    score: number;
-    winrate: number;
-    games: number;
-    avatar_url: string;
-    wins: number;
-    losses: number;
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  avatar_url: string;
+  isAccountVerified: number;
+  points: number;
+  wins: number;
+  losses: number;
+  rank: number;
+  online_status: number;
 }
 
-
-export interface PlayerWithRank extends Player {
+export type Player = User & {
     rank: number;
+    games: number;
+    winrate: number;
 }

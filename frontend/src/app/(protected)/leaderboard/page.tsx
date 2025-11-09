@@ -6,9 +6,6 @@ import Table from "@/components/leaderboard/Table";
 import { useEffect, useState, useMemo, use } from "react";
 import { Player } from "@/constants/leaderboard";
 
-interface PlayerWithRank extends Player {
-    rank: number;
-}
 
 export default function Leaderboard({
     searchParams,
@@ -16,7 +13,7 @@ export default function Leaderboard({
     searchParams: Promise<{ page?: string }>
 }) {
     const resolvedSearchParams = use(searchParams)
-    const [allPlayers, setAllPlayers] = useState<PlayerWithRank[]>([])
+    const [allPlayers, setAllPlayers] = useState<Player[]>([])
     const [loading, setLoading] = useState(true)
     const widthMap: Map<number, number> = new Map()
     widthMap.set(1, 30)
@@ -24,6 +21,7 @@ export default function Leaderboard({
     widthMap.set(3, 50)
     const limit = 20
     const page = Number(resolvedSearchParams.page) || 1
+    // console.log("all players", allPlayers)
 
     const numOfPlayers = allPlayers.length
     const numOfPages = Math.ceil(numOfPlayers / limit)
@@ -31,6 +29,7 @@ export default function Leaderboard({
     const topPlayers = useMemo(() => get_top_players(allPlayers), [allPlayers])
     const players = useMemo(() => get_paginated_players(allPlayers, page, limit), [allPlayers, page, limit])
 
+    
     useEffect(() => {
         async function getLeaderboard() {
             const allPlayersData = await get_all_leaderboard()
@@ -46,25 +45,25 @@ export default function Leaderboard({
             </div>
         ) : (
 
-            <div className="w-[90%] m-auto">
-                <h1 className="text-center text-[2rem] mb-5">Leaderboard</h1>
-                <div className={`flex items-end w-[${widthMap.get(topPlayers.length)}%] mx-auto`}>
+            <div className="w-[80%] mx-auto mt-30 min-w-6xl">
+                <h1 className="text-center text-[2rem] mb-10">Leaderboard</h1>
+                <div className={`flex items-end w-[${widthMap.get(topPlayers.length)}%] mx-auto justify-center mb-20`}>
 
                     {
                         numOfPlayers > 1 ? (
-                            <Badge color={"orange-500"} showCrown={false} imgSrc={"/avatars/avatar2.png"} username={topPlayers[1].username} score={topPlayers[1].score} rank={2} />
+                            <Badge color={"orange-500"} showCrown={false} imgSrc={topPlayers[1].avatar_url} username={topPlayers[1].username} score={topPlayers[1].points} rank={2} />
                         ) :
                             (<></>)
                     }
                     {
                         numOfPlayers > 0 ? (
-                            <Badge color={"yellow-500"} showCrown={true} imgSrc={"/avatars/avatar1.png"} username={topPlayers[0].username} score={topPlayers[0].score} rank={1} />
+                            <Badge color={"yellow-500"} showCrown={true} imgSrc={topPlayers[0].avatar_url} username={topPlayers[0].username} score={topPlayers[0].points} rank={1} />
                         ) :
                             (<></>)
                     }
                     {
                         numOfPlayers > 2 ? (
-                            <Badge color={"gray-500"} showCrown={false} imgSrc={"/avatars/avatar4.png"} username={topPlayers[2].username} score={topPlayers[2].score} rank={3} />
+                            <Badge color={"gray-500"} showCrown={false} imgSrc={topPlayers[2].avatar_url} username={topPlayers[2].username} score={topPlayers[2].points} rank={3} />
                         ) :
                             (<></>)
                     }

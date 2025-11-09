@@ -12,6 +12,7 @@ import {
 export function generateGameState(
   gameId: string,
   player1: IPlayer,
+  gameType: 'remote' | 'tournament' | 'invite',
   player2: IPlayer | null,
   tournamentId: string | null,
   tournamentMatchId: string | null,
@@ -21,6 +22,7 @@ export function generateGameState(
   return {
     id: gameId,
     db_id: 0,
+    type: gameType,
     isTournamentGame: tournamentId ? true : false,
     tournamentId: tournamentId,
     tournamentMatchId: tournamentMatchId,
@@ -53,23 +55,23 @@ export function generateGameState(
       id: player1.id,
       username: player1.username,
       avatar: player1.avatar,
-      frame: player1.frame,
       level: player1.level,
+      points: player1.points,
       ready: false,
     },
     player2: {
       id: player2 ? player2.id : null,
       username: player2 ? player2.username : null,
       avatar: player2 ? player2.avatar : null,
-      frame: player2 ? player2.frame : null,
       level: player2 ? player2.level : null,
+      points: player2 ? player2.points : null,
       ready: false,
     },
     playersNb: 1,
     winner_id: null,
     startDate: null,
-    startAt: new Date().getTime(),
-    playtime: null,
+    startAt: null,
+    playtime: 0,
   };
 }
 

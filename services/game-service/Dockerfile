@@ -1,5 +1,6 @@
 FROM node:22-bullseye AS base
 WORKDIR /app
+RUN mkdir logs
 # COPY package.json ./
 # COPY package-lock.json ./
 # RUN npm install --only=prod

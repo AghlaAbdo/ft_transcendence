@@ -15,22 +15,29 @@ export default function CloseGameDialog({
   dialogRef,
   gameId,
   isTournamentGame,
+  isLocal,
 }: {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   gameId: string | null;
   isTournamentGame: boolean;
+  isLocal: boolean;
 }) {
   const { user } = useUser();
   const router = useRouter();
-  const { setHideHeaderSidebar } = useLayout();
+  const { setHideHeaderSidebar, setHideSidebar } = useLayout();
   const params = useParams<MatchPageParams>();
 
   function handleCancel() {
     dialogRef.current?.close();
   }
   function handleQuit() {
+    if (isLocal) {
+      router.replace('/game');
+      return;
+    }
     socket.emit('quit', { userId: user.id, gameId });
     setHideHeaderSidebar(false);
+    setHideSidebar(false);
     if (isTournamentGame)
       router.replace(`/game/tournament/${params.tournamentId}`);
     else router.replace('/game');
