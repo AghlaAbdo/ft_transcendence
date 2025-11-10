@@ -15,7 +15,9 @@ function handleKeypress(_str: string, key: any) {
   if (key.name === 'up') {
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'up');
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'up');
+    socket.emit('movePaddle', playerData.gameId, playerData.role, 'up');
   } else if (key.name === 'down') {
+    socket.emit('movePaddle', playerData.gameId, playerData.role, 'down');
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'down');
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'down');
   } else if (key.sequence === 'q') {

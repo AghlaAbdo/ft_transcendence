@@ -80,3 +80,16 @@ export function handleMatchDetails(
     console.log(chalk.red('You are already playing in another session !'));
   }
 }
+
+export function handleOpponentQuit(socket: Socket, status: string) {
+  if (status === 'playing')
+    socket.emit('quit', {
+      userId: playerData.user!.id,
+      gameId: playerData.gameId,
+    });
+  console.log(chalk.yellow.bold('\nOpponent Quit!'));
+  console.log(chalk.green('You Win!'));
+  clearKeypress();
+  setUpReadline();
+  console.log(chalk.yellowBright('Type "play" to start or "exit" to quit.'));
+}
