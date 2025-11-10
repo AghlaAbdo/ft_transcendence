@@ -1,17 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
 import { Socket, io } from 'socket.io-client';
-
 import { BlockedUserInput } from '@/components/chat/BlockedUser';
 import { BlockingUserInput } from '@/components/chat/BlockingUser';
 import { Chatlist } from '@/components/chat/ChatList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { MessageInput } from '@/components/chat/MessageInput';
 import ChatListSkeleton from '@/components/chat/chatlist_loading';
-
-import { User, useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 
 interface conversation {
   id: number;
@@ -37,7 +34,6 @@ export default function ChatPage() {
   const [showChatList, setShowChatList] = useState(true);
   const [otherUser, setOtherUser] = useState<Friend | null>(null);
 
-  
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -55,6 +51,7 @@ export default function ChatPage() {
         try {
           const fetchmessage = await fetch(
             `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}`
+            ,{credentials: "include" }
           );
           const data = await fetchmessage.json();
           console.log(      'messages: ', data);
@@ -80,7 +77,7 @@ export default function ChatPage() {
     };
     fetchingmessages();
   }, [selectedChatId]);
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<Socket |null >(null);
   const handleSendMessage = (messageContent: string) => {
     if (socketRef.current && selectedChatId && messageContent.trim() && user && otherUser) {
       socketRef.current.emit('ChatMessage', {
@@ -94,16 +91,21 @@ export default function ChatPage() {
   const [UserId_2, SetUser_2] = useState<number | null>(null);
   useEffect(() => {
     if (!user) return;
-    const socket = io(`wss://localhost:8080`, {
+    const socket = io({
       path: '/ws/chat/socket.io/',
-      auth: { user_id: user?.id },
+      autoConnect: false,
+      withCredentials: true
     });
+    socket.connect();
     socketRef.current = socket;
     socket.on('ChatMessage', (data) => {
       if ((selectedChatId === -1  || !selectedChatId) && data.chat_id) {
         setSelectedChatId(data.chat_id);
       }
       set_conv((prevMessages) => [...prevMessages, data]);
+    });
+    socket.on('block', (data) => {
+
     });
     return () => {
       socket.disconnect();

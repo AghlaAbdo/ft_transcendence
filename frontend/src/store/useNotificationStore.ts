@@ -12,6 +12,7 @@ interface Notification {
   created_at: string;
   user_username: string;
   user_avatar: string;
+  game_link: string,
 }
 
 interface NotificationState {

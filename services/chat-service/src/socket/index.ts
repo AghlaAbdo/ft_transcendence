@@ -1,6 +1,10 @@
 import { Server, Socket } from "socket.io";
 import { create_new_chat, insert_message } from "../database/conversations.js";
 import Database from "better-sqlite3";
+import cookie from "cookie"
+import jwt from "jsonwebtoken"
+
+const JWT_SECRET: string = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
 
 declare module "socket.io" {
   interface Socket {
@@ -10,12 +14,10 @@ declare module "socket.io" {
 
 const onlineUsers: Map<number, Set<Socket>> = new Map();
 export function initSocket(server: any, db: Database.Database) {
-  const handleConnection = (socket: Socket) => {
-    const user__id = parseInt(
-      socket.handshake.auth?.user_id ||
-        (socket.handshake.query.user_id as string) ||
-        (socket.handshake.headers["user_id"] as string)
-    );
+  const handleConnection = (socket: Socket, data: {id: string, username: string}) => {
+    console.log('user connetcion: ',data);
+    
+    const user__id = parseInt(data.id);
 
     if (isNaN(user__id)) {
       console.log("Invalid user ID — disconnecting socket");
@@ -32,10 +34,13 @@ export function initSocket(server: any, db: Database.Database) {
     //   socket.disconnect();
     // });
 
-    socket.on("ChatMessage", async (data: any) => {
+    socket.on("block", async (data) => {
+      const {actor_id, target_id } = data;
+    })
+  
+    socket.on("ChatMessage", async (data) => {
       try {
         const { chatId, sender, receiver, message } = data;
-
         if (
           typeof sender !== "number" ||
           typeof receiver !== "number" ||
@@ -58,7 +63,6 @@ export function initSocket(server: any, db: Database.Database) {
         }
 
         if (!sender || !receiver || !message) return;
-        // console.log("data: ", data);
 
         let actualChatId = chatId;
         console.log("in socket handler: ", message);
@@ -116,6 +120,37 @@ export function initSocket(server: any, db: Database.Database) {
     pingInterval: 25000, // ping kola 25s
     connectTimeout: 10000, // 10s to connect
   });
-  io.on("connection", handleConnection);
+
+   io.use((socket, next) => {
+    let token: string | undefined;
+
+    const cookieHeader = socket.handshake.headers.cookie;
+    console.log("headers: ", socket.handshake.headers);
+    if (cookieHeader) {
+      const cookies = cookie.parse(cookieHeader);
+      token = cookies.token;
+    }
+
+
+    if (!token) {
+      console.log("No token found");
+      next(new Error('NO_TOKEN'));
+      return;
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as {
+        id: string;
+        username: string;
+      };
+      handleConnection(socket, decoded);
+      next();
+      console.log("Decoded token: ", decoded);
+      // (handleConnection(socket, io, String(decoded.id)), next());
+    } catch (err) {
+      return next(new Error('INVALID_TOKEN'));
+    }
+  });
+
   return io;
 }

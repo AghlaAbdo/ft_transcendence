@@ -68,9 +68,11 @@ const userRoutes = async (fastify, options) => {
     });
     
     fastify.put('/notifications/friend_request/mark-as-read', {
-        onRequest: [fastify.authenticate]
-      }, async (req, res) => {
       
+      onRequest: [fastify.authenticate]
+    }, async (req, res) => {
+      
+      console.log('this is mark as friend req');
       const {userId} =  req.body;
       const db = req.server.db;
       console.log('user: ', userId);
@@ -84,7 +86,7 @@ const userRoutes = async (fastify, options) => {
       }, async (req, res) => {
       const {userId} =  req.body;
       const db = req.server.db;
-
+        console.log('this is mark as game inv');
       return notoficationModel.mark_friend_request_as_read(db, userId, "game_invite");
     });
 }

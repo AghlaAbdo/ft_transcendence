@@ -5,16 +5,6 @@ import { io, Socket } from 'socket.io-client';
 import { toast } from 'sonner';
 import { useNotificationStore } from '@/store/useNotificationStore';
 
-type notification = {
-  id: number;
-  user_id: number;
-  actor_id: string;
-  // avatar_url: string;
-  type: string;
-  read: boolean;
-  created_at: string;
-};
-
 interface SocketState {
   socket: Socket | null;
   connect: (userId: number) => void;
@@ -35,8 +25,22 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.on('connect', () => {
       console.log('Connected to socket');
     });
-    socket.on('Notification', (data) => {
+    socket.on('Notification', async (data) => {
       const { addNotification, incrementUnread } = useNotificationStore.getState();
+
+      const userRes = await fetch(
+                `https://localhost:8080/api/users/${data.user_id}`
+              );
+      const userData = await userRes.json();
+      data = {
+        ...data,
+                user_username: userData.user.username,
+                user_avatar: userData.user.avatar_url,
+      }
+
+      toast.message('you have new notification!')
+
+
       addNotification(data);
       incrementUnread();
     });

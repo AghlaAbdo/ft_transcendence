@@ -1,17 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-import Image from 'next/image';
-
 import { motion } from 'framer-motion';
-
 import useConnectSocket from '@/lib/useConnectSocket';
-
 import { useLayout } from '@/context/LayoutContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationStore } from '@/store/useNotificationStore';
-
 import { GlobalSearch } from './global_search';
 import { markAllNotificationsAsRead_friend } from './markAsRead';
 import NotificationCenter from './notifications';

@@ -22,7 +22,7 @@ interface Friend {
 
 interface ChatWindowProps {
   SelectedChatId: number | null;
-  userId: number | null;
+  userId: number ;
   conv: Message[];
   other_User: Friend | null;
   onBackClick?: () => void;
@@ -41,7 +41,7 @@ export const ChatWindow = ({
  useEffect(() => {
     const time = setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
-    },50);
+    },250);
     return () => clearTimeout(time);
 }, [conv, SelectedChatId]);
 const [open, setopen] = useState(false);
@@ -183,6 +183,7 @@ const [open, setopen] = useState(false);
                   onClick={(e) => e.stopPropagation()}
                 >
                     <UserActionsMenu
+                      user={userId}
                       onClose={() => setopen(false)}
                       _other_user={other_User}
                     />

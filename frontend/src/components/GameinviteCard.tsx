@@ -1,95 +1,81 @@
 "use client";
 
-import { useNotificationStore } from "@/store/useNotificationStore";
-import { log } from "node:console";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle, XCircle, Gamepad2 } from "lucide-react";
+import { useNotificationStore } from "@/store/useNotificationStore";
+import { useRouter } from 'next/navigation';
 
-export interface FriendRequestCardProps {
+export interface GameInviteCardProps {
   user_id: number;
   id: number;
   username: string;
-  // online_status: boolean;
   avatar_url?: string;
-  // status: string;
+  game_link :string
+  onclose: () => void;
 }
 
-export default function FriendRequestCard({ id, username, avatar_url, user_id }: FriendRequestCardProps) {
-  console.log('username: ', username);
-  
+export default function GameInviteCard({ id, username, avatar_url, user_id, game_link,onclose}: GameInviteCardProps) {
   const [isLoading, setIsLoading] = useState<'accept' | 'reject' | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const router = useRouter();
   const removeNotification = useNotificationStore((state) => state.removeNotification);
 
   const handleAccept = async () => {
-    setIsLoading('accept');
-    try {
-      const response = await fetch(`https://localhost:8080/api/friends/accept/${user_id}`, {
-        method: "PUT",
-        credentials: "include",
-      });
-
-      const data: { status: boolean, message: string} = await response.json();
-
-      if (response.ok && data.status) {
-        toast.success(`${data.message}`);
-        removeNotification(id);
-        setTimeout(() => setIsVisible(false), 300);
-      } else {
-        toast.error(`${data.message}`);
-      }
-    } catch (error) {
-      console.error("Error accepting friend request:", error);
-      toast.error("An unexpected error occurred.");
-    } finally {
-      // removeNotification(id);
-      console.log('remove notifications');
-      setIsLoading(null);
-    }
+    removeNotification(id);
+    onclose();
+    router.push(`/game/game-invite/${game_link}`);
+    // end for delete only one notification
   };
-  
+
   const handleReject = async () => {
     setIsLoading('reject');
     try {
-      const response = await fetch(`https://localhost:8080/api/friends/reject/${user_id}`, {
+      const response = await fetch(`https://localhost:8080/api/game/reject/${user_id}`, {
         method: "DELETE",
-        credentials: "include"
+        credentials: "include",
       });
 
-      const data: {status: boolean, message: string} = await response.json();
+      const data: { status: boolean, message: string } = await response.json();
+
       if (response.ok && data.status) {
-        removeNotification(id);
         toast.success(`${data.message}`);
+        removeNotification(id);
         setTimeout(() => setIsVisible(false), 300);
       } else {
         toast.error(`${data.message}`);
       }
     } catch (error) {
-      console.error("Error rejecting friend request:", error);
+      console.error("Error rejecting game invite:", error);
       toast.error("An unexpected error occurred.");
     } finally {
       setIsLoading(null);
     }
   };
 
-  if (!isVisible) {
-    return null;
-  }
-
+  if (!isVisible) return null;
 
   return (
-    <div className="flex items-center justify-between bg-slate-700 hover:bg-slate-800 p-3 shadow-md w-full scrollbar-none [&::-webkit-scrollbar]:hidden">
-      <div
-      className="flex items-center gap-3">
+    <div className="flex items-center gap-4 p-4 hover:bg-slate-700/30 transition-colors">
+      <div className="relative">
         <img
-          src={avatar_url || "/default-avatar.png"}
-          alt="Avatar"
-          className="w-12 h-12 rounded-full object-cover"
+          src={avatar_url || '/default-avatar.png'}
+          alt={username}
+          className="w-12 h-12 rounded-full"
         />
-        <p className="text-lg font-bold">{username}</p>
+    
       </div>
-       <div className="flex gap-2">
+
+      <div className="flex-1 min-w-0">
+        <p className="text-white font-medium truncate">
+          {username}
+        </p>
+        <p className="text-slate-400 text-sm">
+          invited you to play a game
+        </p>
+      </div>
+
+      <div className="flex gap-2">
         <button
           onClick={handleAccept}
           disabled={isLoading !== null}

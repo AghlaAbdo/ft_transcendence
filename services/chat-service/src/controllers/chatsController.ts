@@ -36,6 +36,7 @@ export async function getMessagesHandler(
   req: FastifyRequest<{ Params: GetMessagesParams }>,
   reply: FastifyReply
 ) {
+  
   const chatId = parseInt(req.params.chatId);
   
   if (isNaN(chatId) || chatId <= 0) {
@@ -128,6 +129,8 @@ export async function getChatsHandler(
   req: FastifyRequest<{ Params: GetChatsParams }>,
   reply: FastifyReply
 ) {
+  console.log('alllllo chats');
+  
   const userId = parseInt(req.params.userId);
   
   if (isNaN(userId) || userId <= 0) {

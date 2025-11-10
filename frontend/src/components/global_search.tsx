@@ -35,7 +35,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         const data = await response.json();
         if (data.status) {
           setUsers(data.users.filter(
-            (_user: any) => 
+            (_user: User) => 
               _user.id !== user.id &&
               _user.username.toLowerCase().includes(searchTerm.toLowerCase())
         ));

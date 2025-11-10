@@ -247,6 +247,8 @@ const searchQuery = async (request, reply) => {
 }
 
 const blockFriend = async (request, reply) => {
+    console.log('hereeee niga');
+    
     try {
         const currentUserId = request.user.id;
         const targetUserId = parseInt(request.params.id);
@@ -278,9 +280,8 @@ const blockFriend = async (request, reply) => {
             });
         }
 
-        friendModel.blockFriend(db, {currentUserId, targetUserId} );
-
-        friendModel.blockFriend(db, { currentUserId, targetUserId });
+        friendModel.blockFriend(db, {currentUserId, targetUserId});
+        // friendModel.blockFriend(db, {currentUserId, targetUserId});
 
         return reply.code(200).send({
             status: true,

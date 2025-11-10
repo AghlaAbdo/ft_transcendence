@@ -69,17 +69,19 @@ export const Chatlist = ({
 
   const [chats, setChats] = useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const filteredChats = chats.filter((chat) => {
-    if (!searchQuery) return true;
-    const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
-    const userIdString = otherUser.username.toString();
-    return userIdString.includes(searchQuery);
-  });
+    const filteredChats = chats.filter((chat) => {
+      if (!searchQuery) return true;
+      const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
+      const userIdString = otherUser.username.toString();
+      return userIdString.includes(searchQuery);
+    });
   
   useEffect(() => {
     if (userId) {
       setLoading(true); // do not forgot to use this later
-      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`) // fetch chats from backend
+      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`
+        ,{credentials: "include" }
+      )
       .then((res) => res.json())
       .then((data: Chat[]) => {
         setChats(data);

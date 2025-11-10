@@ -1,14 +1,17 @@
-
 import { useEffect, useState } from 'react';
-import { useNotificationStore } from "@/store/useNotificationStore";
+
 import { Eye, UserPlus, X } from 'lucide-react';
 import { Bell, Check, Clock, Gamepad2 } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
+import GameInviteCard from './GameinviteCard';
 import FriendRequestCard from './Rrequest';
-import { markAllNotificationsAsRead_friend, markAllNotificationsAsRead_game } from './markAsRead';
-
+import {
+  markAllNotificationsAsRead_friend,
+  markAllNotificationsAsRead_game,
+} from './markAsRead';
 
 interface Notification {
   id: number;
@@ -19,6 +22,7 @@ interface Notification {
   type: string;
   read: number;
   created_at: string;
+  game_link: string,
 }
 
 interface Notification_props {
@@ -28,7 +32,16 @@ interface Notification_props {
 const NotificationCenter = ({ onClose }: Notification_props) => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('friend_request');
-  const { notifications, setNotifications, setError, setIsLoading, isLoading, resetUnread, removeNotification } = useNotificationStore();
+  const [render, setrender] = useState<boolean>(false);
+  const {
+    notifications,
+    setNotifications,
+    setError,
+    setIsLoading,
+    isLoading,
+    resetUnread,
+    removeNotification,
+  } = useNotificationStore();
   const friendRequests = notifications.filter(
     (n) => n.type === 'friend_request'
   );
@@ -39,39 +52,44 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
 
   const { user } = useAuth();
 
- useEffect(() => {
-  if (!user) 
-    return;
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch(`https://localhost:8080/api/users/notifications/${user.id}`);
-      const data = await res.json();
-
-      if (res.ok && data.status) {
-        
-        const notificationsWithUserData = await Promise.all(
-          data.notifications.map(async (notif: Notification) => {
-            const userRes = await fetch(`https://localhost:8080/api/users/${notif.user_id}`);
-            const userData = await userRes.json();
-            return {
-              ...notif,
-              user_username: userData.user.username,
-              user_avatar: userData.user.avatar_url
-            };
-          })
+  useEffect(() => {
+    setrender(false)
+    if (!user) return;
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch(
+          `https://localhost:8080/api/users/notifications/${user.id}`
         );
-        setNotifications(notificationsWithUserData);
+        const data = await res.json();
+        
+        // console.log('before condition: ', data);
+        if (res.ok && data.status) {
+          // console.log('in condition');
+          
+          const notificationsWithUserData = await Promise.all(
+            data.notifications.map(async (notif: Notification) => {
+              const userRes = await fetch(
+                `https://localhost:8080/api/users/${notif.user_id}`
+              );
+              const userData = await userRes.json();
+              
+              return {
+                ...notif,
+                user_username: userData.user.username,
+                user_avatar: userData.user.avatar_url,
+              };
+            })
+          );
+          setNotifications(notificationsWithUserData);
+        }
+      } catch (err) {
+        console.error('API:', err);
       }
-    } catch (err) {
-      console.error('API Error:', err);
-    }
-  };
+    };
 
-  fetchNotifications();
-}, [user]);
-
-
-
+    fetchNotifications();
+    setrender(true)
+  }, [user], );
 
 
   return (
@@ -96,40 +114,41 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
               </div>
             </div>
 
-            { user &&
-
+            {user && (
               <div className='flex border-b border-slate-700 bg-slate-750'>
-              <button
-                onClick={() => {setActiveTab('friend_request');
-                  markAllNotificationsAsRead_friend(user.id);
-                }}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
-                  activeTab === 'friend_request'
-                    ? 'text-green-400 bg-slate-700 border-b-2 border-green-400'
-                    : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/50'
-                }`}
-              >
-                <UserPlus size={18} />
-                <span>Friend Requests</span>
-              </button>
-              <button
-                onClick={() => {setActiveTab('game_invite')
-                  markAllNotificationsAsRead_game(user.id)
-                }}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
-                  activeTab === 'game_invite'
-                  ? 'text-purple-400 bg-slate-700 border-b-2 border-purple-400'
-                  : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/50'
+                <button
+                  onClick={() => {
+                    setActiveTab('friend_request');
+                    markAllNotificationsAsRead_friend(user.id);
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
+                    activeTab === 'friend_request'
+                      ? 'text-green-400 bg-slate-700 border-b-2 border-green-400'
+                      : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/50'
                   }`}
-                  >
-                <Gamepad2 size={18} />
-                <span>Game Invites</span>
-              </button>
-            </div>
-              }
+                >
+                  <UserPlus size={18} />
+                  <span>Friend Requests</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('game_invite');
+                    markAllNotificationsAsRead_game(user.id);
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium transition-all ${
+                    activeTab === 'game_invite'
+                      ? 'text-purple-400 bg-slate-700 border-b-2 border-purple-400'
+                      : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/50'
+                  }`}
+                >
+                  <Gamepad2 size={18} />
+                  <span>Game Invites</span>
+                </button>
+              </div>
+            )}
 
             <div className='max-h-[600px] overflow-y-auto'>
-              {activeNotifications.length === 0 ? (
+              {notifications && activeNotifications.length === 0 ? (
                 <div className='p-8 text-center'>
                   {activeTab === 'friend_request' ? (
                     <UserPlus
@@ -153,32 +172,36 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                   </p>
                 </div>
               ) : (
-                <div
-                  className='overflow-y-auto max-h-64 divide-y divide-slate-600 scrollbar-none [&::-webkit-scrollbar]:hidden'>
-                  {activeNotifications.map((notif) => (
-                    // notif.type === "friend_request" ? (
-                    <div
-                      key={notif.id}
-                      className="transition-all duration-200 hover:bg-slate-750">
-                      <FriendRequestCard
-                        id = {notif.user_id}
-                        username={notif.user_username}
-                        avatar_url={notif.user_avatar}
-                      />
-                    </div>
-                    // ) 
-                    // :
-                    //  (
-                    // <div
-                    //   key={notif.id}
-                    //   className="transition-all duration-200 hover:bg-slate-750">
-                    //   <FriendRequestCard
-                    //     id = {notif.user_id}
-                    //     username={notif.user_username}
-                    //     avatar_url={notif.user_avatar}
-                    //   />
-                    // </div>)  
-                  ))}
+                <div className='overflow-y-auto max-h-64 divide-y divide-slate-600 scrollbar-none [&::-webkit-scrollbar]:hidden'>
+                  {render && notifications && activeNotifications.map((notif) =>
+                    notif.type === 'friend_request' ? (
+                      <div
+                        key={notif.id}
+                        className='transition-all duration-200 hover:bg-slate-750'
+                      >
+                        <FriendRequestCard
+                          id={notif.id}
+                          user_id={notif.user_id}
+                          username={notif.user_username}
+                          avatar_url={notif.user_avatar}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        key={notif.id}
+                        className='transition-all duration-200 hover:bg-slate-750'
+                      >
+                        <GameInviteCard
+                          onclose={onClose}
+                          id={notif.id}
+                          user_id={notif.user_id}
+                          username={notif.user_username}
+                          avatar_url={notif.user_avatar}
+                          game_link={notif.game_link}
+                        />
+                      </div>
+                    )
+                  )}
                 </div>
               )}
             </div>
