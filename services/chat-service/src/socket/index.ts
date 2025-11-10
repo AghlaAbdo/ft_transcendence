@@ -15,7 +15,7 @@ declare module "socket.io" {
 const onlineUsers: Map<number, Set<Socket>> = new Map();
 export function initSocket(server: any, db: Database.Database) {
   const handleConnection = (socket: Socket, data: {id: string, username: string}) => {
-    console.log('user connetcion: ',data);
+    // console.log('user connetcion: ',data);
     
     const user__id = parseInt(data.id);
 
@@ -125,7 +125,7 @@ export function initSocket(server: any, db: Database.Database) {
     let token: string | undefined;
 
     const cookieHeader = socket.handshake.headers.cookie;
-    console.log("headers: ", socket.handshake.headers);
+    // console.log("headers: ", socket.handshake.headers);
     if (cookieHeader) {
       const cookies = cookie.parse(cookieHeader);
       token = cookies.token;

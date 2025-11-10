@@ -81,6 +81,23 @@ const userRoutes = async (fastify, options) => {
     });
     
     
+    fastify.put('/notifications/delete', {
+      
+      onRequest: [fastify.authenticate]
+    }, async (req, res) => {
+      console.log('on delete methode');
+      
+      const {notif_id} = req.body;
+      // const {userId} =  req.body;
+      const db = req.server.db;
+      console.log('notif_id: ', notif_id);
+      
+      // console.log('user: ', userId);
+      
+      return notoficationModel.mark_one_game_as_read(db , notif_id);
+    });
+
+
     fastify.put('/notifications/game/mark-as-read',{
         onRequest: [fastify.authenticate]
       }, async (req, res) => {

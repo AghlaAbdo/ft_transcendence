@@ -54,6 +54,7 @@ function insert_notification(db, user_id, actor_id, type, game_link) {
 // }
 
 function mark_friend_request_as_read(db, userId, type) {
+
   console.log('mark as read game: ');
   
   console.log("notifi mark as read: ", type);
@@ -71,10 +72,30 @@ function mark_friend_request_as_read(db, userId, type) {
   }
 }
 
+
+function mark_one_game_as_read(db, notif_id) {
+  
+  console.log(' ------   mark as read game: ', notif_id);
+  // console.log("notifi mark as read: ", type);
+  
+  try {
+    const stmt = db.prepare(
+      `DELETE FROM notifications WHERE id = ?`
+    );
+    const info = stmt.run(notif_id);
+
+    return { status: info.changes > 0 };
+  } catch (error) {
+    console.error("Error updating notification:", error);
+    return { status: false, error: error.message };
+  }
+}
+
 const notoficationModel = {
   getnotifications,
   insert_notification,
   mark_friend_request_as_read,
+  mark_one_game_as_read,
 };
 
 export default notoficationModel;

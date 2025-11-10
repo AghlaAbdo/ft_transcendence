@@ -41,7 +41,7 @@ const handleConnection = (fastify, socket) => {
     try {
       const { user_id, actor_id, type, game_link } = data;
 
-      console.log("recived put notification: ", data);
+      // console.log("recived put notification: ", data);
       if (
         typeof user_id !== "number" ||
         typeof actor_id !== "number" ||

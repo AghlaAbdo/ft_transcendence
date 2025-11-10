@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { CheckCircle, XCircle, Gamepad2 } from "lucide-react";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useRouter } from 'next/navigation';
+import { markOneNotificationsAsRead_game } from "./markAsRead";
 
 export interface GameInviteCardProps {
   user_id: number;
@@ -22,6 +23,7 @@ export default function GameInviteCard({ id, username, avatar_url, user_id, game
   const removeNotification = useNotificationStore((state) => state.removeNotification);
 
   const handleAccept = async () => {
+    markOneNotificationsAsRead_game(id);
     removeNotification(id);
     onclose();
     router.push(`/game/game-invite/${game_link}`);
