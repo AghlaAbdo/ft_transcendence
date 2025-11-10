@@ -66,9 +66,13 @@ export default function ChatPage() {
                 : data.messages[0].sender;
             if (otherId) {
               const userResponse = await fetch(
-                `https://localhost:8080/api/users/${otherId}`
+                `https://localhost:8080/api/users/profile/${otherId}`, {
+                  credentials: 'include'
+                }
               );
               const userData = await userResponse.json();
+              console.log(userData);
+              
               setOtherUser(userData.user);
             }
           }
