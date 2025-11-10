@@ -1,38 +1,33 @@
 import Image from "next/image"
 
 interface BadgeProps {
-    imgSrc: string;
-    rank: number;
-    username: string;
-    score: number;
-    showCrown: boolean;
-    color: string;
+  imgSrc: string;
+  rank: number;
+  username: string;
+  score: number;
+  showCrown: boolean;
+  color: string;
 }
 
 export default function Badge({imgSrc, rank, username, score, showCrown, color}: BadgeProps) {
   const position: string = rank !== 1 ? "transfrom translate-y-5" : "mx-20";
-    return (
+  return (
     <div className={`flex flex-col items-center w-fit ${position}`}>
       {
         showCrown && (
           <div className="w-fit">
-        <Image
-        src={"/icons/crown.svg"}
-        alt="crown"
-        width={40}
-        height={40}
-      />
-      </div>
+            <Image
+              src={"/icons/crown.svg"}
+              alt="crown"
+              width={40}
+              height={40}
+            />
+          </div>
         )
       }
       <div className="relative w-fit flex flex-col items-center">
-        <div className={`rounded-full border-4 border-${color} overflow-hidden`}>
-          <Image
-            src={imgSrc}
-            alt="Winner"
-            width={120}
-            height={120}
-          />
+        <div className={`rounded-full border-4 border-${color} overflow-hidden w-[120px] h-[120px]`}>
+          <img src={imgSrc} alt="Winner" className=" w-full h-full object-cover"/>
         </div>
         <span className={`
           absolute 
@@ -51,5 +46,5 @@ export default function Badge({imgSrc, rank, username, score, showCrown, color}:
         <span className="mt-1 text-[.8rem] bg-[#1D293D] border-1 border-[#45556C] px-2 py-1 rounded-[12px] 2xl:text-[.9rem]">{score} P</span>
       </div>
     </div>
-    )
+  )
 }
