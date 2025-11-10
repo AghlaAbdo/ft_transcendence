@@ -1,5 +1,4 @@
 import friendModel from "../models/friendModel.js";
-import { logEvent } from "../app.js";
 
 import logEvent from '../app.js'
 
