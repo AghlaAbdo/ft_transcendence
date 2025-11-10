@@ -44,7 +44,12 @@ const authPlugin = async (fastify, options) => {
 
             console.log('current user for logged up--->; ', decoded);
 
-            const user = fastify.db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.id);
+            const user = fastify.db.prepare(`
+                SELECT id, username, email,avatar_url,
+                isAccountVerified, points, wins, losses, level, is_google_auth, 
+                online_status, is_2fa_enabled, createdAt, updatedAt FROM USERS WHERE id = ?`
+            ).get(decoded.id);
+            
             if (!user) {
                 fastify.clearAuthCookie(reply);
                 return reply.code(401).send({ status: false, message: 'User no longer exists' });
