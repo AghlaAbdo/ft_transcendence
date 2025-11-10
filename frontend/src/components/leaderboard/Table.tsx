@@ -25,25 +25,19 @@ export default function Table({players, numOfPages, page}: TableProps) {
                     <span>Games</span>
                 </div>
                 {
-                    players.map((player, index) => 
-                    <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
+                    players.map((player, index) =>
+                        <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
                         hover:bg-[#222e43] transition-colors duration-100 ease-in-out
                     " key={player.username}>
-                        <li className="pl-2">{player.rank}</li>
-                        <div className="flex items-center">
-                            <Image
-                            src={player.avatar_url}
-                            alt="crown"
-                            width={30}
-                            height={30}
-                            className="rounded-full"
-                            />
-                            <Link href={`/profile/${player.id}`}><li className="pl-3">{player.username}</li></Link>
-                        </div>
-                        <li className="w-fit px-2 bg-[#27344b] border-1 border-[#45556C] rounded-[12px]">{player.points} P</li>
-                        <li>{player.winrate} %</li>
-                        <li>{player.games}</li>
-                    </ul>
+                            <li className="pl-2">{player.rank}</li>
+                            <div className="flex items-center">
+                                <img src={player.avatar_url} alt="" className="w-[30px] h-[30px] rounded-full object-cover" />
+                                <Link href={`/profile/${player.id}`}><li className="pl-3">{player.username}</li></Link>
+                            </div>
+                            <li className="w-fit px-2 bg-[#27344b] border-1 border-[#45556C] rounded-[12px]">{player.points} P</li>
+                            <li>{player.winrate} %</li>
+                            <li>{player.games}</li>
+                        </ul>
                     )
                 }
                 {
@@ -52,38 +46,38 @@ export default function Table({players, numOfPages, page}: TableProps) {
                             <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                 flex items-center justify-center font-bold
                                 rounded-[4px] hover:bg-gray-400
-                            " 
-                            href={`leaderboard/?page=${1}`}>{"<<"}</Link>
+                            "
+                                href={`leaderboard/?page=${1}`}>{"<<"}</Link>
                             {
                                 page > 1 ? (
                                     <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                     flex items-center justify-center font-bold
                                     rounded-[4px] hover:bg-gray-400
-                                    " 
-                                    href={`leaderboard/?page=${page - 1}`}>&lt;</Link>
+                                    "
+                                        href={`leaderboard/?page=${page - 1}`}>&lt;</Link>
                                 ):
-                                (
-                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    (
+                                        <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                     flex items-center justify-center font-bold
                                     rounded-[4px] hover:bg-gray-400
-                                    " 
-                                    href={`leaderboard/?page=${1}`}>&lt;</Link>
-                                )
+                                    "
+                                            href={`leaderboard/?page=${1}`}>&lt;</Link>
+                                    )
                             }
                             <Link className="m-1 bg-[#9333EA] p-2 w-[30px] h-[30px] 
                                 flex items-center justify-center font-bold
                                 rounded-[4px]
-                            " 
-                            href={`leaderboard/?page=${page}`}>{page}</Link>
+                            "
+                                href={`leaderboard/?page=${page}`}>{page}</Link>
                             {
                                 page + 1 < numOfPages ? (
                                     <>
-                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                        <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                     flex items-center justify-center font-bold
                                     rounded-[4px] hover:bg-gray-400
-                                    " 
-                                    href={`leaderboard/?page=${page + 1}`}>{page + 1}</Link>
-                                    <span className="w-[30px] text-center">...</span>
+                                    "
+                                            href={`leaderboard/?page=${page + 1}`}>{page + 1}</Link>
+                                        <span className="w-[30px] text-center">...</span>
                                     </>
                                 ): (
                                     <></>
@@ -91,31 +85,31 @@ export default function Table({players, numOfPages, page}: TableProps) {
                             }
                             {
                                 page < numOfPages ? (
-                               <>
+                                    <>
+                                        <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    "
+                                            href={`leaderboard/?page=${numOfPages}`}>{numOfPages}</Link>
+                                        <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
+                                    flex items-center justify-center font-bold
+                                    rounded-[4px] hover:bg-gray-400
+                                    "
+                                            href={`leaderboard/?page=${page + 1}`}>&gt;</Link>
+                                    </>
+                                ):(
                                     <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                     flex items-center justify-center font-bold
                                     rounded-[4px] hover:bg-gray-400
-                                    " 
-                                    href={`leaderboard/?page=${numOfPages}`}>{numOfPages}</Link>
-                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
-                                    flex items-center justify-center font-bold
-                                    rounded-[4px] hover:bg-gray-400
-                                    " 
-                                    href={`leaderboard/?page=${page + 1}`}>&gt;</Link>
-                               </>
-                            ):(
-                                    <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
-                                    flex items-center justify-center font-bold
-                                    rounded-[4px] hover:bg-gray-400
-                                    " 
-                                    href={`leaderboard/?page=${numOfPages}`}>&gt;</Link>
+                                    "
+                                        href={`leaderboard/?page=${numOfPages}`}>&gt;</Link>
                                 )
                             }
                             <Link className="m-1 bg-gray-500 p-2 w-[30px] h-[30px] 
                                 flex items-center justify-center font-bold
                                 rounded-[4px] hover:bg-gray-400
-                            " 
-                            href={`leaderboard/?page=${numOfPages}`}>{">>"}</Link>
+                            "
+                                href={`leaderboard/?page=${numOfPages}`}>{">>"}</Link>
                         </div>
                     )
                 }

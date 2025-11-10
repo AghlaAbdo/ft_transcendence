@@ -1,4 +1,5 @@
 import friendModel from "../models/friendModel.js";
+import { logEvent } from "../app.js";
 
 const getAllFriends = async (request, reply) => {
     try {
