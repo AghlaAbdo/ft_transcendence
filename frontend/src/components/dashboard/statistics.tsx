@@ -1,4 +1,4 @@
-import { stat, StatWithTimeDict, TimeDict } from "@/constants/dashboard";
+import { TimeDict } from "@/constants/dashboard";
 
 
 interface StatisticsProps {
