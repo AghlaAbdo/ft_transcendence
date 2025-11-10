@@ -51,10 +51,10 @@ export function GameHistory( { id } :  FriendsProps) {
         const enrichedMatches = await Promise.all(
           data.games.map(async (match: EnrichedMatch) => {
             const [playerRes1, playerRes2] = await Promise.all([
-              fetch(`https://localhost:8080/api/users/${match.player1_id}`, {
+              fetch(`https://localhost:8080/api/users/profile/${match.player1_id}`, {
                 credentials: "include"
               }),
-              fetch(`https://localhost:8080/api/users/${match.player2_id}`, {
+              fetch(`https://localhost:8080/api/users/profile/${match.player2_id}`, {
                 credentials: "include"
               }),
             ]);

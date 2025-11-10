@@ -74,11 +74,6 @@ const authPlugin = async (fastify, options) => {
                 message: 'Forbidden: Invalid internal key',
             });
         }
-        try {
-            await request.jwtVerify();
-        } catch (err) {
-            return reply.code(401).send({ message: 'Unauthorized' });
-        }
     });
 
     fastify.log.info('Cookie-based authentication plugin registered')

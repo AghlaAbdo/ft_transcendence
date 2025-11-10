@@ -15,14 +15,15 @@ const userRoutes = async (fastify, options) => {
 
     
     fastify.get('/:id', { 
-        // onRequest: [fastify.authenticate] 
-        onRequest: [fastify.verifyInternalRequest] 
-
+      onRequest: [fastify.verifyInternalRequest] 
     }, userController.getUserById); 
+
+    fastify.get('/profile/:id', { 
+      onRequest: [fastify.authenticate]
+    }, userController.getUserById);
     
     fastify.get('/',{ 
-        // onRequest: [fastify.authenticate] 
-        onRequest: [fastify.verifyInternalRequest] 
+      onRequest: [fastify.authenticate] 
     },  userController.getAllUsers); 
 
 

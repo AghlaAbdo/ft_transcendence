@@ -21,7 +21,9 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`https://localhost:8080/api/users`);
+        const response = await fetch(`https://localhost:8080/api/users`, {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
