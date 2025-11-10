@@ -2,6 +2,7 @@ import fp from 'fastify-plugin';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
+const INTERNAL_SECRET = process.env.INTERNAL_SECRET || 'pingpongsupersecretkey';
 const COOKIE_NAME = 'token';
 
 const authPlugin = async (fastify, options) => {
@@ -61,6 +62,22 @@ const authPlugin = async (fastify, options) => {
         } catch (error) {
             fastify.clearAuthCookie(reply);
             reply.code(401).send({status:'false', error: error.message, message: 'Unauthorized: Authentication failed'});
+        }
+    });
+
+    fastify.decorate('verifyInternalRequest', async (request, reply) => {
+        const internalKey = request.headers['x-internal-key'];
+        
+        if (!internalKey || internalKey !== INTERNAL_SECRET) {
+            return reply.status(403).send({
+                status: false,
+                message: 'Forbidden: Invalid internal key',
+            });
+        }
+        try {
+            await request.jwtVerify();
+        } catch (err) {
+            return reply.code(401).send({ message: 'Unauthorized' });
         }
     });
 

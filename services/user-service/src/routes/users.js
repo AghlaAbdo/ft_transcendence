@@ -15,11 +15,14 @@ const userRoutes = async (fastify, options) => {
 
     
     fastify.get('/:id', { 
-        onRequest: [fastify.authenticate] 
+        // onRequest: [fastify.authenticate] 
+        onRequest: [fastify.verifyInternalRequest] 
+
     }, userController.getUserById); 
     
     fastify.get('/',{ 
-        onRequest: [fastify.authenticate] 
+        // onRequest: [fastify.authenticate] 
+        onRequest: [fastify.verifyInternalRequest] 
     },  userController.getAllUsers); 
 
 
@@ -45,7 +48,9 @@ const userRoutes = async (fastify, options) => {
       onRequest: [fastify.authenticate]
     }, userController.searchQuery);
 
-    fastify.post('/update-stats', userController.updateStats);
+    fastify.post('/update-stats', {
+      onRequest: [fastify.verifyInternalRequest]
+    },userController.updateStats);
 
     fastify.get("/notifications/:userId", {
         onRequest: [fastify.authenticate]
