@@ -13,15 +13,13 @@ const userRoutes = async (fastify, options) => {
         onRequest: [fastify.authenticate] 
     }, userController.deleteAccount); 
 
-    // fastify.post('/change-password');
-    // fastify.post('/forgot-password'); // auth 
     
     fastify.get('/:id', { 
-        // onRequest: [fastify.authenticate] 
+        onRequest: [fastify.authenticate] 
     }, userController.getUserById); 
     
     fastify.get('/',{ 
-        // onRequest: [fastify.authenticate] 
+        onRequest: [fastify.authenticate] 
     },  userController.getAllUsers); 
 
 
