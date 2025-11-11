@@ -16,6 +16,8 @@ const getFriends = (db, id) => {
 }
 
 const getFriendData = (db, user_id, friend_id) => {
+    // console.log('user-id: ', user_id, ', friend:', );
+    
     const query = `
         SELECT u.id, u.username, u.online_status, u.avatar_url, f.status,
                f.user_id, f.friend_id, f.blocked_by
