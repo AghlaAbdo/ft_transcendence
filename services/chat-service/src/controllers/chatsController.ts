@@ -82,7 +82,9 @@ async function fetchUserFromService(ids: number[]) {
     await Promise.all(
       ids.map(async (id) => {
         try {
-          const res = await fetch(`http://user-service:5000/api/users/${id}`);
+          const res = await fetch(`http://user-service:5000/api/users/${id}`, {
+            headers: { 'x-internal-key': 'pingpongsupersecretkey' }
+          });
           if (!res.ok) return null;
           const data = await res.json();
           return data.user ?? null;

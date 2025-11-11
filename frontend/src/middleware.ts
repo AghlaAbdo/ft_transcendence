@@ -46,18 +46,12 @@ export default async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
-    // if (matchesRoutes(path, SKIP_MIDDLEWARE_ROUTES)) {
-    //     return NextResponse.next();
-    // }
-
     const tokenCookie = req.cookies.get('token');
     const token = tokenCookie?.value;
     
     let isAuthenticated = false;
     
-    if (matchesRoutes(path, publicAuthRoutes) ) {
-        return NextResponse.next();
-    }
+
     if (token) {
         try {
             const { payload } = await jwtVerify(token, secret);
@@ -70,24 +64,14 @@ export default async function middleware(req: NextRequest) {
             return response;
         }
     }
-    
-    // If user has token and tries to access login page
-    // if (isAuthenticated && path === '/login') {
-    //     return NextResponse.redirect(new URL('/home', req.url));
-    // }
         
     if (!isAuthenticated && matchesRoutes(path, protectedRoutes)) {
         return NextResponse.redirect(new URL('/login', req.url))
     }
 
-    // if (isAuthenticated && matchesRoutes(path, publicAuthRoutes)) {
-    //     return NextResponse.redirect(new URL('/home', req.url));
-    // }
-
-    if (isAuthenticated && (path === '/login' || path === '/signup')) {
+    if (isAuthenticated && matchesRoutes(path, publicAuthRoutes)) {
         return NextResponse.redirect(new URL('/home', req.url));
     }
-
 
     return NextResponse.next();
 }

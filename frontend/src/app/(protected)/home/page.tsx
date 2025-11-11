@@ -6,13 +6,11 @@ import PieChart from "@/components/dashboard/pie"
 import Statistic from "@/components/dashboard/statistic"
 import Statistics from "@/components/dashboard/statistics"
 import Image from "next/image"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { GetGames, GetStats, GetWeekStats } from "@/app/(protected)/lib/dashboard"
-import { game, stat, StatWithTimeDict, WeekStats } from "@/constants/dashboard"
+import { game, StatWithTimeDict, WeekStats } from "@/constants/dashboard"
 import { Player } from "@/constants/leaderboard"
-import { get_all_leaderboard, get_user_by_username } from "../lib/leaderboard"
 import { useAuth } from "@/hooks/useAuth"
-import Link from "next/link";
 
 
 
@@ -119,7 +117,7 @@ export default function Dashboard() {
                         </div>
                         <div className="flex flex-wrap mt-4 justify-around">
                             <Statistics label="Total games" value={user!.games} />
-                            <Statistics label="Rank" value={user!.rank} />
+                            <Statistics label="Level" value={user!.level} />
                             <Statistics label="Points" value={user!.points} />
                             <Statistics label="Total play time" total_stats={stats?.total_play_time} />
                             <Statistics label="Avg games duration" avg_stats={stats?.avg_play_time} />

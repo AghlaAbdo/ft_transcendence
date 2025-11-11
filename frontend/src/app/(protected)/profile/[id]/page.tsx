@@ -21,7 +21,7 @@ const ProfilePage = () => {
       try {
         if (!id) 
           return; 
-        const response = await fetch(`https://localhost:8080/api/users/${id}`, {
+        const response = await fetch(`https://localhost:8080/api/users/profile/${id}`, {
           credentials: "include"
         });
         const data: {status: string, user: User, message: string} = await response.json();
