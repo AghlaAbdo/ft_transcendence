@@ -19,8 +19,6 @@ export function initSocket(server: any, db: Database.Database) {
     socket: Socket,
     data: { id: string; username: string }
   ) => {
-    // console.log('user connetcion: ',data);
-
     const user__id = parseInt(data.id);
 
     if (isNaN(user__id)) {
@@ -33,14 +31,8 @@ export function initSocket(server: any, db: Database.Database) {
     }
     onlineUsers.get(user__id)!.add(socket);
 
-    // socket.on('error', (err) => {
-    //   console.error(`Socket error for user ${socket.userId}:`, err);
-    //   socket.disconnect();
-    // });
-
     socket.on("block", async (data) => {
       const { actor_id, target_id } = data;
-      // check  if the user on the db before do anything
       if (!actor_id || !target_id)
         return socket.emit("error", { message: "Invalid data" });
        console.log('------->-----cure: ', actor_id, ", tage: ", target_id);
@@ -66,14 +58,12 @@ export function initSocket(server: any, db: Database.Database) {
           console.log("error : ", data);
           return ;
         }
-        // Send to actor
         const sendersockets = onlineUsers.get(actor_id);
         if (sendersockets) {
           sendersockets.forEach((s) => {
             s.emit("block", { actor_id, target_id });
           });
         }
-        // send to target
         const receiverSockets = onlineUsers.get(target_id);
         if (receiverSockets) {
           receiverSockets.forEach((receiversocket) => {
@@ -110,7 +100,6 @@ export function initSocket(server: any, db: Database.Database) {
           console.log("error    : ", data);
           socket.emit("error", { message: "can not block user" });
           return
-          // return socket.emit("error", { message: "Unauthorized sender" 
         }
 
         const sendersockets = onlineUsers.get(actor_id);
@@ -234,8 +223,6 @@ export function initSocket(server: any, db: Database.Database) {
       };
       handleConnection(socket, decoded);
       next();
-      console.log("Decoded token: ", decoded);
-      // (handleConnection(socket, io, String(decoded.id)), next());
     } catch (err) {
       return next(new Error("INVALID_TOKEN"));
     }

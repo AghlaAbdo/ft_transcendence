@@ -1,7 +1,6 @@
 "use client";
 
 import { useNotificationStore } from "@/store/useNotificationStore";
-import { log } from "node:console";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle, XCircle, Gamepad2 } from "lucide-react";
@@ -10,14 +9,10 @@ export interface FriendRequestCardProps {
   user_id: number;
   id: number;
   username: string;
-  // online_status: boolean;
   avatar_url?: string;
-  // status: string;
 }
 
 export default function FriendRequestCard({ id, username, avatar_url, user_id }: FriendRequestCardProps) {
-  console.log('username: ', username);
-  
   const [isLoading, setIsLoading] = useState<'accept' | 'reject' | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const removeNotification = useNotificationStore((state) => state.removeNotification);
@@ -43,8 +38,6 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
       console.error("Error accepting friend request:", error);
       toast.error("An unexpected error occurred.");
     } finally {
-      // removeNotification(id);
-      console.log('remove notifications');
       setIsLoading(null);
     }
   };

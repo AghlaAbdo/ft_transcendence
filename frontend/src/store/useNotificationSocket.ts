@@ -1,9 +1,10 @@
 'use client';
 
-import { create } from 'zustand';
-import { io, Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { toast } from 'sonner';
+import { create } from 'zustand';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { markOneNotificationsAsRead_game } from '@/components/markAsRead';
 
 interface SocketState {
   socket: Socket | null;
@@ -14,9 +15,7 @@ interface SocketState {
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   connect: (userId) => {
-    // Avoid reconnecting if already connected
     if (get().socket) return;
-
     const socket = io(`https://localhost:8080`, {
       path: '/ws/user/socket.io/',
       auth: { user_id: userId },
@@ -25,28 +24,34 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.on('connect', () => {
       console.log('Connected to socket');
     });
+
+
     socket.on('Notification', async (data) => {
-      const { addNotification, incrementUnread } = useNotificationStore.getState();
+      const { addNotification, incrementUnread , removeNotification} =
+        useNotificationStore.getState();
 
       const userRes = await fetch(
-                `https://localhost:8080/api/users/profile/${data.user_id}`, {
-                  credentials: 'include'
-                }
-              );
+        `https://localhost:8080/api/users/profile/${data.user_id}`,
+        {
+          credentials: 'include',
+        }
+      );
       const userData = await userRes.json();
       data = {
         ...data,
-                user_username: userData.user.username,
-                user_avatar: userData.user.avatar_url,
-      }
-
-      toast.message('you have new notification!')
-
-
+        user_username: userData.user.username,
+        user_avatar: userData.user.avatar_url,
+      };
       addNotification(data);
       incrementUnread();
+      toast.info('you have new notification !');
+      if (data.type === 'game_invite') {
+        setTimeout(() => {
+          markOneNotificationsAsRead_game(data.id);
+          removeNotification(data.id);
+        }, 30000); // 30s
+      }
     });
-
 
     socket.on('disconnect', () => {
       console.log('Disconnected from Socket');
@@ -59,7 +64,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   disconnect: () => {
     const socket = get().socket;
     if (socket) {
-      socket.disconnect(); 
+      socket.disconnect();
       set({ socket: null });
       console.log('Socket disconnected manually');
     }

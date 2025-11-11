@@ -44,7 +44,6 @@ const handleConnection = (fastify, socket) => {
         typeof actor_id !== "number" ||
         typeof type !== "string" ||
         type.trim().length === 0 
-        // game_link.trim().length === 0
       ) {
         return socket.emit("error", { message: "Invalid message data" });
       }
@@ -87,7 +86,7 @@ const handleConnection = (fastify, socket) => {
   });
 
   socket.on("disconnect", () => {
-    // Delay marking offline in case user reconnects quickly (page refresh)
+    // delay marking offline in case user reconnects fast
     const timer = setTimeout(() => {
       if (!onlineUsers.has(user__id)) {
         fastify.db

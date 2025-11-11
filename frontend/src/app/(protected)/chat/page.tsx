@@ -64,7 +64,7 @@ export default function ChatPage() {
             data.messages[0].sender === user.id
             ? data.messages[0].receiver
             : data.messages[0].sender;
-            if (otherId) { //
+            if (otherId) {
               const userResponse = await fetch(
                 `https://localhost:8080/api/friends/friend_data/${otherId}`, {
                   credentials: 'include'
@@ -202,6 +202,8 @@ export default function ChatPage() {
           <div className='flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2'>
             {
               <ChatWindow
+                blocker={blocker}
+                blocked={blocked}
                 SelectedChatId={selectedChatId}
                 userId={user.id}
                 conv={conv_}
@@ -238,6 +240,8 @@ export default function ChatPage() {
             <div className='w-full bg-[#021024] rounded-[20px] flex flex-col my-2'>
               {
                 <ChatWindow
+                  blocker={blocker}
+                  blocked={blocked}
                   SelectedChatId={selectedChatId}
                   userId={user.id}
                   conv={conv_}

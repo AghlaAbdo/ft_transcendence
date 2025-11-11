@@ -3,40 +3,11 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
 const COOKIE_NAME: string = 'token';
-// forward to /api/auth/message
+
 const authPlugin = async (fastify: any, options: any) => {
-    // console.log('options: ', options
-    // );
-    
-    // console.log('midlwaaaare');
-    // fastify.decorate('signToken', (payload: any) => {
-    //     return jwt.sign(payload, JWT_SECRET, {expiresIn: '7d'});
-    // });
-
-    // // Decorate Fastify with cookie setting method
-    // fastify.decorate('setAuthCookie', (reply: any, token: string) => {
-    //     reply.setCookie(COOKIE_NAME, token, {
-    //         path: '/',
-    //         httpOnly: true,
-    //         secure: process.env.NODE_ENV === 'production', //local: http , production: https
-    //         sameSite: 'strict', // CSRF protection  // sameSite: 'lax'
-    //         maxAge: 7 * 24 * 60 * 60 // 7 days 
-    //     });
-    // });
-
-    // fastify.decorate('clearAuthCookie', (reply: any) => {
-    //     reply.clearCookie(COOKIE_NAME, {
-    //         path: '/',
-    //         httpOnly: true,
-    //         secure: process.env.NODE_ENV === 'production',
-    //         sameSite: 'strict'
-    //     });
-    // });
 
     fastify.decorate('authenticate', async (request: any, reply: any) => {
-        console.log('allo forom auth');
         const token = request.cookies[COOKIE_NAME];
-        console.log('cookie:', token);
 
         try {
             if (!token) {
@@ -75,7 +46,7 @@ const authPlugin = async (fastify: any, options: any) => {
 
         } catch (error: any) {
             console.error('Authentication error:', error);
-            // fastify.clearAuthCookie(reply);
+            fastify.clearAuthCookie(reply);
             return reply.code(401).send({
                 status: false, 
                 error: error.message, 

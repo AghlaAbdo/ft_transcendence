@@ -170,8 +170,6 @@ const blockFriend = (db, { currentUserId, targetUserId }) => {
         throw new Error('Friendship not found');
     }
 
-    console.log('blocking status: ', checkExisting);
-
     if (checkExisting.blocked_by) {
         throw new Error('can not block user !');
     }

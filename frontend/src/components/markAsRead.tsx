@@ -45,8 +45,6 @@ export const markAllNotificationsAsRead_game = async (userId: number) => {
 
 export const markOneNotificationsAsRead_game = async (notif_id: number) => {
   try {
-
-    console.log('marking one notifications as read game',  notif_id);
     const response = await fetch('https://localhost:8080/api/users/notifications/delete', {
       method: 'PUT',
       headers: {

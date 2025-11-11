@@ -29,6 +29,8 @@ interface ChatWindowProps {
   showBackButton?: boolean;
   handle_block: (actor_id: number, target_id: number
   ) => void;
+  blocker: boolean;
+  blocked: boolean;
 }
 
 export const ChatWindow = ({
@@ -39,6 +41,8 @@ export const ChatWindow = ({
   onBackClick,
   showBackButton = false,
   handle_block,
+  blocker,
+  blocked
 }: ChatWindowProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
  useEffect(() => {
@@ -186,6 +190,8 @@ const [open, setopen] = useState(false);
                   onClick={(e) => e.stopPropagation()}
                 >
                     <UserActionsMenu
+                      blocked={blocked}
+                      blocker={blocker}
                       user={userId}
                       onClose={() => setopen(false)}
                       _other_user={other_User}
