@@ -4,6 +4,8 @@ import crypto from 'crypto';
 import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
 import { logEvent } from "../app.js";
+import { generateSecret, verifyToken } from '../2fa/TwoFactorService.js';
+import { error } from "console";
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -378,6 +380,146 @@ const forgotPassword = async (request, reply) => {
     }
 }
 
+    // setup 2fa
+const setup2fa = async (req, rep) => {
+try {
+    const db = req.server.db;
+//    if (!db) {
+//       console.error("DB not available on request.server.db");
+//       return rep.status(500).send({ error: "Database not initialized" });
+//     }
+    console.log('allo from 2fa backend');
+    const userId = req.user?.id; // Get from session/JWT
+    const userEmail = req.user?.email;
+    console.log('user id: ', userId);
+    console.log("useremail: ", userEmail);
+    
+    
+    if (!userId || !userEmail) {
+      return rep.status(401).send({ error: 'Unauthorized' });
+    }
+
+    // Generate secret and QR code
+    const setup = await generateSecret(userId, userEmail);
+    console.log('allo from setup 2fa');
+    
+    // Store the secret temporarily (don't enable 2FA yet)
+    // You'll confirm it in the next step
+
+
+    await db.prepare(`
+      UPDATE users 
+      SET totp_secret = ? 
+      WHERE id = ?
+    `).run(setup.secret, userId);
+
+    return {
+      qrCode: setup.qrCode,
+      manualEntryKey: setup.manualEntryKey,
+      message: 'Scan this QR code with Google Authenticator',
+    };
+  } catch (error) {
+    console.error('2FA setup error:', error);
+    return rep.status(500).send({ error: 'Failed to setup 2FA' });
+  }
+}
+// verfy 2fa token
+const verify2Fa = async (req, rep) => {
+try {
+    // console.log('verfify backend');
+    const db = req.server.db;
+    const userId = req.user?.id;
+    const { token } = req.body;
+
+    console.log('user:', userId);
+    console.log('token:', token);
+    if (!userId || !token) {
+        // console.log('ists her 1');
+      return rep.status(400).send({ error: 'Missing required fields' });
+    }
+
+    // Get the secret from database
+    const user = await db.prepare(`
+      SELECT totp_secret 
+      FROM users 
+      WHERE id = ?
+    `).get(userId);
+
+    if (!user?.totp_secret) {
+      return rep.status(400).send({ error: '2FA not set up' });
+    }
+
+    const isValid = verifyToken(user.totp_secret, token);
+
+    if (!isValid) {
+      return rep.status(400).send({ error: 'Invalid verification code' });
+    }
+
+    await db.prepare(`
+      UPDATE users 
+      SET is_2fa_enabled = TRUE 
+      WHERE id = ?
+    `).run(userId);
+
+    return {
+      status: true,
+      message: '2FA enabled successfully',
+    };
+  } catch (error) {
+    console.error('2FA verify error:', error);
+    return rep.status(500).send({ error: 'Failed to verify 2FA' });
+  }
+}
+
+// disable 2fa
+const disable2fa = async(req, rep) => {
+    console.log('allllo');
+    
+try {
+    const db = req.server.db;
+    const userId = req.user?.id;
+    const { token } = req.body;
+
+    if (!userId) {
+      return rep.status(400).send({ error: 'Missing required fields' });
+    }
+
+    // Get the secret
+    const user = await db.prepare(`
+      SELECT totp_secret 
+      FROM users 
+      WHERE id = ?
+    `).get(userId);
+
+    if (!user?.totp_secret) {
+      return rep.status(400).send({ error: '2FA not enabled' });
+    }
+
+    // Verify token before disabling
+    const isValid = verifyToken(user.totp_secret, token);
+
+    if (!isValid) {
+      return rep.status(400).send({ error: 'Invalid verification code' });
+    }
+
+    // Disable 2FA and clear secret
+    await db.prepare(`
+      UPDATE users 
+      SET is_2fa_enabled = FALSE,
+          totp_secret = NULL 
+      WHERE id = ?
+    `).run(userId);
+
+    return {
+      status: false,
+      message: '2FA disabled successfully',
+    };
+  } catch (error) {
+    console.error('2FA disable error:', error);
+    return rep.status(500).send({ error: 'Failed to disable 2FA' });
+  }
+}
+
 const resetPassword = async (request, reply) => {
     try {
         const { token, newPassword } = request.body;
@@ -439,4 +581,4 @@ const resetPassword = async (request, reply) => {
 }
 
 
-export default {login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};
+export default {disable2fa, setup2fa, verify2Fa, login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};

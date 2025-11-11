@@ -12,6 +12,7 @@ interface Notification {
   created_at: string;
   user_username: string;
   user_avatar: string;
+  game_link: string,
 }
 
 interface NotificationState {
@@ -20,6 +21,7 @@ interface NotificationState {
   error: string | null;
   unreadCount: number;
 
+  removeNotification: (id: number) => void;
   setNotifications: (notifications: Notification[]) => void;
   addNotification: (notification: Notification) => void;
   resetUnread: () => void;
@@ -35,6 +37,10 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   error: null,
   unreadCount: 0,
 
+  removeNotification: (id) => set((state) => ({
+    notifications: state.notifications.filter((notif) => notif.id !== id),
+  })),
+  
   setNotifications: (notifications) =>
     set({
       notifications,

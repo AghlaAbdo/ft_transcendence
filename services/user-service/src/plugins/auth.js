@@ -17,8 +17,9 @@ const authPlugin = async (fastify, options) => {
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', //local: http , production: https
-            sameSite: 'strict', // CSRF protection  // sameSite: 'lax'
-            maxAge: 7 * 24 * 60 * 60 // 7 days 
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive for dev, strict for prod
+            maxAge: 7 * 24 * 60 * 60, // 7 days 
+            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost' // Explicit domain for dev
         });
     });
 
@@ -27,7 +28,8 @@ const authPlugin = async (fastify, options) => {
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+            domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
         });
     });
 
@@ -43,7 +45,7 @@ const authPlugin = async (fastify, options) => {
             if (!decoded)
                 return reply.code(401).send({ status: false, message: 'Unauthorized - Invalid token'});
 
-            console.log('current user for logged up--->; ', decoded);
+            // console.log('current user for logged up--->; ', decoded);
 
             const user = fastify.db.prepare(`
                 SELECT id, username, email,avatar_url,

@@ -20,6 +20,7 @@ export interface User {
   losses: number;
   level: number;
   online_status: number;
+  is_2fa_enabled: boolean;
   is_google_auth: number;
 }
 

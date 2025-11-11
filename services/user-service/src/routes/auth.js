@@ -9,6 +9,12 @@ const authRoutes = async (fastify, options) => {
 
     fastify.get('/me', { onRequest: [fastify.authenticate] }, authController.getMe);
 
+    // 2fa routes
+    fastify.get("/2fa/setup", { onRequest: [fastify.authenticate] }, authController.setup2fa);
+    fastify.post("/2fa/disable",{ onRequest: [fastify.authenticate] },  authController.disable2fa);
+    fastify.post("/2fa/verify", { onRequest: [fastify.authenticate] }, authController.verify2Fa);
+
+
     fastify.post('/verify-email', authController.verifyEmail);
 
     fastify.post('/resend-verification', authController.resendVerificationEmail);

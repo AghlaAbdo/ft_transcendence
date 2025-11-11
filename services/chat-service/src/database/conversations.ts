@@ -7,6 +7,8 @@ export function getMessages(db: Database.Database, chatId: number) {
     WHERE c.chat_id = ?
   `);
   const result = stmt.all(chatId);
+  // checkr of the current user
+  
   if (result && result.length > 0)
       return {
           status: true,

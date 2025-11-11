@@ -1,9 +1,5 @@
-import {
-  getMessages,
-  insert_message,
-  getMessage,
-  create_new_chat,
-} from "../database/conversations.js";
+import { FastifyRequest, FastifyReply } from "fastify";
+import { getMessages, getMessage } from "../database/conversations.js";
 import { getChats } from "../database/chats.js";
 
 type ChatRow = {
@@ -15,140 +11,219 @@ type ChatRow = {
   last_message_id: number;
 };
 
-export async function getMessagesHandler(req: any, reply: any) {
-  const chatId = parseInt((req.params as any).chatId);
-  if (isNaN(chatId)) return reply.status(400).send({ error: "Invalid chatId" });
+// Request parameter interfaces
+interface GetMessagesParams {
+  chatId: string;
+}
+
+interface GetMessageParams {
+  messageId: string;
+}
+
+interface GetChatsParams {
+  userId: string;
+}
+
+interface CheckChatExistsParams {
+  userId: string;
+  friendId: string;
+}
+
+export async function getMessagesHandler(
+  req: FastifyRequest<{ Params: GetMessagesParams }>,
+  reply: FastifyReply
+) {
+  const chatId = parseInt(req.params.chatId);
+
+  if (isNaN(chatId) || chatId <= 0) {
+    return reply.status(400).send({ error: "Invalid chatId" });
+  }
 
   try {
-    const db = req.server.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
     }
-    return getMessages(db, chatId);
+
+    // get sender and reciever
+    // const res = await fetch(`http://user-service:5000/friends/friend_data/5`, {
+    //   headers: { "x-internal-key": "pingpongsupersecretkey" },
+    // });
+    // if (!res.ok) console.log('its null');
+    // const data = await res.json();
+    // console.log("friend data :", data);
+
+    const result = getMessages(db, chatId);
+
+    if (!result.status || !result.messages || result.messages.length === 0) {
+      return reply
+        .status(404)
+        .send({ error: "No messages found for this chat" });
+    }
+    return reply.status(200).send(result);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching messages:", err);
     return reply.status(500).send({ error: "Failed to fetch messages" });
   }
 }
 
-// export async function first_message(req: ) {
+export async function getMessageHandler(
+  req: FastifyRequest<{ Params: GetMessageParams }>,
+  reply: FastifyReply
+) {
+  const messageId = parseInt(req.params.messageId);
 
-//   try {
-//     const db = req.server.db;
-//     if (!db)
-//     {
-//       console.error("db plugin not available");
-//       return rep.status(500).send({error: "database not initialized"})
-//     }
-//     return create_new_chat(db,)
-//   } catch {
-
-//   }
-// }
-
-export async function getMessageHandler(req: any, reply: any) {
-  const messageId = parseInt((req.params as any).messageId);
-  if (isNaN(messageId))
+  if (isNaN(messageId) || messageId <= 0) {
     return reply.status(400).send({ error: "Invalid messageId" });
+  }
 
   try {
-    const db = req.server.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
     }
-    return getMessage(db, messageId);
+
+    const result = getMessage(db, messageId) as any;
+
+    if (!result || !result.status || !result.message) {
+      return reply.status(404).send({ error: "Message not found" });
+    }
+
+    return reply.status(200).send(result.message);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching message:", err);
     return reply.status(500).send({ error: "Failed to fetch message" });
   }
 }
 
-// export async function getUserHandler(req: any, reply: any) {
-//   const userId = parseInt((req.params as any).userId);
-//   if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
-
-//   try {
-//     return getUser(userId);
-//   } catch (err) {
-//     console.error(err);
-//     return reply.status(500).send({ error: "Failed to fetch user" });
-//   }`
-// }
-
 async function fetchUserFromService(ids: number[]) {
+  if (!ids || ids.length === 0) {
+    return [];
+  }
+
   const users = (
     await Promise.all(
       ids.map(async (id) => {
         try {
           const res = await fetch(`http://user-service:5000/api/users/${id}`, {
-            headers: { 'x-internal-key': 'pingpongsupersecretkey' }
+            headers: { "x-internal-key": "pingpongsupersecretkey" },
           });
           if (!res.ok) return null;
           const data = await res.json();
           return data.user ?? null;
-        } catch {
+        } catch (err) {
+          console.error(
+            `Error fetching user ${id}:`,
+            err instanceof Error ? err.message : err
+          );
           return null;
         }
       })
     )
   ).filter(Boolean);
+
   return users;
 }
 
-export async function getChatsHandler(req: any, reply: any) {
-  const userId = parseInt((req.params as any).userId);
-  if (isNaN(userId)) return reply.status(400).send({ error: "Invalid userId" });
+export async function getChatsHandler(
+  req: FastifyRequest<{ Params: GetChatsParams }>,
+  reply: FastifyReply
+) {
+  const userId = parseInt(req.params.userId);
+
+  if (isNaN(userId) || userId <= 0) {
+    return reply.status(400).send({ error: "Invalid userId" });
+  }
 
   try {
-    const db = (req as any).server?.db;
+    const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
     }
+
     const result: ChatRow[] = getChats(db, userId);
+
+    if (!result || result.length === 0) {
+      return reply.status(200).send([]);
+    }
+
     const userIds = Array.from(
-      new Set(result.flatMap((c) => [c.sender, c.receiver]).filter(Boolean))
+      new Set(
+        result
+          .flatMap((c) => [c.sender, c.receiver])
+          .filter((id) => typeof id === "number" && id > 0)
+      )
     );
+
+    if (userIds.length === 0) {
+      return reply.status(200).send(result);
+    }
+
     const users = await fetchUserFromService(userIds);
     const userMap = new Map(users.map((u: any) => [u.id, u]));
 
     const enriched = result.map((chat) => ({
       ...chat,
-      sender: userMap.get(chat.sender),
-      receiver: userMap.get(chat.receiver),
+      sender: userMap.get(chat.sender) || null,
+      receiver: userMap.get(chat.receiver) || null,
     }));
 
-    return enriched;
+    return reply.status(200).send(enriched);
   } catch (err) {
-    console.error("Chats error:", err);
+    console.error("Error fetching chats:", err);
     return reply.status(500).send({ error: "Failed to fetch chats" });
   }
 }
 
-export async function checkChatExistsHandler(req: any, rep: any) {
-  const userId = parseInt((req.params).userId);
-  const friendId = parseInt((req.params).friendId);
+export async function checkChatExistsHandler(
+  req: FastifyRequest<{ Params: CheckChatExistsParams }>,
+  reply: FastifyReply
+) {
+  const userId = parseInt(req.params.userId);
+  const friendId = parseInt(req.params.friendId);
+
+  if (isNaN(userId) || userId <= 0) {
+    return reply.status(400).send({ error: "Invalid userId" });
+  }
+
+  if (isNaN(friendId) || friendId <= 0) {
+    return reply.status(400).send({ error: "Invalid friendId" });
+  }
+
+  if (userId === friendId) {
+    return reply
+      .status(400)
+      .send({ error: "Cannot create chat with yourself" });
+  }
+
   try {
-    const db = req.server.db;
+    const db = (req.server as any).db;
     if (!db) {
-      return rep.status(500).send({ error: "Database not initialized" });
+      console.error("DB not available on request.server.db");
+      return reply.status(500).send({ error: "Database not initialized" });
     }
+
     const stmt = db.prepare(`
       SELECT chat_id
       FROM chats
       WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)
       LIMIT 1
-      `);
-      const result = stmt.get(userId, friendId, friendId, userId);
-      if (result) {
-        return {exists: true,chat_id: result.chat_id}
-      }
-      else {
-        return { exists: false, chat_id: -1 };
-      }
+    `);
+
+    const result = stmt.get(userId, friendId, friendId, userId) as
+      | { chat_id: number }
+      | undefined;
+
+    if (result) {
+      return reply.status(200).send({ exists: true, chat_id: result.chat_id });
+    } else {
+      return reply.status(200).send({ exists: false, chat_id: -1 });
+    }
   } catch (err) {
-    return rep.status(500).send({ error: "Failed to check chat" });
+    console.error("Error checking chat existence:", err);
+    return reply.status(500).send({ error: "Failed to check chat" });
   }
 }

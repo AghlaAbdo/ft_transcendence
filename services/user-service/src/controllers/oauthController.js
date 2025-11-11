@@ -126,6 +126,14 @@ const handleGoogleCallback = async (request, reply) => {
             isAccountVerified: user.isAccountVerified
         });
 
+        // Set session data for additional persistence
+        request.session.user = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            isAccountVerified: user.isAccountVerified
+        };
+
         request.server.setAuthCookie(reply, token);
          
         // reply.send({ 

@@ -15,6 +15,26 @@ const getFriends = (db, id) => {
     return stmt.all(id, id, id, id);
 }
 
+const getFriendData = (db, user_id, friend_id) => {
+    const query = `
+        SELECT u.id, u.username, u.online_status, u.avatar_url, f.status,
+               f.user_id, f.friend_id, f.blocked_by
+        FROM FRIENDS f
+        JOIN USERS u 
+            ON (f.user_id = ? AND u.id = f.friend_id)
+            OR (f.friend_id = ? AND u.id = f.user_id)
+        WHERE (f.user_id = ? AND f.friend_id = ?)
+           OR (f.user_id = ? AND f.friend_id = ?)
+        AND (f.status = 'accepted' OR f.status = 'blocked')
+        AND u.id != ?
+    `;
+    const stmt = db.prepare(query);
+    return stmt.get(user_id, user_id, user_id, friend_id, friend_id, user_id, user_id);
+}
+
+
+
+
 const sreachQueryFriends = (db, id, query) => {
     const querySQL = `
         SELECT u.id, u.username, u.online_status, u.avatar_url, f.status
@@ -137,6 +157,8 @@ const removeFriendRequest = (db, { user_id, friend_id }) => {
 };
 
 const blockFriend = (db, { currentUserId, targetUserId }) => {
+    console.log('cure: ', currentUserId, ", tage: ", targetUserId);
+    
     const checkExisting = db.prepare(`
             SELECT id, status, blocked_by 
             FROM FRIENDS 
@@ -148,6 +170,9 @@ const blockFriend = (db, { currentUserId, targetUserId }) => {
         throw new Error('Friendship not found');
     }
 
+    if (checkExisting.blocked_by) {
+        throw new Error('can not block user !');
+    }
 
     const blockQuery = `
         UPDATE FRIENDS
@@ -165,6 +190,35 @@ const blockFriend = (db, { currentUserId, targetUserId }) => {
 }
 
 
+const unblockFriend = (db, { currentUserId, targetUserId }) => {
+    console.log('cure: ', currentUserId, ", tage: ", targetUserId);
+    const checkExisting = db.prepare(`
+            SELECT id, status, blocked_by 
+            FROM FRIENDS 
+            WHERE (user_id = ? AND friend_id = ?) 
+               OR (user_id = ? AND friend_id = ?)
+    `).get(currentUserId, targetUserId, targetUserId, currentUserId);  
+
+    if (!checkExisting) {
+        throw new Error('Friendship not found');
+    }
+
+
+    const blockQuery = `
+        UPDATE FRIENDS
+        SET status = 'accepted', 
+            blocked_by = NULL
+        WHERE id = ?
+    `;
+
+    const res = db.prepare(blockQuery).run(checkExisting.id);
+    if (res.changes === 0) {
+        throw new Error("Failed to update block status");
+    }
+
+    return true;
+}
+
 export default {
     getFriends,
     getPendingRequests,
@@ -173,5 +227,7 @@ export default {
     acceptFriendRequest,
     rejectFriend,
     removeFriendRequest,
-    blockFriend
+    blockFriend,
+    unblockFriend,
+    getFriendData
 }

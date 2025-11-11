@@ -268,11 +268,13 @@ const updateInfo = async (request, reply) => {
 }
 
 const searchQuery = async (request, reply) => {
+    console.log('allo from backenddd');
+    
     try {
         const { query } = request.query;
         const trimQuery = query?.trim();
 
-        if (!trimQuery || trimQuery.length < 2) {
+        if (!trimQuery) {
             return reply.code(400).send({
                 status: false,
                 message: "Query must be at least 2 characters"

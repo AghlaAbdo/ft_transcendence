@@ -2,22 +2,19 @@ import { Ban } from 'lucide-react';
 import { toast } from 'sonner';
 
 type BlockingUserProps = {
-  onUnblock?: () => void;
+  onUnblock: () => void;
 };
 
 export const BlockingUserInput = ({ onUnblock }: BlockingUserProps) => {
   const handleUnblock = () => {
-    if (onUnblock) {
       try {
         onUnblock();
         toast.success('User has been unblocked');
       } catch (err) {
         toast.error('Failed to unblock user');
       }
-    } else {
       // placeholder behaviour if no handler provided
     //   toast('Unblock action not implemented', { duration: 3000 });
-    }
   };
 
   return (
