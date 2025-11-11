@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import {toast}  from "sonner"
 import { useSocketStore } from '@/store/useNotificationSocket';
 type chat_options_props = {
+  handle_block : (actor_id: number, target_id: number) => void;
   onClose: () => void;
   _other_user: Friend;
   user: number;
@@ -16,7 +17,7 @@ interface Friend {
   avatar_url: string;
 }
 
-const UserActionsMenu = ({ onClose, _other_user, user}: chat_options_props) => {
+const UserActionsMenu = ({ onClose, _other_user, user, handle_block}: chat_options_props) => {
   const router = useRouter();
   const handleViewProfile = (id: number) => {
     router.push(`/profile/${id}`);
@@ -44,23 +45,9 @@ const UserActionsMenu = ({ onClose, _other_user, user}: chat_options_props) => {
     }
   };
 
-  const handleBlock = async () => {
-    try {
-      const response = await fetch(`https://localhost:8080/api/friends/block/${_other_user.id}`, {
-        method: 'PUT',
-        credentials: "include"
-      });
-      const data: { status: boolean, message: string} = await response.json();
-
-      if (response.ok && data.status) {
-        toast.success(`${data.message}`);
-      } else {
-        toast.error(`${data.message}`);
-      }
-    } catch (error) {
-      console.error("Error blocking friend", error);
-      toast.error("An unexpected error occurred.");
-    }
+  const handleBlock = () => {
+    // console.log(current);
+    handle_block(user, _other_user.id);
     onClose();
   };
 

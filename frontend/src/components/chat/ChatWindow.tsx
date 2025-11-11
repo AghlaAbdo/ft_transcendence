@@ -27,6 +27,8 @@ interface ChatWindowProps {
   other_User: Friend | null;
   onBackClick?: () => void;
   showBackButton?: boolean;
+  handle_block: (actor_id: number, target_id: number
+  ) => void;
 }
 
 export const ChatWindow = ({
@@ -35,7 +37,8 @@ export const ChatWindow = ({
   conv,
   other_User,
   onBackClick,
-  showBackButton = false
+  showBackButton = false,
+  handle_block,
 }: ChatWindowProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
  useEffect(() => {
@@ -186,6 +189,7 @@ const [open, setopen] = useState(false);
                       user={userId}
                       onClose={() => setopen(false)}
                       _other_user={other_User}
+                      handle_block={handle_block}
                     />
                 </div>
               </div>

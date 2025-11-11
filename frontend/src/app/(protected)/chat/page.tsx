@@ -33,6 +33,8 @@ export default function ChatPage() {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [showChatList, setShowChatList] = useState(true);
   const [otherUser, setOtherUser] = useState<Friend | null>(null);
+  const [blocked, setblocked] = useState<boolean>(false);
+  const [blocker, setblocker] = useState<boolean>(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -43,10 +45,9 @@ export default function ChatPage() {
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, [selectedChatId]);
-
+  
   useEffect(() => {
     const fetchingmessages = async () => {
-      
       if (user && selectedChatId && selectedChatId != -1) {
         try {
           const fetchmessage = await fetch(
@@ -62,12 +63,19 @@ export default function ChatPage() {
             data.messages[0].sender === user.id
             ? data.messages[0].receiver
             : data.messages[0].sender;
-            if (otherId) {
+            if (otherId) { //
               const userResponse = await fetch(
-                `https://localhost:8080/api/users/${otherId}`
+                `https://localhost:8080/api/friends/friend_data/${otherId}`, {
+                  credentials: 'include'
+                }
               );
               const userData = await userResponse.json();
-              setOtherUser(userData.user);
+              // console.log("freidn+dansdfnd: ", userData.friends);
+              setOtherUser(userData.friends);
+              if (user.id === userData.friends.blocked_by)
+                  setblocker(true)
+              if (otherId === userData.friends.blocked_by)
+                  setblocked(true)
             }
           }
         } catch (error) {
@@ -75,6 +83,9 @@ export default function ChatPage() {
         }
       }
     };
+    // "user_id": 2,
+    // "friend_id": 5,
+    // "blocked_by": 2
     fetchingmessages();
   }, [selectedChatId]);
   const socketRef = useRef<Socket |null >(null);
@@ -104,14 +115,34 @@ export default function ChatPage() {
       }
       set_conv((prevMessages) => [...prevMessages, data]);
     });
+    
     socket.on('block', (data) => {
-
+      setblocked(false);
+      setblocker(false)
+      const {actor_id, target_id } = data;
+      if (actor_id === user.id)
+        setblocker(true)
+      if (target_id === user.id)
+        setblocked(true);
     });
+
     return () => {
       socket.disconnect();
     };
   }, [user]);
-
+  
+  const handle_block = (actor_id: number, target_id:number) => {
+    console.log('user clicked blocker_id: ', actor_id);
+    console.log('user clicked traget_id: ', target_id);
+    if (socketRef.current && selectedChatId && user && otherUser) {
+      console.log('current: ', actor_id, ', target: ', target_id);
+      
+      socketRef.current.emit('block', {
+        actor_id: actor_id,
+        target_id: target_id
+      });
+    }
+  }
   const handleChatSelect = (chatId: number, selectedFriend?: Friend) => {
     if (selectedFriend) {
       setOtherUser(selectedFriend)
@@ -152,13 +183,18 @@ export default function ChatPage() {
                 userId={user.id}
                 conv={conv_}
                 other_User={otherUser}
+                handle_block={handle_block}
               />
             }
-            {selectedChatId && (
-              // <BlockedUserInput />
-              // <BlockingUserInput />
-              <MessageInput onSendMessage={handleSendMessage} />
-            )}
+            {selectedChatId && otherUser && !blocker && !blocked && (
+                <MessageInput onSendMessage={handleSendMessage} />
+              )}
+              {selectedChatId && otherUser && blocker && !blocked && (
+                <BlockingUserInput />
+              )}
+               {selectedChatId && otherUser && blocked && !blocker && (
+                <BlockedUserInput />
+              )}
           </div>
         </>
       ) : (
@@ -183,11 +219,17 @@ export default function ChatPage() {
                   other_User={otherUser}
                   onBackClick={handleBackToChatList}
                   showBackButton={true}
+                  handle_block={handle_block}
                 />
               }
-              {selectedChatId && otherUser && (
-                // <BlockingUserInput />
+              {selectedChatId && otherUser && !blocked && !blocked && (
                 <MessageInput onSendMessage={handleSendMessage} />
+              )}
+              {selectedChatId && otherUser && blocker && !blocked && (
+                <BlockingUserInput />
+              )}
+               {selectedChatId && otherUser && blocked && !blocker && (
+                <BlockedUserInput />
               )}
             </div>
           )}

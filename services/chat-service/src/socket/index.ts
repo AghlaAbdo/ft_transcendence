@@ -1,10 +1,11 @@
 import { Server, Socket } from "socket.io";
 import { create_new_chat, insert_message } from "../database/conversations.js";
 import Database from "better-sqlite3";
-import cookie from "cookie"
-import jwt from "jsonwebtoken"
+import cookie from "cookie";
+import jwt from "jsonwebtoken";
 
-const JWT_SECRET: string = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
+const JWT_SECRET: string =
+  process.env.JWT_SECRET || "pingpongsupersecretkey123";
 
 declare module "socket.io" {
   interface Socket {
@@ -14,9 +15,12 @@ declare module "socket.io" {
 
 const onlineUsers: Map<number, Set<Socket>> = new Map();
 export function initSocket(server: any, db: Database.Database) {
-  const handleConnection = (socket: Socket, data: {id: string, username: string}) => {
+  const handleConnection = (
+    socket: Socket,
+    data: { id: string; username: string }
+  ) => {
     // console.log('user connetcion: ',data);
-    
+
     const user__id = parseInt(data.id);
 
     if (isNaN(user__id)) {
@@ -35,9 +39,51 @@ export function initSocket(server: any, db: Database.Database) {
     // });
 
     socket.on("block", async (data) => {
-      const {actor_id, target_id } = data;
-    })
-  
+      const { actor_id, target_id } = data;
+      // check  if the user on the db before do anything
+      if (!actor_id || !target_id)
+        return socket.emit("error", { message: "Invalid data" });
+       console.log('------->-----cure: ', actor_id, ", tage: ", target_id);
+      try {
+        console.log("actor_id: ", actor_id);
+        console.log("target_id: ", target_id);
+
+        const response = await fetch(
+          `http://user-service:5000/api/friends/block`,
+          {
+            method: "POST",
+            headers: {
+              "x-internal-key": "pingpongsupersecretkey",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ actor_id, target_id }),
+          }
+        );
+
+        const data = await response.json();
+        if (!response.ok) {
+          // socket.emit("error", { message: "can not block user" });
+          console.log("error : ", data);
+        }
+        // Send to actor
+        const sendersockets = onlineUsers.get(actor_id);
+        if (sendersockets) {
+          sendersockets.forEach((s) => {
+            s.emit("block", { actor_id, target_id });
+          });
+        }
+        // send to target
+        const receiverSockets = onlineUsers.get(target_id);
+        if (receiverSockets) {
+          receiverSockets.forEach((receiversocket) => {
+            receiversocket.emit("block", { actor_id, target_id });
+          });
+        }
+      } catch (err) {
+        console.error("some thing went wrong: ", err);
+      }
+    });
+
     socket.on("ChatMessage", async (data) => {
       try {
         const { chatId, sender, receiver, message } = data;
@@ -121,20 +167,17 @@ export function initSocket(server: any, db: Database.Database) {
     connectTimeout: 10000, // 10s to connect
   });
 
-   io.use((socket, next) => {
+  io.use((socket, next) => {
     let token: string | undefined;
-
     const cookieHeader = socket.handshake.headers.cookie;
-    // console.log("headers: ", socket.handshake.headers);
     if (cookieHeader) {
       const cookies = cookie.parse(cookieHeader);
       token = cookies.token;
     }
 
-
     if (!token) {
       console.log("No token found");
-      next(new Error('NO_TOKEN'));
+      next(new Error("NO_TOKEN"));
       return;
     }
 
@@ -148,7 +191,7 @@ export function initSocket(server: any, db: Database.Database) {
       console.log("Decoded token: ", decoded);
       // (handleConnection(socket, io, String(decoded.id)), next());
     } catch (err) {
-      return next(new Error('INVALID_TOKEN'));
+      return next(new Error("INVALID_TOKEN"));
     }
   });
 

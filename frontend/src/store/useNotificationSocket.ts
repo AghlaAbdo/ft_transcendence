@@ -29,7 +29,9 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       const { addNotification, incrementUnread } = useNotificationStore.getState();
 
       const userRes = await fetch(
-                `https://localhost:8080/api/users/${data.user_id}`
+                `https://localhost:8080/api/users/profile/${data.user_id}`, {
+                  credentials: 'include'
+                }
               );
       const userData = await userRes.json();
       data = {

@@ -15,6 +15,24 @@ const getFriends = (db, id) => {
     return stmt.all(id, id, id, id);
 }
 
+const getFriendData = (db, user_id, friend_id) => {
+    const query = `
+        SELECT u.id, u.username, u.online_status, u.avatar_url, f.status,
+               f.user_id, f.friend_id, f.blocked_by
+        FROM FRIENDS f
+        JOIN USERS u 
+            ON u.id = f.friend_id
+        WHERE (f.user_id = ? AND f.friend_id = ?)
+           OR (f.user_id = ? AND f.friend_id = ?)
+        AND (f.status = 'accepted' OR f.status = 'blocked')
+    `;
+    const stmt = db.prepare(query);
+    return stmt.get(user_id, friend_id, friend_id, user_id);  // Check both directions
+}
+
+
+
+
 const sreachQueryFriends = (db, id, query) => {
     const querySQL = `
         SELECT u.id, u.username, u.online_status, u.avatar_url, f.status
@@ -137,6 +155,8 @@ const removeFriendRequest = (db, { user_id, friend_id }) => {
 };
 
 const blockFriend = (db, { currentUserId, targetUserId }) => {
+    console.log('cure: ', currentUserId, ", tage: ", targetUserId);
+    
     const checkExisting = db.prepare(`
             SELECT id, status, blocked_by 
             FROM FRIENDS 
@@ -173,5 +193,6 @@ export default {
     acceptFriendRequest,
     rejectFriend,
     removeFriendRequest,
-    blockFriend
+    blockFriend,
+    getFriendData
 }

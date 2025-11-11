@@ -103,15 +103,9 @@ async function fetchUserFromService(ids: number[]) {
       ids.map(async (id) => {
         try {
           const res = await fetch(`http://user-service:5000/api/users/${id}`, {
-            // headers: { 'Content-Type': 'application/json' },
-            // signal: AbortSignal.timeout(5000), 
+            headers: { 'x-internal-key': 'pingpongsupersecretkey' }
           });
-          
-          if (!res.ok) {
-            console.warn(`Failed to fetch user ${id}: ${res.status} ${res.statusText}`);
-            return null;
-          }
-          
+          if (!res.ok) return null;
           const data = await res.json();
           return data.user ?? null;
         } catch (err) {
@@ -129,8 +123,7 @@ export async function getChatsHandler(
   req: FastifyRequest<{ Params: GetChatsParams }>,
   reply: FastifyReply
 ) {
-  console.log('alllllo chats');
-  
+
   const userId = parseInt(req.params.userId);
   
   if (isNaN(userId) || userId <= 0) {

@@ -1,5 +1,7 @@
 import friendModel from "../models/friendModel.js";
 
+import logEvent from '../app.js'
+
 const getAllFriends = async (request, reply) => {
     try {
         // const user_id = request.user.id;
@@ -26,6 +28,38 @@ const getAllFriends = async (request, reply) => {
 
     } catch (error) {
         console.error('Error in getAllFriends:', error); 
+        return reply.code(500).send({
+            status: false,
+            message: error.message
+        });       
+    }
+}
+
+const getFriendData = async (request, reply) => {
+    try {
+        const user_id = request.user.id;
+        const friend_id = parseInt(request.params.id);
+        const db = request.server.db;
+
+        const friend = friendModel.getFriendData(db, user_id, friend_id);
+
+
+        if (!friend || friend.length == 0) {
+            return reply.send({
+                status: true,
+                friends: [],
+                message: 'Friend not found or not accepted/blocked relationship.'
+            }); 
+        }
+
+
+        reply.code(200).send({
+            status: true,
+            friends: friend,
+        });
+
+    } catch (error) {
+        console.error('Error in getFriendData:', error);
         return reply.code(500).send({
             status: false,
             message: error.message
@@ -116,6 +150,7 @@ const acceptFriendRequest = async (request, reply) => {
             AND actor_id = ?`)
             .run(requester_id, accepter_id);
 
+        logEvent("info", "user", "friend_request", {action: "accept"})
         reply.code(200).send({
             status: true,
             message: "Friend request accepted successfully"
@@ -162,6 +197,8 @@ const rejectFriendRequest = async (request, reply) => {
             AND actor_id = ?`)
         .run(requester_id, accepter_id);
         
+        
+        logEvent("info", "user", "friend_request", {action: "reject"})
         return reply.code(200).send({
             status: true,
             message: "Friend request rejected successfully"
@@ -247,13 +284,17 @@ const searchQuery = async (request, reply) => {
 }
 
 const blockFriend = async (request, reply) => {
-    console.log('hereeee niga');
-    
+    // console.log('hereeee niga-------------------: ');
     try {
-        const currentUserId = request.user.id;
-        const targetUserId = parseInt(request.params.id);
-
-        if (!targetUserId || isNaN(targetUserId)) {
+        
+        
+        const  {actor_id, target_id} = request.body;
+        console.log("------------------>", actor_id, target_id);
+        const currentUserId = actor_id;
+        const targetUserId = target_id;
+        
+        console.log("------>", currentUserId, targetUserId);
+        if (!currentUserId || !targetUserId) {
             return reply.code(400).send({
                 status: false,
                 message: "Invalid user ID"
@@ -280,6 +321,7 @@ const blockFriend = async (request, reply) => {
             });
         }
 
+
         friendModel.blockFriend(db, {currentUserId, targetUserId});
         // friendModel.blockFriend(db, {currentUserId, targetUserId});
 
@@ -304,5 +346,6 @@ export default {
     removeFriend,
     getPendingRequests,
     searchQuery,
-    blockFriend
+    blockFriend,
+    getFriendData
 };

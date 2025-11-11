@@ -10,6 +10,10 @@ const friendRoutes = (fastify, options) => {
     fastify.get("/:id", {
         onRequest: [fastify.authenticate] 
     }, friendController.getAllFriends);
+
+    fastify.get("/friend_data/:id", {
+        onRequest: [fastify.authenticate] 
+    }, friendController.getFriendData);
     
     fastify.get("/pending", {
         onRequest: [fastify.authenticate] 
@@ -25,8 +29,8 @@ const friendRoutes = (fastify, options) => {
         onRequest: [fastify.authenticate] 
     }, friendController.acceptFriendRequest);
 
-    fastify.put("/block/:id", {
-        onRequest: [fastify.authenticate]
+    fastify.post("/block", {
+        // onRequest: [fastify.authenticate]
     }, friendController.blockFriend);
 
 
@@ -43,15 +47,6 @@ const friendRoutes = (fastify, options) => {
     fastify.get("/:id/search", {
         onRequest: [fastify.authenticate] 
     }, friendController.searchQuery);
-
-
-
-    // fastify.post("/friends/send", { onRequest: [fastify.authenticate] }, friendController.sendFriendRequest);
-    // fastify.post("/friends/accept", { onRequest: [fastify.authenticate] }, friendController.acceptFriendRequest);
-    // fastify.post("/friends/reject", { onRequest: [fastify.authenticate] }, friendController.rejectFriendRequest);
-    // fastify.delete("/friends/remove", { onRequest: [fastify.authenticate] }, friendController.removeFriend);
-    // fastify.get("/friends", { onRequest: [fastify.authenticate] }, friendController.getAllFriends);
-    // fastify.get("/friends/requests", { onRequest: [fastify.authenticate] }, friendController.getFriendRequests);
 
 }
 

@@ -43,6 +43,14 @@ await fastify.register(dbPlugin as any);
 await fastify.register(authPlugin as any);
 await fastify.register(chatsRoutes as any);
 
+fastify.addHook('onRequest', async (request, reply) => {
+        logEvent('info', 'chat', 'api_request', {
+            method: request.method,
+            path: request.url,
+        });
+});
+
+
 fastify.setErrorHandler((error, request, reply) => {
   console.error("Fastify error:", error);
   reply.status(500).send({

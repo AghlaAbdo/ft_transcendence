@@ -83,7 +83,7 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
       <div
       className="flex items-center gap-3">
         <img
-          src={avatar_url || "/default-avatar.png"}
+          src={avatar_url || "/avatars/avatar1.png"} // TODO add default-avatar
           alt="Avatar"
           className="w-12 h-12 rounded-full object-cover"
         />

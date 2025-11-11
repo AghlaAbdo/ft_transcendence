@@ -27,32 +27,11 @@ export default function GameInviteCard({ id, username, avatar_url, user_id, game
     removeNotification(id);
     onclose();
     router.push(`/game/game-invite/${game_link}`);
-    // end for delete only one notification
   };
 
   const handleReject = async () => {
-    setIsLoading('reject');
-    try {
-      const response = await fetch(`https://localhost:8080/api/game/reject/${user_id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      const data: { status: boolean, message: string } = await response.json();
-
-      if (response.ok && data.status) {
-        toast.success(`${data.message}`);
-        removeNotification(id);
-        setTimeout(() => setIsVisible(false), 300);
-      } else {
-        toast.error(`${data.message}`);
-      }
-    } catch (error) {
-      console.error("Error rejecting game invite:", error);
-      toast.error("An unexpected error occurred.");
-    } finally {
-      setIsLoading(null);
-    }
+    markOneNotificationsAsRead_game(id);
+    removeNotification(id);
   };
 
   if (!isVisible) return null;

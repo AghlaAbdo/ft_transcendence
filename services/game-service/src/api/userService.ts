@@ -1,13 +1,14 @@
-import { USER_SERVICE_HOST } from '../config/env';
+import { USER_SERVICE_HOST, INTERNAL_API_KEY } from '../config/env';
 
 export async function fetchUser(userId: string) {
   try {
     const url = `${USER_SERVICE_HOST}/api/users/${userId}`;
     const response = await fetch(url, {
       // Include internal headers if needed for security or tracing
-      headers: {
-        'X-Internal-Request': 'game-service',
-      },
+      // headers: {
+      //   'X-Internal-Request': 'game-service',
+      // },
+      headers: { 'x-internal-key': INTERNAL_API_KEY }
     });
     if (!response.ok) {
       console.log("Couldn't fetch user: something wet wrong");

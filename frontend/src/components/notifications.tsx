@@ -62,15 +62,12 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
         );
         const data = await res.json();
         
-        // console.log('before condition: ', data);
         if (res.ok && data.status) {
-          // console.log('in condition');
-          
           const notificationsWithUserData = await Promise.all(
             data.notifications.map(async (notif: Notification) => {
-              const userRes = await fetch(
-                `https://localhost:8080/api/users/${notif.user_id}`
-              );
+             const userRes = await fetch(`https://localhost:8080/api/users/profile/${notif.user_id}`, {
+              credentials: 'include'
+            });
               const userData = await userRes.json();
               
               return {

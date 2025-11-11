@@ -14,7 +14,7 @@ mkdir -p certs/server-certs
 
 openssl genrsa -out certs/ca/ca.key 4096
 openssl req -x509 -new -nodes -key certs/ca/ca.key -sha256 -days 365 \
-  -subj "/CN=PrometheusCA" \
+  -subj "/CN=ft_transcendence" \
   -out certs/ca/ca.crt
 
 
