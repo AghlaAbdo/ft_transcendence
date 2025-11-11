@@ -23,7 +23,7 @@ function handleKeypress(_str: string, key: any) {
   } else if (key.sequence === 'q') {
     console.log('Quitting game...');
     // console.log('playerData when quit 22: ', playerData);
-    console.log('playerData.gameStatus: ', playerData.gameStatus);
+    // console.log('playerData.gameStatus: ', playerData.gameStatus);
     if (playerData.gameStatus === 'matching')
       socket.emit('cancelMatching', {
         userId: playerData.user!.id,

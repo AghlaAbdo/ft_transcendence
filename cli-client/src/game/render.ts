@@ -40,7 +40,7 @@ export function renderGame(state: IGameState) {
 Bing-Bong
 Use arrows to move up and down
 Press 'Q' to quit
-  ${playerData.user?.username}: ${state.leftPaddle.score}                               ${playerData.opponent?.username}: ${state.rightPaddle.score}
+  ${playerData.user?.username}: ${playerData.paddle.score}                               ${playerData.opponent?.username}: ${playerData.opponentPaddle.score}
 ----------------------------------------------------------------------------------
 `;
 
