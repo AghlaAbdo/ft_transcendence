@@ -33,7 +33,7 @@ interface Friend {
 
 interface ChatlistProps {
   onSelect: (chatId: number, selectedFriend?:Friend) => void;
-  onReceiveChange: (userId_2: number) => void;
+  // onReceiveChange: (userId_2: number) => void;
   selectedChatId: number | null;
   userId: number | null;
   conv: Message[];
@@ -43,7 +43,7 @@ export const Chatlist = ({
   onSelect,
   selectedChatId,
   userId,
-  onReceiveChange,
+  // onReceiveChange,
   conv,
 }: ChatlistProps) => {
   const [tick, setTick] = useState(0);
@@ -125,7 +125,6 @@ export const Chatlist = ({
                   key={chat.chat_id}
                   onClick={() => {
                     onSelect(chat.chat_id);
-                    onReceiveChange(otherUser.id);
                   }}
                   className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
                   hover:bg-gray-800 ${

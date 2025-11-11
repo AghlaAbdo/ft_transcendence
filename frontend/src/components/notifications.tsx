@@ -191,7 +191,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                         <GameInviteCard
                           onclose={onClose}
                           id={notif.id}
-                          user_id={notif.user_id}
                           username={notif.user_username}
                           avatar_url={notif.user_avatar}
                           game_link={notif.game_link}

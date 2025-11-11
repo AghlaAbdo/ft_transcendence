@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
-import { CheckCircle, XCircle, Gamepad2 } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useRouter } from 'next/navigation';
 import { markOneNotificationsAsRead_game } from "./markAsRead";
 
 export interface GameInviteCardProps {
-  user_id: number;
   id: number;
   username: string;
   avatar_url?: string;
@@ -16,25 +14,26 @@ export interface GameInviteCardProps {
   onclose: () => void;
 }
 
-export default function GameInviteCard({ id, username, avatar_url, user_id, game_link,onclose}: GameInviteCardProps) {
+export default function GameInviteCard({ id, username, avatar_url, game_link,onclose}: GameInviteCardProps) {
   const [isLoading, setIsLoading] = useState<'accept' | 'reject' | null>(null);
-  const [isVisible, setIsVisible] = useState(true);
   const router = useRouter();
   const removeNotification = useNotificationStore((state) => state.removeNotification);
 
   const handleAccept = async () => {
+    setIsLoading('accept');
     markOneNotificationsAsRead_game(id);
     removeNotification(id);
     onclose();
     router.push(`/game/game-invite/${game_link}`);
+    setIsLoading(null);
   };
 
   const handleReject = async () => {
+    setIsLoading('reject');
     markOneNotificationsAsRead_game(id);
     removeNotification(id);
+    setIsLoading(null);
   };
-
-  if (!isVisible) return null;
 
   return (
     <div className="flex items-center gap-4 p-4 hover:bg-slate-700/30 transition-colors">
