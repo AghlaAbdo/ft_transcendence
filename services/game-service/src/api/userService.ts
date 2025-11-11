@@ -8,7 +8,7 @@ export async function fetchUser(userId: string) {
       // headers: {
       //   'X-Internal-Request': 'game-service',
       // },
-      headers: { 'x-internal-key': INTERNAL_API_KEY }
+      headers: { 'x-internal-key': INTERNAL_API_KEY },
     });
     if (!response.ok) {
       console.log("Couldn't fetch user: something wet wrong");

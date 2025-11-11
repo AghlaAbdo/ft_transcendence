@@ -574,11 +574,11 @@ export const usePongGameLogic = (
       socket.off('tournMatchDetails');
       socket.off('matchDetails');
       // console.log("on quit, opponent: ", opponentId.current);
-      socket.emit('quit', {
-        userId: user.id,
-        gameId: gameId.current,
-        opponentId: opponentId.current,
-      });
+      // socket.emit('quit', {
+      //   userId: user.id,
+      //   gameId: gameId.current,
+      //   opponentId: opponentId.current,
+      // });
     };
   }, []);
 
