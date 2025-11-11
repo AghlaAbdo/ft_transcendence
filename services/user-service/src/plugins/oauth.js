@@ -24,5 +24,5 @@ const googleOAuth = async (fastify, options) => {
 
 export default fp(googleOAuth, {
     name: 'google-oauth',
-    // dependencies: ['@fastify/session'] // Declares that this plugin needs the session plugin to be registered first
+    dependencies: ['@fastify/session'] // Declares that this plugin needs the session plugin to be registered first
 });
