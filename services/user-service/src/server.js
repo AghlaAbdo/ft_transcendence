@@ -30,7 +30,6 @@ const handleConnection = (fastify, socket) => {
   }
   onlineUsers.get(user__id).add(socket);
 
-  // onlineUsers.set(user__id, socket);
 
   fastify.db
     .prepare(`UPDATE USERS SET online_status = 1 WHERE id = ?`)
@@ -40,8 +39,6 @@ const handleConnection = (fastify, socket) => {
   socket.on("Notification", async (data) => {
     try {
       const { user_id, actor_id, type, game_link } = data;
-
-      // console.log("recived put notification: ", data);
       if (
         typeof user_id !== "number" ||
         typeof actor_id !== "number" ||

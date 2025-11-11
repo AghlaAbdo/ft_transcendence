@@ -29,6 +29,11 @@ const friendRoutes = (fastify, options) => {
         onRequest: [fastify.authenticate] 
     }, friendController.acceptFriendRequest);
 
+    fastify.post("/unblock", {
+        // onRequest: [fastify.authenticate]
+    }, friendController.unblockFriend);
+
+
     fastify.post("/block", {
         // onRequest: [fastify.authenticate]
     }, friendController.blockFriend);

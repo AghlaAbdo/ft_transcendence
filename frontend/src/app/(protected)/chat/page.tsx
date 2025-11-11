@@ -9,6 +9,7 @@ import { ChatWindow } from '@/components/chat/ChatWindow';
 import { MessageInput } from '@/components/chat/MessageInput';
 import ChatListSkeleton from '@/components/chat/chatlist_loading';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface conversation {
   id: number;
@@ -70,7 +71,6 @@ export default function ChatPage() {
                 }
               );
               const userData = await userResponse.json();
-              // console.log("freidn+dansdfnd: ", userData.friends);
               setOtherUser(userData.friends);
               if (user.id === userData.friends.blocked_by)
                   setblocker(true)
@@ -83,9 +83,6 @@ export default function ChatPage() {
         }
       }
     };
-    // "user_id": 2,
-    // "friend_id": 5,
-    // "blocked_by": 2
     fetchingmessages();
   }, [selectedChatId]);
   const socketRef = useRef<Socket |null >(null);
@@ -110,7 +107,7 @@ export default function ChatPage() {
     socket.connect();
     socketRef.current = socket;
     socket.on('ChatMessage', (data) => {
-      if ((selectedChatId === -1  || !selectedChatId) && data.chat_id) {
+      if ((selectedChatId === -1) && data.chat_id) {
         setSelectedChatId(data.chat_id);
       }
       set_conv((prevMessages) => [...prevMessages, data]);
@@ -124,6 +121,22 @@ export default function ChatPage() {
         setblocker(true)
       if (target_id === user.id)
         setblocked(true);
+    });
+
+    socket.on('unblock', (data) => {
+      const {actor_id, target_id } = data;
+      if (actor_id && target_id) {  
+        if (actor_id === user.id)
+          setblocker(false);
+        if (target_id === user.id)
+         setblocked(false);
+      }
+    });
+
+    socket.on('error', data => {
+      const {message } = data;
+      if (message)
+          toast.error(message);
     });
 
     return () => {
@@ -143,6 +156,16 @@ export default function ChatPage() {
       });
     }
   }
+
+  const handle_unblock = (actor_id: number, target_id: number) => {
+    if (socketRef.current && selectedChatId && user && otherUser) {
+      socketRef.current.emit('unblock', {
+        actor_id: actor_id,
+        target_id: target_id
+      });
+    }
+  }
+
   const handleChatSelect = (chatId: number, selectedFriend?: Friend) => {
     if (selectedFriend) {
       setOtherUser(selectedFriend)
@@ -190,7 +213,9 @@ export default function ChatPage() {
                 <MessageInput onSendMessage={handleSendMessage} />
               )}
               {selectedChatId && otherUser && blocker && !blocked && (
-                <BlockingUserInput />
+                <BlockingUserInput 
+                  onUnblock={() => handle_unblock(user.id, otherUser.id)}
+                />
               )}
                {selectedChatId && otherUser && blocked && !blocker && (
                 <BlockedUserInput />
@@ -226,7 +251,9 @@ export default function ChatPage() {
                 <MessageInput onSendMessage={handleSendMessage} />
               )}
               {selectedChatId && otherUser && blocker && !blocked && (
-                <BlockingUserInput />
+                <BlockingUserInput 
+                  onUnblock={() => handle_unblock(user.id, otherUser.id)}
+                />
               )}
                {selectedChatId && otherUser && blocked && !blocker && (
                 <BlockedUserInput />

@@ -9,7 +9,6 @@ type chat_options_props = {
   user: number;
 }
 
-
 interface Friend {
   id: number,
   username: string,
@@ -46,7 +45,6 @@ const UserActionsMenu = ({ onClose, _other_user, user, handle_block}: chat_optio
   };
 
   const handleBlock = () => {
-    // console.log(current);
     handle_block(user, _other_user.id);
     onClose();
   };

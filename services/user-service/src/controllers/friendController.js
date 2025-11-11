@@ -338,6 +338,64 @@ const blockFriend = async (request, reply) => {
     }
 }
 
+
+
+const unblockFriend = async (request, reply) => {
+    // console.log('hereeee niga-------------------: ');
+    try {
+        
+        
+        const  {actor_id, target_id} = request.body;
+        console.log("------------------>", actor_id, target_id);
+        const currentUserId = actor_id;
+        const targetUserId = target_id;
+        
+        console.log("------>", currentUserId, targetUserId);
+        if (!currentUserId || !targetUserId) {
+            return reply.code(400).send({
+                status: false,
+                message: "Invalid user ID"
+            }); 
+        }
+
+        if (currentUserId === targetUserId) {
+            return reply.code(400).send({
+                status: false,
+                message: "Cannot unblock yourself"
+            });
+        }
+        const db = request.server.db;
+
+        const targetUser = db.prepare(`
+            SELECT id FROM USERS
+            WHERE id = ?
+        `).get(targetUserId);
+
+        if (!targetUser) {
+            return reply.code(404).send({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+
+        friendModel.unblockFriend(db, {currentUserId, targetUserId});
+
+        return reply.code(200).send({
+            status: true,
+            message: "User unblocked successfully"
+        });
+        
+    } catch (error) {
+        return reply.code(500).send({
+            status: false,
+            message: error.message || 'Failed to block user'
+        }); 
+    }
+}
+
+
+
 export default {
     getAllFriends,
     sendFriendRequest,
@@ -347,5 +405,6 @@ export default {
     getPendingRequests,
     searchQuery,
     blockFriend,
+    unblockFriend,
     getFriendData
 };

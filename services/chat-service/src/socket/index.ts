@@ -62,8 +62,9 @@ export function initSocket(server: any, db: Database.Database) {
 
         const data = await response.json();
         if (!response.ok) {
-          // socket.emit("error", { message: "can not block user" });
+          socket.emit("error", { message: "can not block user" });
           console.log("error : ", data);
+          return ;
         }
         // Send to actor
         const sendersockets = onlineUsers.get(actor_id);
@@ -84,6 +85,52 @@ export function initSocket(server: any, db: Database.Database) {
       }
     });
 
+    socket.on("unblock", async (data) => {
+      const { actor_id, target_id } = data;
+      if (!actor_id || !target_id)
+        return socket.emit("error", { message: "Invalid data" });
+       console.log('------->-----cure: ', actor_id, ", tage: ", target_id);
+      try {
+        console.log("actor_id: ", actor_id);
+        console.log("target_id: ", target_id);
+        const response = await fetch(
+          `http://user-service:5000/api/friends/unblock`,
+          {
+            method: "POST",
+            headers: {
+              "x-internal-key": "pingpongsupersecretkey",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ actor_id, target_id }),
+          }
+        );
+
+        const data = await response.json();
+        if (!response.ok) {
+          console.log("error    : ", data);
+          socket.emit("error", { message: "can not block user" });
+          return
+          // return socket.emit("error", { message: "Unauthorized sender" 
+        }
+
+        const sendersockets = onlineUsers.get(actor_id);
+        if (sendersockets) {
+          sendersockets.forEach((s) => {
+            s.emit("unblock", { actor_id, target_id });
+          });
+        }
+
+        const receiverSockets = onlineUsers.get(target_id);
+        if (receiverSockets) {
+          receiverSockets.forEach((receiversocket) => {
+            receiversocket.emit("unblock", { actor_id, target_id });
+          });
+        }
+      } catch (err) {
+        console.error("some thing went wrong: ", err);
+      }
+    });
+  
     socket.on("ChatMessage", async (data) => {
       try {
         const { chatId, sender, receiver, message } = data;
@@ -107,7 +154,6 @@ export function initSocket(server: any, db: Database.Database) {
         if (chatId !== -1 && (typeof chatId !== "number" || chatId <= 0)) {
           return socket.emit("error", { message: "Invalid chat ID" });
         }
-
         if (!sender || !receiver || !message) return;
 
         let actualChatId = chatId;
@@ -194,6 +240,5 @@ export function initSocket(server: any, db: Database.Database) {
       return next(new Error("INVALID_TOKEN"));
     }
   });
-
   return io;
 }
