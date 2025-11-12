@@ -126,20 +126,15 @@ const handleGoogleCallback = async (request, reply) => {
             isAccountVerified: user.isAccountVerified
         });
 
-        request.server.setAuthCookie(reply, token);
+        // request.server.setAuthCookie(reply, token);
+        reply.setCookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Must be false for localhost // false on dev , true on prod
+            sameSite: 'lax', // Must be 'lax' for OAuth redirects
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60
+        });
          
-        // reply.send({ 
-        //     status: true, 
-        //     message: "User Logged in successfully", 
-        //     user: {
-        //         id: user.id,
-        //         username: user.username,
-        //         email: user.email,
-        //         avatar_url: user.avatar_url,
-        //         isAccountVerified: user.isAccountVerified
-        //     }
-        // });
-
         logEvent("info", "user", "user_login", {result: "success", provider: "google"})
         return reply.redirect('https://localhost:8080/success');
         // return reply.redirect(302, `${process.env.FRONTEND_URL}/success`);
@@ -147,100 +142,12 @@ const handleGoogleCallback = async (request, reply) => {
     } catch (error) {
         console.error('An error occurred:', error);
         request.log.error(error);
-        // return reply.code(500).send({ 
-            //     status: false, 
-            //     message: error.message,
-            //     error: "Internal Server Error" });
+
             logEvent("info", "user", "user_login", {result: "failure", provider: "google"})
         return reply.redirect('https://localhost:8080/login');
     }
 }
 
-        // Store the access token in an HttpOnly, Secure cookie
-        // reply.setCookie('access_token', accessToken, {
-        //     httpOnly: true,
-        //     secure: true, // Ensure this is true in production (requires HTTPS)
-        //     sameSite: 'Strict',
-        //     maxAge: data.expires_in * 1000, // Set expiration time
-        // });
-
-        // // Optionally store the refresh token in another cookie
-        // reply.setCookie('refresh_token', refreshToken, {
-        //     httpOnly: true,
-        //     secure: true,
-        //     sameSite: 'Strict',
-        //     maxAge: 30 * 24 * 60 * 60 * 1000, // Example: 30 days
-        // });
-
-// async function verifyAccessToken(request, reply) {
-//     const accessToken = request.cookies.access_token;
-
-//     if (!accessToken) {
-//         reply.status(401).send({ error: 'Unauthorized: No access token provided' });
-//         return;
-//     }
-
-//     try {
-//         // Validate the token (e.g., decode JWT or verify with OAuth provider)
-//         const userData = jwt.verify(accessToken, process.env.JWT_SECRET); // Example for JWT
-//         request.user = userData; // Attach user data to the request
-//     } catch (err) {
-//         reply.status(401).send({ error: 'Unauthorized: Invalid access token' });
-//     }
-// }
-
-// fastify.get('/protected', { preHandler: verifyAccessToken }, async (request, reply) => {
-//     reply.send({ message: 'You have access to this protected route', user: request.user });
-// });
-
-// fastify.post('/logout', async (request, reply) => {
-//     reply.clearCookie('access_token');
-//     reply.clearCookie('refresh_token');
-//     reply.send({ message: 'Logged out successfully' });
-// });
-
-// fastify.post('/refresh-token', async (request, reply) => {
-//     const refreshToken = request.cookies.refresh_token;
-
-//     if (!refreshToken) {
-//         return reply.status(401).send({ error: 'Unauthorized: No refresh token provided' });
-//     }
-
-//     try {
-//         // Send the refresh token to the OAuth provider's token endpoint
-//         const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded',
-//             },
-//             body: new URLSearchParams({
-//                 client_id: process.env.GOOGLE_CLIENT_ID,
-//                 client_secret: process.env.GOOGLE_CLIENT_SECRET,
-//                 refresh_token: refreshToken,
-//                 grant_type: 'refresh_token',
-//             }).toString(),
-//         });
-
-//         if (!tokenResponse.ok) {
-//             return reply.status(401).send({ error: 'Failed to refresh token' });
-//         }
-
-//         const data = await tokenResponse.json();
-//         const newAccessToken = data.access_token;
-
-//         // Set the new access token in an HttpOnly, Secure cookie
-//         reply.setCookie('access_token', newAccessToken, {
-//             httpOnly: true,
-//             secure: true, // Ensure this is true in production (requires HTTPS)
-//             sameSite: 'Strict',
-//             maxAge: data.expires_in * 1000, // Set expiration time
-//         });
-
-//         reply.send({ message: 'Access token refreshed successfully' });
-//     } catch (error) {
-//         console.error('Error refreshing token:', error);
-//         reply.status(500).send({ error: 'Internal Server Error' });
-//     }
-// });
+   
 
 export default { initiateGoogleLogin, handleGoogleCallback }
