@@ -41,7 +41,7 @@ export function initSocket(server: any, db: Database.Database) {
         console.log("target_id: ", target_id);
 
         const response = await fetch(
-          `http://user-service:5000/api/friends/block`,
+          `http://user-service:5000/api/friends/block`, // front
           {
             method: "POST",
             headers: {
@@ -144,7 +144,7 @@ export function initSocket(server: any, db: Database.Database) {
           return socket.emit("error", { message: "Invalid chat ID" });
         }
         if (!sender || !receiver || !message) return;
-
+    // check if the users are friends in the user managements
         let actualChatId = chatId;
         console.log("in socket handler: ", message);
 

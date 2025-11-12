@@ -18,8 +18,6 @@ export async function generateSecret(userId, email) {
 }
 
 export function verifyToken(secret, token) {
-  console.log('allo from verify token');
-  
   return speakeasy.totp.verify({
     secret,
     encoding: 'base32',
