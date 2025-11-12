@@ -11,8 +11,8 @@ services:
   nextjs:
     build:
       target: production
-    env_file:
-      ./services/chat-service/.env
+    # env_file:
+    #   ./services/chat-service/.env
 
   game-service:
     build:
