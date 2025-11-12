@@ -23,7 +23,6 @@ export const markAllNotificationsAsRead_friend = async (userId: number) => {
 
 export const markAllNotificationsAsRead_game = async (userId: number) => {
   try {
-    console.log('marking all notifications as read game');
     const response = await fetch('https://localhost:8080/api/users/notifications/game/mark-as-read', {
       method: 'PUT',
       headers: {

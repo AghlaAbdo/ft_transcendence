@@ -114,7 +114,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
               </div>
               <p className='text-gray-400 text-sm'>
                 No users hound matching{' '}
-                <span className='text-white font-medium'>"{searchTerm}"</span>
+                <span className='text-white font-medium'>{searchTerm}</span>
               </p>
             </div>
           </div>

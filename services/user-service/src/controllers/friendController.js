@@ -4,7 +4,6 @@ import logEvent from '../app.js'
 
 const getAllFriends = async (request, reply) => {
     try {
-        // const user_id = request.user.id;
         const user_id = parseInt(request.params.id);
         const db = request.server.db;
 
@@ -36,6 +35,7 @@ const getAllFriends = async (request, reply) => {
 }
 
 const getFriendData = async (request, reply) => {
+    
     try {
         const user_id = request.user.id;
         const friend_id = parseInt(request.params.id);
@@ -67,6 +67,44 @@ const getFriendData = async (request, reply) => {
     }
 }
 
+// getFriendData_backend
+
+const getFriendData_backend = async (request, reply) => {
+    console.log('friend handler bakend--------------------');
+    
+    try {
+        // const user_id = request.user.id;
+        const friend_id = parseInt(request.params.friendid);
+        const user_id = parseInt(request.params.userid);
+        console.log('current user: ', user_id);
+        console.log('firnd id: ', friend_id);
+        const db = request.server.db;
+
+        const friend = friendModel.getFriendData(db, user_id, friend_id);
+
+
+        if (!friend || friend.length == 0) {
+            return reply.send({
+                status: true,
+                friends: [],
+                message: 'Friend not found or not accepted/blocked relationship.'
+            }); 
+        }
+
+
+        reply.code(200).send({
+            status: true,
+            friends: friend,
+        });
+
+    } catch (error) {
+        console.error('Error in getFriendData:', error);
+        return reply.code(500).send({
+            status: false,
+            message: error.message
+        });       
+    }
+}
 // Get friend requests RECEIVED by me
 const getPendingRequests = async (request, reply) => {
     try {
@@ -406,5 +444,6 @@ export default {
     searchQuery,
     blockFriend,
     unblockFriend,
-    getFriendData
+    getFriendData,
+    getFriendData_backend,
 };

@@ -1,14 +1,5 @@
 'use client';
 
-import { User } from '@/hooks/useAuth';
-import { useSocketStore } from '@/store/useNotificationSocket';
-
-// type User = {
-//   id: number;
-//   username: string;
-//   online_status: 0 | 1 | 2;
-//   avatar_url: string;
-// };
 type UserCardProps = {
   _user: Friend;
 };

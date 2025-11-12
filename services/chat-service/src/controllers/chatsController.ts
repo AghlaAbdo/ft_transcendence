@@ -11,9 +11,9 @@ type ChatRow = {
   last_message_id: number;
 };
 
-// Request parameter interfaces
 interface GetMessagesParams {
   chatId: string;
+  otherUserId: string
 }
 
 interface GetMessageParams {
@@ -32,8 +32,11 @@ interface CheckChatExistsParams {
 export async function getMessagesHandler(
   req: FastifyRequest<{ Params: GetMessagesParams }>,
   reply: FastifyReply
+
 ) {
   const chatId = parseInt(req.params.chatId);
+  const userid = (req as any).user.id;
+  const otherUserId = parseInt(req.params.otherUserId);
 
   if (isNaN(chatId) || chatId <= 0) {
     return reply.status(400).send({ error: "Invalid chatId" });
@@ -45,14 +48,15 @@ export async function getMessagesHandler(
       console.error("DB not available on request.server.db");
       return reply.status(500).send({ error: "Database not initialized" });
     }
+    if (userid && otherUserId) {
 
-    // get sender and reciever
-    // const res = await fetch(`http://user-service:5000/friends/friend_data/5`, {
-    //   headers: { "x-internal-key": "pingpongsupersecretkey" },
-    // });
-    // if (!res.ok) console.log('its null');
-    // const data = await res.json();
-    // console.log("friend data :", data);
+      const res = await fetch(`http://user-service:5000/api/friends/friend_data_backend/${userid}/${otherUserId}`, {
+        headers: { "x-internal-key": "pingpongsupersecretkey" },
+      });
+      if (!res.ok) console.log('its null');
+      const data = await res.json();
+      console.log("friend data :", data);
+    }
 
     const result = getMessages(db, chatId);
 

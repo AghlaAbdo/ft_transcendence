@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { Eye, UserPlus, X } from 'lucide-react';
-import { Bell, Check, Clock, Gamepad2 } from 'lucide-react';
+import { UserPlus, X } from 'lucide-react';
+import { Bell, Gamepad2 } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationStore } from '@/store/useNotificationStore';
@@ -36,11 +36,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
   const {
     notifications,
     setNotifications,
-    setError,
-    setIsLoading,
-    isLoading,
-    resetUnread,
-    removeNotification,
   } = useNotificationStore();
   const friendRequests = notifications.filter(
     (n) => n.type === 'friend_request'
@@ -165,7 +160,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                       : 'game invites'}
                   </p>
                   <p className='text-slate-600 text-sm mt-1'>
-                    You're all caught up!
+                    You are all caught up!
                   </p>
                 </div>
               ) : (
@@ -191,7 +186,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
                         <GameInviteCard
                           onclose={onClose}
                           id={notif.id}
-                          user_id={notif.user_id}
                           username={notif.user_username}
                           avatar_url={notif.user_avatar}
                           game_link={notif.game_link}

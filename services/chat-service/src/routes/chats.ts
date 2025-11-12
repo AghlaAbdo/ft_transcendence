@@ -7,7 +7,7 @@ import {
 } from "../controllers/chatsController.js";
 
 export default async function chatsRoutes(fastify: FastifyInstance) {
-  fastify.get("/api/chat/messages/:chatId", {
+  fastify.get("/api/chat/messages/:chatId/:otherUserId", {
     onRequest: [(fastify as any).authenticate]
   }, getMessagesHandler);
   
