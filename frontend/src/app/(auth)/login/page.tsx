@@ -33,7 +33,7 @@ const LoginPage = () => {
   
         
         if (response.ok) {
-          toast.success("✅ Logged in successfully!");
+          toast.success(" Logged in successfully!");
           router.push('/home');
           setMessage('Signup successful!');
           
@@ -43,11 +43,11 @@ const LoginPage = () => {
             router.push(`/verifyEmail?email=${encodeURIComponent(email)}`);
             // console.log(data);
           }  
-          toast.error(`❌ ${data.message}`);
+          toast.error(`${data.message}`);
           setMessage(data.error || 'Login failed.');
         }
       } catch (error) {
-        toast.error(`❌ Network error. Please check your connection and try again.`);
+        toast.error(`Network error. Please check your connection and try again.`);
         setMessage('Network error. Please check your connection and try again.');
       } 
   }

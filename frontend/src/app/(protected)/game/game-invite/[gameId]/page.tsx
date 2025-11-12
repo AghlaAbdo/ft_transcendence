@@ -76,7 +76,8 @@ export default function GameInvite() {
     username: user.username,
     avatar: user.avatar_url!,
     frame: 'silver2',
-    level: '34',
+    level: user.level,
+    points: user.points,
     isEliminated: false,
   };
 

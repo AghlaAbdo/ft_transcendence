@@ -12,6 +12,6 @@ CMD ["/usr/local/bin/run_dev.sh"]
 
 FROM base AS production
 COPY . .
-RUN RUN npm install --only=prod
+RUN npm install
 RUN npm run build
 CMD ["npm", "run", "start"]

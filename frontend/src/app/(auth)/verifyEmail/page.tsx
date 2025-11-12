@@ -6,8 +6,9 @@ import { KeyRound, Mail } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { toast } from 'sonner';
+import { Suspense } from 'react';
 
-const VerifyEmailPage = () => {
+const VerifyEmailPageForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
@@ -38,7 +39,7 @@ const VerifyEmailPage = () => {
         });
 
         if (response.ok) {
-            toast.success("✅ Your email has been verified.");
+            toast.success(" Your email has been verified.");
             router.push("/home");
         } else {
             const data: { success?: boolean; message?: string; error?: string } = await response.json();
@@ -78,9 +79,9 @@ const VerifyEmailPage = () => {
         const data = await response.json();
         if (response.ok && data.status) {
           setShowResend(false);
-          toast.success("📧 New verification email sent!");
+          toast.success("New verification email sent!");
         } else {
-          toast.error("❌ " + data.message);
+          toast.error("" + data.message);
         }
     } catch (error: unknown) {
         toast.error('Network error. Please try again.');
@@ -153,4 +154,14 @@ const VerifyEmailPage = () => {
   )
 }
 
-export default VerifyEmailPage
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className='flex justify-center items-center min-h-screen'>
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    }>
+      <VerifyEmailPageForm />
+    </Suspense>
+  );
+}
