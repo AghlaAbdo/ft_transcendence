@@ -426,7 +426,7 @@ const updateStats = async (request, reply) => {
             message: "Stats updated successfully" 
         });
     } catch (err) {
-        console.error("❌ Error updating user stats:", err);
+        console.error(" Error updating user stats:", err);
         return reply.status(500).send({ 
             status: false,
             message: "Error updating user stats" 

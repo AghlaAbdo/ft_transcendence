@@ -112,6 +112,14 @@ const login = async (request, reply) => {
             });
         }
 
+        if (user.is_2fa_enabled) {
+            return reply.code(206).send({
+                status: true,
+                message: "Two-factor authentication code required.",
+                requires2FA: true
+            });
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid)
             throw new Error("Incorrect password.");
