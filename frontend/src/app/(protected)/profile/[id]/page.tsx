@@ -33,8 +33,10 @@ const ProfilePage = () => {
 
         if (response.ok && data.status) {
           setUser(data.user);
+          setError(null);
         } else {
-          throw new Error(data.message || "Failed to load user");
+          setUser(null);
+          setError(data.message || "Failed to load user");
         }
         } catch (erro) {
           setError(getErrorMessage(error));
@@ -48,12 +50,17 @@ const ProfilePage = () => {
   if (loading) 
     return <p className="text-gray-400">Loading profile...</p>;
   
-  if (error)
-    return <p className="text-red-500">{error}</p>;
-
-  if (!user) 
-    return <p className="text-gray-500">User not found</p>;
+  if (error){
+    return (<div className="flex justify-center items-center h-screen">
+      <p className="font-bold text-xl">{error}</p>
+    </div>);
+  }
   
+  if (!user) {
+    return (<div className="flex justify-center items-center h-screen">
+      <p className="font-bold text-xl">User not found</p>
+    </div>);
+  }
   return (
     <div className="h-[calc(100vh_-_72px)] bg-[#111827] text-white flex px-2 gap-2 ">
       <div className="flex-1 rounded-[20px] flex flex-col mt-10 my-2 gap-2 max-w-7xl mx-auto">
