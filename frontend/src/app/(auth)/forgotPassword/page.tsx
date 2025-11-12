@@ -37,7 +37,7 @@ const ForgotPasswordPage = () => {
       <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
         <div className='text-3xl font-bold text-center mb-5'>Forgot your password?</div>
 
-        <p className='text-slate-400 text-center -mt-3 mb-5'>Enter your email and we'll sent you a link to reset your password</p>
+        <p className='text-slate-400 text-center -mt-3 mb-5'>Enter your email and we&apos;ll sent you a link to reset your password</p>
         <form className='space-y-4' onSubmit={handleFrogotPassword}>
             
             <Input

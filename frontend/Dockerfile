@@ -8,9 +8,9 @@ RUN chmod +x /usr/local/bin/run_dev.sh
 CMD ["/usr/local/bin/run_dev.sh"]
 
 
-FROM base AS production
-COPY package.json ./
-COPY package-lock.json ./
+FROM ./
+COPY package-lock.js base AS production
+COPY package.jsonon ./
 RUN npm install --only=prod
 COPY . .
 RUN npm run build
