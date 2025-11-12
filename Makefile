@@ -24,3 +24,5 @@ super_clean: fclean
 	sudo rm logs/*.log
 
 re: down dev
+
+reb: down prod

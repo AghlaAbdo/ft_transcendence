@@ -32,7 +32,7 @@ interface Friend {
 }
 
 interface ChatlistProps {
-  onSelect: (chatId: number, selectedFriend?:Friend) => void;
+  onSelect: (chatId: number, selectedFriend?:number) => void;
   selectedChatId: number | null;
   userId: number | null;
   conv: Message[];
@@ -77,7 +77,7 @@ export const Chatlist = ({
   useEffect(() => {
     if (userId) {
       setLoading(true); // do not forgot to use this later
-      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`
+      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats` // here use just user id in the crendtiels
         ,{credentials: "include" }
       )
       .then((res) => res.json())
@@ -122,7 +122,7 @@ export const Chatlist = ({
                 <div
                   key={chat.chat_id}
                   onClick={() => {
-                    onSelect(chat.chat_id);
+                    onSelect(chat.chat_id, otherUser?.id);
                   }}
                   className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
                   hover:bg-gray-800 ${

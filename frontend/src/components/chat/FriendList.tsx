@@ -7,7 +7,7 @@ import { useDebounce } from 'use-debounce';
 interface FriendListProps {
   user: User | null;
   onClose: () => void;
-  onchatselected: (friendid: number, selectedFriend?:Friend) => void;
+  onchatselected: (friendid: number, selectedFriend?:number) => void;
 }
 
 interface Friend {
@@ -56,15 +56,13 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     if (!user || !selectedFriend) return;
     try {
       const fetchChatExistense = await fetch(
-        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${selectedFriend.id}`
+        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${selectedFriend.id}`
       );
       const data = await fetchChatExistense.json();
       if (data.exists) {
-        console.log('user is there');
-        onchatselected(data.chat_id);
+        onchatselected(data.chat_id, selectedFriend.id);
       } else {
-        console.log('user its not there');
-        onchatselected(-1, selectedFriend);
+        onchatselected(-1, selectedFriend.id);
       }
       onClose();
     } catch {

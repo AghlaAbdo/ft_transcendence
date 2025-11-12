@@ -1,7 +1,6 @@
 import { FastifyInstance } from "fastify";
 import {
   getMessagesHandler,
-  getMessageHandler,
   getChatsHandler,
   checkChatExistsHandler,
 } from "../controllers/chatsController.js";
@@ -11,15 +10,11 @@ export default async function chatsRoutes(fastify: FastifyInstance) {
     onRequest: [(fastify as any).authenticate]
   }, getMessagesHandler);
   
-  fastify.get("/api/chat/message/:messageId", {
-    onRequest: [(fastify as any).authenticate]
-  }, getMessageHandler);
-  
-  fastify.get("/api/chat/chats/:userId", {
+  fastify.get("/api/chat/chats", {
     onRequest: [(fastify as any).authenticate]
   }, getChatsHandler);
   
-  fastify.get('/api/chat/check/:userId/:friendId', {
+  fastify.get('/api/chat/check/:friendId', {
     onRequest: [(fastify as any).authenticate]
   }, checkChatExistsHandler);
 }

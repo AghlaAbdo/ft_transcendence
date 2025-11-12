@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+
 import { Socket, io } from 'socket.io-client';
 import { toast } from 'sonner';
+
 import { BlockedUserInput } from '@/components/chat/BlockedUser';
 import { BlockingUserInput } from '@/components/chat/BlockingUser';
 import { Chatlist } from '@/components/chat/ChatList';
@@ -37,6 +39,7 @@ export default function ChatPage() {
   const [otherUser, setOtherUser] = useState<Friend | null>(null);
   const [blocked, setblocked] = useState<boolean>(false);
   const [blocker, setblocker] = useState<boolean>(false);
+  const [other_user_id, setotheruserid] = useState<number>(0);
 
   const selectedChatIdRef = useRef(selectedChatId);
   useEffect(() => {
@@ -53,35 +56,46 @@ export default function ChatPage() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, [selectedChatId]);
 
-  console.log("-- Ever here");
-
   useEffect(() => {
     const fetchingmessages = async () => {
-      if (user && selectedChatId && selectedChatId != -1) {
+      console.log('other user id: ', other_user_id);
+      if (user && selectedChatId && other_user_id) {
         try {
-          const fetchmessage = await fetch(
-            `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}/${otherUser?.id}`,
+          const userResponse = await fetch(
+            `https://localhost:8080/api/friends/friend_data/${other_user_id}`,
             { credentials: 'include' }
           );
-          const data = await fetchmessage.json();
-          if (data.status) {
-            set_conv(data.messages);
-            const otherId =
-              data.messages[0].sender === user.id
-                ? data.messages[0].receiver
-                : data.messages[0].sender;
-            if (otherId) {
-              const userResponse = await fetch(
-                `https://localhost:8080/api/friends/friend_data/${otherId}`,
-                {
-                  credentials: 'include',
-                }
-              );
-              const userData = await userResponse.json();
-              setOtherUser(userData.friends);
-              if (user.id === userData.friends.blocked_by) setblocker(true);
-              if (otherId === userData.friends.blocked_by) setblocked(true);
+          const userData = await userResponse.json();
+          console.log('friend data fetched: ', userData);
+          setOtherUser(userData.friends);
+          if (user.id === userData.friends.blocked_by) setblocker(true);
+          if (other_user_id === userData.friends.blocked_by) setblocked(true);
+
+          if (selectedChatId != -1) {
+            const fetchmessage = await fetch(
+              `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}/${other_user_id}`,
+              { credentials: 'include' }
+            );
+            const data = await fetchmessage.json();
+            if (data.status) {
+              set_conv(data.messages);
             }
+            // const otherId =
+            //   data.messages[0].sender === user.id
+            //     ? data.messages[0].receiver
+            //     : data.messages[0].sender;
+            // if (otherId) {
+            // const userResponse = await fetch(
+            //   `https://localhost:8080/api/friends/friend_data/${otherId}`,
+            //   {
+            //     credentials: 'include',
+            //   }
+            // );
+            // const userData = await userResponse.json();
+            // setOtherUser(userData.friends);
+            // if (user.id === userData.friends.blocked_by) setblocker(true);
+            // if (otherId === userData.friends.blocked_by) setblocked(true);
+            // }
           }
         } catch (error) {
           console.error('failed because of: ', error);
@@ -89,7 +103,7 @@ export default function ChatPage() {
       }
     };
     fetchingmessages();
-  }, [selectedChatId]);
+  }, [other_user_id, selectedChatId]);
   const socketRef = useRef<Socket | null>(null);
   const handleSendMessage = (messageContent: string) => {
     if (
@@ -167,9 +181,10 @@ export default function ChatPage() {
     }
   };
 
-  const handleChatSelect = (chatId: number, selectedFriend?: Friend) => {
+  const handleChatSelect = (chatId: number, selectedFriend?: number) => {
+    // console.log('handle chat selected user :', selectedFriend);
     if (selectedFriend) {
-      setOtherUser(selectedFriend);
+      setotheruserid(selectedFriend);
     }
     setSelectedChatId(chatId);
     if (isMobile) {
