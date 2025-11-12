@@ -11,6 +11,7 @@ const publicAuthRoutes = [
     '/resetPassword',
     '/verifyEmail',
     '/check-email',
+    '/verify2fa'
 ];
 const protectedRoutes = ["/home", "/profile", "/game", "/chat", "/settings"];
 

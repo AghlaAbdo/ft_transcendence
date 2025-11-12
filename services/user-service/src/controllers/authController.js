@@ -5,7 +5,10 @@ import { sendVerificationEmail } from '../utils/sendVerificationEmail.js';
 import { sendPasswordResetEmail } from "../utils/sendPasswordResetEmail.js";
 import { logEvent } from "../app.js";
 import { generateSecret, verifyToken } from '../2fa/TwoFactorService.js';
-import { error } from "console";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
+
 
 const signup = async (request, reply) => {
     const {username, email, password} = request.body;
@@ -92,6 +95,18 @@ const signup = async (request, reply) => {
     }
 };
 
+const generate2FAToken = (id, email) => {
+    const token = jwt.sign( { 
+        userId: id,
+        email: email,
+        purpose: '2fa-verification'
+        }, process.env.JWT_SECRET, { 
+            expiresIn: '10m' 
+        }
+    );
+    return token;
+}
+
 const login = async (request, reply) => {
     const {email, password} = request.body;
     
@@ -113,10 +128,12 @@ const login = async (request, reply) => {
         }
 
         if (user.is_2fa_enabled) {
+            const tmpToken = generate2FAToken(user.id, user.email);
             return reply.code(206).send({
                 status: true,
                 message: "Two-factor authentication code required.",
-                requires2FA: true
+                requires2FA: true,
+                tmpToken: tmpToken
             });
         }
 
@@ -479,9 +496,73 @@ try {
   }
 }
 
-// disable 2fa
+const verifyToken2fa = async(request, reply) => {
+    try {
+        const { token, tmpToken } = request.body;
+        
+        if (!token || !tmpToken) {
+            return reply.status(400).send({
+                error: 'Token and tmpToken are Required!'
+            });
+        }
+        const decoded = jwt.verify(tmpToken, JWT_SECRET);
+        
+        if (decoded.purpose !== '2fa-verification') {
+            return reply.status(401).json({ status: false, message: 'Invalid token' });
+        }
+        
+        const db = request.server.db;
+        const user = userModel.getUserByID(db, decoded.userId);
+
+        if (!user) {
+            return reply.status(404).send({
+                status: false,
+                error: "User not found or token expired"
+            });
+        }
+
+        const {totp_secret} = db.prepare(`
+            SELECT totp_secret 
+            FROM users 
+            WHERE id = ?
+            `).get(user.id);
+
+        if (!totp_secret) {
+            return reply.status(400).send({ 
+                status: false,
+                error: '2FA not enabled for this user' 
+            });
+        }
+
+
+        const isValid = verifyToken(totp_secret, token);
+
+        if (!isValid) {
+            return rep.status(400).send({ status: false, error: 'Invalid verification code' });
+        }
+
+        const newToken = request.server.signToken({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            isAccountVerified: user.isAccountVerified
+        });
+
+        request.server.setAuthCookie(reply, newToken);
+
+        return reply.status(200).send({
+            status: true,
+            message: '2FA verification successful',
+        });
+
+    } catch (error) {
+        console.error("Verification 2fa error:", error);
+        reply.status(400).send({status: false, error: error.message});
+    }
+}
+
+
 const disable2fa = async(req, rep) => {
-    console.log('allllo');
     
 try {
     const db = req.server.db;
@@ -589,4 +670,4 @@ const resetPassword = async (request, reply) => {
 }
 
 
-export default {disable2fa, setup2fa, verify2Fa, login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};
+export default {disable2fa, verifyToken2fa, setup2fa, verify2Fa, login, signup, logout, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, getMe};

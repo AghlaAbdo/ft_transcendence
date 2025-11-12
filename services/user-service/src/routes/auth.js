@@ -14,6 +14,9 @@ const authRoutes = async (fastify, options) => {
     fastify.post("/2fa/disable",{ onRequest: [fastify.authenticate] },  authController.disable2fa);
     fastify.post("/2fa/verify", { onRequest: [fastify.authenticate] }, authController.verify2Fa);
 
+    fastify.post("/2fa/verify-token", authController.verifyToken2fa);
+
+
 
     fastify.post('/verify-email', authController.verifyEmail);
 

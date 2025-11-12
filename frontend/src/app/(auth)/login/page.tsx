@@ -32,13 +32,23 @@ const LoginPage = () => {
         });
   
         
-        if (response.ok) {
+        const data : {status: boolean, 
+                      message: string, 
+                      error: string, 
+                      requires2FA: boolean,
+                      tmpToken: string 
+                    } = await response.json();
+        if (response.ok && data.status) {
+          if (data.requires2FA) {
+            toast.success("Two-factor authentication is enabled. Please enter your verification code.");
+            router.push(`/verify2fa?tmpToken=${data.tmpToken}`);
+            return ;
+          }
           toast.success(" Logged in successfully!");
           router.push('/home');
           setMessage('Signup successful!');
           
         } else {
-          const data = await response.json();
           if (data.error === 'EMAIL_NOT_VERIFIED') {
             router.push(`/verifyEmail?email=${encodeURIComponent(email)}`);
             // console.log(data);

@@ -21,9 +21,9 @@ export function verifyToken(secret, token) {
   console.log('allo from verify token');
   
   return speakeasy.totp.verify({
-    secret,
+    secret: secret,
     encoding: 'base32',
-    token,
+    token: token,
     window: 2,
   });
 }
