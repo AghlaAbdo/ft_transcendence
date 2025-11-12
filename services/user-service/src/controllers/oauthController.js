@@ -5,27 +5,9 @@ const initiateGoogleLogin = async (request, reply) => {
     const authURL = request.server.getGoogleAuthURL();
     reply.redirect(authURL);
 }
-// # Step 1: Define the token endpoint and parameters
-// # Step 2: Prepare the data for the token exchange
-// # Step 3: Make the POST request to exchange the code for an access token
-// # Step 4: Handle the response
 
-/*
-    Use the Access Token:
-
-    Include the access token in the Authorization header 
-    (e.g., Bearer <access_token>) when making API requests.
-    (Optional) Refresh the Token:
-    If the access token expires, use the refresh token (if provided) to obtain a new access token.
-*/
 const handleGoogleCallback = async (request, reply) => {
-    /*
-        https://your-app.com/oauth/callback?code=AUTHORIZATION_CODE
-        The code in request.query.code is the authorization code provided by Google. 
-        It is a temporary code that your server can use to exchange for an access token 
-        and optionally a refresh token. These tokens allow your application to access 
-        the user's data on their behalf.
-    */
+
    const code = request.query.code;
    if (!code) {
      return reply.redirect('https://localhost:8080/login');
@@ -48,12 +30,7 @@ const handleGoogleCallback = async (request, reply) => {
             body: tokenData.toString()
         });
         if (!tokenResponse.ok) {
-            // const errorText = await tokenResponse.text();
-            // console.log('token echange error: ', errorText);
-            // throw new Error(`Token exchange failed: ${tokenResponse.status} ${errorText}`);
-            // throw new Error(`Token exchange failed: ${tokenResponse.status}`);
-            // reply.status(400).send({status: false,  error: 'Failed to retrieve token' });
-            // return ;
+  
             return reply.redirect('https://localhost:8080/login?error=token_failed');
         }
         const data = await tokenResponse.json();
@@ -137,7 +114,6 @@ const handleGoogleCallback = async (request, reply) => {
          
         logEvent("info", "user", "user_login", {result: "success", provider: "google"})
         return reply.redirect('https://localhost:8080/success');
-        // return reply.redirect(302, `${process.env.FRONTEND_URL}/success`);
         
     } catch (error) {
         console.error('An error occurred:', error);

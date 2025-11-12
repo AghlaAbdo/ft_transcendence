@@ -17,7 +17,7 @@ const authPlugin = async (fastify, options) => {
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', //local: http , production: https
-            sameSite: 'strict', // CSRF protection  // sameSite: 'lax'
+            sameSite: 'lax', // CSRF protection  // sameSite: 'lax'
             maxAge: 7 * 24 * 60 * 60 // 7 days 
         });
     });
@@ -27,7 +27,7 @@ const authPlugin = async (fastify, options) => {
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            sameSite: 'lax'
         });
     });
 
