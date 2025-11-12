@@ -1,5 +1,4 @@
 import {useState } from 'react';
-
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -77,12 +76,6 @@ export default function Disable2fa({onclose,handledisable}: disable2faprops) {
       </div>
 
       <div className='flex gap-2'>
-        <button
-          onClick={onclose}
-          className='flex-1 px-3 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors'
-        >
-          Cancel
-        </button>
         <button
           onClick={handleVerify}
           disabled={code.length !== 6 || isVerifying}

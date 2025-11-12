@@ -45,6 +45,12 @@ const SettingsPage = () => {
   const {user, isLoading} = useAuth();
   const [avatar, setAvatar] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [is_google_auth, setgooglelogin] = useState<number>(0);
+  useEffect(() =>{
+      if (!user)
+          return;
+        setgooglelogin(user.is_google_auth);
+  }, [user])
 
   const [activeTab, setActiveTab] = useState<"info" | "security">("info");
   useEffect(() => {
@@ -144,7 +150,7 @@ const SettingsPage = () => {
         toast.error(dataResponse.message);
       }
     } catch (error) {
-      toast.error(`❌ Network error. Please check your connection and try again.`);
+      toast.error(`Network error. Please check your connection and try again.`);
     }
   }
 
@@ -168,7 +174,7 @@ const SettingsPage = () => {
         toast.error(dataResponse.message);
       }
     } catch (error) {
-      toast.error(`❌ Network error. Please check your connection and try again.`);
+      toast.error(`Network error. Please check your connection and try again.`);
     }
   }
 
@@ -271,16 +277,18 @@ const SettingsPage = () => {
                     >
                       Info
                     </button>
-                    <button
+                    { !is_google_auth  && 
+                      <button
                       onClick={() => setActiveTab("security")}
                       className={`px-6 py-3 text-lg font-semibold transition ${
                         activeTab === "security"
-                          ? "text-purple-500 border-b-4 border-purple-500"
-                          : "text-gray-400 hover:text-white"
-                      }`}
-                    >
+                        ? "text-purple-500 border-b-4 border-purple-500"
+                        : "text-gray-400 hover:text-white"
+                        }`}
+                        >
                       Security
                     </button>
+                    }
                   </div>
 
                   {/* Content */}
@@ -363,7 +371,7 @@ const SettingsPage = () => {
                           Update Password
                         </button>
                       </form>
-                      <TwoFactorAuth/>
+                        <TwoFactorAuth/>
                     </div>
                       
                     )}

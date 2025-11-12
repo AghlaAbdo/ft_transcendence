@@ -64,11 +64,11 @@ const SignUpPage = () => {
           router.push(`/verifyEmail?email=${encodeURIComponent(data.email)}`);
           
         } else {
-          toast.error(`❌ ${dataResponse.message}`);
+          toast.error(`${dataResponse.message}`);
           setMessage(dataResponse.message || 'Signup failed.');
         }
       } catch (error) {
-        toast.error(`❌ Network error. Please check your connection and try again.`);
+        toast.error(`Network error. Please check your connection and try again.`);
         setMessage('Network error. Please check your connection and try again.');
       } 
       // finally {

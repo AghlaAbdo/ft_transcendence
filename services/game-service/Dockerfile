@@ -1,19 +1,17 @@
 FROM node:22-bullseye AS base
 WORKDIR /app
 RUN mkdir logs
-# COPY package.json ./
-# COPY package-lock.json ./
-# RUN npm install --only=prod
+COPY package.json ./
+COPY package-lock.json ./
 
 FROM base AS development
-# RUN npm install
-
 COPY run_dev.sh /usr/local/bin/run_dev.sh
 RUN chmod +x /usr/local/bin/run_dev.sh
 CMD ["/usr/local/bin/run_dev.sh"]
-# CMD ["npm", "run", "dev"]
+
 
 FROM base AS production
-# COPY . .
+COPY . .
+RUN npm install
 RUN npm run build
 CMD ["npm", "run", "start"]

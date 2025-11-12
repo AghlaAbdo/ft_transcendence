@@ -1,5 +1,4 @@
 import { Ban } from 'lucide-react';
-import { toast } from 'sonner';
 
 export const BlockedUserInput = () => {
   return (

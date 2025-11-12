@@ -5,6 +5,7 @@ import { Lock } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { FormEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner';
+import { Suspense } from 'react';
 
 
 import * as z from "zod";
@@ -32,7 +33,7 @@ const resetPasswordSchema = z
 type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 
-const ResetPasswordPage = () => {
+const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
   const [password, setPassword] = useState<string>("");
   const [confirm, setConfirm] = useState<string>("");
@@ -48,12 +49,12 @@ const ResetPasswordPage = () => {
     // e.preventDefault();
     
     // if (password !== confirm) {
-    //     toast.error("❌ Passwords do not match");
+    //     toast.error("Passwords do not match");
     //     return;
     // }
 
     if (!token) {
-        toast.error("❌ Missing token.");
+        toast.error("Missing token.");
         return;
     }
 
@@ -66,11 +67,11 @@ const ResetPasswordPage = () => {
       });
 
       if (response.ok) {
-        toast.success("✅ Password reset successful! Please log in.");
+        toast.success(" Password reset successful! Please log in.");
         window.location.href = "/login";
       } else {
         const data : { error?: string} = await response.json();
-        toast.error(data.error || "❌ Failed to send reset email.");
+        toast.error(data.error || "Failed to send reset email.");
       }
     } catch (error) {
       toast.error('Network error. Please try again.');
@@ -107,7 +108,7 @@ const ResetPasswordPage = () => {
             )}
             {/* {confirm && confirm !== password && (
                 <p className="text-red-500 text-sm mt-1">
-                    ❌ Passwords do not match
+                    Passwords do not match
                 </p>)
             } */}
             <button 
@@ -124,4 +125,14 @@ const ResetPasswordPage = () => {
     )
 }
 
-export default ResetPasswordPage
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className='flex justify-center items-center min-h-screen'>
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}

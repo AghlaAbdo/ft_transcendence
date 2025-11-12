@@ -8,7 +8,7 @@ interface Notification {
   type: string;
   user_id: number;
   actor_id: number;
-  read: number; // 0 = unread, 1 = read
+  read: number;
   created_at: string;
   user_username: string;
   user_avatar: string;
@@ -26,6 +26,7 @@ interface NotificationState {
   addNotification: (notification: Notification) => void;
   resetUnread: () => void;
   incrementUnread: () => void;
+  decrementUnread: () => void;
 
   setError: (error: string | null) => void;
   setIsLoading: (loading: boolean) => void;
@@ -49,8 +50,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
 
   addNotification: (notification) =>
     set((state) => ({
-      notifications: [notification, ...state.notifications],
-      // unreadCount: state.unreadCount + (notification.read === 0 ? 1 : 0),
+      notifications: [notification, ...state.notifications]
     })),
 
   resetUnread: () => set({ unreadCount: 0 }),
@@ -58,6 +58,8 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   incrementUnread: () =>
     set((state) => ({ unreadCount: state.unreadCount + 1 })),
 
+  decrementUnread: () =>
+    set((state) => ({ unreadCount: state.unreadCount - 1 })),
   setError: (error) => set({ error }),
   setIsLoading: (loading) => set({ isLoading: loading }),
 }));

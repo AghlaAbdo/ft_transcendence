@@ -1,4 +1,4 @@
-import { Eye, Gamepad2, Ban, X } from 'lucide-react';
+import { Eye, Gamepad2, Ban} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSocketStore } from '@/store/useNotificationSocket';
 type chat_options_props = {

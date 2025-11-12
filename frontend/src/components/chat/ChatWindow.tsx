@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState , useLayoutEffect} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MoreVertical } from 'lucide-react';
 import UserActionsMenu from './UserActionsMenu';
 

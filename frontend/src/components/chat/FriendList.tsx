@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Search, UserPlus, X } from 'lucide-react';
+import { Loader2, Search, X } from 'lucide-react';
 import { User } from '@/hooks/useAuth';
 import FriendCard from './FriendCard';
 import { useDebounce } from 'use-debounce';
@@ -77,7 +77,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
 
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
-      {/* search Header */}
+
       <div className='flex items-center justify-between px-5 py-1'>
         <h2 className='text-xl font-medium text-white'>Search Friends</h2>
         <button
@@ -89,7 +89,6 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
         </button>
       </div>
 
-      {/* Search Input */}
       <div className='px-5 py-1.5'>
         <div className='relative group'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-500 transition-colors' />
@@ -140,7 +139,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
               </div>
               <p className='text-gray-400 text-sm'>
                 No users found matching{' '}
-                <span className='text-white font-medium'>"{searchTerm}"</span>
+                <span className='text-white font-medium'>{searchTerm}</span>
               </p>
             </div>
           </div>
@@ -164,7 +163,6 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
             {friends.map((user) => (
               <div
                 key={user.id}
-                // className='w-full'
               >
                 <button
                   onClick={() => {
