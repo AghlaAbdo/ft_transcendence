@@ -2,22 +2,19 @@ import { Ban } from 'lucide-react';
 import { toast } from 'sonner';
 
 type BlockingUserProps = {
-  onUnblock?: () => void;
+  onUnblock: () => void;
 };
 
 export const BlockingUserInput = ({ onUnblock }: BlockingUserProps) => {
   const handleUnblock = () => {
-    if (onUnblock) {
       try {
         onUnblock();
         toast.success('User has been unblocked');
       } catch (err) {
         toast.error('Failed to unblock user');
       }
-    } else {
       // placeholder behaviour if no handler provided
     //   toast('Unblock action not implemented', { duration: 3000 });
-    }
   };
 
   return (
@@ -28,7 +25,7 @@ export const BlockingUserInput = ({ onUnblock }: BlockingUserProps) => {
         </div>
 
         <h3 className="text-sm font-semibold text-purple-200">You blocked this user</h3>
-        <p className="text-xs text-gray-400 mt-1">They won't be able to send or receive messages to/from you.</p>
+        <p className="text-xs text-gray-400 mt-1">They can not be able to send or receive messages to/from you.</p>
 
         <div className="mt-3 ">
           <button

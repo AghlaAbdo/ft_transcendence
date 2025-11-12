@@ -72,9 +72,9 @@ const userRoutes = async (fastify, options) => {
     });
     
     fastify.put('/notifications/friend_request/mark-as-read', {
-        onRequest: [fastify.authenticate]
-      }, async (req, res) => {
       
+      onRequest: [fastify.authenticate]
+    }, async (req, res) => {
       const {userId} =  req.body;
       const db = req.server.db;
       console.log('user: ', userId);
@@ -83,12 +83,20 @@ const userRoutes = async (fastify, options) => {
     });
     
     
+    fastify.put('/notifications/delete', {
+      onRequest: [fastify.authenticate]
+    }, async (req, res) => {
+      const {notif_id} = req.body;
+      const db = req.server.db;
+
+      return notoficationModel.mark_one_game_as_read(db , notif_id);
+    });
+
     fastify.put('/notifications/game/mark-as-read',{
         onRequest: [fastify.authenticate]
       }, async (req, res) => {
       const {userId} =  req.body;
       const db = req.server.db;
-
       return notoficationModel.mark_friend_request_as_read(db, userId, "game_invite");
     });
 }

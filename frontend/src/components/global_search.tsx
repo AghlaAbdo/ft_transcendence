@@ -1,8 +1,8 @@
-
 import { useEffect, useState } from 'react';
-import { Eye, Loader2, Search, UserPlus, X } from 'lucide-react';
+import {Loader2, Search, X } from 'lucide-react';
 import { User, useAuth } from '@/hooks/useAuth';
 import UserCard from './User_card';
+import { useDebounce } from 'use-debounce';
 
 interface GlobalSearchProps {
   onClose: () => void;
@@ -10,26 +10,35 @@ interface GlobalSearchProps {
 
 export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 200);
 
   useEffect(() => {
+    if (!user)
+        return;
     const fetchUsers = async () => {
+      if (!searchTerm.trim().length)
+      {
+        setUsers([]);
+        return;
+      }
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`https://localhost:8080/api/users`, {
-          credentials: 'include'
-        });
+        const response = await fetch(`https://localhost:8080/api/users/search?query=${searchTerm}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         if (data.status) {
-          setUsers(data.users);
+          setUsers(data.users.filter(
+            (_user: User) => 
+              _user.id !== user.id &&
+              _user.username.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
         } else {
           setError('Failed to load users');
         }
@@ -41,26 +50,10 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
       }
     };
     fetchUsers();
-  }, []);
-
-  // Filter users based on search term
-  useEffect(() => {
-    if (searchTerm && searchTerm.trim() && user) {
-      setFilteredUsers(
-        users.filter(
-          (_user) =>
-            _user.id !== user.id &&
-            _user.username.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredUsers([]);
-    }
-  }, [searchTerm, users, user]);
+  }, [debouncedSearchTerm]);
 
   return (
     <div className='py-1 flex flex-col rounded-xl border border-slate-700'>
-      {/* Search Header */}
       <div className='flex items-center justify-between px-5 py-1'>
         <h2 className='text-xl font-medium text-white'>Search Users</h2>
         <button
@@ -72,7 +65,6 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         </button>
       </div>
 
-      {/* Search Input */}
       <div className='px-5 py-1.5'>
         <div className='relative group'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-500 transition-colors' />
@@ -96,9 +88,8 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
         </div>
       </div>
 
-      {/* Results Container */}
       <div className='flex-1 overflow-y-auto px-5 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden'>
-        {isLoading && (
+        {isLoading && searchTerm && (
           <div className='flex flex-col items-center justify-center py-12 text-gray-400'>
             <Loader2 className='w-8 h-8 animate-spin mb-3' />
             <p className='text-sm'>Searching users...</p>
@@ -115,15 +106,15 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
           </div>
         )}
 
-        {!isLoading && !error && searchTerm && filteredUsers.length === 0 && (
+        {!isLoading && !error && searchTerm && users.length === 0 && (
           <div className='flex items-center justify-center py-2'>
             <div className='text-center'>
               <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center'>
                 <Search className='w-8 h-8 text-gray-500' />
               </div>
               <p className='text-gray-400 text-sm'>
-                No users found matching{' '}
-                <span className='text-white font-medium'>"{searchTerm}"</span>
+                No users hound matching{' '}
+                <span className='text-white font-medium'>{searchTerm}</span>
               </p>
             </div>
           </div>
@@ -142,9 +133,9 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
           </div>
         )}
 
-        {!isLoading && !error && filteredUsers.length > 0 && (
+        {!isLoading && !error && searchTerm && users.length > 0 && (
           <div className='mt-3 space-y-1 max-h-64 '>
-            {filteredUsers.map((user) => (
+            {users.map((user) => (
               <div
                 key={user.id}
                 className='animate-in fade-in slide-in-from-bottom-2 duration-200'

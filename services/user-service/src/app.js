@@ -55,6 +55,17 @@ const createApp = () => {
 
     fastify.register(fastifyCookie);
 
+    // Register session plugin - CRITICAL for session persistence
+    fastify.register(fastifySession, {
+        secret: process.env.SESSION_SECRET || 'WvWBL9ZdBBYAAztIRYYNAdgeUz1igece2iISjaMYkSA0EHQdzyFSFbv4',
+        cookie: {
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
+        }
+    });
+
     fastify.addHook('onRequest', async (request, reply) => {
             logEvent('info', 'user', 'api_request', {
                 method: request.method,

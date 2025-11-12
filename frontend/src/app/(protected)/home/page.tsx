@@ -6,13 +6,11 @@ import PieChart from "@/components/dashboard/pie"
 import Statistic from "@/components/dashboard/statistic"
 import Statistics from "@/components/dashboard/statistics"
 import Image from "next/image"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { GetGames, GetStats, GetWeekStats } from "@/app/(protected)/lib/dashboard"
-import { game, stat, StatWithTimeDict, WeekStats } from "@/constants/dashboard"
+import { game, StatWithTimeDict, WeekStats } from "@/constants/dashboard"
 import { Player } from "@/constants/leaderboard"
-import { get_all_leaderboard, get_user_by_username } from "../lib/leaderboard"
 import { useAuth } from "@/hooks/useAuth"
-import Link from "next/link";
 
 
 

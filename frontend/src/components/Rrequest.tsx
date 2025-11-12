@@ -1,25 +1,26 @@
 "use client";
 
-import { log } from "node:console";
+import { useNotificationStore } from "@/store/useNotificationStore";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export interface FriendRequestCardProps {
+  user_id: number;
   id: number;
   username: string;
-  // online_status: boolean;
   avatar_url?: string;
-  // status: string;
 }
 
-export default function FriendRequestCard({ id, username, avatar_url }: FriendRequestCardProps) {
+export default function FriendRequestCard({ id, username, avatar_url, user_id }: FriendRequestCardProps) {
   const [isLoading, setIsLoading] = useState<'accept' | 'reject' | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const removeNotification = useNotificationStore((state) => state.removeNotification);
 
   const handleAccept = async () => {
     setIsLoading('accept');
     try {
-      const response = await fetch(`https://localhost:8080/api/friends/accept/${id}`, {
+      const response = await fetch(`https://localhost:8080/api/friends/accept/${user_id}`, {
         method: "PUT",
         credentials: "include",
       });
@@ -28,6 +29,7 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
 
       if (response.ok && data.status) {
         toast.success(`${data.message}`);
+        removeNotification(id);
         setTimeout(() => setIsVisible(false), 300);
       } else {
         toast.error(`${data.message}`);
@@ -43,13 +45,14 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
   const handleReject = async () => {
     setIsLoading('reject');
     try {
-      const response = await fetch(`https://localhost:8080/api/friends/reject/${id}`, {
+      const response = await fetch(`https://localhost:8080/api/friends/reject/${user_id}`, {
         method: "DELETE",
         credentials: "include"
       });
 
       const data: {status: boolean, message: string} = await response.json();
       if (response.ok && data.status) {
+        removeNotification(id);
         toast.success(`${data.message}`);
         setTimeout(() => setIsVisible(false), 300);
       } else {
@@ -79,60 +82,34 @@ export default function FriendRequestCard({ id, username, avatar_url }: FriendRe
         />
         <p className="text-lg font-bold">{username}</p>
       </div>
-
-      {/* <div className="flex gap-3">
-        <button
-          onClick={handleAccept}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold disabled:opacity-50"
-        >
-          Accept
-        </button>
-        <button
-          onClick={handleReject}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold disabled:opacity-50"
-        >
-          Reject
-        </button>
-      </div> */}
-
-      <div className="flex gap-3">
+       <div className="flex gap-2">
         <button
           onClick={handleAccept}
           disabled={isLoading !== null}
-          className={`
-            px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold 
-            transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-            flex items-center gap-2 min-w-[100px] justify-center
-            ${isLoading === 'accept' ? 'bg-green-700' : ''}
-          `}
+          className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
         >
           {isLoading === 'accept' ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Accepting...
-            </>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
-            'Accept'
+            <>
+              <CheckCircle size={16} />
+              <span>Accept</span>
+            </>
           )}
         </button>
         
         <button
           onClick={handleReject}
           disabled={isLoading !== null}
-          className={`
-            px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold 
-            transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-            flex items-center gap-2 min-w-[100px] justify-center
-            ${isLoading === 'reject' ? 'bg-red-700' : ''}
-          `}
+          className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
         >
           {isLoading === 'reject' ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Rejecting...
-            </>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
           ) : (
-            'Reject'
+            <>
+              <XCircle size={16} />
+              <span>Decline</span>
+            </>
           )}
         </button>
       </div>

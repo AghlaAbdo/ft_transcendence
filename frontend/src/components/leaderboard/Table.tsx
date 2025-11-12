@@ -1,4 +1,3 @@
-import Image from "next/image"
 import Link from "next/link"
 import { Player } from "@/constants/leaderboard";
 
@@ -25,7 +24,7 @@ export default function Table({players, numOfPages, page}: TableProps) {
                     <span>Games</span>
                 </div>
                 {
-                    players.map((player, index) =>
+                    players.map((player) =>
                         <ul className="grid grid-cols-5 py-2 items-center rounded-[12px]
                         hover:bg-[#222e43] transition-colors duration-100 ease-in-out
                     " key={player.username}>

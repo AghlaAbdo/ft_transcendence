@@ -1,8 +1,10 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import fastifyCookie from "@fastify/cookie";
 import { initSocket } from "./socket/index.js";
 import chatsRoutes from "./routes/chats.js";
 import dbPlugin from "./plugins/db.js";
+import authPlugin from "./plugins/midlware.js";
 import fs from 'fs';
 
 const logStream = fs.createWriteStream('./logs/chat.log', { flags: 'a' });
@@ -35,9 +37,10 @@ export function logEvent(level: 'info' | 'warn' | 'error' | 'debug', service: st
   }
 }
 
-// adding plugins 
 await fastify.register(cors, { origin: "*" });
+await fastify.register(fastifyCookie);
 await fastify.register(dbPlugin as any);
+await fastify.register(authPlugin as any);
 await fastify.register(chatsRoutes as any);
 
 fastify.addHook('onRequest', async (request, reply) => {
@@ -59,7 +62,7 @@ fastify.setErrorHandler((error, request, reply) => {
 const start = async () => {
   try {
     await fastify.listen({ port: 4545, host: "0.0.0.0" });
-    const io = initSocket(fastify.server as any, (fastify as any).db);
+    initSocket(fastify.server, (fastify as any).db);
     console.log("chat-service running on port 4545");
   } catch (err) {
     console.error("Startup error:", err);

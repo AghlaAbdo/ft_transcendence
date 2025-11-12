@@ -43,7 +43,7 @@ const authPlugin = async (fastify, options) => {
             if (!decoded)
                 return reply.code(401).send({ status: false, message: 'Unauthorized - Invalid token'});
 
-            console.log('current user for logged up--->; ', decoded);
+            // console.log('current user for logged up--->; ', decoded);
 
             const user = fastify.db.prepare(`
                 SELECT id, username, email,avatar_url,

@@ -1,12 +1,14 @@
-import { Eye, Gamepad2, Ban, X } from 'lucide-react';
+import { Eye, Gamepad2, Ban} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import {toast}  from "sonner"
-import { User } from '@/hooks/useAuth';
+import { useSocketStore } from '@/store/useNotificationSocket';
 type chat_options_props = {
+  handle_block : (actor_id: number, target_id: number) => void;
   onClose: () => void;
   _other_user: Friend;
+  user: number;
+  blocked: boolean;
+  blocker: boolean;
 }
-
 
 interface Friend {
   id: number,
@@ -15,54 +17,43 @@ interface Friend {
   avatar_url: string;
 }
 
-const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
+const UserActionsMenu = ({ onClose, _other_user, user, handle_block, blocker, blocked}: chat_options_props) => {
   const router = useRouter();
   const handleViewProfile = (id: number) => {
     router.push(`/profile/${id}`);
   }
-
+  const { socket } =  useSocketStore();
   const handleInviteToGame = async () => {
+    if (!socket)
+        return;
     console.log('Invite to game clicked');
     onClose();
-    const response = await fetch(`/api/game/game-invite?challengerId=5&opponentId=8`, {
+
+    const response = await fetch(`/api/game/game-invite?challengerId=${user}&opponentId=${_other_user.id}`, {
       method: 'POST'
     });
     const data = await response.json();
     console.log("recived data in gameInvite: ", data);
-    if (data && data.gameId)
+    if (data && data.gameId) {
+      socket.emit("Notification", {
+        user_id: user,
+        actor_id: _other_user.id,
+        type: "game_invite",
+        game_link :data.gameId,
+      })
       router.push(`/game/game-invite/${data.gameId}`);
+    }
   };
 
-  const handleBlock = async () => {
-    console.log('Block user clicked');
-
-    try {
-      const response = await fetch(`https://localhost:8080/api/friends/block/${_other_user.id}`, {
-        method: 'PUT',
-        credentials: "include"
-      });
-      const data: { status: boolean, message: string} = await response.json();
-
-      if (response.ok && data.status) {
-        toast.success(`${data.message}`);
-      } else {
-        toast.error(`${data.message}`);
-      }
-    } catch (error) {
-      console.error("Error blocking friend", error);
-      toast.error("An unexpected error occurred.");
-    }
+  const handleBlock = () => {
+    handle_block(user, _other_user.id);
     onClose();
-    // Add your blocking logic here
   };
 
   return (
     <div className="p-0">
-      {/* Header */}
 
-      {/* Action Buttons */}
       <div>
-        {/* View Profile */}
         <button
           onClick={() => {
             handleViewProfile(_other_user.id)
@@ -71,32 +62,40 @@ const UserActionsMenu = ({ onClose, _other_user }: chat_options_props) => {
           }
           className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-700 hover:text-white transition-all duration-200 group"
         >
-          <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400 group-hover:bg-purple-500/30 transition-colors duration-200">
+          <div className="p-1">
             <Eye className="w-5 h-5" />
           </div>
           <span className="ml-3 font-medium">View Profile</span>
         </button>
 
-        {/* Invite to Game */}
         <button
           onClick={handleInviteToGame}
-          className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-slate-700 hover:text-white transition-all duration-200 group"
+          disabled={blocker || blocked}
+          className={`flex items-center w-full p-2 rounded-lg transition-all duration-200 group ${
+            blocker || blocked 
+              ? 'text-gray-500 cursor-not-allowed opacity-50' 
+              : 'text-gray-200 hover:bg-slate-700 hover:text-white'
+          }`}
         >
-          <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400 group-hover:bg-purple-500/30 transition-colors duration-200">
+          <div className="p-1">
             <Gamepad2 className="w-5 h-5" />
           </div>
           <span className="ml-3 font-medium">Invite to Game</span>
         </button>
 
-        {/* Block User */}
         <button
           onClick={handleBlock}
-          className="flex items-center w-full p-2 text-gray-200 rounded-lg hover:bg-red-900/30 hover:text-red-400 transition-all duration-200 group"
+          disabled={blocker || blocked}
+          className={`flex items-center w-full p-2 rounded-lg transition-all duration-200 group ${
+            blocker || blocked
+              ? 'text-gray-500 cursor-not-allowed opacity-50'
+              : 'text-gray-200 hover:bg-red-900/30 hover:text-red-400'
+          }`}
         >
-          <div className="p-2 rounded-lg bg-red-500/20 text-red-400 group-hover:bg-red-500/30 transition-colors duration-200">
+          <div className={`p-1 ${blocker || blocked ? '' : 'text-red'}`}>
             <Ban className="w-5 h-5" />
           </div>
-          <span className="ml-3 font-medium">Block User</span>
+          <span className={`ml-3 font-medium ${blocker || blocked ? '' : 'text-red'}`}>Block User</span>
         </button>
       </div>
     </div>

@@ -6,7 +6,7 @@ services:
       - chat-service
       - user-service
       - nextjs
-      # - game-service
+      - game-service
       # - prometheus
       # - kibana
 

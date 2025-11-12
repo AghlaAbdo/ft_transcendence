@@ -29,16 +29,21 @@ export const MessageInput = ({ onSendMessage }: SendMessageProps) => {
       message.substring(0, start) + 
       emoji + 
       message.substring(end);
-    
-    setMessage(newMessage);
-    
-    // Set cursor position after emoji (setTimeout needed for React DOM update)
+      setMessage(newMessage);
+
+      // Set cursor position after emoji (setTimeout needed for React DOM update)
       input.focus();
       // Calculate position using the actual emoji string length in the new message
       const newPos = start + emoji.length;
       input.setSelectionRange(newPos, newPos);
     setopen(false);
   };
+
+  
+  useEffect(()=> {
+    if (inputRef.current)
+      inputRef.current.focus();
+  },[])
 
   const handleSendMessage = () => {
     const msg = message.trim();

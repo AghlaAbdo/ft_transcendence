@@ -1,17 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-import Image from 'next/image';
-
 import { motion } from 'framer-motion';
-
 import useConnectSocket from '@/lib/useConnectSocket';
-
 import { useLayout } from '@/context/LayoutContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotificationStore } from '@/store/useNotificationStore';
-
 import { GlobalSearch } from './global_search';
 import { markAllNotificationsAsRead_friend } from './markAsRead';
 import NotificationCenter from './notifications';
@@ -40,7 +34,6 @@ export default function Header() {
     const handleEsckey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setopen(false);
-        // resetUnread();
       }
     };
     document.addEventListener('keydown', handleEsckey);
@@ -80,7 +73,7 @@ export default function Header() {
       )}
         <div className='flex justify-between items-center gap-4'>
           <button className='cursor-pointer' onClick={() => setopen(true)}>
-            {/* Search Icon*/}
+
             <svg
               className='fill-gray-50'
               width='22'
@@ -101,7 +94,7 @@ export default function Header() {
                 markAllNotificationsAsRead_friend(user.id);
               }}
             >
-              {/* Notification Icon */}
+
               <svg
                 className='stroke-gray-50'
                 width='22'
@@ -123,15 +116,16 @@ export default function Header() {
                   strokeLinejoin='round'
                 />
               </svg>
-              <span className='absolute top-0 right-0  translate-x-1/3 -translate-y-1/3 bg-red-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center'>
+              { unreadCount > 0 && (
+                <span className='absolute top-0 right-0  translate-x-1/3 -translate-y-1/3 bg-red-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center'>
                 {unreadCount}
-              </span>
+              </span>)
+              }
             </button>
           )}
         </div>
       </motion.div>
-
-      {/* Global Search Modal */}
+  
       <div
         className={`fixed inset-0 bg-black/50 z-50 pt-5 transition-opacity duration-200 ease-out ${
           isopen

@@ -16,6 +16,11 @@ const ProfilePage = () => {
   const [error, setError] = useState<string | null>(null);
 
 
+  const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
   useEffect( () => {
     const fetchUserById = async () => {
       try {
@@ -31,8 +36,8 @@ const ProfilePage = () => {
         } else {
           throw new Error(data.message || "Failed to load user");
         }
-        } catch (error: any) {
-          setError(error.message);
+        } catch (erro) {
+          setError(getErrorMessage(error));
         } finally {
         setLoading(false);
       }
