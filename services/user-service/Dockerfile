@@ -15,6 +15,6 @@ ENV NODE_ENV=production
 COPY . .
 # Remove dev dependencies
 # RUN npm prune --omit=dev
-RUN RUN npm install --only=prod
-RUN npm run build
-CMD ["npm", "start"]
+RUN npm install --only=prod
+# RUN npm run build
+CMD ["npm", "run", "start"]

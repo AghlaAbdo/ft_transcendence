@@ -53,6 +53,8 @@ export default function ChatPage() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, [selectedChatId]);
 
+  console.log("-- Ever here");
+
   useEffect(() => {
     const fetchingmessages = async () => {
       if (user && selectedChatId && selectedChatId != -1) {

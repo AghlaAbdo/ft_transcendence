@@ -6,6 +6,10 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
   safelist: [
     'border-orange-500',
     'border-yellow-500',
@@ -19,10 +23,6 @@ const config: Config = {
     'w-[50%]',
     'w-[30%]',
   ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
+} as Config
 
 export default config

@@ -169,13 +169,13 @@ function fp(plugin) {
 ```
 Without fp:
 ┌─ fastify (root)
-│  └─ dbPlugin → db ❌ (scoped)
+│  └─ dbPlugin → db (scoped)
 │  └─ routesPlugin → can't see db
 
 With fp:
 ┌─ fastify (root)
-│  └─ dbPlugin → db ✅ (propagates up)
-└─ routesPlugin → can see db ✅
+│  └─ dbPlugin → db  (propagates up)
+└─ routesPlugin → can see db 
 ```
 
 ---
@@ -271,7 +271,7 @@ fastify.addHook("onClose", async (instance, done) => {
 
 ## Alternative Approaches (and Why Plugin is Better)
 
-### ❌ Approach 1: Global Variable
+### Approach 1: Global Variable
 
 ```typescript
 // database.ts
@@ -292,7 +292,7 @@ export function handler(req, reply) {
 
 ---
 
-### ❌ Approach 2: Open Connection per Request
+### Approach 2: Open Connection per Request
 
 ```typescript
 export function handler(req, reply) {
@@ -310,7 +310,7 @@ export function handler(req, reply) {
 
 ---
 
-### ✅ Approach 3: Plugin (Current)
+###  Approach 3: Plugin (Current)
 
 ```typescript
 // plugin opens DB once

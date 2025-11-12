@@ -150,7 +150,7 @@ const SettingsPage = () => {
         toast.error(dataResponse.message);
       }
     } catch (error) {
-      toast.error(`❌ Network error. Please check your connection and try again.`);
+      toast.error(`Network error. Please check your connection and try again.`);
     }
   }
 
@@ -174,7 +174,7 @@ const SettingsPage = () => {
         toast.error(dataResponse.message);
       }
     } catch (error) {
-      toast.error(`❌ Network error. Please check your connection and try again.`);
+      toast.error(`Network error. Please check your connection and try again.`);
     }
   }
 

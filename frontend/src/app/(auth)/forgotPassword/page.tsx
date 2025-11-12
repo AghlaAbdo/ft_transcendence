@@ -21,11 +21,11 @@ const ForgotPasswordPage = () => {
       });
 
       if (response.ok) {
-        toast.success("📩 we’ve sent you a reset link.");
+        toast.success("we’ve sent you a reset link.");
         setEmail("");
       } else {
         const data : { message?: string} = await response.json();
-        toast.error(data.message || "❌ Failed to send reset email.");
+        toast.error(data.message || "Failed to send reset email.");
       }
     } catch (error) {
       toast.error('Network error. Please try again.');

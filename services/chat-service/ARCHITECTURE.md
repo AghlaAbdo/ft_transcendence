@@ -161,9 +161,9 @@ export function getMessages(db: Database.Database, chatId: number) {
 ### Why Use a Plugin?
 
 **Problem**: Multiple files need DB access. Options:
-1. ❌ Each file opens its own DB connection → resource waste, inconsistent state
-2. ❌ Global variable → hard to test, hidden dependencies
-3. ✅ **Plugin**: Centralized, lifecycle-managed, injectable
+1. Each file opens its own DB connection → resource waste, inconsistent state
+2. Global variable → hard to test, hidden dependencies
+3.  **Plugin**: Centralized, lifecycle-managed, injectable
 
 ### Plugin Implementation (`plugins/db.ts`)
 
@@ -248,9 +248,9 @@ const fastify = Fastify();
 fastify.decorate("db", myDatabase);
 
 // Now accessible as:
-fastify.db              // ✅
-req.server.db           // ✅ (in route handlers)
-reply.server.db         // ✅
+fastify.db              // 
+req.server.db           //  (in route handlers)
+reply.server.db         // 
 ```
 
 ### Registration Order Matters
@@ -344,7 +344,7 @@ const onlineUsers: Map<number, Socket> = new Map();
 ## Best Practices
 
 ### 1. **Dependency Injection**
-❌ **Bad**: Global DB variable
+**Bad**: Global DB variable
 ```typescript
 // database.ts
 const db = new Database("chat.db");  // Global
@@ -353,7 +353,7 @@ export function getMessages(chatId) {
 }
 ```
 
-✅ **Good**: Inject DB as parameter
+ **Good**: Inject DB as parameter
 ```typescript
 export function getMessages(db: Database.Database, chatId: number) {
   return db.prepare("...").all(chatId);
@@ -363,12 +363,12 @@ export function getMessages(db: Database.Database, chatId: number) {
 **Benefits**: Testable, flexible, no hidden dependencies
 
 ### 2. **Use Prepared Statements**
-❌ **Dangerous**: String concatenation (SQL injection risk)
+**Dangerous**: String concatenation (SQL injection risk)
 ```typescript
 db.exec(`SELECT * FROM messages WHERE id = ${messageId}`);
 ```
 
-✅ **Safe**: Parameterized queries
+ **Safe**: Parameterized queries
 ```typescript
 db.prepare("SELECT * FROM messages WHERE id = ?").get(messageId);
 ```

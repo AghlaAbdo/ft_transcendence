@@ -235,14 +235,14 @@ export function getMessages(db: Database.Database, chatId: number, limit = 50, o
 
 ## Security Checklist
 
-- ✅ Use parameterized queries (prepared statements)
-- ✅ Validate all inputs (parse, check types, ranges)
-- ✅ Don't expose raw error messages to clients
-- ✅ Use CORS correctly (don't use `*` in production)
-- ✅ Authenticate socket connections
-- ✅ Rate limit endpoints
-- ✅ Sanitize user-generated content
-- ✅ Enable SQLite foreign keys
+-  Use parameterized queries (prepared statements)
+-  Validate all inputs (parse, check types, ranges)
+-  Don't expose raw error messages to clients
+-  Use CORS correctly (don't use `*` in production)
+-  Authenticate socket connections
+-  Rate limit endpoints
+-  Sanitize user-generated content
+-  Enable SQLite foreign keys
 
 ---
 
