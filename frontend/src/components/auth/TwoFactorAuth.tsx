@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
-
-import { QrCode } from 'lucide-react';
 import { toast } from 'sonner';
-
 import { useAuth } from '@/hooks/useAuth';
-
-import Switcher4 from '../toggle_button';
 import Disable2fa from './Disable2fa';
 import QrModal from './QrModal';
 

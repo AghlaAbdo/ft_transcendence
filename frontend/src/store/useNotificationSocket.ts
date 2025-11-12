@@ -25,9 +25,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       console.log('Connected to socket');
     });
 
-
     socket.on('Notification', async (data) => {
-      const { addNotification, incrementUnread , removeNotification} =
+      const { addNotification, incrementUnread , removeNotification, decrementUnread} =
         useNotificationStore.getState();
 
       const userRes = await fetch(
@@ -43,12 +42,13 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         user_avatar: userData.user.avatar_url,
       };
       addNotification(data);
-      incrementUnread();
+    incrementUnread();
       toast.info('you have new notification !');
       if (data.type === 'game_invite') {
         setTimeout(() => {
           markOneNotificationsAsRead_game(data.id);
           removeNotification(data.id);
+          decrementUnread();
         }, 30000); // 30s
       }
     });

@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { X, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { setegid, setSourceMapsEnabled } from 'process';
-import { setEnvironmentData } from 'worker_threads';
 
 interface qrCode {
   manualEntryKey: string;

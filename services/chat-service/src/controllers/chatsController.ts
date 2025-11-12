@@ -11,7 +11,6 @@ type ChatRow = {
   last_message_id: number;
 };
 
-// Request parameter interfaces
 interface GetMessagesParams {
   chatId: string;
   otherUserId: string
@@ -33,8 +32,8 @@ interface CheckChatExistsParams {
 export async function getMessagesHandler(
   req: FastifyRequest<{ Params: GetMessagesParams }>,
   reply: FastifyReply
+
 ) {
-  console.log('aloooo');
   const chatId = parseInt(req.params.chatId);
   const userid = (req as any).user.id;
   const otherUserId = parseInt(req.params.otherUserId);

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { User, useAuth } from '@/hooks/useAuth';
 import { Search_Input } from './Search_Input';
 import { NoChats } from './noChats';
@@ -33,7 +33,6 @@ interface Friend {
 
 interface ChatlistProps {
   onSelect: (chatId: number, selectedFriend?:Friend) => void;
-  // onReceiveChange: (userId_2: number) => void;
   selectedChatId: number | null;
   userId: number | null;
   conv: Message[];
@@ -43,7 +42,6 @@ export const Chatlist = ({
   onSelect,
   selectedChatId,
   userId,
-  // onReceiveChange,
   conv,
 }: ChatlistProps) => {
   const [tick, setTick] = useState(0);

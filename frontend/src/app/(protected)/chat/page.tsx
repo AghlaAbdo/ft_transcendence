@@ -62,9 +62,7 @@ export default function ChatPage() {
             { credentials: 'include' }
           );
           const data = await fetchmessage.json();
-          console.log('messages: ', data);
           if (data.status) {
-            console.log('allo from messages');
             set_conv(data.messages);
             const otherId =
               data.messages[0].sender === user.id
@@ -117,8 +115,6 @@ export default function ChatPage() {
     socket.connect();
     socketRef.current = socket;
     socket.on('ChatMessage', (data) => {
-      console.log('chat id on front : ', selectedChatId);
-    
       if (selectedChatIdRef.current === -1 && data.chat_id) {
         setSelectedChatId(data.chat_id);
       }
@@ -152,11 +148,7 @@ export default function ChatPage() {
   }, [user]);
 
   const handle_block = (actor_id: number, target_id: number) => {
-    console.log('user clicked blocker_id: ', actor_id);
-    console.log('user clicked traget_id: ', target_id);
     if (socketRef.current && selectedChatId && user && otherUser) {
-      console.log('current: ', actor_id, ', target: ', target_id);
-
       socketRef.current.emit('block', {
         actor_id: actor_id,
         target_id: target_id,

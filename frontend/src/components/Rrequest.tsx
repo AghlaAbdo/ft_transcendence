@@ -3,7 +3,7 @@
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Gamepad2 } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export interface FriendRequestCardProps {
   user_id: number;

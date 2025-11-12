@@ -11,7 +11,6 @@ interface disable2faprops {
 
 export default function Disable2fa({onclose,handledisable}: disable2faprops) {
   const [code, setCode] = useState('');
-  const [copied, setCopied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
   const handleVerify = async () => {
