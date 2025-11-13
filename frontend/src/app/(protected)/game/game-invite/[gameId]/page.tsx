@@ -40,7 +40,7 @@ export default function GameInvite() {
       setHideSidebar(false);
     });
     socket.on('matchNotFound', () => {
-      console.log('GAmeInvite match not found!!');
+      // console.log('GAmeInvite match not found!!');
       setHideHeaderSidebar(false);
       setHideSidebar(false);
       setLoading(false);

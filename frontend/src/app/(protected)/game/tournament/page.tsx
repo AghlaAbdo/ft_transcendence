@@ -44,13 +44,13 @@ export default function TournamentLobbyPage() {
     });
 
     socket.on('tournamentCreated', (data: { tournamentId: string }) => {
-      console.log('Tournament created:', data.tournamentId);
+      // console.log('Tournament created:', data.tournamentId);
       setIsCreateModalOpen(false);
       router.push(`/game/tournament/${data.tournamentId}`);
     });
 
     socket.on('tournamentJoined', (data: { tournamentId: string }) => {
-      console.log('Tournament joined:', data.tournamentId);
+      // console.log('Tournament joined:', data.tournamentId);
       router.push(`/game/tournament/${data.tournamentId}`);
     });
 

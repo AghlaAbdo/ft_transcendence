@@ -4,6 +4,9 @@ import { getPlayerInfo } from '../utils/getPlayerInfo';
 import { handleGameInvite } from '../remote-game/gameInvite';
 import authorization from './auth';
 import { logEvent } from '../server';
+import { JWT_SECRET } from '../config/env';
+import cookie from 'cookie';
+import jwt from 'jsonwebtoken';
 
 export interface WeekStats {
   week_number: number;
@@ -177,6 +180,28 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.post('/game-invite', async (req, rep) => {
+
+    console.log("jwt secret in auth: ", JWT_SECRET);
+    let userId: string;
+    if (!JWT_SECRET) return rep.code(400).send({ error: 'No JWT_SERCRET found' });;
+    try {
+      const cookies = cookie.parse(req.headers.cookie || '');
+      const token = cookies.token;
+  
+      if (!token) {
+        return rep.code(401).send({ error: 'No token provided' });
+      }
+  
+      const decoded = jwt.verify(token, JWT_SECRET) as {
+        id: string;
+        username: string;
+      };
+      userId = decoded.id;
+      // console.log(" -- Decoded: ", decoded);
+    } catch (err) {
+      return rep.code(401).send({ error: 'Invalid or expired token' });
+    }
+
     logEvent('info', 'game', 'api_request', {
       method: 'POST',
       path: '/game-invite',
@@ -189,8 +214,13 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
     };
     if (!challengerId || !opponentId || challengerId === opponentId) {
       rep
-        .status(500)
+        .status(405)
         .send({ error: 'challengerId and opponentId are required!' });
+      return;
+    } else if (challengerId !== userId) {
+      rep
+        .status(405)
+        .send({ error: 'Not Allowed' });
       return;
     }
     const challenger = await getPlayerInfo(challengerId);

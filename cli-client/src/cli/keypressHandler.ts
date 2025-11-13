@@ -15,13 +15,15 @@ function handleKeypress(_str: string, key: any) {
   if (key.name === 'up') {
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'up');
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'up');
+    socket.emit('movePaddle', playerData.gameId, playerData.role, 'up');
   } else if (key.name === 'down') {
+    socket.emit('movePaddle', playerData.gameId, playerData.role, 'down');
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'down');
     socket.emit('movePaddle', playerData.gameId, playerData.role, 'down');
   } else if (key.sequence === 'q') {
     console.log('Quitting game...');
     // console.log('playerData when quit 22: ', playerData);
-    console.log('playerData.gameStatus: ', playerData.gameStatus);
+    // console.log('playerData.gameStatus: ', playerData.gameStatus);
     if (playerData.gameStatus === 'matching')
       socket.emit('cancelMatching', {
         userId: playerData.user!.id,
