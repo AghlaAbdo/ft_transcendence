@@ -90,6 +90,14 @@ const uploadAvatar = async (request, reply) => {
             });
         }
 
+        const mimetype = file.mimetype;
+        if (mimetype !== 'image/png' && mimetype !== 'image/jpeg') {
+            return reply.status(400).send({
+                status: false,
+                message: 'Only PNG or JPEG images are allowed'
+            });
+        }
+
         const uploadDir = path.join(process.cwd(), "uploads", "avatars");
 
         if (!fs.existsSync(uploadDir)) {
@@ -101,9 +109,8 @@ const uploadAvatar = async (request, reply) => {
         const buffer = await file.toBuffer();
         await fs.promises.writeFile(filePath, buffer);
         
-        // const avatar_url = `https://localhost:8080/uploads/avatars/${user.id}-${file.filename}`;
-        const avatar_url = `/uploads/avatars/${user.id}-${file.filename}`;    
         const db = request.server.db;
+        const avatar_url = `/uploads/avatars/${user.id}-${file.filename}`;    
 
         db.prepare(`
             UPDATE USERS
@@ -117,7 +124,7 @@ const uploadAvatar = async (request, reply) => {
         });
 
     } catch (error) {
-        console.error("Avatar upload failed:", err);
+        console.error("Avatar upload failed:", error);
         return reply.status(500).send( { status: false, error: "Internal Server Error" });
     }
 }
@@ -268,7 +275,6 @@ const updateInfo = async (request, reply) => {
 }
 
 const searchQuery = async (request, reply) => {
-    console.log('allo from backenddd');
     
     try {
         const { query } = request.query;

@@ -43,7 +43,7 @@ type ResetPasswordInput = z.infer<typeof changePasswordSchema>;
 
 const SettingsPage = () => {
   const {user, isLoading} = useAuth();
-  const [avatar, setAvatar] = useState<string>("");
+  const [avatar, setAvatar] = useState<string | null>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [is_google_auth, setgooglelogin] = useState<number>(0);
   useEffect(() =>{
@@ -80,23 +80,29 @@ const SettingsPage = () => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file  = e.target.files[0];
-      // console.log("file : ", file);
+      const allowedExtensions = ['image/png', 'image/jpeg'];
+
+      if (!allowedExtensions.includes(file.type)) {
+        toast.error('Only PNG or JPEG images are allowed');
+        e.target.value = '';
+        return ;
+      }
 
       if (file.size > 10 * 1024 * 1024) {
         toast.error('File size must be less than 10MB');
+        e.target.value = '';
         return;
       }
       setAvatar(URL.createObjectURL(file));
 
       const formData = new FormData();
-
       formData.append("avatar", file); // files comes from <input type="file">
 
       try {
         const response = await fetch("https://localhost:8080/api/users/upload-avatar", {
           method: "POST",
           body: formData,
-          credentials: "include", // sends the token cookie automatically no Authorization header is required, the browser send token automatically
+          credentials: "include",
         });
 
         if (response.status === 413) {
@@ -112,12 +118,12 @@ const SettingsPage = () => {
         }
 
         const data: {status: boolean, message: string} = await response.json();
-
         if (response.ok && data.status) {
           
           toast.success("Avatar uploaded successfully!");
         } else {
           toast.error("Failed to upload avatar");
+          console.log(data.message);
         }
         
       } catch (error) {
