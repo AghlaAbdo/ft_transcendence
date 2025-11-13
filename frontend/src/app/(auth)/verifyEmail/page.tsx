@@ -93,7 +93,7 @@ const VerifyEmailPageForm = () => {
       <div className='flex justify-center items-center min-h-screen'>
         <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
           <div className='text-xl text-center text-red-400 mb-4'>
-            ⚠️ Email address is missing
+            Email address is missing
           </div>
           <p className='text-center text-slate-300 mb-4'>
             Please go back and sign up again.
