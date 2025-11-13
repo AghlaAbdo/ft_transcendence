@@ -196,8 +196,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
         id: string;
         username: string;
       };
-      userId = decoded.id;
-      // console.log(" -- Decoded: ", decoded);
+      userId = String(decoded.id);
     } catch (err) {
       return rep.code(401).send({ error: 'Invalid or expired token' });
     }
@@ -206,8 +205,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       method: 'POST',
       path: '/game-invite',
     });
-    console.log('req.body: ', req.body);
-    console.log('req.query: ', req.query);
+
     const { challengerId, opponentId } = req.query as {
       challengerId?: string;
       opponentId?: string;
@@ -232,6 +230,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       return;
     }
     const gameId = handleGameInvite(challenger, opponent);
+    console.log("did sent gam-invite sucess");
     return { message: 'Created game!', gameId };
   });
 }

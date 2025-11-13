@@ -11,7 +11,6 @@ const __dirname = dirname(__filename)
 
 const databasePlugin = async (fastify, options) => {
     const dbPath = path.join(__dirname, '../../database/user-service.db');
-    console.log("dbname ---->: ", dbPath);
     const sqlPath = path.join(__dirname, '../../database/schema.sql');
     const sql = fs.readFileSync(sqlPath, 'utf8');
 

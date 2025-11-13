@@ -2,7 +2,7 @@ import fp from 'fastify-plugin';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
+const INTERNAL_SECRET = process.env.INTERNAL_API_KEY;
 const COOKIE_NAME = 'token';
 
 const authPlugin = async (fastify, options) => {
