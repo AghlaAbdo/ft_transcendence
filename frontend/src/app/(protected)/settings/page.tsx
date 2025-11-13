@@ -139,7 +139,7 @@ const SettingsPage = () => {
 
   const handleUpdateInfo = async (data: FormData) => {
     try {
-      const response = await fetch('https://localhost:8080/api/users/update-info', {
+      const response = await fetch('/api/users/update-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify( {
@@ -162,7 +162,7 @@ const SettingsPage = () => {
 
   const handleChangePasswod = async (data: ResetPasswordInput) => {
     try {
-      const response = await fetch('https://localhost:8080/api/users/change-password', {
+      const response = await fetch('/api/users/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify( {

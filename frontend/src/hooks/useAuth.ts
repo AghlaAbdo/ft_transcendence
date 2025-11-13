@@ -44,7 +44,7 @@ export const useAuth = () : UseAuthReturn => {
     useEffect(() => {
         const checkAuth = async (): Promise<void> => {
             try {
-                const response = await fetch('https://localhost:8080/api/auth/me', {
+                const response = await fetch('/api/auth/me', {
                     method: 'GET',
                     credentials: 'include'
                 });

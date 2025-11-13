@@ -4,7 +4,7 @@ export const markAllNotificationsAsRead_friend = async (userId: number) => {
 
   try {
     console.log('marking all notifications as read');
-    const response = await fetch('https://localhost:8080/api/users/notifications/friend_request/mark-as-read', {
+    const response = await fetch('/api/users/notifications/friend_request/mark-as-read', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export const markAllNotificationsAsRead_friend = async (userId: number) => {
 
 export const markAllNotificationsAsRead_game = async (userId: number) => {
   try {
-    const response = await fetch('https://localhost:8080/api/users/notifications/game/mark-as-read', {
+    const response = await fetch('/api/users/notifications/game/mark-as-read', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export const markAllNotificationsAsRead_game = async (userId: number) => {
 
 export const markOneNotificationsAsRead_game = async (notif_id: number) => {
   try {
-    const response = await fetch('https://localhost:8080/api/users/notifications/delete', {
+    const response = await fetch('/api/users/notifications/delete', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
