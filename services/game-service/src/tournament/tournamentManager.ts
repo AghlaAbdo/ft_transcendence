@@ -378,7 +378,7 @@ export async function advancePlayerInTournament(
     removeUserActiveTournament(currMatch.winnerId, tournamentId);
     io.to(tournamentId).emit('bracketUpdate', tournament.bracket);
     io.to(tournamentId).emit('tournamentWinner', { winner });
-    setTimeout(() => deleteTournament(tournamentId), 3000 * 1e3);
+    setTimeout(() => deleteTournament(tournamentId), 300 * 1e3);
     return;
   }
 
