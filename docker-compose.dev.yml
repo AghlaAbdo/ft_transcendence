@@ -27,7 +27,7 @@ services:
       - ./services/game-service:/app
       - ./logs:/app/logs
     env_file:
-      ./services/game-service/.env.dev
+      ./services/game-service/.env
   #   ports:
   #     - "4000:4000"
   # game-service:
