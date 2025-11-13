@@ -12,7 +12,7 @@ import {
 } from '../config/game';
 import { IGameState } from '../types/types';
 import { Server } from 'socket.io';
-import { getAllGames } from './AllGames';
+import { getAllGames, getGameState } from './AllGames';
 import { getCurrDate } from '../utils/dates';
 import {
   removeUserActiveGame,
@@ -46,11 +46,15 @@ export function startGame(gameState: IGameState) {
 
     setTimeout(() => {
       // console.log("starting:", j);
+      if (!getGameState(gameState.id)) return;
       ioInstance.to(gameState.id).emit('starting', j);
 
       if (j === 1) {
         setTimeout(() => {
-          if (gameState.game.status === 'ended') {
+          if (
+            !getGameState(gameState.id) ||
+            gameState.game.status === 'ended'
+          ) {
             deleteGame(gameState.id);
             return;
           }

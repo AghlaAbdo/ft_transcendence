@@ -9,6 +9,7 @@ import { API_URL } from './config.js';
 import { setupSocket } from './socket/manager.js';
 import { setUpReadline } from './cli/readlineHandler.js';
 import https from 'https';
+import { CLI_EMAIL, CLI_PASS } from './config.js';
 
 export const playerData: IPlayerData = {
   user: null,
@@ -23,7 +24,7 @@ export const playerData: IPlayerData = {
 
 const axiosInstance = axios.create({
   httpsAgent: new https.Agent({
-    rejectUnauthorized: false, // 👈 allows self-signed certs
+    rejectUnauthorized: false, // allows self-signed certs
   }),
 });
 
@@ -44,8 +45,10 @@ async function main() {
 
   const ask = (q: string) =>
     new Promise<string>((res) => rl.question(q, (a) => res(a)));
-  const email = process.env.CLI_USER || (await ask('email: '));
-  const password = process.env.CLI_PASS || (await ask('Password: '));
+  const email = CLI_EMAIL || (await ask('email: '));
+  const password = CLI_PASS || (await ask('Password: '));
+  console.log(`email: [${CLI_EMAIL}]`);
+  console.log(`password: [${CLI_PASS}]`);
   rl.close();
 
   let token: string | null = null;

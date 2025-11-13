@@ -374,7 +374,7 @@ export const useLocalPongLogic = (): returnType => {
     } else if (ball.current.x + 10 >= GAME_WIDTH) {
       scores.current.left += 1;
       ballSpeed.current = BALL_SPEED;
-      console.log('increasing left ??');
+      // console.log('increasing left ??');
       if (scores.current.left === 5) {
         setWinner('Player 1');
         isPlaying.current = false;

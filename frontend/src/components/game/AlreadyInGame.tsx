@@ -32,13 +32,14 @@ export default function AlreadyInGame() {
         </div>
 
         <div className='flex justify-between gap-3 mt-3'>
-          <button
+          {/* <button
             onClick={() => router.replace('/game/play-remote')}
             className='group relative overflow-hidden bg-purple hover:bg-light-purple text-white font-semibold py-2 px-4 rounded-xl shadow-lg transition-all duration-300  cursor-pointer'
           >
             <span className='relative z-10'>Continue Playing</span>
             <div className='absolute inset-0 bg-gradient-to-r from-pink-600 to-purple opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-          </button>
+          </button> */}
+          <div></div>
 
           <button
             onClick={() => router.replace('/game')}

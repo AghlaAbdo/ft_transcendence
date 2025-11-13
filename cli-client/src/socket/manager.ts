@@ -7,6 +7,7 @@ import {
   handleMatchDetails,
   handleMatchFound,
   handlePlayerData,
+  handleOpponentQuit,
 } from './handlers.js';
 
 export let socket: Socket;
@@ -30,7 +31,8 @@ export function setupSocket(token: string): Socket {
   });
 
   socket.on('connect_error', (err) => {
-    console.error('Connect error:', err.message);
+    console.error('Socket connection error:', err.message);
+    process.exit(1);
   });
 
   socket.on('playerData', (data) => {
@@ -49,8 +51,9 @@ export function setupSocket(token: string): Socket {
     handleGameStateUpdate(socket, state);
   });
 
-  socket.on('opponentQuit', (status) => {
+  socket.on('opponentQuit', (socket, status) => {
     console.log('Opponent quit. game status:', status);
+    handleOpponentQuit(socket, status);
   });
 
   socket.on('matchDetails', (data: { gameStatus: string }) => {

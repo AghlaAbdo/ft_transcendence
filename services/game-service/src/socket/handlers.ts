@@ -339,6 +339,8 @@ export function handleQuit(data: {
 export function handleCancelMatching(data: { userId: string; gameId: string }) {
   const gameState = getGameState(data.gameId);
   // console.log('gameStatus in handleCancelMatching: ', gameState?.game.status);
+  console.log(' ---- called cancel Matching ??');
+  // console.log(" -- data: ", data);
   if (
     gameState?.player1.id != data.userId ||
     gameState?.game.status == 'playing'
@@ -350,7 +352,6 @@ export function handleCancelMatching(data: { userId: string; gameId: string }) {
     removeUserActiveGame(gameState.player1.id, gameState.id);
     removeUserActiveGame(gameState.player2.id, gameState.id);
   }
-  console.log(' ---- called cancel Matching ??');
   deleteGame(gameState.id);
 }
 
@@ -397,7 +398,7 @@ export function handleRequestGameState(socket: Socket, userId: string) {
   });
 }
 
-export function hancleQuitRemoteGamePage(data: {
+export function handleQuitRemoteGamePage(data: {
   userId: string;
   gameId: string;
 }) {

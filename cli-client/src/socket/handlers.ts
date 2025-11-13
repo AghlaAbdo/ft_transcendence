@@ -46,7 +46,7 @@ export function handleGameStateUpdate(socket: Socket, state: IGameState) {
     });
     console.log(chalk.bold('\n🏁 Game Over!'));
     console.log(
-      `Final Score: ${state.leftPaddle.score} - ${state.rightPaddle.score}`,
+      `Final Score: ${playerData.role === 'player1' ? state.leftPaddle.score : state.rightPaddle.score} - ${playerData.role === 'player2' ? state.leftPaddle.score : state.rightPaddle.score}`,
     );
     const winner =
       state.winner === playerData.role
@@ -79,4 +79,21 @@ export function handleMatchDetails(
   } else {
     console.log(chalk.red('You are already playing in another session !'));
   }
+}
+
+export function handleOpponentQuit(socket: Socket, status: string) {
+  if (!playerData.inGame)
+    return;
+  if (status === 'playing')
+    socket.emit('quit', {
+      userId: playerData.user!.id,
+      gameId: playerData.gameId,
+    });
+  console.log(chalk.yellow.bold('\nOpponent Quit!'));
+  console.log(chalk.green('You Win!'));
+  playerData.inGame = false;
+  playerData.gameStatus = null;
+  clearKeypress();
+  setUpReadline();
+  console.log(chalk.yellowBright('Type "play" to start or "exit" to quit.'));
 }
