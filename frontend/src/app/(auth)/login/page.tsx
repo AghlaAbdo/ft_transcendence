@@ -28,7 +28,7 @@ const LoginPage = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify( {email, password} ),
-          credentials: "include"  // allow cookies
+          credentials: "include"
         });
   
         

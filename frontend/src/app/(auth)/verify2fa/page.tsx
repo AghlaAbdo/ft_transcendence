@@ -31,7 +31,6 @@ const Verify2faPage = () => {
             body: JSON.stringify({ token: code, tmpToken: tmpToken }),
             }
         );
-        // console.log(response);
         const data: {error: string} = await response.json();
         if (response.ok) {
             router.push('/success');
