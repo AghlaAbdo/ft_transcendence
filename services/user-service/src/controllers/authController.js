@@ -538,7 +538,7 @@ const verifyToken2fa = async(request, reply) => {
         const isValid = verifyToken(totp_secret, token);
 
         if (!isValid) {
-            return rep.status(400).send({ status: false, error: 'Invalid verification code' });
+            return reply.status(400).send({ status: false, error: 'Invalid verification code' });
         }
 
         const newToken = request.server.signToken({
