@@ -96,7 +96,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder='username...'
             className='w-full py-2 pl-11 pr-4 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 z-[1]'
-            autoFocus // remember to put this in the global search also in the
+            autoFocus
           />
           {searchTerm && (
             <button

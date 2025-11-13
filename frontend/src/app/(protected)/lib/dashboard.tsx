@@ -2,11 +2,14 @@
 import { game, stat, StatWithTimeDict, TimeDict, WeekStats } from "@/constants/dashboard"
 
 export async function GetGames(userId: number): Promise<game[]> {
+    console.log('get game ----------------');
     // const empty = false
     // if (empty) {
     //     userId = 1000
     // }
     const response = await fetch(`/api/game/games?userId=${userId}`)
+    console.log('response: ', response);
+    
     if (!response.ok) throw new Error("Error fetching games!")
     const rawData = await response.json()
     const games: game[] = rawData.games

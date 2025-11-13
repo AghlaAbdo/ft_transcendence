@@ -1,18 +1,22 @@
 import createApp from "./app.js";
 import cors from "@fastify/cors";
 import { Server, Socket } from "socket.io";
+import cookie from "cookie";
+import jwt from "jsonwebtoken";
 
 const fastify = createApp();
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "0.0.0.0";
+
+const JWT_SECRET   = process.env.JWT_SECRET;
 
 import notoficationModel from "./models/notoficationModel.js";
 
 const onlineUsers = new Map();
 const disconnectTimers = new Map(); // userId -> timeout
 
-const handleConnection = (fastify, socket) => {
-  const user__id = parseInt(socket.handshake.auth.user_id);
+const handleConnection = (fastify, socket, data) => {
+  const user__id = parseInt(data.id);
   if (isNaN(user__id)) {
     console.log("Invalid user ID — disconnecting socket");
     return socket.disconnect();
@@ -30,12 +34,10 @@ const handleConnection = (fastify, socket) => {
   }
   onlineUsers.get(user__id).add(socket);
 
-
   fastify.db
     .prepare(`UPDATE USERS SET online_status = 1 WHERE id = ?`)
     .run(user__id);
 
-  
   socket.on("Notification", async (data) => {
     try {
       const { user_id, actor_id, type, game_link } = data;
@@ -70,7 +72,6 @@ const handleConnection = (fastify, socket) => {
       if (!new_notification) {
         return socket.emit("error", { message: "Failed to insert notification" });
       }
-      console.log('in notifications socket');
       
       const receiverSockets = onlineUsers.get(actor_id);
         if (receiverSockets) 
@@ -86,7 +87,6 @@ const handleConnection = (fastify, socket) => {
   });
 
   socket.on("disconnect", () => {
-    // delay marking offline in case user reconnects fast
     const timer = setTimeout(() => {
       if (!onlineUsers.has(user__id)) {
         fastify.db
@@ -116,7 +116,30 @@ const start = async () => {
       },
     });
 
-    io.on("connection", (socket) => handleConnection(fastify, socket));
+
+    io.use((socket, next) => {
+        let token;
+        const cookieHeader = socket.handshake.headers.cookie;
+
+        if (cookieHeader) {
+          const cookies = cookie.parse(cookieHeader);
+          token = cookies.token;
+        }
+
+        if (!token) {
+          next(new Error("NO_TOKEN"));
+          return;
+        }
+
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET)
+          
+          handleConnection(fastify, socket, decoded);
+          next();
+        } catch (err) {
+          return next(new Error("INVALID_TOKEN"));
+        }
+      });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

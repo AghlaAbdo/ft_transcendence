@@ -4,8 +4,7 @@ import Database from "better-sqlite3";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET: string =
-  process.env.JWT_SECRET || "pingpongsupersecretkey123";
+const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
 
 declare module "socket.io" {
   interface Socket {
@@ -35,11 +34,9 @@ export function initSocket(server: any, db: Database.Database) {
       const { actor_id, target_id } = data;
       if (!actor_id || !target_id)
         return socket.emit("error", { message: "Invalid data" });
-       console.log('------->-----cure: ', actor_id, ", tage: ", target_id);
       try {
         console.log("actor_id: ", actor_id);
         console.log("target_id: ", target_id);
-
         const response = await fetch(
           `http://user-service:5000/api/friends/block`, // front
           {
@@ -56,7 +53,7 @@ export function initSocket(server: any, db: Database.Database) {
         if (!response.ok) {
           socket.emit("error", { message: "can not block user" });
           console.log("error : ", data);
-          return ;
+          return;
         }
         const sendersockets = onlineUsers.get(actor_id);
         if (sendersockets) {
@@ -79,7 +76,7 @@ export function initSocket(server: any, db: Database.Database) {
       const { actor_id, target_id } = data;
       if (!actor_id || !target_id)
         return socket.emit("error", { message: "Invalid data" });
-       console.log('------->-----cure: ', actor_id, ", tage: ", target_id);
+      console.log("------->-----cure: ", actor_id, ", tage: ", target_id);
       try {
         console.log("actor_id: ", actor_id);
         console.log("target_id: ", target_id);
@@ -99,7 +96,7 @@ export function initSocket(server: any, db: Database.Database) {
         if (!response.ok) {
           console.log("error    : ", data);
           socket.emit("error", { message: "can not block user" });
-          return
+          return;
         }
 
         const sendersockets = onlineUsers.get(actor_id);
@@ -119,7 +116,7 @@ export function initSocket(server: any, db: Database.Database) {
         console.error("some thing went wrong: ", err);
       }
     });
-  
+
     socket.on("ChatMessage", async (data) => {
       try {
         const { chatId, sender, receiver, message } = data;
@@ -144,7 +141,6 @@ export function initSocket(server: any, db: Database.Database) {
           return socket.emit("error", { message: "Invalid chat ID" });
         }
         if (!sender || !receiver || !message) return;
-    // check if the users are friends in the user managements
         let actualChatId = chatId;
         console.log("in socket handler: ", message);
 
@@ -217,6 +213,7 @@ export function initSocket(server: any, db: Database.Database) {
     }
 
     try {
+      if (!JWT_SECRET) return next(new Error("no secret provided"));
       const decoded = jwt.verify(token, JWT_SECRET) as {
         id: string;
         username: string;
