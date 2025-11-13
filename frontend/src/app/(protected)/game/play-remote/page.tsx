@@ -69,7 +69,6 @@ export default function GamePage() {
     return (
       <div className='flex h-[calc(100vh_-_72px)] justify-center items-center'>
         <LoadingPong />
-        !player || !gameId
       </div>
     );
   } else if (matching) {
@@ -82,7 +81,6 @@ export default function GamePage() {
     return (
       <div className='flex h-[100vh] justify-center items-center'>
         <LoadingPong />
-        !opponent
       </div>
     );
   }
