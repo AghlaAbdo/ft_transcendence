@@ -35,9 +35,6 @@ type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
-  const [password, setPassword] = useState<string>("");
-  const [confirm, setConfirm] = useState<string>("");
-  // const [token, setToken] = useState<string | null>(null);
   
   const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
@@ -46,12 +43,6 @@ const ResetPasswordForm = () => {
   const token = searchParams.get("token");
 
   const handleResetPassword = async (data: ResetPasswordInput) =>{
-    // e.preventDefault();
-    
-    // if (password !== confirm) {
-    //     toast.error("Passwords do not match");
-    //     return;
-    // }
 
     if (!token) {
         toast.error("Missing token.");
@@ -106,11 +97,6 @@ const ResetPasswordForm = () => {
             {errors.confirmPassword && (
                 <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
             )}
-            {/* {confirm && confirm !== password && (
-                <p className="text-red-500 text-sm mt-1">
-                    Passwords do not match
-                </p>)
-            } */}
             <button 
                 type='submit'
                 className='flex justify-center items-center border-2 border-slate-700
@@ -119,7 +105,6 @@ const ResetPasswordForm = () => {
             </button>
         </form>
 
-        {/* {message && <p className="mt-2 text-red-500">{message}</p>} */}
       </div>
     </div>
     )

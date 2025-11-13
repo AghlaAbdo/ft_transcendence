@@ -37,24 +37,6 @@ const signup = async (request, reply) => {
 
         if (usernameAlreadyExist && emailAlreadyExist) {
             if (usernameAlreadyExist.isAccountVerified === 0) {
-
-                // const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-                // const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
-                
-                // const email = emailAlreadyExist.email;
-                // const username = usernameAlreadyExist.username;
-                
-                // await sendVerificationEmail(email, verificationToken, username);
-                
-                // db.prepare(`
-                //     UPDATE USERS
-                //     SET verificationToken = ?,
-                //     verificationTokenExpiresAt = ?
-                //     WHERE email = ?
-                //     `).run(verificationToken, tokenExpiry, emailAlreadyExist.email);
-
-                // await sendVerificationEmail(email, verificationToken, username);
-                
                 return reply.code(200).send({
                     status: true,
                     message: "VERIFICATION_EMAIL"
@@ -80,7 +62,6 @@ const signup = async (request, reply) => {
             avatar_url: null,
             verificationToken,
             tokenExpiry,
-            // location
         });
         
         await sendVerificationEmail(email, verificationToken, username);
@@ -141,7 +122,6 @@ const login = async (request, reply) => {
         if (!isPasswordValid)
             throw new Error("Incorrect password.");
         
-        // generateTokenAndSetCookie(reply, user.id, user.username, user.email);
 
         if (!user.isAccountVerified) {
             return reply.code(401).send({
@@ -152,7 +132,6 @@ const login = async (request, reply) => {
             });
         }
 
-        // update online_status = ;
         if (!user.online_status) {
             userModel.updateOnlineStatus(db, user.id, 1);
             user.isAccountVerified = 1;
@@ -199,11 +178,6 @@ const logout = async (request, reply) => {
 const getMe = async (request, reply) => {
     const user = request.user;
 
-    // return reply.code(200).send({
-    //     status: true,
-    //     user: user
-    // });
-    
     return {
         status: true,
         user: user
@@ -245,7 +219,7 @@ const verifyEmail = async (request, reply) => {
                 message: "Verification token has expired",
             });
         }
-        // verifiedAt = CURRENT_TIMESTAMP,
+
         db.prepare(`
             UPDATE USERS
             SET isAccountVerified = 1,
@@ -367,19 +341,6 @@ const forgotPassword = async (request, reply) => {
 
         const resetToken = crypto.randomBytes(32).toString('hex');
         const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-        // const tokenExpiry = new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString();
-
-        // const existingToken = db.prepare(`
-        //     SELECT resetPasswordExpiresAt FROM users 
-        //     WHERE id = ? AND resetPasswordExpiresAt > ?
-        // `).get(user.id, new Date().toISOString());
-
-        // if (existingToken) {
-        //     return reply.code(429).send({ 
-        //         error: 'Password reset already requested. Please check your email or wait before requesting another.',
-        //         code: 'RESET_ALREADY_REQUESTED'
-        //     });
-        // }
 
         db.prepare(`
             UPDATE USERS

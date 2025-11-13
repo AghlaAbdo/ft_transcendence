@@ -1,6 +1,5 @@
 import Fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
-// import fastifySession from '@fastify/session';
 import databasePlugin from './plugins/database.js'
 import fastifyCORS from '@fastify/cors';
 import authPlugin from './plugins/auth.js';

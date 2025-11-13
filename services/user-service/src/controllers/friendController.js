@@ -67,13 +67,11 @@ const getFriendData = async (request, reply) => {
     }
 }
 
-// getFriendData_backend
 
 const getFriendData_backend = async (request, reply) => {
     console.log('friend handler bakend--------------------');
     
     try {
-        // const user_id = request.user.id;
         const friend_id = parseInt(request.params.friendid);
         const user_id = parseInt(request.params.userid);
         console.log('current user: ', user_id);
@@ -105,7 +103,7 @@ const getFriendData_backend = async (request, reply) => {
         });       
     }
 }
-// Get friend requests RECEIVED by me
+
 const getPendingRequests = async (request, reply) => {
     try {
         const user_id = request.user.id;
@@ -322,16 +320,12 @@ const searchQuery = async (request, reply) => {
 }
 
 const blockFriend = async (request, reply) => {
-    // console.log('hereeee niga-------------------: ');
     try {
         
-        
         const  {actor_id, target_id} = request.body;
-        console.log("------------------>", actor_id, target_id);
         const currentUserId = actor_id;
         const targetUserId = target_id;
         
-        console.log("------>", currentUserId, targetUserId);
         if (!currentUserId || !targetUserId) {
             return reply.code(400).send({
                 status: false,
@@ -361,7 +355,6 @@ const blockFriend = async (request, reply) => {
 
 
         friendModel.blockFriend(db, {currentUserId, targetUserId});
-        // friendModel.blockFriend(db, {currentUserId, targetUserId});
 
         return reply.code(200).send({
             status: true,
@@ -379,16 +372,12 @@ const blockFriend = async (request, reply) => {
 
 
 const unblockFriend = async (request, reply) => {
-    // console.log('hereeee niga-------------------: ');
     try {
         
-        
         const  {actor_id, target_id} = request.body;
-        console.log("------------------>", actor_id, target_id);
         const currentUserId = actor_id;
         const targetUserId = target_id;
         
-        console.log("------>", currentUserId, targetUserId);
         if (!currentUserId || !targetUserId) {
             return reply.code(400).send({
                 status: false,

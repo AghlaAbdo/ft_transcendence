@@ -3,15 +3,9 @@ CREATE TABLE IF NOT EXISTS USERS (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
-    -- password VARCHAR(255) NOT NULL,
     password VARCHAR(255) , -- Nullable - NULL for OAuth users
-    avatar_url VARCHAR(255) NOT NULL, -- Generated via generatePingPongAvatar
+    avatar_url VARCHAR(255) NOT NULL, 
     
-    -- Account verification
-    -- isAccountVerified INTEGER DEFAULT 0,
-    -- verificationToken TEXT,
-    -- verificationTokenExpiresAt DATETIME,
-
     isAccountVerified INTEGER DEFAULT 0,
     verificationToken TEXT,
     verificationTokenExpiresAt DATETIME,
@@ -44,7 +38,7 @@ CREATE TABLE IF NOT EXISTS FRIENDS (
   user_id INTEGER NOT NULL,
   friend_id INTEGER NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'blocked')),
-  blocked_by INTEGER, -- null unless statis is blocked
+  blocked_by INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,

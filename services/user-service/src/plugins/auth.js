@@ -1,8 +1,8 @@
 import fp from 'fastify-plugin';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey123';
-const INTERNAL_SECRET = process.env.INTERNAL_SECRET || 'pingpongsupersecretkey';
+const JWT_SECRET = process.env.JWT_SECRET;
+const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
 const COOKIE_NAME = 'token';
 
 const authPlugin = async (fastify, options) => {
@@ -11,14 +11,13 @@ const authPlugin = async (fastify, options) => {
         return jwt.sign(payload, JWT_SECRET, {expiresIn: '7d'});
     });
 
-    // Decorate Fastify with cookie setting method
     fastify.decorate('setAuthCookie', (reply, token) => {
         reply.setCookie(COOKIE_NAME, token, {
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', //local: http , production: https
             sameSite: 'lax', // Must be 'lax' for OAuth redirects
-            maxAge: 7 * 24 * 60 * 60 // 7 days 
+            maxAge: 7 * 24 * 60 * 60
         });
     });
 
@@ -31,7 +30,6 @@ const authPlugin = async (fastify, options) => {
         });
     });
 
-    // Decorate Fastify with authentication middleware
     fastify.decorate('authenticate', async (request, reply ) => {
         const token = request.cookies[COOKIE_NAME];
 

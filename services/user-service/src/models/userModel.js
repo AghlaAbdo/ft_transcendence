@@ -35,7 +35,7 @@ const createUser = (db, userData) => {
         username,
         email,
         password,
-        avatar_url: originalAvatarUrl, // Rename avatar_url to originalAvatarUrl
+        avatar_url: originalAvatarUrl,
         verificationToken,
         tokenExpiry,
     } = userData;

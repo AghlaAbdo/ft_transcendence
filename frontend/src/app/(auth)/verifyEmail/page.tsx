@@ -127,7 +127,6 @@ const VerifyEmailPageForm = () => {
             />
 
             <div className='flex justify-center items-center'>
-            {/* {hidden && <p>{hidden}</p>} */}
             {showResend ?
               (<button 
                   type='button'
@@ -148,7 +147,6 @@ const VerifyEmailPageForm = () => {
 
         </form>
 
-        {/* {message && <p className="mt-2 text-red-500">{message}</p>} */}
       </div>
     </div>
   )

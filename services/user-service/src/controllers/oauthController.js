@@ -45,7 +45,6 @@ const handleGoogleCallback = async (request, reply) => {
         });
 
         if (!userInfo.ok) {
-            // return reply.status(400).send({status: false,  error: 'Failed to retrieve userInfo' });
             return reply.redirect('https://localhost:8080/login');
         }
 
@@ -56,11 +55,10 @@ const handleGoogleCallback = async (request, reply) => {
         let user = userModel.getUserByEmail(db, userInfoData.email);
         const username = userInfoData.email
                                     .split('@')[0]
-                                    .replace(/[^a-zA-Z0-9]/g, '') // Remove special characters
+                                    .replace(/[^a-zA-Z0-9]/g, '')
                                     .toLowerCase();
         
         if (!user) {
-            // console.log("---------------[not exist]---------------");
             const userdataDb = {
                 username,
                 email: userInfoData.email,
@@ -71,7 +69,6 @@ const handleGoogleCallback = async (request, reply) => {
             };
 
             const userID = userModel.createUser(db, userdataDb);
-            // console.log('\n', userInfoData.email_verified);
             if (userInfoData.email_verified === true) {
                 db.prepare(`
                 UPDATE USERS
@@ -81,9 +78,6 @@ const handleGoogleCallback = async (request, reply) => {
                 WHERE id = ?
                 `).run(userID);
             }
-            // auth_type: 'oauth',
-                // oauth_id: userInfoData.sub,
-                // oauth_provider: 'google'
             user = userModel.getUserByID(db, userID);
         }
         else {

@@ -13,7 +13,7 @@ const JWT_SECRET   = process.env.JWT_SECRET;
 import notoficationModel from "./models/notoficationModel.js";
 
 const onlineUsers = new Map();
-const disconnectTimers = new Map(); // userId -> timeout
+const disconnectTimers = new Map();
 
 const handleConnection = (fastify, socket, data) => {
   const user__id = parseInt(data.id);

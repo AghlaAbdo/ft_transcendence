@@ -1,6 +1,6 @@
 import transporter from "./mailer.js";
 
-const EMAIL = process.env.EMAIL  || 'ayoubhadiri0320@gmail.com';
+const EMAIL = process.env.EMAIL;
 
 export const sendVerificationEmail = async (email, verificationToken, username) => {
     const mailOptions = {

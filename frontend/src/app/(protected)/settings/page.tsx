@@ -145,7 +145,7 @@ const SettingsPage = () => {
         body: JSON.stringify( {
           username: data.username,
         }),
-        credentials: "include"  // allow cookies
+        credentials: "include"
       });
 
       const dataResponse = await response.json();
@@ -169,7 +169,7 @@ const SettingsPage = () => {
           currentPassword: data.currentPassword, 
           newPassword: data.newPassword 
         }),
-        credentials: "include"  // allow cookies
+        credentials: "include"
       });
 
       const dataResponse = await response.json();
@@ -200,7 +200,6 @@ const SettingsPage = () => {
               </div>
 
               <div className="flex-1 mt-10  rounded-3xl bg-[#0f172a] h-[400px] flex flex-col p-14 space-y-12 shadow-xl">
-                  {/* Title */}
                   <div>
                     <h2 className="text-3xl font-bold text-white">Profile Picture</h2>
                     <p className="text-gray-400 text-xl font-medium mt-3">Update your avatar to personalize your profile</p>
@@ -211,12 +210,6 @@ const SettingsPage = () => {
                       <div className="rounded-full  overflow-hidden shadow-2xl">
                         
                         {avatar && (
-                            // <img
-                            //   src={avatar || "/avatars/avatar1.png"}
-                            //   alt="avatar"
-                            //   className="w-45 h-45 object-cover"
-                              
-                            // />
                             <div className={`w-full relative`}>
                               <img
                                 src={avatar}
@@ -248,7 +241,6 @@ const SettingsPage = () => {
                               : "bg-orange-500"   // ingame
                           }`}
                         ></span>
-                      {/* <span className="absolute bottom-6 right-6 w-8 h-8 bg-green-500 border-8 border-[#0f172a] rounded-full"></span> */}
                     </div>
 
                     <div className="flex flex-col items-start space-y-6 text-gray-300">
@@ -271,7 +263,6 @@ const SettingsPage = () => {
                     <p className="text-gray-400 text-xl font-medium mt-3">Update your Info or Add an extra layer of security to your account</p>
                 </div>
                 <div className="flex-1  rounded-3xl bg-[#0f172a] p-10 shadow-xl">
-                  {/* Tabs */}
                   <div className="flex space-x-6 border-b border-slate-700 mb-10">
                     <button
                       onClick={() => setActiveTab("info")}
@@ -297,7 +288,6 @@ const SettingsPage = () => {
                     }
                   </div>
 
-                  {/* Content */}
                   <div className="flex justify-center">
                     {activeTab === "info" && (
                       <form className="space-y-6 flex flex-col w-[600px]" onSubmit={handleSubmitInfo(handleUpdateInfo)}>

@@ -28,11 +28,7 @@ type FormData = z.infer<typeof schema>;
 
 const SignUpPage = () => {
   const router = useRouter();
-  // const [username, setUsername] = useState('');
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  // const [isLoading, setIsLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
       resolver: zodResolver(schema),
@@ -40,8 +36,6 @@ const SignUpPage = () => {
 
   
     const handleSignUp = async (data: FormData) => {
-      // e.preventDefault();
-      // setIsLoading(true);
       setMessage('');
   
       try {
@@ -49,13 +43,11 @@ const SignUpPage = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
-          // credentials: "include"  // allow cookies
         });
   
         const dataResponse: {status: boolean, message: string} = await response.json();
 
         if (response.ok && dataResponse.status) {
-          // setMessage('Signup successful!');
           if (dataResponse.message === 'VERIFICATION_EMAIL')
             toast.success("Please verify your email address. We've sent you a new verification email");
           else
@@ -71,9 +63,7 @@ const SignUpPage = () => {
         toast.error(`Network error. Please check your connection and try again.`);
         setMessage('Network error. Please check your connection and try again.');
       } 
-      // finally {
-        // setIsLoading(false);
-      // }
+
     }
 
   const { handleGoogleLogin } = useGoogleAuth();
@@ -156,7 +146,6 @@ const SignUpPage = () => {
           </button>
 
       </form>
-      {/* {message && <p className="text-center text-white mt-4">{message}</p>} */}
       {
         message && (
           <p className={`text-center mt-4 ${

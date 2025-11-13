@@ -3,17 +3,6 @@ import notoficationModel from "../models/notoficationModel.js";
 
 const userRoutes = async (fastify, options) => {
     
-    fastify.get('/profile', { 
-        onRequest: [fastify.authenticate] 
-    }, userController.getProfile);
-    fastify.put('/profile', { 
-        onRequest: [fastify.authenticate] 
-    }, userController.updateProfile); 
-    fastify.delete('/account', { 
-        onRequest: [fastify.authenticate] 
-    }, userController.deleteAccount); 
-
-    
     fastify.get('/:id', { 
       onRequest: [fastify.verifyInternalRequest] 
     }, userController.getUserById); 

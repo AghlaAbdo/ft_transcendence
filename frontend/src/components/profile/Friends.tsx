@@ -12,7 +12,6 @@ interface Friend {
   username: string,
   online_status: 0 | 1 | 2;
   avatar_url: string;
-  // status: 0 | 1| 2;
 }
 
 

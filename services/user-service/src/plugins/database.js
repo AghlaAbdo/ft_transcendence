@@ -10,9 +10,8 @@ const __dirname = dirname(__filename)
 
 
 const databasePlugin = async (fastify, options) => {
-    //__dirname --> gives the absolute path 
     const dbPath = path.join(__dirname, '../../database/user-service.db');
-    console.log("------> ", dbPath);
+    console.log("dbname ---->: ", dbPath);
     const sqlPath = path.join(__dirname, '../../database/schema.sql');
     const sql = fs.readFileSync(sqlPath, 'utf8');
 
@@ -22,7 +21,7 @@ const databasePlugin = async (fastify, options) => {
 
     db.exec(sql);
 
-    fastify.decorate('db', db); // makes fastify.db acessible in routes/hooks
+    fastify.decorate('db', db);
 
     // Close the database connection when the server stops
     fastify.addHook('onClose', (instance, done) => {

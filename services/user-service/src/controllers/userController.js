@@ -307,15 +307,6 @@ const searchQuery = async (request, reply) => {
         });
     }
 }
- 
-const  getProfile = async (request, reply) => {
-}
-
-const  updateProfile = async (request, reply) => {
-}
-
-const  deleteAccount = async (request, reply) => {
-}
 
 const twoFactorAuth = async (request, reply) => {
     try {
@@ -329,11 +320,8 @@ const twoFactorAuth = async (request, reply) => {
             });
         }
 
-        console.log("-------> 2fa : ", enable);
         const db = request.server.db;
 
-
-        
         if (enable) {
             const secret = authenticator.generateSecret();
             console.log("secret: ", secret);
@@ -406,8 +394,6 @@ const updateStats = async (request, reply) => {
             WHERE id = ?;
         `).run(loserId);
 
-        // userModel.recalculateRanks(db);
-
         const winner = userModel.getUserByID(db, winnerId);
         const loser = userModel.getUserByID(db, loserId);
 
@@ -444,9 +430,6 @@ const updateStats = async (request, reply) => {
 export default { 
     getUserById, 
     getAllUsers, 
-    getProfile, 
-    updateProfile, 
-    deleteAccount, 
     uploadAvatar, 
     changePassword,
     updateInfo,

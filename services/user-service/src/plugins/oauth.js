@@ -2,7 +2,7 @@ import fp from 'fastify-plugin';
 
 const redirectUri = process.env.CALL_BACK_URI;
 const clientID = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+// const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
 const googleOAuth = async (fastify, options) => {
     fastify.decorate('getGoogleAuthURL', () => {

@@ -62,7 +62,6 @@ const ForgotPasswordPage = () => {
         
         </form>
 
-        {/* {message && <p className="mt-2 text-red-500">{message}</p>} */}
       </div>
     </div>
   )

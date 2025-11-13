@@ -2,11 +2,6 @@ import friendController from "../controllers/friendController.js";
 
 const friendRoutes = (fastify, options) => {
 
-    // fastify.get("/", {
-    //     onRequest: [fastify.authenticate] 
-    // }, friendController.getAllFriends);
-
-
     fastify.get("/:id", {
         onRequest: [fastify.authenticate] 
     }, friendController.getAllFriends);
