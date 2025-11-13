@@ -1,19 +1,10 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { getMessages, getMessage } from "../database/conversations.js";
+import { getMessages } from "../database/conversations.js";
 import { getChats } from "../database/chats.js";
-
-type ChatRow = {
-  chat_id: number;
-  sender: number;
-  receiver: number;
-  last_message_content: string;
-  last_message_timestamp: string;
-  last_message_id: number;
-};
-
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
 interface GetMessagesParams {
   chatId: string;
-  otherUserId: string
+  otherUserId: string;
 }
 
 interface GetMessageParams {
@@ -32,11 +23,12 @@ interface CheckChatExistsParams {
 export async function getMessagesHandler(
   req: FastifyRequest<{ Params: GetMessagesParams }>,
   reply: FastifyReply
-
 ) {
   const chatId = parseInt(req.params.chatId);
   const userid = (req as any).user.id;
   const otherUserId = parseInt(req.params.otherUserId);
+  console.log("other user id: ", otherUserId);
+  console.log("current user id :", userid);
 
   if (isNaN(chatId) || chatId <= 0) {
     return reply.status(400).send({ error: "Invalid chatId" });
@@ -49,13 +41,23 @@ export async function getMessagesHandler(
       return reply.status(500).send({ error: "Database not initialized" });
     }
     if (userid && otherUserId) {
-
-      const res = await fetch(`http://user-service:5000/api/friends/friend_data_backend/${userid}/${otherUserId}`, {
-        headers: { "x-internal-key": "pingpongsupersecretkey" },
-      });
-      if (!res.ok) console.log('its null');
+      const res = await fetch(
+        `http://user-service:5000/api/friends/friend_data_backend/${userid}/${otherUserId}`,
+        {
+          headers: { "x-internal-key": "pingpongsupersecretkey" },
+        }
+      );
+      if (!res.ok)
+        return reply
+          .status(500)
+          .send({ error: "Failed to fetch friendship data" });
       const data = await res.json();
-      console.log("friend data :", data);
+      if (data.status && data.friends.length === 0) {
+        return reply.status(403).send({
+          status: false,
+          error: "Not authorized to view messages from non-friends",
+        });
+      }
     }
 
     const result = getMessages(db, chatId);
@@ -72,62 +74,33 @@ export async function getMessagesHandler(
   }
 }
 
-export async function getMessageHandler(
-  req: FastifyRequest<{ Params: GetMessageParams }>,
-  reply: FastifyReply
-) {
-  const messageId = parseInt(req.params.messageId);
-
-  if (isNaN(messageId) || messageId <= 0) {
-    return reply.status(400).send({ error: "Invalid messageId" });
-  }
-
-  try {
-    const db = (req.server as any).db;
-    if (!db) {
-      console.error("DB not available on request.server.db");
-      return reply.status(500).send({ error: "Database not initialized" });
-    }
-
-    const result = getMessage(db, messageId) as any;
-
-    if (!result || !result.status || !result.message) {
-      return reply.status(404).send({ error: "Message not found" });
-    }
-
-    return reply.status(200).send(result.message);
-  } catch (err) {
-    console.error("Error fetching message:", err);
-    return reply.status(500).send({ error: "Failed to fetch message" });
-  }
-}
-
 async function fetchUserFromService(ids: number[]) {
   if (!ids || ids.length === 0) {
     return [];
   }
 
-  const users = (
+  if (!INTERNAL_API_KEY) return null;
+  console.log("interal keu: ", INTERNAL_API_KEY)
+   const users = (
     await Promise.all(
       ids.map(async (id) => {
         try {
           const res = await fetch(`http://user-service:5000/api/users/${id}`, {
-            headers: { "x-internal-key": "pingpongsupersecretkey" },
+            headers: { "x-internal-key": INTERNAL_API_KEY },
           });
           if (!res.ok) return null;
           const data = await res.json();
-          return data.user ?? null;
+          return data.user;
         } catch (err) {
-          console.error(
-            `Error fetching user ${id}:`,
-            err instanceof Error ? err.message : err
-          );
+          console.error(`Error fetching user ${id}:`);
           return null;
         }
       })
     )
   ).filter(Boolean);
 
+  console.log('after user fetching');
+  
   return users;
 }
 
@@ -135,29 +108,35 @@ export async function getChatsHandler(
   req: FastifyRequest<{ Params: GetChatsParams }>,
   reply: FastifyReply
 ) {
-  const userId = parseInt(req.params.userId);
-
+  console.log('before get user----------');
+  
+  const userId = (req as any).user.id;
+  console.log('user id : ', userId);
+  
+  // const userId = 2;
   if (isNaN(userId) || userId <= 0) {
-    return reply.status(400).send({ error: "Invalid userId" });
+    return reply.status(401).send({ error: "Invalid userId" });
   }
 
   try {
     const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
-      return reply.status(500).send({ error: "Database not initialized" });
+      return reply.status(401).send({ error: "Database not initialized" });
     }
 
-    const result: ChatRow[] = getChats(db, userId);
-
-    if (!result || result.length === 0) {
+    const response = getChats(db, userId);
+    if (!response || !response.status)
+        return reply.status(500).send({error: "some went wrong!"});
+    if (response.result.length == 0) {
       return reply.status(200).send([]);
     }
 
+    const result = response.result;
     const userIds = Array.from(
       new Set(
         result
-          .flatMap((c) => [c.sender, c.receiver])
+          .flatMap((c) => [(c as any).sender, (c as any).receiver])
           .filter((id) => typeof id === "number" && id > 0)
       )
     );
@@ -167,9 +146,11 @@ export async function getChatsHandler(
     }
 
     const users = await fetchUserFromService(userIds);
+    if (!users || users.length < 0)
+      return reply.status(400).send({ error: "Failed to fetch chats" });
     const userMap = new Map(users.map((u: any) => [u.id, u]));
 
-    const enriched = result.map((chat) => ({
+    const enriched = result.map((chat: any) => ({
       ...chat,
       sender: userMap.get(chat.sender) || null,
       receiver: userMap.get(chat.receiver) || null,
@@ -178,7 +159,7 @@ export async function getChatsHandler(
     return reply.status(200).send(enriched);
   } catch (err) {
     console.error("Error fetching chats:", err);
-    return reply.status(500).send({ error: "Failed to fetch chats" });
+    return reply.status(301).send({ error: "Failed to fetch chats" });
   }
 }
 
@@ -186,7 +167,7 @@ export async function checkChatExistsHandler(
   req: FastifyRequest<{ Params: CheckChatExistsParams }>,
   reply: FastifyReply
 ) {
-  const userId = parseInt(req.params.userId);
+  const userId = (req as any).user.id;
   const friendId = parseInt(req.params.friendId);
 
   if (isNaN(userId) || userId <= 0) {

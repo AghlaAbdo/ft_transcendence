@@ -31,6 +31,8 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.get('/games', async (req, reply) => {
+    console.log("indeed in /games");
+    
     logEvent('info', 'game', 'api_request', { method: 'GET', path: '/games' });
     const db: DatabaseType = (fastify as any).db;
     try {

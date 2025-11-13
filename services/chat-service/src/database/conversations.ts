@@ -20,10 +20,6 @@ export function getMessages(db: Database.Database, chatId: number) {
     } 
 }
 
-export function getMessage(db: Database.Database, MessageId: number) {
-  const stmt = db.prepare('SELECT * FROM messages WHERE id = ?');
-  return stmt.get(MessageId);
-}
 
 export function create_new_chat(
   db: Database.Database,

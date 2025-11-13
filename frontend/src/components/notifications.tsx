@@ -12,6 +12,7 @@ import {
   markAllNotificationsAsRead_friend,
   markAllNotificationsAsRead_game,
 } from './markAsRead';
+import { toast } from 'sonner';
 
 interface Notification {
   id: number;
@@ -53,10 +54,13 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
     const fetchNotifications = async () => {
       try {
         const res = await fetch(
-          `https://localhost:8080/api/users/notifications/${user.id}`
+          `https://localhost:8080/api/users/notifications`,  {credentials: "include"}
         );
+        if (!res.ok) {
+          toast.error('some thing went wrong!');
+          return 
+        }
         const data = await res.json();
-        
         if (res.ok && data.status) {
           const notificationsWithUserData = await Promise.all(
             data.notifications.map(async (notif: Notification) => {
@@ -82,7 +86,6 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
     fetchNotifications();
     setrender(true)
   }, [user], );
-
 
   return (
     <div>

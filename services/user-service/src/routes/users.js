@@ -40,7 +40,6 @@ const userRoutes = async (fastify, options) => {
         onRequest: [fastify.authenticate]
     }, userController.updateInfo);
 
-
     fastify.put('/2fa', {
         onRequest: [fastify.authenticate]
     }, userController.twoFactorAuth);
@@ -53,15 +52,13 @@ const userRoutes = async (fastify, options) => {
       onRequest: [fastify.verifyInternalRequest]
     },userController.updateStats);
 
-    fastify.get("/notifications/:userId", {
+    fastify.get("/notifications", {
         onRequest: [fastify.authenticate]
       },
       async (req, reply) => {
-      
-      const userId = parseInt((req.params).userId);
+        const userId = req.user.id;
       if (isNaN(userId)) 
         return reply.status(400).send({ error: "Invalid userId" });
-    
       try {
         const db = req.server.db;
         return  notoficationModel.getnotifications(db, userId);
@@ -70,18 +67,17 @@ const userRoutes = async (fastify, options) => {
         return reply.status(500).send({ error: "Failed to fetch notifications" });
       }
     });
-    
+
     fastify.put('/notifications/friend_request/mark-as-read', {
-      
+
       onRequest: [fastify.authenticate]
     }, async (req, res) => {
       const {userId} =  req.body;
       const db = req.server.db;
       console.log('user: ', userId);
-      
+
       return notoficationModel.mark_friend_request_as_read(db, userId ,  "friend_request");
     });
-    
     
     fastify.put('/notifications/delete', {
       onRequest: [fastify.authenticate]

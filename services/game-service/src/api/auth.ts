@@ -7,6 +7,8 @@ export default async function authorization(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
+  console.log("jwt secret in auth: ", JWT_SECRET);
+  if (!JWT_SECRET) return reply.code(400).send({ error: 'No JWT_SERCRET found' });;
   try {
     const cookies = cookie.parse(request.headers.cookie || '');
     const token = cookies.token;

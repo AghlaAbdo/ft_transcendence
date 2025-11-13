@@ -16,11 +16,13 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   connect: (userId) => {
     if (get().socket) return;
-    const socket = io(`https://localhost:8080`, {
+    const socket = io({
       path: '/ws/user/socket.io/',
-      auth: { user_id: userId },
+      autoConnect: false,
+      withCredentials: true,
+      // auth: { user_id: userId },
     });
-
+    socket.connect();
     socket.on('connect', () => {
       console.log('Connected to socket');
     });

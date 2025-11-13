@@ -432,7 +432,7 @@ try {
     // You'll confirm it in the next step
 
 
-    await db.prepare(`
+    db.prepare(`
       UPDATE users 
       SET totp_secret = ? 
       WHERE id = ?
@@ -464,7 +464,7 @@ try {
     }
 
     // Get the secret from database
-    const user = await db.prepare(`
+    const user = db.prepare(`
       SELECT totp_secret 
       FROM users 
       WHERE id = ?
@@ -480,7 +480,7 @@ try {
       return rep.status(400).send({ error: 'Invalid verification code' });
     }
 
-    await db.prepare(`
+    db.prepare(`
       UPDATE users 
       SET is_2fa_enabled = TRUE 
       WHERE id = ?
@@ -574,7 +574,7 @@ try {
     }
 
     // Get the secret
-    const user = await db.prepare(`
+    const user = db.prepare(`
       SELECT totp_secret 
       FROM users 
       WHERE id = ?
@@ -592,7 +592,7 @@ try {
     }
 
     // Disable 2FA and clear secret
-    await db.prepare(`
+    db.prepare(`
       UPDATE users 
       SET is_2fa_enabled = FALSE,
           totp_secret = NULL 

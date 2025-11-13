@@ -7,7 +7,7 @@ import { useDebounce } from 'use-debounce';
 interface FriendListProps {
   user: User | null;
   onClose: () => void;
-  onchatselected: (friendid: number, selectedFriend?:Friend) => void;
+  onchatselected: (friendid: number, selectedFriend?:number) => void;
 }
 
 interface Friend {
@@ -56,15 +56,13 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     if (!user || !selectedFriend) return;
     try {
       const fetchChatExistense = await fetch(
-        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${user.id}/${selectedFriend.id}`
+        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${selectedFriend.id}`
       );
       const data = await fetchChatExistense.json();
       if (data.exists) {
-        console.log('user is there');
-        onchatselected(data.chat_id);
+        onchatselected(data.chat_id, selectedFriend.id);
       } else {
-        console.log('user its not there');
-        onchatselected(-1, selectedFriend);
+        onchatselected(-1, selectedFriend.id);
       }
       onClose();
     } catch {
@@ -98,7 +96,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder='username...'
             className='w-full py-2 pl-11 pr-4 bg-[#1F2937] text-white placeholder-gray-400 border border-gray-600 rounded-lg outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 z-[1]'
-            autoFocus // remember to put this in the global search also in the
+            autoFocus
           />
           {searchTerm && (
             <button

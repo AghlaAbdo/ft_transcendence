@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
+
 import { formatDistanceToNow } from 'date-fns';
 import { Plus } from 'lucide-react';
+
 import { User, useAuth } from '@/hooks/useAuth';
+
+import { FriendList } from './FriendList';
 import { Search_Input } from './Search_Input';
 import { NoChats } from './noChats';
-import { FriendList } from './FriendList';
+import { toast } from 'sonner';
 
 interface Message {
   id: number;
@@ -25,14 +29,14 @@ interface Chat {
 }
 
 interface Friend {
-  id: number,
-  username: string,
+  id: number;
+  username: string;
   online_status: 0 | 1 | 2;
   avatar_url: string;
 }
 
 interface ChatlistProps {
-  onSelect: (chatId: number, selectedFriend?:Friend) => void;
+  onSelect: (chatId: number, selectedFriend?: number) => void;
   selectedChatId: number | null;
   userId: number | null;
   conv: Message[];
@@ -48,17 +52,15 @@ export const Chatlist = ({
   const [loading, setLoading] = useState(true);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
 
-  const {user} = useAuth();
-  useEffect(() =>{
-    if (!showFriendsModal)
-        return;
-    const handleEsckey = (e: KeyboardEvent) =>{
-      if (e.key == 'Escape')
-        setShowFriendsModal(false)
-    }
+  const { user } = useAuth();
+  useEffect(() => {
+    if (!showFriendsModal) return;
+    const handleEsckey = (e: KeyboardEvent) => {
+      if (e.key == 'Escape') setShowFriendsModal(false);
+    };
     document.addEventListener('keydown', handleEsckey);
     return () => document.removeEventListener('keydown', handleEsckey);
-  }, [showFriendsModal])
+  }, [showFriendsModal]);
 
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 60000);
@@ -67,25 +69,40 @@ export const Chatlist = ({
 
   const [chats, setChats] = useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-    const filteredChats = chats.filter((chat) => {
-      if (!searchQuery) return true;
-      const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
-      const userIdString = otherUser.username.toString();
-      return userIdString.includes(searchQuery);
-    });
-  
+  const filteredChats = chats.filter((chat) => {
+    if (!searchQuery) return true;
+    const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
+    const userIdString = otherUser.username.toString();
+    return userIdString.includes(searchQuery);
+  });
+
   useEffect(() => {
-    if (userId) {
-      setLoading(true); // do not forgot to use this later
-      fetch(`${process.env.NEXT_PUBLIC_CHAT_API}/chats/${userId}`
-        ,{credentials: "include" }
-      )
-      .then((res) => res.json())
-      .then((data: Chat[]) => {
-        setChats(data);
-      })
-      .catch((err) => console.error('Failed to fetch chats:', err));
+    // console.log("---> ", process.env.NEXT_PUBLIC_CHAT_API);
+    
+    if (!userId)
+        return
+      const fetch_messages = async () => {
+        try {
+          setLoading(true); // do not forgot to use this later
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_CHAT_API}/chats`, // here use just user id in the crendtiels
+            { credentials: 'include' }
+          )
+        if (!response.ok) {
+          toast.error('some thing went wrong!');
+          return;
+        }
+        const data = await response.json();
+        if (data.length > 0)
+          setChats(data);
+        else
+          setChats([]);
+      } catch (error) {
+        console.error('Failed to fetch chats:', error)
+      }
     }
+    setLoading(false);
+    fetch_messages();
   }, [userId, conv]);
 
   return (
@@ -93,7 +110,7 @@ export const Chatlist = ({
       <div className='lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]'>
         <div className='flex items-center justify-between p-4 border-b border-gray-600'>
           <h2 className='text-lg font-semibold text-white'>Messages</h2>
-          <button 
+          <button
             onClick={() => setShowFriendsModal(true)}
             className='p-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition '
             title='Start new conversation'
@@ -122,11 +139,11 @@ export const Chatlist = ({
                 <div
                   key={chat.chat_id}
                   onClick={() => {
-                    onSelect(chat.chat_id);
+                    onSelect(chat.chat_id, otherUser?.id);
                   }}
                   className={`flex items-center p-3 my-1 rounded-md cursor-pointer 
                   hover:bg-gray-800 ${
-                    selectedChatId === chat.chat_id ? "bg-gray-700" : ""
+                    selectedChatId === chat.chat_id ? 'bg-gray-700' : ''
                   }`}
                 >
                   <div className='relative mr-3'>
@@ -164,19 +181,25 @@ export const Chatlist = ({
         )}
       </div>
 
-     {showFriendsModal && (
-       <div
-         className="fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center "
-         onClick={() => setShowFriendsModal(false)}
-       >
-         <div
-           className="bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg"
-           onClick={(e) => e.stopPropagation()}
-         >
-           <FriendList user={user} onchatselected={onSelect} onClose={() => {setShowFriendsModal(false)}} />
-         </div>
-       </div>
-     )}
+      {showFriendsModal && (
+        <div
+          className='fixed inset-0 bg-black/50 z-50 pt-5 flex justify-center items-center '
+          onClick={() => setShowFriendsModal(false)}
+        >
+          <div
+            className='bg-slate-800 rounded-xl mx-2 w-[calc(100%-16px)] md:mx-0 md:w-full md:max-w-lg'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FriendList
+              user={user}
+              onchatselected={onSelect}
+              onClose={() => {
+                setShowFriendsModal(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };

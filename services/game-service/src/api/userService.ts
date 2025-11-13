@@ -1,6 +1,7 @@
 import { USER_SERVICE_HOST, INTERNAL_API_KEY } from '../config/env';
 
 export async function fetchUser(userId: string) {
+  if (!INTERNAL_API_KEY || !USER_SERVICE_HOST) return null;
   try {
     const url = `${USER_SERVICE_HOST}/api/users/${userId}`;
     const response = await fetch(url, {

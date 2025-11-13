@@ -34,12 +34,12 @@ const friendRoutes = (fastify, options) => {
     }, friendController.acceptFriendRequest);
 
     fastify.post("/unblock", {
-        // onRequest: [fastify.authenticate]
+        onRequest: [fastify.verifyInternalRequest] 
     }, friendController.unblockFriend);
 
 
     fastify.post("/block", {
-        // onRequest: [fastify.authenticate]
+        onRequest: [fastify.verifyInternalRequest] 
     }, friendController.blockFriend);
 
 

@@ -7,9 +7,9 @@ const FASTIFY_PORT = parseInt(process.env.FASTIFY_PORT || '4000');
 const SOCKETIO_PORT = parseInt(process.env.SOCKETIO_PORT || '4040');
 const USER_SERVICE_HOST =
   process.env.USER_SERVICE_HOST || 'http://user-service:5000';
-const JWT_SECRET = process.env.JWT_SECRET || 'pingpongsupersecretkey';
+const JWT_SECRET = process.env.JWT_SECRET;
 
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || 'supersecretkey123';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
 
 export {
   DB_NAME,
