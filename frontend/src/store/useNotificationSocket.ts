@@ -20,7 +20,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       path: '/ws/user/socket.io/',
       autoConnect: false,
       withCredentials: true,
-      // auth: { user_id: userId },
     });
     socket.connect();
     socket.on('connect', () => {

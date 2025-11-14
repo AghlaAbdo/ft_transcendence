@@ -17,7 +17,7 @@ export default function UserCard({ id, username, avatar_url }: UserCardProps) {
       
       setLoading(true);
       
-      const response = await fetch("https://localhost:8080/api/friends/request", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

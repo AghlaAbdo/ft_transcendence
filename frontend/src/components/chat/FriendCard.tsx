@@ -12,7 +12,6 @@ interface Friend {
   avatar_url: string;
 }
 
-
 export default function FriendCard({ _user }: UserCardProps) {
   return (
     <div className="flex items-center justify-between w-full p-3 bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg overflow-visible">

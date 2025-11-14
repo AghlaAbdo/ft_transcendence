@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import jwt from 'jsonwebtoken';
+import {config} from "../config/env.js"
 
 // const JWT_SECRET: string | null = process.env.JWT_SECRET;
 const COOKIE_NAME: string = 'token';
@@ -18,7 +18,7 @@ const authPlugin = async (fastify: any, options: any) => {
                 });
             }
             
-            const response = await fetch('http://user-service:5000/api/auth/me', {
+            const response = await fetch(`${config.userServiceUrl}/api/auth/me`, {
                 method: 'GET',
                 headers: {
                     'Cookie': `${COOKIE_NAME}=${token}`,

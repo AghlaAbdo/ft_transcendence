@@ -7,7 +7,6 @@ export const NoChats = ({ isSearching }: NoChatsProps) => {
     <div className='text-center'>
       <div className='mb-4'>
         {isSearching ? (
-          // Search icon for "no results" state
           <svg
             className='mx-auto h-16 w-16 text-gray-600'
             fill='none'
@@ -22,7 +21,6 @@ export const NoChats = ({ isSearching }: NoChatsProps) => {
             />
           </svg>
         ) : (
-          // Chat bubble icon for "no chats" state
           <svg
             className='mx-auto h-16 w-16 text-gray-600'
             fill='none'

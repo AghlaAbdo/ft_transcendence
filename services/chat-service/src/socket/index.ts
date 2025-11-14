@@ -8,6 +8,7 @@ import Database from "better-sqlite3";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { checkFriendshipStatus } from "../database/chats.js";
+import {config } from "../config/env.js"
 
 const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
 
@@ -44,11 +45,11 @@ export function initSocket(server: any, db: Database.Database) {
         console.log("actor_id: ", actor_id);
         console.log("target_id: ", target_id);
         const response = await fetch(
-          `http://user-service:5000/api/friends/block`, // front
+          `${config.userServiceUrl}/api/friends/block`, // front
           {
             method: "POST",
             headers: {
-              "x-internal-key": "pingpongsupersecretkey",
+              "x-internal-key": config.internalApiKey,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ actor_id, target_id }),
@@ -85,7 +86,7 @@ export function initSocket(server: any, db: Database.Database) {
         return socket.emit("error", { message: "Invalid data" });
       try {
         const response = await fetch(
-          `http://user-service:5000/api/friends/unblock`,
+          `${config.userServiceUrl}/api/friends/unblock`,
           {
             method: "POST",
             headers: {

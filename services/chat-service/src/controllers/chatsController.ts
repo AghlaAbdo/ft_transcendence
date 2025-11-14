@@ -1,7 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getMessages } from "../database/conversations.js";
 import { getChats } from "../database/chats.js";
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
+import { config } from "../config/env.js";
+
 interface GetMessagesParams {
   chatId: string;
   otherUserId: string;
@@ -40,9 +41,9 @@ export async function getMessagesHandler(
     }
     if (userid && otherUserId) {
       const res = await fetch(
-        `http://user-service:5000/api/friends/friend_data_backend/${userid}/${otherUserId}`,
+        `${config.userServiceUrl}/api/friends/friend_data_backend/${userid}/${otherUserId}`,
         {
-          headers: { "x-internal-key": "pingpongsupersecretkey" },
+          headers: { "x-internal-key": config.internalApiKey },
         }
       );
       if (!res.ok)
@@ -83,14 +84,13 @@ async function fetchUserFromService(ids: number[]) {
     return [];
   }
 
-  if (!INTERNAL_API_KEY) return null;
-  console.log("interal keu: ", INTERNAL_API_KEY)
+  // if (!INTERNAL_API_KEY) return null;
    const users = (
     await Promise.all(
       ids.map(async (id) => {
         try {
-          const res = await fetch(`http://user-service:5000/api/users/${id}`, {
-            headers: { "x-internal-key": INTERNAL_API_KEY },
+          const res = await fetch(`${config.userServiceUrl}/api/users/${id}`, {
+            headers: { "x-internal-key": config.internalApiKey },
           });
           if (!res.ok) return null;
           const data = await res.json();

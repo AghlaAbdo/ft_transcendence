@@ -40,7 +40,7 @@ export function GameHistory( { id } :  FriendsProps) {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await fetch(`https://localhost:8080/api/game/games?userId=${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/game/games?userId=${id}`, {
           method: 'GET',
           credentials: "include"
         });
@@ -51,10 +51,10 @@ export function GameHistory( { id } :  FriendsProps) {
         const enrichedMatches = await Promise.all(
           data.games.map(async (match: EnrichedMatch) => {
             const [playerRes1, playerRes2] = await Promise.all([
-              fetch(`https://localhost:8080/api/users/profile/${match.player1_id}`, {
+              fetch(`${process.env.NEXT_PUBLIC_API}/api/users/profile/${match.player1_id}`, {
                 credentials: "include"
               }),
-              fetch(`https://localhost:8080/api/users/profile/${match.player2_id}`, {
+              fetch(`${process.env.NEXT_PUBLIC_API}/api/users/profile/${match.player2_id}`, {
                 credentials: "include"
               }),
             ]);

@@ -20,7 +20,7 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
   const handleAccept = async () => {
     setIsLoading('accept');
     try {
-      const response = await fetch(`https://localhost:8080/api/friends/accept/${user_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/accept/${user_id}`, {
         method: "PUT",
         credentials: "include",
       });
@@ -45,7 +45,7 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
   const handleReject = async () => {
     setIsLoading('reject');
     try {
-      const response = await fetch(`https://localhost:8080/api/friends/reject/${user_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/reject/${user_id}`, {
         method: "DELETE",
         credentials: "include"
       });
@@ -76,7 +76,7 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
       <div
       className="flex items-center gap-3">
         <img
-          src={avatar_url || "/avatars/avatar1.png"} // TODO add default-avatar
+          src={avatar_url || "/avatars/avatar1.png"}
           alt="Avatar"
           className="w-12 h-12 rounded-full object-cover"
         />

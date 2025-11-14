@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-
+import {config } from "../config/env.js"
 export function getChats(db: Database.Database, userId: number) {
   try {
     const stmt = db.prepare(`
@@ -22,9 +22,9 @@ export function getChats(db: Database.Database, userId: number) {
 export async function checkFriendshipStatus(userId1: number, userId2: number) {
   try {
     const response = await fetch(
-      `http://user-service:5000/api/friends/friend_data_backend/${userId1}/${userId2}`,
+      `${config.userServiceUrl}/api/friends/friend_data_backend/${userId1}/${userId2}`,
       {
-        headers: { "x-internal-key": "pingpongsupersecretkey" },
+        headers: { "x-internal-key":  config.internalApiKey},
       }
     );
 

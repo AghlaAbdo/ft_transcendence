@@ -1,5 +1,4 @@
 import { Search } from "lucide-react";
-// import {useState, useEffect} from 'react'
 
 interface search_props {
   onsearchchange_2: (query: string) => void;

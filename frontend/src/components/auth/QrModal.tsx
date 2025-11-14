@@ -36,7 +36,7 @@ export default function QrMOdal ({qr, onclose, onVerificationSuccess}: Qrporps) 
     
     setIsVerifying(true);
     try {
-      const response = await fetch('https://localhost:8080/api/auth/2fa/verify', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/auth/2fa/verify`, {
         method: 'POST',
         credentials: 'include',
         headers: {

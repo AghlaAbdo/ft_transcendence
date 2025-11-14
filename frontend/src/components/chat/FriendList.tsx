@@ -32,7 +32,7 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     setError(null);
     const fetchFriends = async () => {
       try {
-        const response = await fetch(`https://localhost:8080/api/friends/${user.id}/search?query=${searchTerm}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/${user.id}/search?query=${searchTerm}`, {
           method: 'GET',
           credentials: 'include',
         });

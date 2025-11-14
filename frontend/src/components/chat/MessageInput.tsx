@@ -24,16 +24,12 @@ export const MessageInput = ({ onSendMessage }: SendMessageProps) => {
     const end = input.selectionEnd || 0;
     const emoji = emojiData.emoji;
     
-    // Insert emoji at cursor position
     const newMessage = 
       message.substring(0, start) + 
       emoji + 
       message.substring(end);
       setMessage(newMessage);
-
-      // Set cursor position after emoji (setTimeout needed for React DOM update)
       input.focus();
-      // Calculate position using the actual emoji string length in the new message
       const newPos = start + emoji.length;
       input.setSelectionRange(newPos, newPos);
     setopen(false);
@@ -71,15 +67,12 @@ export const MessageInput = ({ onSendMessage }: SendMessageProps) => {
   return (
     <>
       <div className="p-4 relative">
-        {/* Emoji Picker + Overlay */}
         {isopen && (
           <>
-            {/* Overlay (detects outside click) */}
             <div
               onClick={() => setopen(false)}
               className="fixed inset-0 transition-opacity duration-200 ease-out opacity-100"
             />
-            {/* Emoji Picker container */}
             <div
               onClick={(e) => e.stopPropagation()}
               className={`absolute bottom-full mb-2 right-4 z-50
@@ -102,8 +95,6 @@ export const MessageInput = ({ onSendMessage }: SendMessageProps) => {
             </div>
           </>
         )}
-
-        {/* Input + Buttons */}
         <div
           className="flex items-center bg-[#1F2937] rounded-2xl px-4 py-2.5 shadow-sm
             border border-gray-600 transition-all duration-200
@@ -119,14 +110,12 @@ export const MessageInput = ({ onSendMessage }: SendMessageProps) => {
             className="flex-1 bg-transparent text-gray-200 placeholder-gray-500 
               outline-none text-sm"
           />
-
           <button
             onClick={() => setopen(true)}
             className="ml-3 text-gray-400 hover:text-gray-200 transition-colors"
           >
             <Smile size={20} />
           </button>
-
           <button
             onClick={handleSendMessage}
             className="ml-2 bg-purple-600 hover:bg-purple-700 active:scale-95 

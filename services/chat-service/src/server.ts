@@ -6,6 +6,7 @@ import chatsRoutes from "./routes/chats.js";
 import dbPlugin from "./plugins/db.js";
 import authPlugin from "./plugins/midlware.js";
 import fs from 'fs';
+import { validateEnv } from './config/env.js';
 
 const logStream = fs.createWriteStream('./logs/chat.log', { flags: 'a' });
 
@@ -14,6 +15,8 @@ declare module "socket.io" {
     userId?: number;
   }
 }
+
+validateEnv();
 
 const fastify = Fastify({
   logger: {
