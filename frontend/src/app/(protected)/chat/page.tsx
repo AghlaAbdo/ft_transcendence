@@ -58,16 +58,13 @@ export default function ChatPage() {
 
   useEffect(() => {
     const fetchingmessages = async () => {
-      console.log('other user id: ', other_user_id);
       if (user && selectedChatId && other_user_id) {
         try {
           const userResponse = await fetch(
-            `https://localhost:8080/api/friends/friend_data/${other_user_id}`,
+            `${process.env.NEXT_PUBLIC_URL}/api/friends/friend_data/${other_user_id}`,
             { credentials: 'include' }
           );
-          
           const userData = await userResponse.json();
-          console.log('friend data fetched: ', userData);
           if (!userData) {
             toast.error("some thing went wrong");
             return;
@@ -76,7 +73,7 @@ export default function ChatPage() {
           if (user.id === userData.friends.blocked_by) setblocker(true);
           if (other_user_id === userData.friends.blocked_by) setblocked(true);
 
-          if (selectedChatId != -1) {
+          if (selectedChatId !== -1) {
             const fetchmessage = await fetch(
               `${process.env.NEXT_PUBLIC_CHAT_API}/messages/${selectedChatId}/${other_user_id}`,
               { credentials: 'include' }
@@ -93,7 +90,8 @@ export default function ChatPage() {
       }
     };
     fetchingmessages();
-  }, [other_user_id, selectedChatId]);
+  }, [other_user_id, selectedChatId, user]);
+
   const socketRef = useRef<Socket | null>(null);
   const handleSendMessage = (messageContent: string) => {
     if (
@@ -106,7 +104,6 @@ export default function ChatPage() {
       socketRef.current.emit('ChatMessage', {
         chatId: selectedChatId,
         message: messageContent,
-        sender: user.id,
         receiver: otherUser.id,
       });
     }
@@ -161,26 +158,23 @@ export default function ChatPage() {
     };
   }, [user]);
 
-  const handle_block = (actor_id: number, target_id: number) => {
+  const handle_block = (target_id: number) => {
     if (socketRef.current && selectedChatId && user && otherUser) {
       socketRef.current.emit('block', {
-        actor_id: actor_id,
         target_id: target_id,
       });
     }
   };
 
-  const handle_unblock = (actor_id: number, target_id: number) => {
+  const handle_unblock = (target_id: number) => {
     if (socketRef.current && selectedChatId && user && otherUser) {
       socketRef.current.emit('unblock', {
-        actor_id: actor_id,
         target_id: target_id,
       });
     }
   };
 
   const handleChatSelect = (chatId: number, selectedFriend?: number) => {
-    // console.log('handle chat selected user :', selectedFriend);
     if (selectedFriend) {
       setotheruserid(selectedFriend);
     }
@@ -229,7 +223,7 @@ export default function ChatPage() {
             )}
             {selectedChatId && otherUser && blocker && !blocked && (
               <BlockingUserInput
-                onUnblock={() => handle_unblock(user.id, otherUser.id)}
+                onUnblock={() => handle_unblock(otherUser.id)}
               />
             )}
             {selectedChatId && otherUser && blocked && !blocker && (
@@ -268,7 +262,7 @@ export default function ChatPage() {
               )}
               {selectedChatId && otherUser && blocker && !blocked && (
                 <BlockingUserInput
-                  onUnblock={() => handle_unblock(user.id, otherUser.id)}
+                  onUnblock={() => handle_unblock(otherUser.id)}
                 />
               )}
               {selectedChatId && otherUser && blocked && !blocker && (

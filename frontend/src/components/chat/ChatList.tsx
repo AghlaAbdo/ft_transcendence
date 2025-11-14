@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { formatDistanceToNow } from 'date-fns';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { User, useAuth } from '@/hooks/useAuth';
 
 import { FriendList } from './FriendList';
 import { Search_Input } from './Search_Input';
 import { NoChats } from './noChats';
-import { toast } from 'sonner';
 
 interface Message {
   id: number;
@@ -70,41 +70,43 @@ export const Chatlist = ({
   const [chats, setChats] = useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const filteredChats = chats.filter((chat) => {
-    if (!searchQuery) return true;
+    if (!chat?.sender || !chat?.receiver) {
+      return false;
+    }
+    if (!searchQuery?.trim()) {
+      return true;
+    }
     const otherUser = chat.sender.id === userId ? chat.receiver : chat.sender;
+    if (!otherUser?.username) {
+      return false;
+    }
     const userIdString = otherUser.username.toString();
     return userIdString.includes(searchQuery);
   });
 
   useEffect(() => {
-    // console.log("---> ", process.env.NEXT_PUBLIC_CHAT_API);
-    
-    if (!userId)
-        return
-      const fetch_messages = async () => {
-        try {
-          setLoading(true); // do not forgot to use this later
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_CHAT_API}/chats`, // here use just user id in the crendtiels
-            { credentials: 'include' }
-          )
+    if (!userId) return;
+    const fetch_messages = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CHAT_API}/chats`, // here use just user id in the crendtiels
+          { credentials: 'include' }
+        );
         if (!response.ok) {
           toast.error('some thing went wrong!');
           return;
         }
         const data = await response.json();
-        if (data.length > 0)
-          setChats(data);
-        else
-          setChats([]);
+        if (data.length > 0) setChats(data);
+        else setChats([]);
       } catch (error) {
-        console.error('Failed to fetch chats:', error)
+        console.error('Failed to fetch chats:', error);
       }
-    }
-    setLoading(false);
+    };
     fetch_messages();
+    setLoading(false);
   }, [userId, conv]);
-
   return (
     <>
       <div className='lg:w-1/4 outline-none flex flex-col bg-[#021024] rounded-[20px] my-2 h-[calc(100vh_-_88px)]'>

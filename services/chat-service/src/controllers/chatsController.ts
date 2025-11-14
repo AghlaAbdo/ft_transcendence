@@ -1,7 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getMessages } from "../database/conversations.js";
 import { getChats } from "../database/chats.js";
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
+import { config } from "../config/env.js";
+
 interface GetMessagesParams {
   chatId: string;
   otherUserId: string;
@@ -27,8 +28,6 @@ export async function getMessagesHandler(
   const chatId = parseInt(req.params.chatId);
   const userid = (req as any).user.id;
   const otherUserId = parseInt(req.params.otherUserId);
-  console.log("other user id: ", otherUserId);
-  console.log("current user id :", userid);
 
   if (isNaN(chatId) || chatId <= 0) {
     return reply.status(400).send({ error: "Invalid chatId" });
@@ -42,9 +41,9 @@ export async function getMessagesHandler(
     }
     if (userid && otherUserId) {
       const res = await fetch(
-        `http://user-service:5000/api/friends/friend_data_backend/${userid}/${otherUserId}`,
+        `${config.userServiceUrl}/api/friends/friend_data_backend/${userid}/${otherUserId}`,
         {
-          headers: { "x-internal-key": "pingpongsupersecretkey" },
+          headers: { "x-internal-key": config.internalApiKey },
         }
       );
       if (!res.ok)
@@ -52,7 +51,13 @@ export async function getMessagesHandler(
           .status(500)
           .send({ error: "Failed to fetch friendship data" });
       const data = await res.json();
-      if (data.status && data.friends.length === 0) {
+
+      if (!data.status)
+        return reply.status(403).send({
+          status: false,
+          error: "Failed to fetch friendship data",
+        });
+      if (data.status &&  data.friends.length === 0) {
         return reply.status(403).send({
           status: false,
           error: "Not authorized to view messages from non-friends",
@@ -62,7 +67,7 @@ export async function getMessagesHandler(
 
     const result = getMessages(db, chatId);
 
-    if (!result.status || !result.messages || result.messages.length === 0) {
+    if (!result.status || !result.messages) {
       return reply
         .status(404)
         .send({ error: "No messages found for this chat" });
@@ -79,14 +84,12 @@ async function fetchUserFromService(ids: number[]) {
     return [];
   }
 
-  if (!INTERNAL_API_KEY) return null;
-  console.log("interal keu: ", INTERNAL_API_KEY)
    const users = (
     await Promise.all(
       ids.map(async (id) => {
         try {
-          const res = await fetch(`http://user-service:5000/api/users/${id}`, {
-            headers: { "x-internal-key": INTERNAL_API_KEY },
+          const res = await fetch(`${config.userServiceUrl}/api/users/${id}`, {
+            headers: { "x-internal-key": config.internalApiKey },
           });
           if (!res.ok) return null;
           const data = await res.json();
@@ -99,8 +102,6 @@ async function fetchUserFromService(ids: number[]) {
     )
   ).filter(Boolean);
 
-  console.log('after user fetching');
-  
   return users;
 }
 
@@ -108,12 +109,8 @@ export async function getChatsHandler(
   req: FastifyRequest<{ Params: GetChatsParams }>,
   reply: FastifyReply
 ) {
-  console.log('before get user----------');
-  
   const userId = (req as any).user.id;
-  console.log('user id : ', userId);
-  
-  // const userId = 2;
+
   if (isNaN(userId) || userId <= 0) {
     return reply.status(401).send({ error: "Invalid userId" });
   }
@@ -198,15 +195,14 @@ export async function checkChatExistsHandler(
       LIMIT 1
     `);
 
-    const result = stmt.get(userId, friendId, friendId, userId) as
-      | { chat_id: number }
-      | undefined;
+    const result = stmt.get(userId, friendId, friendId, userId)
 
     if (result) {
       return reply.status(200).send({ exists: true, chat_id: result.chat_id });
     } else {
       return reply.status(200).send({ exists: false, chat_id: -1 });
     }
+
   } catch (err) {
     console.error("Error checking chat existence:", err);
     return reply.status(500).send({ error: "Failed to check chat" });

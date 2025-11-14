@@ -42,7 +42,7 @@ export default function TwoFactorAuth() {
   const fetchQRCode = async () => {
     try {
       const response = await fetch(
-        'https://localhost:8080/api/auth/2fa/setup',
+        `${process.env.NEXT_PUBLIC_API}/api/auth/2fa/setup`,
         {
           method: 'GET',
           credentials: 'include',

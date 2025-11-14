@@ -46,7 +46,7 @@ export default function Friends ({ id } : FriendsProps) {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const response = await fetch(`https://localhost:8080/api/friends/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/${id}`, {
           method: 'GET',
           credentials: 'include',
         });

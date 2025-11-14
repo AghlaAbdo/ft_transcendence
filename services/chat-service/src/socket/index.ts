@@ -1,8 +1,14 @@
 import { Server, Socket } from "socket.io";
-import { create_new_chat, insert_message } from "../database/conversations.js";
+import {
+  create_new_chat,
+  get_existing_chat,
+  insert_message,
+} from "../database/conversations.js";
 import Database from "better-sqlite3";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
+import { checkFriendshipStatus } from "../database/chats.js";
+import {config } from "../config/env.js"
 
 const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
 
@@ -31,30 +37,31 @@ export function initSocket(server: any, db: Database.Database) {
     onlineUsers.get(user__id)!.add(socket);
 
     socket.on("block", async (data) => {
-      const { actor_id, target_id } = data;
+      const { target_id } = data;
+      const actor_id = socket.userId;
       if (!actor_id || !target_id)
         return socket.emit("error", { message: "Invalid data" });
       try {
         console.log("actor_id: ", actor_id);
         console.log("target_id: ", target_id);
         const response = await fetch(
-          `http://user-service:5000/api/friends/block`, // front
+          `${config.userServiceUrl}/api/friends/block`, // front
           {
             method: "POST",
             headers: {
-              "x-internal-key": "pingpongsupersecretkey",
+              "x-internal-key": config.internalApiKey,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ actor_id, target_id }),
           }
         );
+        if (!response.ok) 
+            return socket.emit("error", { message: "can not block user" });
 
         const data = await response.json();
-        if (!response.ok) {
-          socket.emit("error", { message: "can not block user" });
-          console.log("error : ", data);
-          return;
-        }
+
+        if (!data.status)
+            return socket.emit("error", { message: data.message});
         const sendersockets = onlineUsers.get(actor_id);
         if (sendersockets) {
           sendersockets.forEach((s) => {
@@ -73,15 +80,13 @@ export function initSocket(server: any, db: Database.Database) {
     });
 
     socket.on("unblock", async (data) => {
-      const { actor_id, target_id } = data;
+      const {target_id } = data;
+      const actor_id = socket.userId;
       if (!actor_id || !target_id)
         return socket.emit("error", { message: "Invalid data" });
-      console.log("------->-----cure: ", actor_id, ", tage: ", target_id);
       try {
-        console.log("actor_id: ", actor_id);
-        console.log("target_id: ", target_id);
         const response = await fetch(
-          `http://user-service:5000/api/friends/unblock`,
+          `${config.userServiceUrl}/api/friends/unblock`,
           {
             method: "POST",
             headers: {
@@ -93,11 +98,11 @@ export function initSocket(server: any, db: Database.Database) {
         );
 
         const data = await response.json();
-        if (!response.ok) {
-          console.log("error    : ", data);
-          socket.emit("error", { message: "can not block user" });
-          return;
-        }
+        if (!response.ok) 
+            return socket.emit("error", { message: "can not block user" });
+
+        if (!data.status)
+            return socket.emit("error", { message: data.message});
 
         const sendersockets = onlineUsers.get(actor_id);
         if (sendersockets) {
@@ -112,6 +117,7 @@ export function initSocket(server: any, db: Database.Database) {
             receiversocket.emit("unblock", { actor_id, target_id });
           });
         }
+
       } catch (err) {
         console.error("some thing went wrong: ", err);
       }
@@ -119,7 +125,8 @@ export function initSocket(server: any, db: Database.Database) {
 
     socket.on("ChatMessage", async (data) => {
       try {
-        const { chatId, sender, receiver, message } = data;
+        const { chatId, receiver, message } = data;
+        const sender = socket.userId;
         if (
           typeof sender !== "number" ||
           typeof receiver !== "number" ||
@@ -129,26 +136,48 @@ export function initSocket(server: any, db: Database.Database) {
           return socket.emit("error", { message: "Invalid message data" });
         }
 
-        if (sender !== socket.userId) {
-          return socket.emit("error", { message: "Unauthorized sender" });
-        }
+        if (!sender || !receiver || !message)
+          return socket.emit("error", { message: "Failed to insert message" });
 
-        if (message.length > 1000) {
+        if (sender === receiver) {
+          return socket.emit("error", {
+            message: "Cannot send messages to yourself",
+          });
+        }
+        if (message.trim().length > 1000) {
           return socket.emit("error", { message: "Message too long" });
         }
 
         if (chatId !== -1 && (typeof chatId !== "number" || chatId <= 0)) {
-          return socket.emit("error", { message: "Invalid chat ID" });
+          return socket.emit("error", { message: "invalid chat ID" });
         }
-        if (!sender || !receiver || !message) return;
+
+        const friendshipCheck = await checkFriendshipStatus(sender, receiver);
+        if (!friendshipCheck.canChat) {
+          return socket.emit("error", { message: friendshipCheck.reason });
+        }
+
         let actualChatId = chatId;
-        console.log("in socket handler: ", message);
 
         if (chatId === -1) {
-          console.log(`Creating new chat between ${sender} and ${receiver}`);
-          actualChatId = create_new_chat(db, sender, receiver, message);
-          console.log(`New chat created with ID: ${actualChatId}`);
+          const existingChatId = get_existing_chat(db, sender, receiver);
+          if (existingChatId) {
+            actualChatId = existingChatId;
+            console.log(
+              `Using existing chat ${existingChatId} between ${sender} and ${receiver}`
+            );
+          } else {
+            actualChatId = create_new_chat(db, sender, receiver, message);
+            if (!actualChatId) {
+              return socket.emit("error", { message: "Failed to create chat" });
+            }
+          }
         }
+        if (!actualChatId)
+          return socket.emit("error", {
+            message: "Failed to create new chat!",
+          });
+
         const newMessage = insert_message(
           db,
           actualChatId,
@@ -201,6 +230,7 @@ export function initSocket(server: any, db: Database.Database) {
   io.use((socket, next) => {
     let token: string | undefined;
     const cookieHeader = socket.handshake.headers.cookie;
+
     if (cookieHeader) {
       const cookies = cookie.parse(cookieHeader);
       token = cookies.token;

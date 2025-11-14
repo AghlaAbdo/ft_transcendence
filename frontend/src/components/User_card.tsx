@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { useSocketStore } from '@/store/useNotificationSocket';
 import { useRouter } from 'next/navigation';
 
-
 type UserCardProps = {
   _user: User
   onClose: () => void; 
@@ -36,7 +35,7 @@ export default function UserCard({ _user, onClose }: UserCardProps) {
   const handleAddFriend = async (user: User) => {
     try {
       setLoading(true);
-      const response = await fetch("https://localhost:8080/api/friends/request", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

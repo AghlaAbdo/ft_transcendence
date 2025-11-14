@@ -27,7 +27,7 @@ interface ChatWindowProps {
   other_User: Friend | null;
   onBackClick?: () => void;
   showBackButton?: boolean;
-  handle_block: (actor_id: number, target_id: number
+  handle_block: (target_id: number
   ) => void;
   blocker: boolean;
   blocked: boolean;
@@ -52,8 +52,6 @@ export const ChatWindow = ({
     return () => clearTimeout(time);
 }, [conv, SelectedChatId]);
 const [open, setopen] = useState(false);
-  // if (SelectedChatId && conv.length === 0)
-  //   return <div className='flex justify-center items-center text-white h-screens'>Loading Messages ...</div>
   return (
     <>
       <div className='flex-1 flex flex-col min-h-0'>

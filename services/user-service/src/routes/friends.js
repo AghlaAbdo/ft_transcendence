@@ -11,7 +11,7 @@ const friendRoutes = (fastify, options) => {
     }, friendController.getFriendData);
 
     fastify.get("/friend_data_backend/:userid/:friendid", {
-        // onRequest: [fastify.verifyInternalRequest] 
+        onRequest: [fastify.verifyInternalRequest]
     }, friendController.getFriendData_backend);
     
     fastify.get("/pending", {

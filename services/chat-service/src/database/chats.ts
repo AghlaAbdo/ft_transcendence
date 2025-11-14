@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-
+import {config } from "../config/env.js"
 export function getChats(db: Database.Database, userId: number) {
   try {
     const stmt = db.prepare(`
@@ -15,5 +15,38 @@ export function getChats(db: Database.Database, userId: number) {
   } catch (error) {
     console.error("Failed to get chats:", error);
     return {status: false, result:[]};
+  }
+}
+
+
+export async function checkFriendshipStatus(userId1: number, userId2: number) {
+  try {
+    const response = await fetch(
+      `${config.userServiceUrl}/api/friends/friend_data_backend/${userId1}/${userId2}`,
+      {
+        headers: { "x-internal-key":  config.internalApiKey},
+      }
+    );
+
+    if (!response.ok) {
+      return { canChat: false, reason: "Failed to check friendship" };
+    }
+
+    const data = await response.json();
+
+    if (!data.status || data.friends.length === 0) {
+      return { canChat: false, reason: "Users are not friends" };
+    }
+
+    const friendship = data.friends;
+  
+    if (friendship.blocked_by) {
+      return { canChat: false, reason: "User is blocked" };
+    }
+
+    return { canChat: true };
+  } catch (err) {
+    console.error("checkFriendshipStatus error:", err);
+    return { canChat: false, reason: "Server error" };
   }
 }

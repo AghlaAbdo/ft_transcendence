@@ -1,5 +1,3 @@
-
-
 export const markAllNotificationsAsRead_friend = async (userId: number) => {
 
   try {
