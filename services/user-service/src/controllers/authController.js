@@ -18,10 +18,10 @@ const signup = async (request, reply) => {
         if (!username || !email || !password)
             throw new Error('All fields are required');
 
-        if (username.length < 8 || username.length > 20) {
+        if (username.length < 8 || username.length > 14) {
             return reply.code(400).send({
                 status: false,
-                message: "Username must be between 8 and 20 characters"
+                message: "Username must be between 8 and 14 characters"
             });
         }
         
@@ -145,7 +145,7 @@ const login = async (request, reply) => {
 
         request.server.setAuthCookie(reply, token);
 
-        reply.send({status: true, user: {id: user.id, username: user.username, level: user.rank}});
+        reply.send({status: true, token, user: {id: user.id, username: user.username, level: user.rank}});
         logEvent("info", "user", "user_login", {result: "success", provider: "local"})
         
     } catch(error) {

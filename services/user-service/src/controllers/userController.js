@@ -216,10 +216,10 @@ const updateInfo = async (request, reply) => {
             });
         }
 
-        if (username.length < 8 || username.length > 20) {
+        if (username.length < 8 || username.length > 14) {
             return reply.code(400).send({
                 status: false,
-                message: "Username must be between 8 and 20 characters"
+                message: "Username must be between 8 and 14 characters"
             });
         }
 
