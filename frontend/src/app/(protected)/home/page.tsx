@@ -42,28 +42,31 @@ export default function Dashboard() {
     useEffect(() => {
         async function getData() {
             if (!authUser || authLoading) return;
-            const games: game[] = await GetGames(authUser.id)
-            console.log(games)
-            const stats: StatWithTimeDict = await GetStats(authUser.id)
-            setStats(stats)
-            const weeklyStats: WeekStats[] = await GetWeekStats(authUser.id)
-            setWeeklyStats(weeklyStats)
-            const current_user: Player = {
-                ...authUser,
-                games: authUser.wins + authUser.losses,
-                winrate: (authUser.wins + authUser.losses) > 0 ? Math.round((authUser.wins / (authUser.wins + authUser.losses)) * 100) : 0
+            try{
+
+                const games: game[] = await GetGames(authUser.id)
+                const stats: StatWithTimeDict = await GetStats(authUser.id)
+                setStats(stats)
+                const weeklyStats: WeekStats[] = await GetWeekStats(authUser.id)
+                setWeeklyStats(weeklyStats)
+                const current_user: Player = {
+                    ...authUser,
+                    games: authUser.wins + authUser.losses,
+                    winrate: (authUser.wins + authUser.losses) > 0 ? Math.round((authUser.wins / (authUser.wins + authUser.losses)) * 100) : 0
+                }
+                setUser(current_user)
+                setAllGames(games)
+                setVisibleGames(games.slice(0, limit))
+                currentOffset.current = limit
+                setLoading(0)
+                setObserverStart(true)
+            } catch(err) {
+                console.log(err)
             }
-            setUser(current_user)
-            setAllGames(games)
-            setVisibleGames(games.slice(0, limit))
-            currentOffset.current = limit
-            setLoading(0)
-            setObserverStart(true)
         }
         getData()
     }, [authUser, authLoading])
     useEffect(() => {
-        // console.log("observer") 
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
@@ -86,10 +89,8 @@ export default function Dashboard() {
             </div>
         ) : (
             <div className="flex flex-col mt-25 min-w-6xl">
-                {/* up */}
                 <div className="flex mb-5 justify-around">
-                    {/* up left */}
-                    <div className="relative h-[45vh] overflow-hidden rounded-[10px] w-[30%] group 2xl:h-[40vh]">
+                    <div className="relative h-[30vh] xl:h-[40vh] overflow-hidden rounded-[10px] w-[30%] group 2xl:h-[40vh]">
                         <Image
                             src="/images/board.jpg"
                             alt="board"
@@ -107,8 +108,7 @@ export default function Dashboard() {
                         </div>
 
                     </div>
-                    {/* up right  */}
-                    <div className="h-[45vh] rounded-[10px] w-[65%] bg-gray-800 overflow-y-auto custom-scrollbar-gray 2xl:h-[40vh]">
+                    <div className="h-[30vh] xl:h-[40vh] rounded-[10px] w-[65%] bg-gray-800 overflow-y-auto custom-scrollbar-gray 2xl:h-[40vh]">
                         <h2 className="p-4 font-bold 2xl:text-[1.2rem]">OVERVIEW</h2>
                         <div className="flex items-center pl-10 2xl:mb-10">
                             <PieChart user={user!} />
@@ -125,14 +125,11 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
-                {/* down */}
                 <div className="flex mb-10 justify-around">
-                    {/* down left */}
-                    <div className="h-[45vh] rounded-[10px] w-[30%] 2xl:h-[40vh]">
+                    <div className="h-[30vh] xl:h-[40vh] rounded-[10px] w-[30%] 2xl:h-[40vh]">
                         <BarChart weeklyStats={weeklyStats} />
                     </div>
-                    {/* down right  */}
-                    <div className="h-[45vh] rounded-[10px] w-[65%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">
+                    <div className="h-[30vh] xl:h-[40vh] rounded-[10px] w-[65%] bg-gray-800 overflow-y-hidden flex flex-col 2xl:h-[40vh]">
                         <div className="grid grid-cols-5 py-3 pr-5 justify-items-center border-b-1 border-gray-700">
                             <span className="2xl:text-[1.2rem]">Date & Time</span>
                             <span className="2xl:text-[1.2rem]">Type</span>
@@ -178,9 +175,6 @@ export default function Dashboard() {
                                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
                                     </div>
                                 )}
-                                {/* {loading !== 2 && currentOffset.current < allGames.length && (
-                                    <div className="h-4"></div>
-                                )} */}
                             </div>
                         </div>
                     </div>
