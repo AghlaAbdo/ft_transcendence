@@ -22,7 +22,6 @@ const databasePlugin = async (fastify, options) => {
 
     fastify.decorate('db', db);
 
-    // Close the database connection when the server stops
     fastify.addHook('onClose', (instance, done) => {
         instance.db.close();
         done();

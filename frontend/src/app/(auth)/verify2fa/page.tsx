@@ -3,8 +3,9 @@ import { log } from 'console';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react'
 import { toast } from 'sonner';
+import { Suspense } from 'react';
 
-const Verify2faPage = () => {
+const Verify2faPageForm = () => {
     const [code, setCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const searchParams = useSearchParams();
@@ -83,4 +84,14 @@ return (
   );
 }
 
-export default Verify2faPage
+export default function Verify2faPage() {
+    return (
+      <Suspense fallback={
+        <div className='flex justify-center items-center min-h-screen'>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      }>
+        <Verify2faPageForm />
+      </Suspense>
+    );
+  }

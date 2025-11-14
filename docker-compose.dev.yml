@@ -7,8 +7,8 @@ services:
       - user-service
       - nextjs
       - game-service
-      # - prometheus
-      # - kibana
+      - prometheus
+      - kibana
 
   nextjs:
     build:

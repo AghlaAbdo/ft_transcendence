@@ -15,8 +15,8 @@ const authPlugin = async (fastify, options) => {
         reply.setCookie(COOKIE_NAME, token, {
             path: '/',
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', //local: http , production: https
-            sameSite: 'lax', // Must be 'lax' for OAuth redirects
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60
         });
     });

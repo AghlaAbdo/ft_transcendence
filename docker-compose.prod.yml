@@ -7,6 +7,8 @@ services:
       - user-service
       - nextjs
       - game-service
+      - prometheus
+      - kibana
 
   nextjs:
     build:
@@ -19,15 +21,21 @@ services:
       target: production
     env_file:
       ./services/game-service/.env
+    volumes:
+      - ./logs:/app/logs
 
   user-service:
     build:
       target: production
     env_file:
       ./services/user-service/.env
+    volumes:
+      - ./logs:/app/logs
 
   chat-service:
     build:
       target: production
     env_file:
       ./services/chat-service/.env
+    volumes:
+      - ./logs:/app/logs

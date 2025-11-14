@@ -12,12 +12,6 @@ import {config } from "../config/env.js"
 
 const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
 
-declare module "socket.io" {
-  interface Socket {
-    userId?: number;
-  }
-}
-
 const onlineUsers: Map<number, Set<Socket>> = new Map();
 export function initSocket(server: any, db: Database.Database) {
   const handleConnection = (

@@ -9,11 +9,12 @@ import {
   handlePlayerData,
   handleOpponentQuit,
 } from './handlers.js';
+import { SOCKET_URL } from '../config.js'
 
 export let socket: Socket;
 
 export function setupSocket(token: string): Socket {
-  socket = io('wss://localhost:8080', {
+  socket = io(SOCKET_URL, {
     path: '/ws/game',
     auth: { token },
     transports: ['websocket'],

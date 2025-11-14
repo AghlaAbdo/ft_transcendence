@@ -366,14 +366,11 @@ const forgotPassword = async (request, reply) => {
     }
 }
 
-    // setup 2fa
+
 const setup2fa = async (req, rep) => {
 try {
     const db = req.server.db;
-//    if (!db) {
-//       console.error("DB not available on request.server.db");
-//       return rep.status(400).send({ error: "Database not initialized" });
-//     }
+
     console.log('allo from 2fa backend');
     const userId = req.user?.id; // Get from session/JWT
     const userEmail = req.user?.email;
@@ -385,13 +382,8 @@ try {
       return rep.status(401).send({ error: 'Unauthorized' });
     }
 
-    // Generate secret and QR code
     const setup = await generateSecret(userId, userEmail);
     console.log('allo from setup 2fa');
-    
-    // Store the secret temporarily (don't enable 2FA yet)
-    // You'll confirm it in the next step
-
 
     db.prepare(`
       UPDATE users 
@@ -409,10 +401,9 @@ try {
     return rep.status(400).send({ error: 'Failed to setup 2FA' });
   }
 }
-// verfy 2fa token
+
 const verify2Fa = async (req, rep) => {
 try {
-    // console.log('verfify backend');
     const db = req.server.db;
     const userId = req.user?.id;
     const { token } = req.body;
@@ -420,11 +411,9 @@ try {
     console.log('user:', userId);
     console.log('token:', token);
     if (!userId || !token) {
-        // console.log('ists her 1');
       return rep.status(400).send({ error: 'Missing required fields' });
     }
 
-    // Get the secret from database
     const user = db.prepare(`
       SELECT totp_secret 
       FROM users 
