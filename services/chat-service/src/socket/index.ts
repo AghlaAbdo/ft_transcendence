@@ -12,12 +12,6 @@ import {config } from "../config/env.js"
 
 const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
 
-declare module "socket.io" {
-  interface Socket {
-    userId?: number;
-  }
-}
-
 const onlineUsers: Map<number, Set<Socket>> = new Map();
 export function initSocket(server: any, db: Database.Database) {
   const handleConnection = (
@@ -141,7 +135,7 @@ export function initSocket(server: any, db: Database.Database) {
 
         if (sender === receiver) {
           return socket.emit("error", {
-            message: "Cannot send messages to yourself",
+            messgae: "Cannot send messages to yourself",
           });
         }
         if (message.trim().length > 1000) {
@@ -163,9 +157,6 @@ export function initSocket(server: any, db: Database.Database) {
           const existingChatId = get_existing_chat(db, sender, receiver);
           if (existingChatId) {
             actualChatId = existingChatId;
-            console.log(
-              `Using existing chat ${existingChatId} between ${sender} and ${receiver}`
-            );
           } else {
             actualChatId = create_new_chat(db, sender, receiver, message);
             if (!actualChatId) {
@@ -228,6 +219,8 @@ export function initSocket(server: any, db: Database.Database) {
   });
 
   io.use((socket, next) => {
+    console.log('new socket auth');
+    
     let token: string | undefined;
     const cookieHeader = socket.handshake.headers.cookie;
 

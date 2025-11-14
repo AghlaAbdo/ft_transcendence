@@ -47,8 +47,6 @@ services:
     image: chat-service:v2.0.0
     build:
       context: ./services/chat-service
-    ports:
-      - "4545:4545"
     networks:
       - main_net
 

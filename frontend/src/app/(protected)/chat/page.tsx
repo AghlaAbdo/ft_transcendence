@@ -61,7 +61,7 @@ export default function ChatPage() {
       if (user && selectedChatId && other_user_id) {
         try {
           const userResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}/api/friends/friend_data/${other_user_id}`,
+            `/api/friends/friend_data/${other_user_id}`,
             { credentials: 'include' }
           );
           const userData = await userResponse.json();

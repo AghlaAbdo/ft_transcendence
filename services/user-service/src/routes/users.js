@@ -77,6 +77,7 @@ const userRoutes = async (fastify, options) => {
       return notoficationModel.mark_one_game_as_read(db , notif_id);
     });
 
+    
     fastify.put('/notifications/game/mark-as-read',{
         onRequest: [fastify.authenticate]
       }, async (req, res) => {

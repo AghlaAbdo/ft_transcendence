@@ -162,12 +162,12 @@ const blockFriend = (db, { currentUserId, targetUserId }) => {
     const checkExisting = db.prepare(`
             SELECT id, status, blocked_by 
             FROM FRIENDS 
-            WHERE (user_id = ? AND friend_id = ?) 
+ Friendship           WHERE (user_id = ? AND friend_id = ?) 
                OR (user_id = ? AND friend_id = ?)
     `).get(currentUserId, targetUserId, targetUserId, currentUserId);  
 
     if (!checkExisting) {
-        throw new Error('Friendship not found');
+        throw new Error(' not found');
     }
 
     if (checkExisting.blocked_by) {

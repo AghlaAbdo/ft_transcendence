@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   read INTEGER DEFAULT 0,
   game_link TEXT,
   created_at TEXT DEFAULT (datetime('now')),
+  expiry_time INTEGER,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL
 );
