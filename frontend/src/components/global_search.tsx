@@ -28,7 +28,7 @@ export const GlobalSearch = ({ onClose }: GlobalSearchProps) => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/users/search?query=${searchTerm}`);
+        const response = await fetch(`/api/users/search?query=${searchTerm}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

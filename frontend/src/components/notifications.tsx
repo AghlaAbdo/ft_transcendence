@@ -54,7 +54,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
     const fetchNotifications = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API}/api/users/notifications`,  {credentials: "include"}
+          `/api/users/notifications`,  {credentials: "include"}
         );
         if (!res.ok) {
           toast.error('some thing went wrong!');
@@ -64,7 +64,7 @@ const NotificationCenter = ({ onClose }: Notification_props) => {
         if (res.ok && data.status) {
           const notificationsWithUserData = await Promise.all(
             data.notifications.map(async (notif: Notification) => {
-             const userRes = await fetch(`${process.env.NEXT_PUBLIC_API}/api/users/profile/${notif.user_id}`, {
+             const userRes = await fetch(`/api/users/profile/${notif.user_id}`, {
               credentials: 'include'
             });
               const userData = await userRes.json();

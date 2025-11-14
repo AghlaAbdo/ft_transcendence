@@ -90,7 +90,7 @@ export const Chatlist = ({
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_CHAT_API}/chats`, // here use just user id in the crendtiels
+          `/api/chat/chats`, // here use just user id in the crendtiels
           { credentials: 'include' }
         );
         if (!response.ok) {

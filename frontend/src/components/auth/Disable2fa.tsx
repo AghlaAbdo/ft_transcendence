@@ -22,7 +22,7 @@ export default function Disable2fa({onclose,handledisable}: disable2faprops) {
     setIsVerifying(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/api/auth/2fa/disable`,
+        `/api/auth/2fa/disable`,
         {
           method: 'POST',
           credentials: 'include',

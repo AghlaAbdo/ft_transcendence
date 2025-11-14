@@ -35,7 +35,7 @@ export default function UserCard({ _user, onClose }: UserCardProps) {
   const handleAddFriend = async (user: User) => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/request`, {
+      const response = await fetch(`/api/friends/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

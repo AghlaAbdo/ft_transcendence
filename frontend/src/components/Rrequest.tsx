@@ -20,7 +20,7 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
   const handleAccept = async () => {
     setIsLoading('accept');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/accept/${user_id}`, {
+      const response = await fetch(`/api/friends/accept/${user_id}`, {
         method: "PUT",
         credentials: "include",
       });
@@ -45,7 +45,7 @@ export default function FriendRequestCard({ id, username, avatar_url, user_id }:
   const handleReject = async () => {
     setIsLoading('reject');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/friends/reject/${user_id}`, {
+      const response = await fetch(`/api/friends/reject/${user_id}`, {
         method: "DELETE",
         credentials: "include"
       });

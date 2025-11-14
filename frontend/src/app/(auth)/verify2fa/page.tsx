@@ -21,7 +21,7 @@ const Verify2faPage = () => {
 
         try {
         const response = await fetch(
-            'https://localhost:8080/api/auth/2fa/verify-token',
+            '/api/auth/2fa/verify-token',
             {
             method: 'POST',
             credentials: 'include',

@@ -99,7 +99,7 @@ const SettingsPage = () => {
       formData.append("avatar", file); // files comes from <input type="file">
 
       try {
-        const response = await fetch("https://localhost:8080/api/users/upload-avatar", {
+        const response = await fetch("/api/users/upload-avatar", {
           method: "POST",
           body: formData,
           credentials: "include",

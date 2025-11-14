@@ -48,7 +48,7 @@ export async function getMessagesHandler(
       );
       if (!res.ok)
         return reply
-          .status(500)
+          .status(401)
           .send({ error: "Failed to fetch friendship data" });
       const data = await res.json();
 
