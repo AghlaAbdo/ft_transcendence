@@ -24,7 +24,7 @@ const getAllFriends = async (request, reply) => {
     });
   } catch (error) {
     console.error("Error in getAllFriends:", error);
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message,
     });
@@ -53,7 +53,7 @@ const getFriendData = async (request, reply) => {
     });
   } catch (error) {
     console.error("Error in getFriendData:", error);
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message,
     });
@@ -90,7 +90,7 @@ const getFriendData_backend = async (request, reply) => {
     });
   } catch (error) {
     console.error("Error in getFriendData:", error);
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message,
     });
@@ -110,7 +110,7 @@ const getPendingRequests = async (request, reply) => {
       count: requests.length,
     });
   } catch (error) {
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message,
     });
@@ -307,7 +307,7 @@ const searchQuery = async (request, reply) => {
     });
   } catch (error) {
     console.error("Error in searchQuery:", error);
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message || "failed to search friends",
     });
@@ -362,7 +362,7 @@ const blockFriend = async (request, reply) => {
       message: "User blocked successfully",
     });
   } catch (error) {
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message || "Failed to block user",
     });
@@ -416,7 +416,7 @@ const unblockFriend = async (request, reply) => {
       message: "User unblocked successfully",
     });
   } catch (error) {
-    return reply.code(500).send({
+    return reply.code(400).send({
       status: false,
       message: error.message || "Failed to block user",
     });

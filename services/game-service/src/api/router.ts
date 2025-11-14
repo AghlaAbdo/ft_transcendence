@@ -30,7 +30,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       return { matches };
     } catch (error) {
       console.error('Error retrieving matches:', error);
-      reply.status(500).send({ error: 'Failed to retrieve matches' });
+      reply.status(400).send({ error: 'Failed to retrieve matches' });
     }
   });
 
@@ -65,7 +65,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       return { games };
     } catch (error) {
       console.error('Error retrieving games:', error);
-      reply.status(500).send({ error: 'Failed to retrieve games' });
+      reply.status(400).send({ error: 'Failed to retrieve games' });
     }
   });
 
@@ -96,7 +96,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       return { stats };
     } catch (error) {
       console.error('Error retrieving stats:', error);
-      reply.status(500).send({ error: 'Failed to retrieve stats' });
+      reply.status(400).send({ error: 'Failed to retrieve stats' });
     }
   });
 
@@ -176,7 +176,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       return { stats };
     } catch (error) {
       console.error('Error retrieving weekly stats:', error);
-      reply.status(500).send({ error: 'Failed to retrieve weekly stats' });
+      reply.status(400).send({ error: 'Failed to retrieve weekly stats' });
     }
   });
 
@@ -235,7 +235,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
     // console.log("challenger: ", challenger);
     // console.log("opponent: ", opponent);
     if (!challenger || !opponent) {
-      rep.status(500).send({ error: 'Players not found!' });
+      rep.status(400).send({ error: 'Players not found!' });
       return;
     }
     const gameId = handleGameInvite(challenger, opponent);

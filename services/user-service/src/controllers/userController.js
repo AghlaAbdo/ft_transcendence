@@ -43,7 +43,7 @@ const getUserById = async (request, reply) => {
         });
 
     } catch (error) {
-        reply.code(500).send({
+        reply.code(400).send({
             status: false,
             message: error.message || 'Failed to fetch user'
         });
@@ -71,7 +71,7 @@ const  getAllUsers = async (request, reply) => {
         });
 
     } catch (error) {
-        reply.code(500).send({
+        reply.code(400).send({
             status: false,
             message: error.message || 'Failed to fetch users'
         });
@@ -125,7 +125,7 @@ const uploadAvatar = async (request, reply) => {
 
     } catch (error) {
         console.error("Avatar upload failed:", error);
-        return reply.status(500).send( { status: false, error: "Internal Server Error" });
+        return reply.status(400).send( { status: false, error: "Internal Server Error" });
     }
 }
 
@@ -197,9 +197,9 @@ const changePassword = async (request, reply) => {
 
     } catch (error) {
         console.error("Password change failed:", error);
-        return reply.status(500).send({ 
+        return reply.status(400).send({ 
             status: false,
-            message: "Internal Server Error" 
+            message: "some thing went wrong!" 
         });
     }
 }
@@ -267,9 +267,9 @@ const updateInfo = async (request, reply) => {
 
     } catch (error) {
         console.error("Info change failed:", error);
-        return reply.status(500).send({ 
+        return reply.status(400).send({ 
             status: false,
-            message: "Internal Server Error" 
+            message: "some thing went wrong!" 
         });
     }
 }
@@ -301,7 +301,7 @@ const searchQuery = async (request, reply) => {
         });
 
     } catch (error) {
-        reply.code(500).send({
+        reply.code(400).send({
             status: false,
             message: error.message || 'Failed to search users'
         });
@@ -358,9 +358,9 @@ const twoFactorAuth = async (request, reply) => {
         
     } catch (error) {
         console.error(error);
-        return reply.code(500).send({
+        return reply.code(400).send({
             status: false,
-            message: "Internal server error"
+            message: "some thing went wrong!"
         });
     }
 }
@@ -419,7 +419,7 @@ const updateStats = async (request, reply) => {
         });
     } catch (err) {
         console.error("Error updating user stats:", err);
-        return reply.status(500).send({ 
+        return reply.status(400).send({ 
             status: false,
             message: "Error updating user stats" 
         });

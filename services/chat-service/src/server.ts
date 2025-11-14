@@ -56,8 +56,8 @@ fastify.addHook('onRequest', async (request, reply) => {
 
 fastify.setErrorHandler((error, request, reply) => {
   console.error("Fastify error:", error);
-  reply.status(500).send({
-    error: "Internal Server Error",
+  reply.status(400).send({
+    error: "some thing went wrong",
     message: error.message,
   });
 });

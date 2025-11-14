@@ -167,7 +167,7 @@ const logout = async (request, reply) => {
         reply.send({status: true, message: 'Logged out successfully'});
     } catch (error) {
         console.error("logout error:", error);
-        reply.code(500).send({ 
+        reply.code(400).send({ 
             status: false, 
             message: 'An error occurred during logout'
         });
@@ -358,7 +358,7 @@ const forgotPassword = async (request, reply) => {
         });
     } catch (error) {
         console.error("Password reset request error:", error);
-        reply.code(500).send({ 
+        reply.code(400).send({ 
             error: 'Failed to process password reset request',
             code: 'SERVER_ERROR',
             message: error.message
@@ -372,7 +372,7 @@ try {
     const db = req.server.db;
 //    if (!db) {
 //       console.error("DB not available on request.server.db");
-//       return rep.status(500).send({ error: "Database not initialized" });
+//       return rep.status(400).send({ error: "Database not initialized" });
 //     }
     console.log('allo from 2fa backend');
     const userId = req.user?.id; // Get from session/JWT
@@ -406,7 +406,7 @@ try {
     };
   } catch (error) {
     console.error('2FA setup error:', error);
-    return rep.status(500).send({ error: 'Failed to setup 2FA' });
+    return rep.status(400).send({ error: 'Failed to setup 2FA' });
   }
 }
 // verfy 2fa token
@@ -453,7 +453,7 @@ try {
     };
   } catch (error) {
     console.error('2FA verify error:', error);
-    return rep.status(500).send({ error: 'Failed to verify 2FA' });
+    return rep.status(400).send({ error: 'Failed to verify 2FA' });
   }
 }
 
@@ -566,7 +566,7 @@ try {
     };
   } catch (error) {
     console.error('2FA disable error:', error);
-    return rep.status(500).send({ error: 'Failed to disable 2FA' });
+    return rep.status(400).send({ error: 'Failed to disable 2FA' });
   }
 }
 
@@ -622,7 +622,7 @@ const resetPassword = async (request, reply) => {
 
     } catch (error) {
         console.error("Password reset error:", error);
-        reply.code(500).send({ 
+        reply.code(400).send({ 
             error: 'Failed to reset password',
             code: 'SERVER_ERROR',
             message: error.message

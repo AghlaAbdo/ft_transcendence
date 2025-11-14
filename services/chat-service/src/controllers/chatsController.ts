@@ -37,7 +37,7 @@ export async function getMessagesHandler(
     const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
-      return reply.status(500).send({ error: "Database not initialized" });
+      return reply.status(400).send({ error: "Database not initialized" });
     }
     if (userid && otherUserId) {
       const res = await fetch(
@@ -48,17 +48,17 @@ export async function getMessagesHandler(
       );
       if (!res.ok)
         return reply
-          .status(401)
+          .status(400)
           .send({ error: "Failed to fetch friendship data" });
       const data = await res.json();
 
       if (!data.status)
-        return reply.status(403).send({
+        return reply.status(400).send({
           status: false,
           error: "Failed to fetch friendship data",
         });
       if (data.status &&  data.friends.length === 0) {
-        return reply.status(403).send({
+        return reply.status(400).send({
           status: false,
           error: "Not authorized to view messages from non-friends",
         });
@@ -69,13 +69,13 @@ export async function getMessagesHandler(
 
     if (!result.status || !result.messages) {
       return reply
-        .status(404)
+        .status(400)
         .send({ error: "No messages found for this chat" });
     }
     return reply.status(200).send(result);
   } catch (err) {
     console.error("Error fetching messages:", err);
-    return reply.status(500).send({ error: "Failed to fetch messages" });
+    return reply.status(400).send({ error: "Failed to fetch messages" });
   }
 }
 
@@ -114,19 +114,19 @@ export async function getChatsHandler(
   const userId = (req as any).user.id;
 
   if (isNaN(userId) || userId <= 0) {
-    return reply.status(401).send({ error: "Invalid userId" });
+    return reply.status(400).send({ error: "Invalid userId" });
   }
 
   try {
     const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
-      return reply.status(401).send({ error: "Database not initialized" });
+      return reply.status(400).send({ error: "Database not initialized" });
     }
 
     const response = getChats(db, userId);
     if (!response || !response.status)
-        return reply.status(500).send({error: "some went wrong!"});
+        return reply.status(400).send({error: "something went wrong!"});
     if (response.result.length == 0) {
       return reply.status(200).send([]);
     }
@@ -187,7 +187,7 @@ export async function checkChatExistsHandler(
     const db = (req.server as any).db;
     if (!db) {
       console.error("DB not available on request.server.db");
-      return reply.status(500).send({ error: "Database not initialized" });
+      return reply.status(400).send({ error: "Database not initialized" });
     }
 
     const stmt = db.prepare(`
@@ -207,6 +207,6 @@ export async function checkChatExistsHandler(
 
   } catch (err) {
     console.error("Error checking chat existence:", err);
-    return reply.status(500).send({ error: "Failed to check chat" });
+    return reply.status(400).send({ error: "Failed to check chat" });
   }
 }

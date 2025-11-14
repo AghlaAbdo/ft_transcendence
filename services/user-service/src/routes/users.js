@@ -53,7 +53,7 @@ const userRoutes = async (fastify, options) => {
         return  notoficationModel.getnotifications(db, userId);
       } catch (err) {
         console.error(err);
-        return reply.status(500).send({ error: "Failed to fetch notifications" });
+        return reply.status(400).send({ error: "Failed to fetch notifications" });
       }
     });
 

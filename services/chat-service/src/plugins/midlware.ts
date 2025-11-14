@@ -37,7 +37,7 @@ const authPlugin = async (fastify: any, options: any) => {
             
             if (!userData || !userData.user) {
                 fastify.clearAuthCookie(reply);
-                return reply.code(401).send({ 
+                return reply.code(400).send({ 
                     status: false, 
                     message: 'User not found'
                 });
@@ -46,7 +46,7 @@ const authPlugin = async (fastify: any, options: any) => {
 
         } catch (error: any) {
             fastify.clearAuthCookie(reply);
-            return reply.code(401).send({
+            return reply.code(400).send({
                 status: false, 
                 error: error.message, 
                 message: 'Unauthorized: Authentication failed'
