@@ -84,7 +84,6 @@ async function fetchUserFromService(ids: number[]) {
     return [];
   }
 
-  // if (!INTERNAL_API_KEY) return null;
    const users = (
     await Promise.all(
       ids.map(async (id) => {
