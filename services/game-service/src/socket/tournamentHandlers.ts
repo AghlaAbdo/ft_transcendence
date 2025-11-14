@@ -37,7 +37,7 @@ export async function handleCreateTournament(
   if (!user) return;
 
   if (getUserActiveTournament(userId)) {
-    console.log('user in another game in handleCreatetournament!');
+    // console.log('user in another game in handleCreatetournament!');
     socket.emit('inTournament', {
       tournamentId: getUserActiveTournament(userId),
     });
@@ -97,7 +97,7 @@ export async function handleJoinTournament(
   }
 
   if (getUserActiveTournament(userId)) {
-    console.log('user in another game in handleCreatetournament!');
+    // console.log('user in another game in handleCreatetournament!');
     socket.emit('inTournament', {
       tournamentId: getUserActiveTournament(userId),
     });
@@ -118,7 +118,7 @@ export async function handleJoinTournament(
       startTournament(tournament);
     }
   }
-  console.log('joined tournamentId: ', tournamentId, ' userId: ', userId);
+  // console.log('joined tournamentId: ', tournamentId, ' userId: ', userId);
 }
 
 function joinPlayerToTournament(
@@ -143,7 +143,7 @@ export function handleTournPlayerInLoby(
   const tournament = getTournament(data.tournamentId);
   const ioInstance = getIoInstance();
   if (!tournament || !tournament.players.get(data.userId)) {
-    console.log('Player not in Tournament !!');
+    // console.log('Player not in Tournament !!');
     socket.emit('notInTournament');
     return;
   }
@@ -247,14 +247,14 @@ export function handleReadyForMatch(
     (data.userId !== gameState.player1.id &&
       data.userId !== gameState.player2.id)
   ) {
-    console.log('!gameState || !tournament in handleReadyForMatch');
+    // console.log('!gameState || !tournament in handleReadyForMatch');
     socket.emit('notInMatch');
     return;
   }
   socket.emit('inMatch');
   // console.log('sent Inmatch??');
   if (gameState.game.status === 'playing') {
-    console.log("gameStatus is 'playing' in handleReadyForMatch!!");
+    // console.log("gameStatus is 'playing' in handleReadyForMatch!!");
     return;
   }
   // console.log('got readyForMatch, userId: ', data.userId);

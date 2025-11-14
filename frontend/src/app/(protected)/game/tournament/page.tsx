@@ -199,6 +199,7 @@ export default function TournamentLobbyPage() {
               value={tournamentName}
               onChange={(e) => setTournamentName(e.target.value)}
               placeholder='Enter tournament name'
+              maxLength={30}
               className='w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-white focus:ring-pink-500 focus:border-pink-500'
             />
             {showError && !tournamentName.trim() && (

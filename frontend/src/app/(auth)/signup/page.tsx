@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const schema = z.object({
-  username: z.string().min(6, "Username must be at least 6 characters"),
+  username: z.string().min(8, "Username must be at least 8 characters"),
   email: z.string().email("Invalid email"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")

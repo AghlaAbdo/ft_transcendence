@@ -57,7 +57,7 @@ export function quitActiveGame(socketId: string) {
     const gameState = getGameState(activeGameId);
     if (gameState && activeGameId) {
       removeUserActiveGame(userId, activeGameId);
-      console.log('---- did remove userActiveGame in Disconnect!!');
+      // console.log('---- did remove userActiveGame in Disconnect!!');
       // console.log("called quit from quitActiveGame");
       handleQuit({ gameId: gameState.id, userId });
     }

@@ -246,14 +246,14 @@ function notifyPlayersForMatch(tournament: ITournament, match: IMatch) {
   const player2Info = tournament.players.get(match.player2Id);
 
   if (!player1Info || !player2Info) {
-    console.log(`Missing player info for match ${match.id}.`);
+    // console.log(`Missing player info for match ${match.id}.`);
     return;
   }
 
   const player1SocketId = getUserSocketId(player1Info.id);
   const player2SocketId = getUserSocketId(player2Info.id);
   if (!player1SocketId || !player2SocketId) {
-    console.log("Couldn't get players sockets !!!");
+    // console.log("Couldn't get players sockets !!!");
     return;
   }
 

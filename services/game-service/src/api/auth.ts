@@ -7,7 +7,7 @@ export default async function authorization(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  console.log('jwt secret in auth: ', JWT_SECRET);
+  // console.log('jwt secret in auth: ', JWT_SECRET);
   if (!JWT_SECRET)
     return reply.code(400).send({ error: 'No JWT_SERCRET found' });
   try {

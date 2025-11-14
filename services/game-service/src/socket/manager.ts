@@ -41,7 +41,7 @@ export function initializeSocketIO(server: http.Server): Server {
   const io: Server = new Server(server, {
     path: '/ws/game',
     cors: {
-      origin: '*',
+      origin: 'https://34.175.207.6/',
       methods: ['GET', 'POST'],
     },
   });

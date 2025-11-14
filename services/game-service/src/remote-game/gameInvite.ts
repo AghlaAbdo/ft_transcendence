@@ -17,11 +17,11 @@ export function handleGameInvite(challenger: IPlayer, opponent: IPlayer) {
     null,
   );
   addGameState(gameState);
-  console.log('Created Game: ', gameId);
+  // console.log('Created Game: ', gameId);
   setTimeout(() => {
     if (!gameState.player1.ready || !gameState.player2.ready) {
-      console.log('delete game: ', gameId);
-      console.log("Because Players didn't join");
+      // console.log('delete game: ', gameId);
+      // console.log("Because Players didn't join");
       const io = getIoInstance();
       if (gameState.player1.ready) {
         const userSocketId = getUserSocketId(gameState.player1.id!);

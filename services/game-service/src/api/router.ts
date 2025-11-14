@@ -35,7 +35,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.get('/games', async (req, reply) => {
-    console.log('indeed in /games');
+    // console.log('indeed in /games');
 
     logEvent('info', 'game', 'api_request', { method: 'GET', path: '/games' });
     const db: DatabaseType = (fastify as any).db;
@@ -181,7 +181,7 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.post('/game-invite', async (req, rep) => {
-    console.log('jwt secret in auth: ', JWT_SECRET);
+    // console.log('jwt secret in auth: ', JWT_SECRET);
     let userId: string;
     if (!JWT_SECRET)
       return rep.code(400).send({ error: 'No JWT_SERCRET found' });

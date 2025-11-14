@@ -13,7 +13,7 @@ export async function fetchUser(userId: string) {
     });
     if (!response.ok) {
       console.log("Couldn't fetch user: something wet wrong");
-      console.log('url: ', url);
+      // console.log('url: ', url);
       return null;
     }
     const user = await response.json();

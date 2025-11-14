@@ -24,7 +24,7 @@ function postGame(gameState: IGameState): void {
       gameState.playtime,
       gameState.startDate,
     );
-  console.log('\nLast inserted id: ', result.lastInsertRowid, '\n');
+  // console.log('\nLast inserted id: ', result.lastInsertRowid, '\n');
 }
 
 export { postGame };

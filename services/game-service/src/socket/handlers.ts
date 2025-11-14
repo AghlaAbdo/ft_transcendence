@@ -46,13 +46,13 @@ export function handleConnection(
   io: Server,
   userId: string,
 ): void {
-  console.log('called handleConnection userId: ', userId);
+  // console.log('called handleConnection userId: ', userId);
   setIoInstance(io);
   setUserSocket(userId, socket.id);
   const userActiveGameId = getUserActiveGame(userId);
   const userActiveTournamentId = getUserActiveTournament(userId);
   if (userActiveGameId) {
-    console.log('did join Socket to gameId again?: ', userActiveGameId);
+    // console.log('did join Socket to gameId again?: ', userActiveGameId);
     socket.join(userActiveGameId);
   }
 
@@ -142,7 +142,7 @@ export async function handlePlay(socket: Socket, userId: string) {
   // console.log('lobyGAme in handlePlay: ', allGames.lobyGame);
   if (!allGames.lobyGame) {
     const gameId = crypto.randomUUID();
-    console.log('--------- First Player Create a game, gameId: ', gameId);
+    // console.log('--------- First Player Create a game, gameId: ', gameId);
     setUserActiveGame(userId, gameId);
     addGameState(generateGameState(gameId, user, 'remote', null, null, null));
     // console.log('\ncurr time: ', allGames.games[gameId].startDate, '\n');
@@ -154,7 +154,7 @@ export async function handlePlay(socket: Socket, userId: string) {
     socket.join(gameId);
     allGames.lobyGame = gameId;
   } else {
-    console.log('---------- Second player joined!!');
+    // console.log('---------- Second player joined!!');
     const lobyGameId = allGames.lobyGame;
     const gameState = getGameState(lobyGameId);
     if (!gameState) return;
@@ -215,7 +215,7 @@ export async function handleRematch(
   // console.log('Recived rematch!!, gameId: ', gameId);
   // console.log('userId in handle rematch: ', userId);
   if (!playerRole) {
-    console.log('playerRole is null!!');
+    // console.log('playerRole is null!!');
     return;
   }
 
@@ -288,7 +288,7 @@ export function handleQuit(data: {
 }): void {
   // console.log('revived quit event!!, data: ', data);
   if (!data.gameId) {
-    console.log('gameId is Null');
+    // console.log('gameId is Null');
     return;
   }
 
@@ -333,13 +333,13 @@ export function handleQuit(data: {
     }
   }
   deleteGame(gameState.id);
-  console.log('player quit');
+  // console.log('player quit');
 }
 
 export function handleCancelMatching(data: { userId: string; gameId: string }) {
   const gameState = getGameState(data.gameId);
   // console.log('gameStatus in handleCancelMatching: ', gameState?.game.status);
-  console.log(' ---- called cancel Matching ??');
+  // console.log(' ---- called cancel Matching ??');
   // console.log(" -- data: ", data);
   if (
     gameState?.player1.id != data.userId ||
@@ -425,7 +425,7 @@ export function handleGetGameInviteMatch(
     let player;
     let playerRole;
     let opponent;
-    console.log('Indeed found gameInvite match!!');
+    // console.log('Indeed found gameInvite match!!');
     socket.join(gameState.id);
     if (gameState.player1.id === data.userId) {
       gameState.player1.ready = true;
@@ -451,7 +451,7 @@ export function handleGetGameInviteMatch(
       username: player.username,
     });
     if (gameState.player1.ready && gameState.player2.ready) {
-      console.log('Indeed started gameInvite match!!');
+      // console.log('Indeed started gameInvite match!!');
       setUserActiveGame(gameState.player1.id, gameState.id);
       setUserActiveGame(gameState.player2.id, gameState.id);
       gameState.game.status = 'playing';
@@ -467,7 +467,7 @@ export function handleLeaveGameInvite(data: {
 }) {
   const gameState = getGameState(data.gameId);
   if (!gameState) return;
-  console.log('Set user unready');
+  // console.log('Set user unready');
   if (data.userId === gameState.player1.id) gameState.player1.ready = false;
   else if (data.userId === gameState.player2.id)
     gameState.player2.ready = false;
