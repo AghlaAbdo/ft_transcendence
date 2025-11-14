@@ -21,7 +21,6 @@ export default function Leaderboard({
     widthMap.set(3, 50)
     const limit = 20
     const page = Number(resolvedSearchParams.page) || 1
-    // console.log("all players", allPlayers)
 
     const numOfPlayers = allPlayers.length
     const numOfPages = Math.ceil(numOfPlayers / limit)
