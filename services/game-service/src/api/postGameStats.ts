@@ -8,7 +8,7 @@ const postGameStats = async (gameState: IGameState) => {
   const loserId = winnerId === player1Id ? player2Id : player1Id;
 
   try {
-    if (!INTERNAL_API_KEY) return
+    if (!INTERNAL_API_KEY) return;
     const url = `${USER_SERVICE_HOST}/api/users/update-stats`;
     const response = await fetch(url, {
       method: 'POST',

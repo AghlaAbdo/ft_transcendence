@@ -241,7 +241,12 @@ export function handleReadyForMatch(
   // console.log('data in handleReady for Match: ', data);
   const tournament = getTournament(data.tournamentId);
   const gameState = getGameState(data.gameId);
-  if (!gameState || !tournament || (data.userId !== gameState.player1.id && data.userId !== gameState.player2.id )) {
+  if (
+    !gameState ||
+    !tournament ||
+    (data.userId !== gameState.player1.id &&
+      data.userId !== gameState.player2.id)
+  ) {
     console.log('!gameState || !tournament in handleReadyForMatch');
     socket.emit('notInMatch');
     return;
@@ -291,7 +296,11 @@ export function handleRequestTournMatchDetails(
   if (data.matchGameId) {
     const gameState = getGameState(data.matchGameId);
     // console.log('gameState is: ', gameState);
-    if (gameState && (data.userId === gameState.player1.id || data.userId === gameState.player2.id)) {
+    if (
+      gameState &&
+      (data.userId === gameState.player1.id ||
+        data.userId === gameState.player2.id)
+    ) {
       let player;
       let playerRole;
       let opponent;

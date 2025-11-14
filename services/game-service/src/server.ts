@@ -4,6 +4,7 @@ import { initializeSocketIO } from './socket/manager';
 import { initializeDb, getDb } from './database/db';
 import apiRouter from './api/router';
 import fs from 'fs';
+import { checkEnv } from './config/env';
 
 const logStream = fs.createWriteStream('./logs/game.log', { flags: 'a' });
 
@@ -61,6 +62,7 @@ fastify.get('/hello', async (request, reply) => {
 
 const start = async () => {
   try {
+    checkEnv();
     await fastify.listen({ port: PORT, host: '0.0.0.0' });
     console.log(`Server listening on port ${PORT}`);
   } catch (err) {

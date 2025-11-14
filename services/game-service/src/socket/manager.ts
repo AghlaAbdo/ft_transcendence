@@ -66,7 +66,7 @@ export function initializeSocketIO(server: http.Server): Server {
     if (!token) return next(new Error('NO_TOKEN'));
 
     try {
-      if (!JWT_SECRET) return next(new Error("No JWT_SECRET provided"));
+      if (!JWT_SECRET) return next(new Error('No JWT_SECRET provided'));
       const decoded = jwt.verify(token, JWT_SECRET) as {
         id: string;
         username: string;

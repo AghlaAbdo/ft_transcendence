@@ -7,6 +7,7 @@ import { logEvent } from '../server';
 import { JWT_SECRET } from '../config/env';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';
+import { USER_SERVICE_HOST, INTERNAL_API_KEY } from '../config/env';
 
 export interface WeekStats {
   week_number: number;
@@ -34,8 +35,8 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.get('/games', async (req, reply) => {
-    console.log("indeed in /games");
-    
+    console.log('indeed in /games');
+
     logEvent('info', 'game', 'api_request', { method: 'GET', path: '/games' });
     const db: DatabaseType = (fastify as any).db;
     try {
@@ -180,18 +181,18 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
   });
 
   fastify.post('/game-invite', async (req, rep) => {
-
-    console.log("jwt secret in auth: ", JWT_SECRET);
+    console.log('jwt secret in auth: ', JWT_SECRET);
     let userId: string;
-    if (!JWT_SECRET) return rep.code(400).send({ error: 'No JWT_SERCRET found' });;
+    if (!JWT_SECRET)
+      return rep.code(400).send({ error: 'No JWT_SERCRET found' });
     try {
       const cookies = cookie.parse(req.headers.cookie || '');
       const token = cookies.token;
-  
+
       if (!token) {
         return rep.code(401).send({ error: 'No token provided' });
       }
-  
+
       const decoded = jwt.verify(token, JWT_SECRET) as {
         id: string;
         username: string;
@@ -216,13 +217,21 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
         .send({ error: 'challengerId and opponentId are required!' });
       return;
     } else if (challengerId !== userId) {
-      rep
-        .status(405)
-        .send({ error: 'Not Allowed' });
+      rep.status(405).send({ error: 'Not Allowed' });
       return;
     }
     const challenger = await getPlayerInfo(challengerId);
     const opponent = await getPlayerInfo(opponentId);
+
+    const friendshipCheck = await checkFriendshipStatus(
+      Number(challengerId),
+      Number(opponentId),
+    );
+    if (!friendshipCheck.canChat) {
+      rep.status(405).send({ error: friendshipCheck.reason });
+      return;
+    }
+
     // console.log("challenger: ", challenger);
     // console.log("opponent: ", opponent);
     if (!challenger || !opponent) {
@@ -230,7 +239,39 @@ export default async function apiRouter(fastify: FastifyInstance, ops: any) {
       return;
     }
     const gameId = handleGameInvite(challenger, opponent);
-    console.log("did sent gam-invite sucess");
+    console.log('did sent gam-invite sucess');
     return { message: 'Created game!', gameId };
   });
+}
+
+async function checkFriendshipStatus(userId1: number, userId2: number) {
+  try {
+    const response = await fetch(
+      `${USER_SERVICE_HOST}/api/friends/friend_data_backend/${userId1}/${userId2}`,
+      {
+        headers: { 'x-internal-key': INTERNAL_API_KEY! },
+      },
+    );
+
+    if (!response.ok) {
+      return { canChat: false, reason: 'Failed to check friendship' };
+    }
+
+    const data = await response.json();
+
+    if (!data.status || data.friends.length === 0) {
+      return { canChat: false, reason: 'Users are not friends' };
+    }
+
+    const friendship = data.friends;
+
+    if (friendship.blocked_by) {
+      return { canChat: false, reason: 'User is blocked' };
+    }
+
+    return { canChat: true };
+  } catch (err) {
+    console.error('checkFriendshipStatus error:', err);
+    return { canChat: false, reason: 'Something went wrong' };
+  }
 }
