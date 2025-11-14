@@ -81,7 +81,7 @@ export async function getMessagesHandler(
 
 async function fetchUserFromService(ids: number[]) {
   if (!ids || ids.length === 0) {
-    return [];
+    return null;
   }
 
    const users = (
@@ -93,6 +93,8 @@ async function fetchUserFromService(ids: number[]) {
           });
           if (!res.ok) return null;
           const data = await res.json();
+          if (!data.user)
+              return null;
           return data.user;
         } catch (err) {
           console.error(`Error fetching user ${id}:`);
