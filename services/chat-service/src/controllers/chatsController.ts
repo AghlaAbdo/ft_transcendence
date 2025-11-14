@@ -27,8 +27,6 @@ export async function getMessagesHandler(
   const chatId = parseInt(req.params.chatId);
   const userid = (req as any).user.id;
   const otherUserId = parseInt(req.params.otherUserId);
-  console.log("other user id: ", otherUserId);
-  console.log("current user id :", userid);
 
   if (isNaN(chatId) || chatId <= 0) {
     return reply.status(400).send({ error: "Invalid chatId" });
@@ -52,7 +50,13 @@ export async function getMessagesHandler(
           .status(500)
           .send({ error: "Failed to fetch friendship data" });
       const data = await res.json();
-      if (data.status && data.friends.length === 0) {
+
+      if (!data.status)
+        return reply.status(403).send({
+          status: false,
+          error: "Failed to fetch friendship data",
+        });
+      if (data.status &&  data.friends.length === 0) {
         return reply.status(403).send({
           status: false,
           error: "Not authorized to view messages from non-friends",
@@ -62,7 +66,7 @@ export async function getMessagesHandler(
 
     const result = getMessages(db, chatId);
 
-    if (!result.status || !result.messages || result.messages.length === 0) {
+    if (!result.status || !result.messages) {
       return reply
         .status(404)
         .send({ error: "No messages found for this chat" });
@@ -99,8 +103,6 @@ async function fetchUserFromService(ids: number[]) {
     )
   ).filter(Boolean);
 
-  console.log('after user fetching');
-  
   return users;
 }
 
@@ -108,12 +110,8 @@ export async function getChatsHandler(
   req: FastifyRequest<{ Params: GetChatsParams }>,
   reply: FastifyReply
 ) {
-  console.log('before get user----------');
-  
   const userId = (req as any).user.id;
-  console.log('user id : ', userId);
-  
-  // const userId = 2;
+
   if (isNaN(userId) || userId <= 0) {
     return reply.status(401).send({ error: "Invalid userId" });
   }
@@ -198,15 +196,14 @@ export async function checkChatExistsHandler(
       LIMIT 1
     `);
 
-    const result = stmt.get(userId, friendId, friendId, userId) as
-      | { chat_id: number }
-      | undefined;
+    const result = stmt.get(userId, friendId, friendId, userId)
 
     if (result) {
       return reply.status(200).send({ exists: true, chat_id: result.chat_id });
     } else {
       return reply.status(200).send({ exists: false, chat_id: -1 });
     }
+
   } catch (err) {
     console.error("Error checking chat existence:", err);
     return reply.status(500).send({ error: "Failed to check chat" });

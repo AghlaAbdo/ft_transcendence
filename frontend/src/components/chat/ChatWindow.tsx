@@ -27,7 +27,7 @@ interface ChatWindowProps {
   other_User: Friend | null;
   onBackClick?: () => void;
   showBackButton?: boolean;
-  handle_block: (actor_id: number, target_id: number
+  handle_block: (target_id: number
   ) => void;
   blocker: boolean;
   blocked: boolean;

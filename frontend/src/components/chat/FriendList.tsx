@@ -3,6 +3,7 @@ import { Loader2, Search, X } from 'lucide-react';
 import { User } from '@/hooks/useAuth';
 import FriendCard from './FriendCard';
 import { useDebounce } from 'use-debounce';
+import { toast } from 'sonner';
 
 interface FriendListProps {
   user: User | null;
@@ -51,22 +52,28 @@ export const FriendList = ({ onClose, onchatselected, user }: FriendListProps) =
     fetchFriends();
   }, [debouncedSearchTerm]);
 
-  const handleFriendSelect = async (selectedFriend: Friend
-  ) => {
+  const handleFriendSelect = async (selectedFriend: Friend) => {
     if (!user || !selectedFriend) return;
     try {
-      const fetchChatExistense = await fetch(
-        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${selectedFriend.id}`
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_CHAT_API}/check/${selectedFriend.id}`,
+        { credentials: 'include' }
       );
-      const data = await fetchChatExistense.json();
+      
+      if (!response.ok) {
+        throw new Error("Failed to check chat");
+      }
+
+      const data = await response.json();
       if (data.exists) {
         onchatselected(data.chat_id, selectedFriend.id);
       } else {
         onchatselected(-1, selectedFriend.id);
       }
       onClose();
-    } catch {
-      console.error('Failed to check chat:', error);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong';
+      toast.error(message);
     }
   };
 

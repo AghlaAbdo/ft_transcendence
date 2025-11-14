@@ -2,7 +2,7 @@ import { Eye, Gamepad2, Ban} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSocketStore } from '@/store/useNotificationSocket';
 type chat_options_props = {
-  handle_block : (actor_id: number, target_id: number) => void;
+  handle_block : (target_id: number) => void;
   onClose: () => void;
   _other_user: Friend;
   user: number;
@@ -46,7 +46,7 @@ const UserActionsMenu = ({ onClose, _other_user, user, handle_block, blocker, bl
   };
 
   const handleBlock = () => {
-    handle_block(user, _other_user.id);
+    handle_block(_other_user.id);
     onClose();
   };
 

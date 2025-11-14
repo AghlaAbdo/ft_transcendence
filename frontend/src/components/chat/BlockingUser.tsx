@@ -9,12 +9,9 @@ export const BlockingUserInput = ({ onUnblock }: BlockingUserProps) => {
   const handleUnblock = () => {
       try {
         onUnblock();
-        toast.success('User has been unblocked');
       } catch (err) {
         toast.error('Failed to unblock user');
       }
-      // placeholder behaviour if no handler provided
-    //   toast('Unblock action not implemented', { duration: 3000 });
   };
 
   return (
