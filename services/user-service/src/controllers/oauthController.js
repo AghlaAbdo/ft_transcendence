@@ -20,10 +20,10 @@ function getUniqueUsername(db, baseUsername) {
   }
 
 const handleGoogleCallback = async (request, reply) => {
-
+   const resUrl = process.env.FRONTEND_URL || 'https://localhost:8080';
    const code = request.query.code;
    if (!code) {
-     return reply.redirect('https://localhost:8080/login');
+     return reply.redirect(`${resUrl}/login`);
    }
 
    const tokenData = new URLSearchParams({
@@ -44,7 +44,7 @@ const handleGoogleCallback = async (request, reply) => {
         });
         if (!tokenResponse.ok) {
   
-            return reply.redirect('https://localhost:8080/login?error=token_failed');
+            return reply.redirect(`${resUrl}/login?error=token_failed`);
         }
         const data = await tokenResponse.json();
 
@@ -58,7 +58,7 @@ const handleGoogleCallback = async (request, reply) => {
         });
 
         if (!userInfo.ok) {
-            return reply.redirect('https://localhost:8080/login');
+            return reply.redirect(`${resUrl}/login`);
         }
 
         const userInfoData = await userInfo.json();
@@ -117,14 +117,14 @@ const handleGoogleCallback = async (request, reply) => {
         request.server.setAuthCookie(reply, token);
          
         logEvent("info", "user", "user_login", {result: "success", provider: "google"})
-        return reply.redirect('https://localhost:8080/success');
+        return reply.redirect(`${resUrl}/success`);
         
     } catch (error) {
         console.error('An error occurred:', error);
         request.log.error(error);
 
             logEvent("info", "user", "user_login", {result: "failure", provider: "google"})
-        return reply.redirect('https://localhost:8080/login');
+        return reply.redirect(`${resUrl}/login`);
     }
 }
 
