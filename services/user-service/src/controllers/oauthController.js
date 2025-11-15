@@ -6,6 +6,19 @@ const initiateGoogleLogin = async (request, reply) => {
     reply.redirect(authURL);
 }
 
+function getUniqueUsername(db, baseUsername) {
+    let username = baseUsername;
+    let counter = 1;
+    
+    // Check if username exists
+    while (userModel.getUserByUsername(db, username)) {
+      username = `${baseUsername}${counter}`;
+      counter++;
+    }
+    
+    return username;
+  }
+
 const handleGoogleCallback = async (request, reply) => {
 
    const code = request.query.code;
@@ -53,10 +66,14 @@ const handleGoogleCallback = async (request, reply) => {
         const db = request.server.db;
 
         let user = userModel.getUserByEmail(db, userInfoData.email);
-        const username = userInfoData.email
+        let username = userInfoData.email
                                     .split('@')[0]
                                     .replace(/[^a-zA-Z0-9]/g, '')
                                     .toLowerCase();
+        
+        username = getUniqueUsername(db, username);    
+        
+        console.log("unique usename: ", username);
         
         if (!user) {
             const userdataDb = {
@@ -98,13 +115,6 @@ const handleGoogleCallback = async (request, reply) => {
         });
 
         request.server.setAuthCookie(reply, token);
-        // reply.setCookie('token', token, {
-        //     httpOnly: true,
-        //     secure: process.env.NODE_ENV === 'production', // Must be false for localhost // false on dev , true on prod
-        //     sameSite: 'lax', // Must be 'lax' for OAuth redirects
-        //     path: '/',
-        //     maxAge: 7 * 24 * 60 * 60
-        // });
          
         logEvent("info", "user", "user_login", {result: "success", provider: "google"})
         return reply.redirect('https://localhost:8080/success');

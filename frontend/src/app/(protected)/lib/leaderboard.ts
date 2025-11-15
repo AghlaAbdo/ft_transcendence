@@ -2,7 +2,7 @@ import { Player } from "@/constants/leaderboard";
 
 export async function get_all_leaderboard(): Promise<Player[]> {
     try {
-        const response = await fetch('/api/users');
+        const response = await fetch('/api/users/');
         if (!response.ok) throw new Error('Failure fetching leaderboard!')
         const rawData = await response.json()
         const players = rawData.users
