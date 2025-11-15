@@ -94,7 +94,6 @@ export function initSocket(server: any, db: Database.Database) {
           }
         );
         const existingChatId = get_existing_chat(db, target_id, actor_id);
-        console.log('unblock chat_id: ' , existingChatId);
         
         if (!existingChatId)
           return socket.emit("error", { message: "no chat history between users" });
