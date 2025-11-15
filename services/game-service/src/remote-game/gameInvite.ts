@@ -19,7 +19,7 @@ export function handleGameInvite(challenger: IPlayer, opponent: IPlayer) {
   addGameState(gameState);
   // console.log('Created Game: ', gameId);
   setTimeout(() => {
-    if (!gameState.player1.ready || !gameState.player2.ready) {
+    if (gameState.game.status !== 'ended' && (!gameState.player1.ready || !gameState.player2.ready)) {
       // console.log('delete game: ', gameId);
       // console.log("Because Players didn't join");
       const io = getIoInstance();
