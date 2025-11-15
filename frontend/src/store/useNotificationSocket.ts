@@ -44,7 +44,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       };
       addNotification(data);
     incrementUnread();
-      toast.info('you have new notification !');
       if (data.type === 'game_invite') {
         setTimeout(() => {
           markOneNotificationsAsRead_game(data.id);

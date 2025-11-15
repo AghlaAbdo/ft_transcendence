@@ -13,7 +13,6 @@ const JWT_SECRET   = process.env.JWT_SECRET;
 import notoficationModel from "./models/notoficationModel.js";
 
 const onlineUsers = new Map();
-const disconnectTimers = new Map();
 
 const handleConnection = (fastify, socket, data) => {
   const user__id = parseInt(data.id);
@@ -21,13 +20,9 @@ const handleConnection = (fastify, socket, data) => {
     console.log("Invalid user ID — disconnecting socket");
     return socket.disconnect();
   }
-
+  
   socket.userId = user__id;
 
-  if (disconnectTimers.has(user__id)) {
-    clearTimeout(disconnectTimers.get(user__id));
-    disconnectTimers.delete(user__id);
-  }
 
   if (!onlineUsers.has(user__id)) {
     onlineUsers.set(user__id, new Set());
@@ -76,7 +71,7 @@ const handleConnection = (fastify, socket, data) => {
       const receiverSockets = onlineUsers.get(actor_id);
         if (receiverSockets) 
           {
-          receiverSockets.forEach((receiversocket) => {
+            receiverSockets.forEach((receiversocket) => {
             receiversocket.emit("Notification", new_notification);
           });
         }
@@ -87,18 +82,19 @@ const handleConnection = (fastify, socket, data) => {
   });
 
   socket.on("disconnect", () => {
-    const timer = setTimeout(() => {
-      if (!onlineUsers.has(user__id)) {
-        fastify.db
-          .prepare(`UPDATE USERS SET online_status = 0 WHERE id = ?`)
-          .run(user__id);
-        console.log(`User ${user__id} disconnected`);
+    if (socket.userId) {
+      const userSockets = onlineUsers.get(socket.userId);
+      if (userSockets) {
+        userSockets.delete(socket);
+        if (userSockets.size === 0) {
+          onlineUsers.delete(socket.userId);
+          fastify.db
+            .prepare(`UPDATE USERS SET online_status = 0 WHERE id = ?`)
+            .run(socket.userId);
+          console.log(`User ${socket.userId} has disconnected.`);
+        }
       }
-      disconnectTimers.delete(user__id);
-    }, 2000); // 2 second delay
-
-    disconnectTimers.set(user__id, timer);
-    onlineUsers.delete(user__id);
+    }
   });
 };
 
