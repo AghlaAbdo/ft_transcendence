@@ -19,7 +19,7 @@ export default function Leaderboard({
     widthMap.set(1, 30)
     widthMap.set(2, 30)
     widthMap.set(3, 50)
-    const limit = 20
+    const limit = 25
     const page = Number(resolvedSearchParams.page) || 1
 
     const numOfPlayers = allPlayers.length
