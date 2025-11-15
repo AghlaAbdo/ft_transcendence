@@ -33,6 +33,7 @@ interface Friend {
 export default function ChatPage() {
   const [conv_, set_conv] = useState<conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [loading, setloaing] = useState<boolean>(true);
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [showChatList, setShowChatList] = useState(true);
@@ -57,6 +58,9 @@ export default function ChatPage() {
   }, [selectedChatId]);
 
   useEffect(() => {
+    setblocked(false);
+    setblocker(false);
+    setloaing(true);
     const fetchingmessages = async () => {
       if (user && selectedChatId && other_user_id) {
         try {
@@ -66,7 +70,7 @@ export default function ChatPage() {
           );
           const userData = await userResponse.json();
           if (!userData) {
-            toast.error("some thing went wrong");
+            toast.error('some thing went wrong');
             return;
           }
           setOtherUser(userData.friends);
@@ -82,7 +86,6 @@ export default function ChatPage() {
             if (data.status) {
               set_conv(data.messages);
             }
-
           }
         } catch (error) {
           console.error('failed because of: ', error);
@@ -90,6 +93,7 @@ export default function ChatPage() {
       }
     };
     fetchingmessages();
+    setloaing(false);
   }, [other_user_id, selectedChatId, user]);
 
   const socketRef = useRef<Socket | null>(null);
@@ -125,22 +129,26 @@ export default function ChatPage() {
     });
 
     socket.on('block', (data) => {
-      const { actor_id, target_id } = data;
-      if (actor_id === user.id) {
-        setblocker(true);
-        setblocked(false);
-      }
-      if (target_id === user.id) {
-        setblocked(true);
-        setblocker(false);
+      const { actor_id, target_id, existingChatId } = data;
+      if (existingChatId == selectedChatIdRef.current) {
+        if (actor_id === user.id) {
+          setblocker(true);
+          setblocked(false);
+        }
+        if (target_id === user.id) {
+          setblocked(true);
+          setblocker(false);
+        }
       }
     });
 
     socket.on('unblock', (data) => {
-      const { actor_id, target_id } = data;
-      if (actor_id === user.id || target_id === user.id) {
-        setblocker(false);
-        setblocked(false);
+      const { actor_id, target_id, existingChatId } = data;
+      if (existingChatId == selectedChatIdRef.current) {
+        if (actor_id === user.id || target_id === user.id) {
+          setblocker(false);
+          setblocked(false);
+        }
       }
     });
 
@@ -207,7 +215,7 @@ export default function ChatPage() {
             conv={conv_}
           />
           <div className='flex-1 bg-[#021024] rounded-[20px] flex flex-col my-2'>
-            {
+            {!loading && (
               <ChatWindow
                 blocker={blocker}
                 blocked={blocked}
@@ -217,18 +225,20 @@ export default function ChatPage() {
                 other_User={otherUser}
                 handle_block={handle_block}
               />
-            }
-            {selectedChatId && otherUser && !blocker && !blocked && (
-              <MessageInput onSendMessage={handleSendMessage} />
             )}
-            {selectedChatId && otherUser && blocker && !blocked && (
+            {!loading && selectedChatId && otherUser && blocker && !blocked && (
               <BlockingUserInput
                 onUnblock={() => handle_unblock(otherUser.id)}
               />
             )}
-            {selectedChatId && otherUser && blocked && !blocker && (
+            {!loading && selectedChatId && otherUser && blocked && !blocker && (
               <BlockedUserInput />
             )}
+            {!loading &&
+              selectedChatId &&
+              otherUser &&
+              !blocker &&
+              !blocked && <MessageInput onSendMessage={handleSendMessage} />}
           </div>
         </>
       ) : (
@@ -244,7 +254,7 @@ export default function ChatPage() {
             </div>
           ) : (
             <div className='w-full bg-[#021024] rounded-[20px] flex flex-col my-2'>
-              {
+              {!loading && (
                 <ChatWindow
                   blocker={blocker}
                   blocked={blocked}
@@ -256,18 +266,26 @@ export default function ChatPage() {
                   showBackButton={true}
                   handle_block={handle_block}
                 />
-              }
-              {selectedChatId && otherUser && !blocked && !blocker && (
-                <MessageInput onSendMessage={handleSendMessage} />
               )}
-              {selectedChatId && otherUser && blocker && !blocked && (
-                <BlockingUserInput
-                  onUnblock={() => handle_unblock(otherUser.id)}
-                />
-              )}
-              {selectedChatId && otherUser && blocked && !blocker && (
-                <BlockedUserInput />
-              )}
+              {!loading &&
+                selectedChatId &&
+                otherUser &&
+                blocker &&
+                !blocked && (
+                  <BlockingUserInput
+                    onUnblock={() => handle_unblock(otherUser.id)}
+                  />
+                )}
+              {!loading &&
+                selectedChatId &&
+                otherUser &&
+                blocked &&
+                !blocker && <BlockedUserInput />}
+              {!loading &&
+                selectedChatId &&
+                otherUser &&
+                !blocked &&
+                !blocker && <MessageInput onSendMessage={handleSendMessage} />}
             </div>
           )}
         </>

@@ -56,16 +56,19 @@ export function initSocket(server: any, db: Database.Database) {
 
         if (!data.status)
             return socket.emit("error", { message: data.message});
+        const existingChatId = get_existing_chat(db, target_id, actor_id);
+        if (!existingChatId)
+          return socket.emit("error", { message: "no chat history between users" }); 
         const sendersockets = onlineUsers.get(actor_id);
         if (sendersockets) {
           sendersockets.forEach((s) => {
-            s.emit("block", { actor_id, target_id });
+            s.emit("block", { actor_id, target_id, existingChatId });
           });
         }
         const receiverSockets = onlineUsers.get(target_id);
         if (receiverSockets) {
           receiverSockets.forEach((receiversocket) => {
-            receiversocket.emit("block", { actor_id, target_id });
+            receiversocket.emit("block", { actor_id, target_id, existingChatId});
           });
         }
       } catch (err) {
@@ -90,7 +93,11 @@ export function initSocket(server: any, db: Database.Database) {
             body: JSON.stringify({ actor_id, target_id }),
           }
         );
-
+        const existingChatId = get_existing_chat(db, target_id, actor_id);
+        console.log('unblock chat_id: ' , existingChatId);
+        
+        if (!existingChatId)
+          return socket.emit("error", { message: "no chat history between users" });
         const data = await response.json();
         if (!response.ok) 
             return socket.emit("error", { message: "can not block user" });
@@ -101,14 +108,14 @@ export function initSocket(server: any, db: Database.Database) {
         const sendersockets = onlineUsers.get(actor_id);
         if (sendersockets) {
           sendersockets.forEach((s) => {
-            s.emit("unblock", { actor_id, target_id });
+            s.emit("unblock", { actor_id, target_id, existingChatId });
           });
         }
 
         const receiverSockets = onlineUsers.get(target_id);
         if (receiverSockets) {
           receiverSockets.forEach((receiversocket) => {
-            receiversocket.emit("unblock", { actor_id, target_id });
+            receiversocket.emit("unblock", { actor_id, target_id , existingChatId});
           });
         }
 
