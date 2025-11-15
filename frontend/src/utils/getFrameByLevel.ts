@@ -6,7 +6,7 @@ export const getFrameByLevel = (level: number) : string => {
     const framesPerRank = 3;       
     const levelPerFrame = 5;      
 
-    console.log("player level: ", level);
+    // console.log("player level: ", level);
     if (level <= 0) level = 1;
 
     const index = Math.floor((level - 1) / levelPerFrame);
@@ -15,7 +15,7 @@ export const getFrameByLevel = (level: number) : string => {
 
     const rankName = ranks[rankIndex] || ranks[ranks.length - 1];
     const framePath = `/frames/${rankName}${frameNumber}.png`;
-    console.log("frame path: ", framePath);
+    // console.log("frame path: ", framePath);
 
     return framePath; 
 }

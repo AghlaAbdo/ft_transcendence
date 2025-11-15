@@ -29,7 +29,7 @@ function insert_notification(db, user_id, actor_id, type, game_link) {
     const notif_id = info.lastInsertRowid;
     const selectStmt = db.prepare("SELECT * FROM notifications WHERE id = ?");
     const last_notif = selectStmt.get(notif_id);
-    console.log("last notification insert: ", last_notif);
+    // console.log("last notification insert: ", last_notif);
     return last_notif;
   }
   const insertStmt = db.prepare(`
@@ -40,7 +40,7 @@ function insert_notification(db, user_id, actor_id, type, game_link) {
   const notif_id = info.lastInsertRowid;
   const selectStmt = db.prepare("SELECT * FROM notifications WHERE id = ?");
   const last_notif = selectStmt.get(notif_id);
-  console.log("last notification insert: ", last_notif);
+  // console.log("last notification insert: ", last_notif);
 
   return last_notif;
 }

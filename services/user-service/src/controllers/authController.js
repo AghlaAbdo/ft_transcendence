@@ -188,7 +188,7 @@ const verifyEmail = async (request, reply) => {
     
     try {
         const { email, token } = request.body;
-        console.log(email);
+        // console.log(email);
         
         if (!email || !token)
             throw new Error('Email and verification token are required');
@@ -371,11 +371,11 @@ const setup2fa = async (req, rep) => {
 try {
     const db = req.server.db;
 
-    console.log('allo from 2fa backend');
+    // console.log('allo from 2fa backend');
     const userId = req.user?.id; // Get from session/JWT
     const userEmail = req.user?.email;
-    console.log('user id: ', userId);
-    console.log("useremail: ", userEmail);
+    // console.log('user id: ', userId);
+    // console.log("useremail: ", userEmail);
     
     
     if (!userId || !userEmail) {
@@ -383,7 +383,7 @@ try {
     }
 
     const setup = await generateSecret(userId, userEmail);
-    console.log('allo from setup 2fa');
+    // console.log('allo from setup 2fa');
 
     db.prepare(`
       UPDATE users 
@@ -408,8 +408,8 @@ try {
     const userId = req.user?.id;
     const { token } = req.body;
 
-    console.log('user:', userId);
-    console.log('token:', token);
+    // console.log('user:', userId);
+    // console.log('token:', token);
     if (!userId || !token) {
       return rep.status(400).send({ error: 'Missing required fields' });
     }

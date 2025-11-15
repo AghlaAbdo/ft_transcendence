@@ -18,7 +18,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth >= 768 && !hideHeaderSidebar) {
-        console.log("sethideSidebar: false");
+        // console.log("sethideSidebar: false");
         setHideSidebar(false);
       } else  {
         setHideSidebar(true);

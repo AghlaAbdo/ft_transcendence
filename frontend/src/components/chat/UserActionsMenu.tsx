@@ -26,14 +26,14 @@ const UserActionsMenu = ({ onClose, _other_user, user, handle_block, blocker, bl
   const handleInviteToGame = async () => {
     if (!socket)
         return;
-    console.log('Invite to game clicked');
+    // console.log('Invite to game clicked');
     onClose();
 
     const response = await fetch(`/api/game/game-invite?challengerId=${user}&opponentId=${_other_user.id}`, {
       method: 'POST'
     });
     const data = await response.json();
-    console.log("recived data in gameInvite: ", data);
+    // console.log("recived data in gameInvite: ", data);
     if (data && data.gameId) {
       socket.emit("Notification", {
         user_id: user,

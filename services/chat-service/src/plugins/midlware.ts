@@ -26,7 +26,6 @@ const authPlugin = async (fastify: any, options: any) => {
                 }
             });
             if (!response.ok) {
-                fastify.clearAuthCookie(reply);
                 return reply.code(401).send({ 
                     status: false, 
                     message: 'Unauthorized - Invalid or expired token'
@@ -36,7 +35,6 @@ const authPlugin = async (fastify: any, options: any) => {
             const userData = await response.json();
             
             if (!userData || !userData.user) {
-                fastify.clearAuthCookie(reply);
                 return reply.code(400).send({ 
                     status: false, 
                     message: 'User not found'
@@ -45,7 +43,6 @@ const authPlugin = async (fastify: any, options: any) => {
             request.user = userData.user;
 
         } catch (error: any) {
-            fastify.clearAuthCookie(reply);
             return reply.code(400).send({
                 status: false, 
                 error: error.message, 

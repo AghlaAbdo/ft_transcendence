@@ -1,7 +1,7 @@
 export const markAllNotificationsAsRead_friend = async (userId: number) => {
 
   try {
-    console.log('marking all notifications as read');
+    // console.log('marking all notifications as read');
     const response = await fetch('/api/users/notifications/friend_request/mark-as-read', {
       method: 'PUT',
       headers: {

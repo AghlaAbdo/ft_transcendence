@@ -36,8 +36,8 @@ export function initSocket(server: any, db: Database.Database) {
       if (!actor_id || !target_id)
         return socket.emit("error", { message: "Invalid data" });
       try {
-        console.log("actor_id: ", actor_id);
-        console.log("target_id: ", target_id);
+        // console.log("actor_id: ", actor_id);
+        // console.log("target_id: ", target_id);
         const response = await fetch(
           `${config.userServiceUrl}/api/friends/block`, // front
           {

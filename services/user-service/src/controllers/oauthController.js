@@ -73,7 +73,7 @@ const handleGoogleCallback = async (request, reply) => {
         
         username = getUniqueUsername(db, username);    
         
-        console.log("unique usename: ", username);
+        // console.log("unique usename: ", username);
         
         if (!user) {
             const userdataDb = {

@@ -42,7 +42,7 @@ export default function UserCard({ _user, onClose }: UserCardProps) {
         body: JSON.stringify({ friend_id: user.id }),
       });
       
-      console.log('friend_id :', user.id);
+      // console.log('friend_id :', user.id);
       if (response.ok) {
         toast.success(`Friend request sent to ${user.username}`);
         send_friend_request(_user.id);

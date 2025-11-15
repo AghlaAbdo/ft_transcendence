@@ -157,7 +157,7 @@ const removeFriendRequest = (db, { user_id, friend_id }) => {
 };
 
 const blockFriend = (db, { currentUserId, targetUserId }) => {
-    console.log('cure: ', currentUserId, ", tage: ", targetUserId);
+    // console.log('cure: ', currentUserId, ", tage: ", targetUserId);
     
     const checkExisting = db.prepare(`
             SELECT id, status, blocked_by 
@@ -191,7 +191,7 @@ const blockFriend = (db, { currentUserId, targetUserId }) => {
 
 
 const unblockFriend = (db, { currentUserId, targetUserId }) => {
-    console.log('cure: ', currentUserId, ", tage: ", targetUserId);
+    // console.log('cure: ', currentUserId, ", tage: ", targetUserId);
     const checkExisting = db.prepare(`
             SELECT id, status, blocked_by 
             FROM FRIENDS 

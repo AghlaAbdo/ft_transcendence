@@ -373,11 +373,11 @@ const unblockFriend = async (request, reply) => {
   // console.log('hereeee niga-------------------: ');
   try {
     const { actor_id, target_id } = request.body;
-    console.log("------------------>", actor_id, target_id);
+    // console.log("------------------>", actor_id, target_id);
     const currentUserId = actor_id;
     const targetUserId = target_id;
 
-    console.log("------>", currentUserId, targetUserId);
+    // console.log("------>", currentUserId, targetUserId);
     if (!currentUserId || !targetUserId) {
       return reply.code(400).send({
         status: false,

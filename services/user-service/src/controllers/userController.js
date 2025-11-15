@@ -324,7 +324,7 @@ const twoFactorAuth = async (request, reply) => {
 
         if (enable) {
             const secret = authenticator.generateSecret();
-            console.log("secret: ", secret);
+            // console.log("secret: ", secret);
 
             db.prepare(`
                 UPDATE USERS
