@@ -390,7 +390,6 @@ try {
       SET totp_secret = ? 
       WHERE id = ?
     `).run(setup.secret, userId);
-
     return {
       qrCode: setup.qrCode,
       manualEntryKey: setup.manualEntryKey,
