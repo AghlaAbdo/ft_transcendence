@@ -51,6 +51,14 @@ const authPlugin = async (fastify, options) => {
                 fastify.clearAuthCookie(reply);
                 return reply.code(401).send({ status: false, message: 'User no longer exists' });
             }
+            
+            if (!user.isAccountVerified) {
+                fastify.clearAuthCookie(reply);
+                return reply.code(403).send({
+                    status: false,
+                    message: 'Email not verified'
+                });
+            }
 
             request.user = user;
 
