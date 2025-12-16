@@ -42,15 +42,14 @@ The application follows a microservices architecture with containerized services
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                      Nginx (Reverse Proxy)              │
-│                    (HTTPS, Port 443)                     │
+│                    (HTTPS, Port 443)                    │
 └────────────┬────────────────────────────────────────────┘
              │
-    ┌────────┴────────┬──────────────┬──────────────┐
-    │                 │              │              │
+    ┌────────┴───────┬─────────────┬─────────────┐
+    │                │             │             │
 ┌───▼────┐    ┌──────▼─────┐  ┌────▼────────┐  ┌─▼──────────┐
-│ Next.js │    │ Game Svc   │  │  User Svc   │  │ Chat Svc   │
-│Frontend │    │(Socket.io) │  │ (REST API)  │  │(Socket.io) │
-└─────────┘    └────────────┘  └─────────────┘  └────────────┘
+│ Next.js│    │ Game Svc   │  │  User Svc   │  │ Chat Svc   │
+└────────┘    └────────────┘  └─────────────┘  └────────────┘
 ```
 
 ### Core Services
